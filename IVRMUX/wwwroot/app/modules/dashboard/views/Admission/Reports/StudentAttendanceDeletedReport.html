@@ -1,0 +1,358 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="LoadData();" novalidate name="myForm">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Deleted Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="well text-center" ng-init="obj.type='All'">
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="obj.type" value="All" name="all" ng-change="OnChangeFlag();">
+                            <span class="lbl padding-8">All</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="obj.type" value="Indi" name="all" ng-change="OnChangeFlag();">
+                            <span class="lbl padding-8">Individual</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMAY_Id" ng-change="OnAttendanceChangeYear()" name="acd_year" required>
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="academic in yearDropdown" ng-selected="{{academic.asmaY_Id == ASMAY_Id}}" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required" style="color:red">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMCL_Id" name="cls" ng-change="OnAttendanceChangeClass()" ng-required="obj.type!='All'"
+                                        ng-disabled="obj.type=='All'">
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="class in classDropdown" value="{{class.asmcL_Id}}">{{class.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                    <div ng-message="required" style="color:red">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMS_Id" name="sec" ng-required="obj.type!='All'"
+                                        ng-disabled="obj.type=='All'" ng-change="OnAttendanceChangeSection()">
+                                    <option value="">Select Section</option>
+                                    <option value="0">All
+                                    <option ng-repeat="section in sectionDropdown" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                    <div ng-message="required" style="color:red">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="obj.fromdate" onkeydown="return false" name="from_date" id="FromDate" ng-change='setTodate(obj)'
+                                               md-min-date="minDatef" md-max-date="maxDatef" md-placeholder="Enter date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.from_date)" ng-messages="myForm.from_date.$error">
+                                    <div ng-message="required" style="color:red">Select From Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="obj.todate" onkeydown="return false" ng-change='setTodate1(obj)' name="to_date" id="todate"
+                                               md-min-date="minDatet" md-max-date="maxDatet" md-placeholder="Enter date" ng-disabled="obj.fromdate==null"
+                                               required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.to_date)" ng-messages="myForm.to_date.$error">
+                                    <div ng-message="required" style="color:red">Select To Date</div>
+                                </div>
+                            </div>
+                            <span style="color:red;">{{errMessage}}</span>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="GetAttendanceDeletedReport(obj);">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#table')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-warn" ng-disabled="excel_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="excel_flag==false">
+        <div class="box-header with-border">
+            <h3 class="box-title">Attendance Deleted Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue_att_del" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div style="overflow-x:scroll;width:100%;">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Attendance Details</th>
+                                        <th>Attendance Date</th>
+                                        <th>Entry Date</th>
+                                        <th>Subject</th>
+                                        <th>Period</th>
+                                        <th>Entry By</th>
+                                        <th>Deleted By</th>
+                                        <th>Deleted Date</th>
+                                    </tr>
+                                </thead>
+                                <tr dir-paginate="user in filterValue2 = (newarray | filter : searchValue_att_del)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">
+                                        <div class="row">
+                                            <label class="col-sm-12">
+                                                <b>Academic Year : {{user.ASMAY_Year}}</b>
+                                            </label>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-sm-12">
+                                                <b>Class : {{user.ASMCL_ClassName}}</b>
+                                            </label>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-sm-12">
+                                                <b>Section : {{user.ASMC_SectionName}}</b>
+                                            </label>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-sm-12">
+                                                <b>Attendance Type : {{user.ASA_Att_Type}}</b>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td class="text-left">
+                                        <div class="row">
+                                            <label class="col-sm-12">
+                                                <b>From Date : {{user.ASA_FromDate}}</b>
+                                            </label>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-sm-12">
+                                                <b>To Date : {{user.ASA_Todate}}</b>
+                                            </label>
+                                        </div>                                       
+                                    </td>
+                                    <td class="text-center">{{user.ASA_Entry_DateTime}}</td>
+                                    <td class="text-left">{{user.ISMS_SubjectName}}</td>
+                                    <td class="text-left">{{user.TTMP_PeriodName}}</td>
+                                    <td class="text-left">{{user.EmpName}}</td>
+                                    <td class="text-left">{{user.DeletedBy}}</td>
+                                    <td class="text-center">{{user.DeletedDate}}</td>
+                                </tr>
+                            </table>
+                            <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div ng-show="dfdsfdsfdsfsd" id="printsection">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3 class="text-center"> Attendance Deleted Report - From : {{obj.fromdate | date:'dd/MM/yyyy'}} To - {{obj.todate | date:'dd/MM/yyyy'}} </h3>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No</th>
+                                <th>Attendance Details</th>
+                                <th>Attendance Date</th>
+                                <th>Entry Date</th>
+                                <th>Subject</th>
+                                <th>Period</th>
+                                <th>Entry By</th>
+                                <th>Deleted By</th>
+                                <th>Deleted Date</th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="user in newarray">
+                            <td class="text-center">{{ $index+1}}</td>
+                            <td class="text-left">
+                                <div class="row">
+                                    <label class="col-sm-12">
+                                        <b>Academic Year : {{user.ASMAY_Year}}</b>
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <label class="col-sm-12">
+                                        <b>Class : {{user.ASMCL_ClassName}}</b>
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <label class="col-sm-12">
+                                        <b>Section : {{user.ASMC_SectionName}}</b>
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <label class="col-sm-12">
+                                        <b>Attendance Type : {{user.ASA_Att_Type}}</b>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="text-left">
+                                <div class="row">
+                                    <label class="col-sm-12">
+                                        <b>From Date : {{user.ASA_FromDate}}</b>
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <label class="col-sm-12">
+                                        <b>To Date : {{user.ASA_Todate}}</b>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="text-center">{{user.ASA_Entry_DateTime}}</td>
+                            <td class="text-left">{{user.ISMS_SubjectName}}</td>
+                            <td class="text-left">{{user.TTMP_PeriodName}}</td>
+                            <td class="text-left">{{user.EmpName}}</td>
+                            <td class="text-left">{{user.DeletedBy}}</td>
+                            <td class="text-center">{{user.DeletedDate}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="dfdsfdsfdsfsdd" id="excelid">
+        <div class="row">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="10" style="text-align:center"><b>Attendance Deleted Report - From : {{obj.fromdate | date:'dd/MM/yyyy'}} To - {{obj.todate | date:'dd/MM/yyyy'}}</b></td>
+                </tr>
+            </table>
+            <table>
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th>Sl.No</th>
+                        <th>Attendance Details</th>
+                        <th>Attendance Date</th>
+                        <th>Entry Date</th>
+                        <th>Subject</th>
+                        <th>Period</th>
+                        <th>Entry By</th>
+                        <th>Deleted By</th>
+                        <th>Deleted Date</th>
+                    </tr>
+                </thead>
+                <tr style="border:0.5px solid black" ng-repeat="user in newarray">
+                    <td class="text-center">{{ $index+1}}</td>
+                    <td class="text-left">
+                        <div class="row">
+                            <label class="col-sm-12">
+                                <b>Academic Year : {{user.ASMAY_Year}}</b>
+                            </label>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-12">
+                                <b>Class : {{user.ASMCL_ClassName}}</b>
+                            </label>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-12">
+                                <b>Section : {{user.ASMC_SectionName}}</b>
+                            </label>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-12">
+                                <b>Attendance Type : {{user.ASA_Att_Type}}</b>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="text-left">
+                        <div class="row">
+                            <label class="col-sm-12">
+                                <b>From Date : {{user.ASA_FromDate}}</b>
+                            </label>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-12">
+                                <b>To Date : {{user.ASA_Todate}}</b>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="text-center">{{user.ASA_Entry_DateTime}}</td>
+                    <td class="text-left">{{user.ISMS_SubjectName}}</td>
+                    <td class="text-left">{{user.TTMP_PeriodName}}</td>
+                    <td class="text-left">{{user.EmpName}}</td>
+                    <td class="text-left">{{user.DeletedBy}}</td>
+                    <td class="text-center">{{user.DeletedDate}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</section>

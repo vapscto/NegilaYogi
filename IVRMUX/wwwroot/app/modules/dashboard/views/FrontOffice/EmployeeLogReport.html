@@ -1,0 +1,534 @@
+﻿<style>
+
+    .lateinearly {
+        background-color: #c535359c;
+        color: white;
+    }
+</style>
+
+
+<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary" ng-app="MyModule">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    Employee Log Report
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <form class="form-horizontal" role="form" name="myForm" data-ng-submit="GetReport()" novalidate>
+                <div class="box-body">
+                    <div class="col-sm-12">
+
+                        <div class="well text-center" data-ng-init="allind ='All'">
+                            <label class="radio-inline">
+                                <input type="radio" value="All" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="Indi" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="chktype" ng-model="usercheck" data-ng-click="all_check()">
+                                    <span class="lbl padding-8"> Type <strong style="color:red;">*</strong></span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label data-ng-model="Emp_GroupType" ng-repeat="option in staff_types">
+                                        <input type="checkbox" ng-model="option.selected" value="{{option.hrmgT_Id}}" ng-click="get_departments()" name="option" ng-required="isOptionsRequired();">
+                                        <span class="lbl padding-8">{{option.hrmgT_EmployeeGroupType}}</span>
+                                    </label>
+
+                                </div>
+
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.option)" ng-messages="myForm.option.$error">
+                                <div ng-message="required">Please Select Atleast One Type</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="chkdept" ng-model="deptcheck" data-ng-click="all_checkdep()">
+                                    <span class="lbl padding-8">Department <strong style="color:red;">*</strong></span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label data-ng-model="Emp_DepartmentName" ng-repeat="option in Department_types">
+                                        <input type="checkbox" ng-model="option.selected" value="{{option.hrmD_Id}}" ng-click="get_designation()" name="option1" ng-required="isOptionsRequired1();">
+                                        <span class="lbl padding-8">{{option.hrmD_DepartmentName}}</span>
+                                    </label>
+
+                                </div>
+
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.option1)" ng-messages="myForm.option1.$error">
+                                <div ng-message="required">Please Select Atleast One Department</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="chkdesg" ng-model="desgcheck" data-ng-click="all_checkdesg()">
+                                    <span class="lbl padding-8">Designation <strong style="color:red;">*</strong></span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label data-ng-model="Emp_DesignationName" ng-repeat="option in Designation_types">
+                                        <input type="checkbox" ng-model="option.selected" value="{{option.hrmdeS_Id}}" ng-click="get_employee()" name="option2" ng-required="isOptionsRequired2();">
+                                        <span class="lbl padding-8">{{option.hrmdeS_DesignationName}}</span>
+                                    </label>
+
+                                </div>
+
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.option2)" ng-messages="myForm.option2.$error">
+                                <div ng-message="required">Please Select Atleast One Designation</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee : <strong style="color:red;" ng-show="!disabledata">*</strong></label>
+
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="emphrmE_Id" ng-model="hrmE_Id" ng-disabled="disabledata" ng-required="!disabledata">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in Employeelst" value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.hrmE_EmployeeFirstName + ' ' + option.hrmE_EmployeeMiddleName + ' ' + option.hrmE_EmployeeLastName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.emphrmE_Id)" ng-messages="myForm.emphrmE_Id.$error">
+                                        <div ng-message="required">Select Employee</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" data-ng-init="datedata1='datewise';datechange('datewise')">
+                                    <input type="radio" value="datewise" name="datedata1" data-ng-model="datedata1" ng-click="datechange(datedata1)">
+                                    <span class="lbl padding-8">Date : <strong style="color:red;" ng-show="datedata1=='datewise'">*</strong></span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="Datepic" onkeydown="return false" name="Datepic1" id="Datepic1" md-placeholder="Enter date" ng-disabled="disabledate1" ng-required="datedata1=='datewise'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.Datepic1)" ng-messages="myForm.Datepic1.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    <input type="radio" value="monthwise" name="datedata1" data-ng-model="datedata1" ng-click="datechange(datedata1)">
+                                    <span class="lbl padding-8">Monthly : <strong style="color:red;" ng-show="datedata1=='monthwise'">*</strong></span>
+                                </label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="year1" ng-model="year" ng-disabled="disabledate2" ng-required="datedata1=='monthwise'">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.hrmlY_LeaveYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                        <div ng-message="required">Select Year</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="month1" ng-model="month" ng-disabled="disabledate3" ng-required="datedata1=='monthwise'">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in fillmonth" value="{{option.monthid}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.monthname}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.month1)" ng-messages="myForm.month1.$error">
+                                        <div ng-message="required">Select Month</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="well text-center">
+                                    <label class="radio-inline">
+                                        <input class="" type="radio" name="Punch" ng-model="rdoPunch" value="punch" />
+                                        <span class="lbl">Punch Time</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input class="" type="radio" name="Punch" ng-model="rdoPunch" value="late" />
+                                        <span class="lbl">Late In</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input class="" type="radio" name="Punch" ng-model="rdoPunch" value="early" />
+                                        <span class="lbl">Early Out</span>
+                                    </label>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="well text-center">
+                                    <label class="radio-inline">
+                                        <input class="" type="radio" name="exclude1" ng-model="exclude" value="IA" ng-click="GetReport(exclude)" />
+                                        <span class="lbl">Include All</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input class="" type="radio" name="exclude1" ng-model="exclude" value="B" ng-click="GetReport(exclude)" />
+                                        <span class="lbl">Exclude Both</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input class="" type="radio" name="exclude1" ng-model="exclude" value="H" ng-click="GetReport(exclude)" />
+                                        <span class="lbl">Exclude Holiday</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input class="" type="radio" name="exclude1" ng-model="exclude" value="A" ng-click="GetReport(exclude)" />
+                                        <span class="lbl">Exclude Absent</span>
+                                    </label>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <label class="control-label col-sm-2">
+                            <input type="radio" value="fromwise" name="datedata1" data-ng-model="datedata1" ng-click="datechange(datedata1)">
+                            <span class="lbl padding-8">From Date : <strong style="color:red;" ng-show="datedata1=='fromwise'">*</strong></span>
+                        </label>
+                        <div class="col-sm-3">
+                            <md-datepicker ng-model="fromdate" onkeydown="return false" md-max-date="maxDatemf" name="fromdatenew" id="fromdatenew" md-placeholder="Enter date" ng-disabled="disabledate4" ng-required="datedata1=='fromwise'"></md-datepicker>
+                            <div class="error-messages" ng-if="interacted(myForm.fromdatenew)" ng-messages="myForm.fromdatenew.$error">
+                                <div ng-message="required">Please Select From date</div>
+                            </div>
+                        </div>
+                        <label class="control-label col-sm-1">
+                            <span class="lbl padding-8">To Date : <strong style="color:red;" ng-show="datedata1=='fromwise'">*</strong></span>
+                        </label>
+                        <div class="col-sm-4">
+                            <md-datepicker ng-model="todate" onkeydown="return false" md-min-date="minDatemf" md-max-date="maxDatemf" ng-click="gettodate()" name="todatenew" id="todatenew" md-placeholder="Enter  date" ng-disabled="disabledate5" ng-required="datedata1=='fromwise'"></md-datepicker>
+                            <div class="error-messages" ng-if="interacted(myForm.todatenew)" ng-messages="myForm.todatenew.$error">
+                                <div ng-message="required">Please Select To Date</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary">
+                            <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                        <md-button type="button" ng-click="exptoex();" class="md-raised md-primary" ng-disabled="!grid_view">
+
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-disabled="!grid_view" id="print-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="grid_view">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">Grid View</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body" style="overflow:scroll">
+            <div ng-show="gridpunchdate">
+                <table id="table1" class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;width:100%;text-align:center">
+                    <thead>
+                        <tr><th colspan="12">Report On {{datenew | date:'dd-MM-yyyy'}}</th></tr>
+                        <tr>
+                            <th>SLNO</th>
+                            <th ng-click="sort('ecode')">Employee Code</th>
+                            <th ng-click="sort('ename')">Employee Name</th>
+                            <th ng-click="sort('gtype')">Type</th>
+                            <th ng-click="sort('depname')">Department</th>
+                            <th ng-click="sort('desgname')">Designation</th>
+                            <th ng-click="sort('intime')">Time In</th>
+                            <th ng-click="sort('outtime')">Time Out</th>
+                            <th ng-click="sort('workingtime')">Worked Hrs</th>
+                            <th ng-click="sort('lateby')">Late In</th>
+                            <th ng-click="sort('earlyby')">Early Out</th>
+                            <th ng-click="sort('Temparature')">Temparature</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in yearlyemprep |orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.ecode}}</td>
+                            <td>{{ user.ename}}</td>
+                            <td>{{ user.gtype}}</td>
+                            <td>{{ user.depname}}</td>
+                            <td>{{ user.desgname}}</td>
+                            <!--<td class="{{user.latein}}">{{ user.intime}}</td>--> <!--only for Hutchings Late IN identification-->
+                            <td>
+                                <span style="color:green;font-weight:600" ng-if="user.intime=='H'">{{ user.intime}}</span>
+                                <span style="color:red;font-weight:600" ng-if="user.intime=='A'">{{ user.intime}}</span>
+                                <span ng-if="user.intime!='A'">{{ user.intime}}</span>
+                            </td>
+                            <td>
+                                <span style="color:green;font-weight:600" ng-if="user.outtime=='H'">{{ user.outtime}}</span>
+                                <span style="color:red;font-weight:600" ng-if="user.outtime=='A'">{{ user.outtime}}</span>
+                                <span ng-if="user.outtime!='A'">{{ user.outtime}}</span>
+                            </td>
+                            <td>
+                                <span style="color:green;font-weight:600" ng-if="user.workingtime=='H'">{{ user.workingtime}}</span>
+                                <span style="color:red;font-weight:600" ng-if="user.workingtime=='A'">{{ user.workingtime}}</span>
+                                <span ng-if="user.workingtime!='A'">{{ user.workingtime}}</span>
+                            </td>
+                            <td>
+                                <span style="color:green;font-weight:600" ng-if="user.lateby=='H'">{{ user.lateby}}</span>
+                                <span style="color:red;font-weight:600" ng-if="user.lateby=='A'">{{ user.lateby}}</span>
+                                <span ng-if="user.lateby!='A'">{{ user.lateby}}</span>
+                            </td>
+                            <td>
+                                <span style="color:green;font-weight:600" ng-if="user.earlyby=='H'">{{ user.earlyby}}</span>
+                                <span style="color:red;font-weight:600" ng-if="user.earlyby=='A'">{{ user.earlyby}}</span>
+                                <span ng-if="user.earlyby!='A'">{{ user.earlyby}}</span>
+                            </td>
+                            <td>
+                                <span style="color:green;font-weight:600" ng-if="user.intemperature=='H'">{{ user.intemperature}}</span>
+                                <span style="color:red;font-weight:600" ng-if="user.intemperature=='A'">{{ user.intemperature}}</span>
+                                <span ng-if="user.intemperature!='A'">{{ user.intemperature}}</span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-show="gridpunchmonth" id="table2">
+                <br />
+                <div class="text-center">
+                    <h5> Employee Log Report</h5>
+                </div>
+                <div ng-repeat="table_list in yearlyemprep" style="padding-bottom:20px;">
+                    <table class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;width:100%;text-align:center" id="tablep{{ $index+1}}">
+                        <thead>
+                            <tr><th colspan="6">  Name : {{table_list.ename}} / Code : {{ table_list.ecode}} / Type : {{table_list.gtype}} / Department : {{ table_list.depname}} / Designation : {{table_list.desgname}}</th></tr>
+                            <tr>
+                                <th>SLNO</th>
+                                <th ng-click="sort('punchdate')">Date</th>
+                                <th ng-click="sort('punchday')">Day</th>
+                                <th ng-click="sort('intime')">Time In</th>
+                                <th ng-click="sort('outtime')">Time Out</th>
+                                <th ng-click="sort('workingtime')">Worked Hrs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in table_list.punchtime |orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                                <td>{{ $index+1}}</td>
+                                <td>{{user.punchdate| date:'dd-MM-yyyy'}}</td>
+                                <td>{{user.punchday}}</td>
+                                <td>{{ user.intime}}</td>
+                                <td>{{ user.outtime}}</td>
+                                <td>{{ user.workingtime}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div ng-show="gridlatedate" id="table3">
+                <table class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;width:100%;text-align:center">
+                    <thead>
+                        <tr><th colspan="7">Report On {{datenew | date:'dd-MM-yyyy'}}</th></tr>
+                        <tr>
+                            <th>SLNO</th>
+                            <th ng-click="sort('ecode')">Employee Code</th>
+                            <th ng-click="sort('ename')">Employee Name</th>
+                            <th ng-click="sort('actualtime')">Actual In Time</th>
+                            <th ng-click="sort('intime')">IN Time</th>
+                            <th ng-click="sort('relaxtime')">Relax Time</th>
+                            <th ng-click="sort('lateby')">Late In By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in yearlyemprep |orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.ecode}}</td>
+                            <td>{{ user.ename}}</td>
+                            <td>{{ user.actualtime}}</td>
+                            <td>{{ user.intime}}</td>
+                            <td>{{ user.relaxtime}}</td>
+                            <td>{{ user.lateby}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-show="gridlatemonth" id="table4">
+                <div ng-repeat="table_list in yearlyemprep" style="padding-bottom:20px;">
+                    <table class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;width:100%;text-align:center" id="tablel{{ $index+1}}">
+                        <thead>
+                            <tr><th colspan="6">  Name : {{table_list.ename}} / Code : {{ table_list.ecode}} / Type : {{table_list.gtype}} / Department : {{ table_list.depname}} /Designation : {{table_list.desgname}}</th></tr>
+                            <tr>
+                                <th>SLNO</th>
+                                <th ng-click="sort('punchdate')">Date</th>
+                                <th ng-click="sort('punchday')">Day</th>
+                                <th ng-click="sort('intime')">In Time</th>
+                                <th ng-click="sort('actualtime')">Actual Time In</th>
+                                <th ng-click="sort('relaxtime')">Relax Time</th>
+                                <th ng-click="sort('lateby')">Late By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in table_list.punchtime |orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.punchdate | date:'dd-MM-yyyy'}}</td>
+                                <td>{{ user.punchday}}</td>
+                                <td>{{ user.intime}}</td>
+                                <td>{{ user.actualtime}}</td>
+                                <td>{{ user.relaxtime}}</td>
+                                <td>{{ user.lateby}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div ng-show="gridearlydate" id="table5">
+                <table class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;width:100%;text-align:center">
+                    <thead>
+                        <tr><th colspan="7">Report On {{datenew | date:'dd-MM-yyyy'}}</th></tr>
+                        <tr>
+                            <th>SLNO</th>
+                            <th ng-click="sort('ecode')">Employee Code</th>
+                            <th ng-click="sort('ename')">Employee Name</th>
+                            <th ng-click="sort('actualtime')">Actual Out Time</th>
+                            <th ng-click="sort('outtime')">Out Time</th>
+                            <th ng-click="sort('relaxtime')">Relax Time</th>
+                            <th ng-click="sort('earlyby')">Early By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in yearlyemprep |orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.ecode}}</td>
+                            <td>{{ user.ename}}</td>
+                            <td>{{ user.actualtime}}</td>
+                            <td>{{ user.outtime}}</td>
+                            <td>{{ user.relaxtime}}</td>
+                            <td>{{ user.earlyby}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-show="gridearlymonth" id="table6">
+                <div ng-repeat="table_list in yearlyemprep" style="padding-bottom:20px">
+                    <table class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;width:100%;text-align:center" id="tablee{{ $index+1}}">
+                        <thead>
+                            <tr><th colspan="6">  Name : {{table_list.ename}} / Code : {{ table_list.ecode}} / Type : {{table_list.gtype}} / Department : {{ table_list.depname}} /Designation : {{table_list.desgname}}</th></tr>
+                            <tr>
+                                <th>SLNO</th>
+                                <th ng-click="sort('punchdate')">Date</th>
+                                <th ng-click="sort('punchday')">Day</th>
+                                <th ng-click="sort('outtime')">Out Time</th>
+                                <th ng-click="sort('actualtime')">Actual Time Out</th>
+                                <th ng-click="sort('relaxtime')">Relax Time</th>
+                                <th ng-click="sort('earlyby')">Early By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in table_list.punchtime |orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.punchdate | date:'dd-MM-yyyy'}}</td>
+                                <td>{{ user.punchday}}</td>
+                                <td>{{ user.outtime}}</td>
+                                <td>{{ user.actualtime}}</td>
+                                <td>{{ user.relaxtime}}</td>
+                                <td>{{ user.earlyby}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="feedback" class="modal fade" role="dialog" data-backdrop="false">
+    <form class="form-horizontal" role="form" name="myForm1" novalidate>
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>Feedback</h4>
+                    <div class="box-body" style="border:1px solid #333;box-sizing:border-box;margin:1%;">
+                        <div ng-repeat="user1 in feedbackquestion" style="padding:0.5% 2% 0.5% 3%;">
+
+                            <h4 class="text-left Question text-capitalize">
+                                {{$index+1}} . {{user1.fmqE_FeedbackQuestions}}
+                                <input type="hidden" value="{{user1.fmtY_Id}}" />
+                                <input type="hidden" value="{{user1.fmqE_Id}}" />
+                            </h4>
+                            <div>
+                                <label class="radio-inline" ng-repeat="user5 in user1.feedbackoptiondata">
+
+                                    <input type="radio" ng-model="user1.name" name="t1_quesoption_{{user1.fmqE_Id}}" value="{{user5.fmoP_Id}}" required />
+                                    <span class="lbl padding-8" style="color:black;font-size:medium">{{user5.fmoP_FeedbackOptions}}</span>
+                                    <!--{{user5.fmoP_OptionsValue}}-->
+                                    <!--<input ng-model="user1.fmoP_OptionsValue" value="" />
+                                    <input type="hidden" ng-model="user1.fmoP_FeedbackOptions" value="" />-->
+                                </label>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1['t1_quesoption_'+user1.fmqE_Id])" ng-messages="myForm1['t1_quesoption_'+user1.fmqE_Id].$error">
+                                    <div ng-message="required">Select Your Answer</div>
+
+                                </div>
+                            </div>
+                            <br /><br />
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-1" style="color:black;font-size:medium">Remark:</label>
+                                <div>
+                                    <textarea class="form-control" id="usr" type="text" ng-model="user1.fsttR_FeedBack" rows="5" style="width:500px;"
+                                              name="t1_quesremarks_{{user1.fmqE_Id}}"
+                                              allow-pattern="(\s|[a-zA-Z0-9])" maxlength="500"></textarea>
+                                </div>
+                                <!--<div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1['t1_quesremarks_'+user1.fmqE_Id])" ng-messages="myForm1['t1_quesremarks_'+user1.fmqE_Id].$error">
+
+                                    <div ng-message="required">Enter The Remarks </div>
+                                </div>-->
+                            </div>
+
+                            <!--<div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1['t1_quesoption_'+user1.fmqE_Id])" ng-messages="myForm1['t1_quesoption_'+user1.fmqE_Id].$error">
+                                <div ng-message="required">Select Your Answer</div>
+                                <div ng-message="required" ng-if="user4.ratmqE_ManualEntryFlg">Enter The Remarks / Feedback Answer</div>
+                            </div>-->
+                            <!--<hr style="height:2px;border-width:0;color:black;background-color:gray">-->
+
+                        </div>
+
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="Savefeedback(user)">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="submit" class="md-raised md-warn" ng-click="clear_first_tab()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer custom-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+ 

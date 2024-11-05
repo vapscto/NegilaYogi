@@ -1,0 +1,327 @@
+﻿<!--<link type="text/css" media="print" rel="stylesheet" href="css/print/BBKV/BBKVTC/BBKVTCPdf.css" />-->
+
+<div data-ng-init="loaddata()" class="challan">
+    <section class="content">
+        <form class="form-horizontal" role="form" method="post" name="myform">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Sibling Student & Employee Student Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="well text-center" ng-init="siblingemployee='sibling'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="sibling" name="stcrcradtc" ng-model="siblingemployee" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Sibling</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="parent" name="stcrcradtc" ng-model="siblingemployee" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Parent</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="ASMAY_Id" name="stcrclstyr" ng-change="onchangeyear()" required>
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="getreport();">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>Cancel
+                        </md-button>
+                        <!--<md-button type="button" class="md-raised md-primary" ng-click="printToCart()" ng-show="Print_flag">
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </md-button>-->
+                        <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel()" ng-show="Print_flag">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="box box-primary" ng-show="gridflag">
+            <div class="box-header with-border">
+                <h3 class="box-title">Sibling Student & Employee Student Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div ng-if="siblingemployee=='sibling'">
+                    <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th>First Child</th>
+                                <th>First Child Admno</th>
+                                <th>First Child Class - Section</th>
+                                <th>Sibling Name</th>
+                                <th>Sibling Admno</th>
+                                <th>Sibling Class - Section</th>
+                                <th>Sibling Order</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in siblingfirstchild">
+                            <tr>
+                                <td class="text-center" rowspan="{{user.studentdetails.length+1}}">{{$index+1}}</td>
+                                <td rowspan="{{user.studentdetails.length+1}}" class="text-left padding-left-5">{{user.FirstStudentName}}</td>
+                                <td rowspan="{{user.studentdetails.length+1}}" class="text-center">{{user.FirstStudentAdmNo}}</td>
+                                <td rowspan="{{user.studentdetails.length+1}}" class="text-center">{{user.FirstStudentclass}} - {{user.FirstStudentsection}} </td>
+                            </tr>
+                            <tr ng-repeat="stud in user.studentdetails">
+                                <td class="text-left padding-left-5"> {{stud.AMSTS_SiblingsName}}</td>
+                                <td class="text-center"> {{stud.SubAdmNo}}</td>
+                                <td class="text-center"> {{stud.Subclass}} - {{stud.Subsection}}</td>
+                                <td class="text-center"> {{stud.orders}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div ng-if="siblingemployee=='parent'">
+                    <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th>Employee Name</th>
+                                <th>Employee Code</th>
+                                <th>Designation</th>
+                                <th>Student Name</th>
+                                <th>Admno</th>
+                                <th>Student Class - Section</th>
+                                <th>Order</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="useremp in employeedetails">
+                            <tr>
+                                <td class="text-center" rowspan="{{useremp.studentdetailsnew.length+1}}">{{$index+1}}</td>
+                                <td rowspan="{{useremp.studentdetailsnew.length+1}}" class="text-left padding-left-5">{{useremp.EMPLOYEENAME}}</td>
+                                <td rowspan="{{useremp.studentdetailsnew.length+1}}" class="text-center">{{useremp.EMPLOYEECODE}}</td>
+                                <td rowspan="{{useremp.studentdetailsnew.length+1}}" class="text-center">{{useremp.HRMD_DepartmentName}} </td>
+                            </tr>
+                            <tr ng-repeat="studemp in useremp.studentdetailsnew">
+                                <td class="text-left padding-left-5"> {{studemp.StudentName}}</td>
+                                <td class="text-center"> {{studemp.ADMNO}}</td>
+                                <td class="text-center"> {{studemp.ASMCL_ClassName}} - {{studemp.ASMC_SectionName}}</td>
+                                <td class="text-center"> {{studemp.AMSTE_SiblingsOrder}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div id="printSectionId" ng-show="table_flag">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>{{details}} - Academic Year {{yearname}}</h4></center>
+                <br />
+                <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>First Child</th>
+                            <th>First Child Admno</th>
+                            <th>First Child Class-Section</th>
+                            <th>Sibling Name</th>
+                            <th>Sibling Admno</th>
+                            <th>Sibling Class-Section</th>
+                            <th>Sibling Order</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in siblingfirstchild">
+                        <tr>
+                            <td class="text-center" rowspan="{{user.studentdetails.length+1}}">{{$index+1}}</td>
+                            <td rowspan="{{user.studentdetails.length+1}}" class="text-left padding-left-5">{{user.FirstStudentName}}</td>
+                            <td rowspan="{{user.studentdetails.length+1}}" class="text-center">{{user.FirstStudentAdmNo}}</td>
+                            <td rowspan="{{user.studentdetails.length+1}}" class="text-center">{{user.FirstStudentclass}} /{{user.FirstStudentsection}} </td>
+                        </tr>
+                        <tr ng-repeat="stud in user.studentdetails">
+                            <td class="text-left padding-left-5"> {{stud.AMSTS_SiblingsName}}</td>
+                            <td class="text-center"> {{stud.SubAdmNo}}</td>
+                            <td class="text-center"> {{stud.Subclass}} / {{stud.Subsection}}</td>
+                            <td class="text-center"> {{stud.orders}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="printSectionIdsibling" ng-show="table_flag">
+                <table class="table table-hover table-responsive table-bordered">
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="8" class="text-center">
+                            <center><h3>{{instname}}</h3></center>  
+                        </td>
+                    </tr>
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="8" class="text-center">
+                            <center><h3> {{instaddress}}</h3></center>                           
+                        </td>
+                    </tr>
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="8" class="text-center">
+                            <center><h4>{{details}} - Academic Year {{yearname}}</h4></center>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                    <thead>
+                        <tr style="border : solid 0.5px black;">
+                            <th>SL.No.</th>
+                            <th>First Child</th>
+                            <th>First Child Admno</th>
+                            <th>First Child Class-Section</th>
+                            <th>
+                                <table>
+                                    <tr style="border : solid 0.5px black;">
+                                        <th>Sibling Name</th>
+                                        <th>Sibling Admno</th>
+                                        <th>Sibling Class-Section</th>
+                                        <th>Sibling Order</th>
+                                    </tr>
+                                </table>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="usersib in siblingfirstchild">
+                        <tr style="border : solid 0.5px black;">
+                            <td class="text-center" style="text-align:center">{{$index+1}}</td>
+                            <td class="text-left padding-left-5" style="text-align:left; padding-left:5px">{{usersib.FirstStudentName}}</td>
+                            <td class="text-center" style="text-align:center">{{usersib.FirstStudentAdmNo}}</td>
+                            <td class="text-center" style="text-align:center">{{usersib.FirstStudentclass}} - {{usersib.FirstStudentsection}} </td>
+                            <td>
+                                <table>
+                                    <tr ng-repeat="studsib in usersib.studentdetails" style="border : solid 0.5px black;">
+                                        <td class="text-left padding-left-5" style="text-align:left; padding-left:5px"> {{studsib.AMSTS_SiblingsName}}</td>
+                                        <td class="text-center" style="text-align:center"> {{studsib.SubAdmNo}}</td>
+                                        <td class="text-center" style="text-align:center"> {{studsib.Subclass}} - {{studsib.Subsection}}</td>
+                                        <td class="text-center" style="text-align:center"> {{studsib.orders}}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="printSectionIdemp" ng-show="table_flag_new">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>{{details}} - Academic Year {{yearname}}</h4></center>
+                <br />
+                <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>Employee Name</th>
+                            <th>Employee Code</th>
+                            <th>Designation</th>
+                            <th>Student Name</th>
+                            <th>Admno</th>
+                            <th>Student Class - Section</th>
+                            <th>Order</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="useremp in employeedetails">
+                        <tr>
+                            <td class="text-center" rowspan="{{useremp.studentdetailsnew.length+1}}">{{$index+1}}</td>
+                            <td rowspan="{{useremp.studentdetailsnew.length+1}}" class="text-left padding-left-5">{{useremp.EMPLOYEENAME}}</td>
+                            <td rowspan="{{useremp.studentdetailsnew.length+1}}" class="text-center">{{useremp.EMPLOYEECODE}}</td>
+                            <td rowspan="{{useremp.studentdetailsnew.length+1}}" class="text-left padding-left-5">{{useremp.HRMD_DepartmentName}} </td>
+                        </tr>
+                        <tr ng-repeat="studemp in useremp.studentdetailsnew">
+                            <td class="text-left padding-left-5"> {{studemp.StudentName}}</td>
+                            <td class="text-center"> {{studemp.ADMNO}}</td>
+                            <td class="text-center"> {{studemp.ASMCL_ClassName}} - {{studemp.ASMC_SectionName}}</td>
+                            <td class="text-center"> {{studemp.AMSTE_SiblingsOrder}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="printSectionIdempnew" ng-show="table_flag_new">
+                <table class="table table-hover table-responsive table-bordered">
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="8" class="text-center">
+                            <center><h3>{{instname}}</h3></center>
+                        </td>
+                    </tr>
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="8" class="text-center">
+                            <center><h3> {{instaddress}}</h3></center>
+                        </td>
+                    </tr>
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="8" class="text-center">
+                            <center><h4>{{details}} - Academic Year {{yearname}}</h4></center>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                    <thead>
+                        <tr style="border : solid 0.5px black;">
+                            <th>SL.No.</th>
+                            <th>Employee Name</th>
+                            <th>Employee Code</th>
+                            <th>Designation</th>
+                            <th>
+                                <table>
+                                    <tr style="border : solid 0.5px black;">
+                                        <th>Student Name</th>
+                                        <th>Admno</th>
+                                        <th>Student Class - Section</th>
+                                        <th>Order</th>
+                                    </tr>
+                                </table>
+                            </th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="useremp in employeedetails">
+                        <tr style="border : solid 0.5px black;">
+                            <td class="text-center" style="text-align:center">{{$index+1}}</td>
+                            <td class="text-left padding-left-5" style="text-align:left; padding-left:5px">{{useremp.EMPLOYEENAME}}</td>
+                            <td class="text-center" style="text-align:center">{{useremp.EMPLOYEECODE}}</td>
+                            <td class="text-left padding-left-5" style="text-align:left; padding-left:5px">{{useremp.HRMD_DepartmentName}} </td>
+                            <td>
+                                <table>
+                                    <tr style="border : solid 0.5px black;" ng-repeat="studemp in useremp.studentdetailsnew">
+                                        <td class="text-left padding-left-5" style="text-align:left; padding-left:5px"> {{studemp.StudentName}}</td>
+                                        <td class="text-center" style="text-align:center"> {{studemp.ADMNO}}</td>
+                                        <td class="text-center" style="text-align:center"> {{studemp.ASMCL_ClassName}} - {{studemp.ASMC_SectionName}}</td>
+                                        <td class="text-center" style="text-align:center"> {{studemp.AMSTE_SiblingsOrder}}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+

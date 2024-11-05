@@ -1,0 +1,310 @@
+﻿
+<style>
+    .alert {
+        padding-bottom: 5px;
+        position: initial;
+        top: 0px;
+        left: 0%;
+        width: 80%;
+        z-index: 999891;
+        padding-top: 2px;
+        margin: 10px;
+    }
+
+    .bg-aqua, .callout.callout-info, .alert-info, .label-info, .modal-info .modal-body {
+        background-color: rgb(63, 81, 181) !important;
+    }
+</style>
+
+<section class="content" data-ng-init="loaddata()">
+    <div class="box box-primary">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">Non Book report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <form class="form-horizontal" role="form" name="myForm" novalidate>
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-lg-6 col-lg-offset-3">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Library Name:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sm" name="year11" ng-model="LMAL_Id" ng-change="onSelectlibrary(LMAL_Id)" required>
+                                    <option value="">Select</option>
+                                    <option ng-repeat="year in lib_list" value="{{year.lmaL_Id}}" ng-selected="LMAL_Id == year.lmaL_Id">
+                                        {{year.lmaL_LibraryName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-5 error-messages" ng-if="interacted(myForm.year11)" ng-messages="myForm.year11.$error">
+                                <div ng-message="required">Select Library</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-6 col-lg-offset-3"> 
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Department :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="dept" ng-model="lmD_Id" ng-disabled="false" required>
+                                        <option value="">Select</option>
+                                        <option value="0">ALL</option>
+                                        <option ng-repeat="dep in deptlist" value="{{dep.lmD_Id }}" ng-selected="{{dep.Selected == true}}">
+                                            {{dep.lmD_DepartmentName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                        <div ng-message="required">Select Department Type</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr />
+                            <div class="form-group">
+                                <div class="well">
+                                    <label class="col-sm-4">Between Entry Date :</label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" ng-true-value="1" ng-false-value="0" data-ng-model="datewised">
+                                        <span class="lbl padding-8">Entry Date</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div>
+                                    <label class="control-label">From Date :</label>
+                                    <md-datepicker name="sch_date" onkeydown="return false" ng-model="Fromdate" md-placeholder="enter date" md-min-date="mindate" ng-disabled="datewised!=1">
+                                    </md-datepicker> &nbsp;
+                                    <label class="control-label">To Date :</label>
+                                    <md-datepicker name="sch_date2" onkeydown="return false" ng-model="ToDate" md-placeholder="enter date" md-min-date="mindate" ng-disabled="datewised!=1">
+                                    </md-datepicker>
+                                </div>
+                                <!--<div class="error-messages" ng-if="interacted(myForm.sch_date2)" ng-messages="myForm.sch_date2.$error">
+                                    <div ng-message="required">select search date</div>
+                                </div>-->
+
+                            </div>
+
+                    </div>
+
+                </div>
+
+                <hr />
+
+                <div class="text-center">
+                    <div class="">
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-click="get_report()" id="save-btn">
+                                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                cancel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-click="printdata()" ng-disabled="printdoption">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="ExportToExcel('#printtable')" ng-disabled="printdoption">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="box box-primary" ng-show="tablediv">
+        <div class="box-header with-border">
+            <h3 class="box-title">NON BOOK REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+
+        <div class="box-body">
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{reportlist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <!--id="printtable"-->
+                <table class="table table-hover table-responsive table-bordered" id="tabledata">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL. No.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LMNBK_NonBookTitle')">Non-Book Title</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LMNBKANO_AccnNo')">Accession No.</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LMD_DepartmentName')">Department Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LMV_VendorName')">Vendor Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LMP_PublisherName')">Publisher Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LMC_CategoryName')">Category Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LMNBK_PurchaseDate')">Purchase Date</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('LMNBK_PublishDate')">Entry Date</a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="boklist in filterValue =(reportlist | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{boklist.LMNBK_NonBookTitle}}</td>
+                            <td>{{boklist.LMNBKANO_AccnNo}}</td>
+                            <td>{{boklist.LMD_DepartmentName}}</td>
+                            <td>{{boklist.LMV_VendorName}}</td>
+                            <td>{{boklist.LMP_PublisherName}}</td>
+                            <td>{{boklist.LMC_CategoryName}}</td>
+                            <td>{{boklist.LMNBK_PurchaseDate | date:'dd-MM-yyyy'}}</td>
+                            <td>{{boklist.LMNBK_PublishDate| date:'dd-MM-yyyy'}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+            <div id="printtable" ng-show="false">
+                <div>
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                  
+
+                    <h3 class="text-center">NON BOOK REPORT</h3>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL. No.
+                                </th>
+                                <th>
+                                    Non-Book Title
+                                </th>
+                                <th>
+                                    Accession No.
+                                </th>
+                                <th>
+                                    Department Name
+                                </th>
+                                <th>
+                                    Vendor Name
+                                </th>
+                                <th>
+                                    Publisher Name
+                                </th>
+                                <th>
+                                    Category Name
+                                </th>
+                                <th>
+                                    Purchase Date
+                                </th>
+                                <th>
+                                    Entry Date
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="boklist in filterValue">
+
+                                <td>{{$index+1}}</td>
+                                <td style="overflow-wrap:break-word">{{boklist.LMNBK_NonBookTitle}}</td>
+                                <td>{{boklist.LMNBKANO_AccnNo}}</td>
+                                <td style="overflow-wrap:break-word">{{boklist.LMD_DepartmentName}}</td>
+                                <td style="overflow-wrap:break-word">{{boklist.LMV_VendorName}}</td>
+                                <td style="overflow-wrap:break-word">{{boklist.LMP_PublisherName}}</td>
+                                <td style="overflow-wrap:break-word">{{boklist.LMC_CategoryName}}</td>
+                                <td>{{boklist.LMNBK_PurchaseDate | date:'dd-MM-yyyy'}}</td>
+                                <td>{{boklist.LMNBK_PublishDate| date:'dd-MM-yyyy'}}</td>
+                            </tr>
+
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="9" class="text-center">
+
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} &nbsp;&nbsp; UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>

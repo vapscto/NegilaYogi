@@ -1,0 +1,273 @@
+﻿
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">InOutCalls Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div style="text-align:center" class="well" data-ng-init="conso='consol'">
+                            <label class="radio-inline">
+                                <input type="radio" name="conso" data-ng-model="conso" value="consol" ng-change="listempty1()" />
+                                <span class="lbl padding-8">Consolidated</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="conso" data-ng-model="conso" value="detail" ng-change="listempty2()" />
+                                <span class="lbl padding-8">Detailed</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">B/W Dates: <span style="color:Red">*</span></label>
+                            <div class="col-sm-4">
+                                <div class="">
+                                    <md-datepicker id="FromDate" ng-model="fromdate" onkeydown="return false" name="fdate" md-placeholder="From Date"
+                                                   md-min-date="minDatef" md-max-date="maxDatef" ng-change='setTodate(fromdate);' required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                        <div ng-message="required">Select the from date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="">
+                                    <md-datepicker id="ToDate" name="tdate" ng-model="todate" onkeydown="return false" md-placeholder="To Date"
+                                                   md-min-date="minDate" md-max-date="maxDate" ng-change='checkErr(fromdate,todate);' required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                                        <div ng-message="required">Select the To date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Type:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="seluse" data-ng-model="typeofrpt" name="acd_year" required>
+                                    <option value=""> Select</option>
+                                    <option value="All"> All</option>
+                                    <option value="Inbound">INBOUND </option>
+                                    <option value="Outbound"> OUTBOUND </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-6">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-click="ShowReportdata()" id="save-btn">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" ng-click="Clear_Details()" target="_blank" class="md-raised md-warn">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Clear
+                            </md-button>
+                            <md-button type="button" ng-show="datapages.length>0" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#Table')">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+                            <md-button type="button" ng-show="datapages2.length>0" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel2('#Table2')">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="datapages.length>0" ng-click="printData();">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="datapages2.length>0" ng-click="printData2();">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+             
+            </div>
+        </div>
+
+    </form>
+   
+    <div class="box box-primary" ng-show="report && datapages.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">IVRS IN OUT CALLS REPORT</h3>
+            <!--<div class="box-tools pull-right">-->
+            <!--<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+        </div>-->
+        </div>
+        <div class="box box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{datapages.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <!--<div class="form-group" ng-if="searchValue!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue1.length}}
+                        </label>
+                    </label>
+                </div>-->
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="searchValue" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+            <div id="printSectionId">
+                <h3 class="box-title text-center">{{name}}</h3>
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                    <thead>
+                        <tr>
+                            <th><a>SL.NO.</a></th>
+                            <th><a href="" ng-click="sortBy('dt')">Date</a></th>
+                            <th><a href="" ng-click="sortBy('IMCD_VirtualNo')">VirtualNo</a></th>
+                            <th><a href="" ng-click="sortBy('IMCD_SchoolName')">SchoolName </a> </th>
+                            <th><a href="" ng-click="sortBy('IMCD_InOutFlg')">InOutFlg</a> </th>
+                            <th><a href="" ng-click="sortBy('Total')">Total</a> </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in datapages | orderBy:propertyName:reverse |  filter:searchValue">
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.dt| date:dd-MM-yyyy }}</td>
+                            <td>{{ user.IMCD_VirtualNo}}</td>
+                            <td>{{user.IMCD_SchoolName}}</td>
+                            <td>{{user.IMCD_InOutFlg}}</td>
+                            <td>{{user.Total}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="box box-primary" ng-show="report2 && datapages2.length>0">
+        <div class="box-header with-border">
+            <h2 class="box-title">IVRS IN OUT CALLS REPORT</h2>
+            <!--<div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+        </div>-->
+        </div>
+        <div class="box box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b>&nbsp;&nbsp;&nbsp;&nbsp; Total Grid Records :</b>
+                            <label class="badge">
+                                {{datapages2.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <!--<div class="form-group" ng-if="searchValue!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue1.length}}
+                        </label>
+                    </label>
+                </div>-->
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                               
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="searchValue2" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="printSectionId2">
+                <h3 class="box-title text-center">{{name}}</h3>
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table2">
+                    <thead>
+                        <tr>
+                            <th><a>SL.NO.</a></th>
+                            <th><a href="" ng-click="sortBy('dt')">Date</a></th>
+                            <th><a href="" ng-click="sortBy('IMCD_VirtualNo')">VirtualNo</a></th>
+                            <th><a href="" ng-click="sortBy('IMCD_SchoolName')">SchoolName </a> </th>
+                            <th><a href="" ng-click="sortBy('IMCD_InOutFlg')">InOutFlg</a> </th>
+
+                            <th><a href="" ng-click="sortBy('IMCD_PulseCount')">Pulse Cont</a> </th>
+                            <th><a href="" ng-click="sortBy('IMCD_MobileNo')">Mobile Number</a> </th>
+
+
+
+                             <th><a href="" ng-click="sortBy('CallDuration')">Call Duration</a> </th>
+                            <th><a href="" ng-click="sortBy('IMCD_CallStatus')">Status</a> </th>
+
+                            <!--<th><a href="" ng-click="sortBy('Total')">Total</a> </th>
+                            <th><a href="" ng-click="sortBy('ReceivedCount')">Received Call Count</a> </th>
+                            <th><a href="" ng-click="sortBy('ConnectedCount')">Connected Call Count</a> </th>
+                            <th><a href="" ng-click="sortBy('NotConnectedCount')">Not Connected call Count</a> </th>-->
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in datapages2 | orderBy:propertyName:reverse |  filter:searchValue2">
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.dt| date:dd-MM-yyyy }}</td>
+                            <td>{{ user.IMCD_VirtualNo}}</td>
+                            <td>{{user.IMCD_SchoolName}}</td>
+                            <td>{{user.IMCD_InOutFlg}}</td>
+
+                            <td>{{user.IMCD_PulseCount}}</td>
+                            <td>{{user.IMCD_MobileNo}}</td>
+
+                            <td>{{user.IMCD_CallDuration}}</td>
+
+
+
+                            <td>{{user.IMCD_CallStatus}}</td>
+                            <!--<td>{{user.Total}}</td>
+                            <td>{{user.ReceivedCount}}</td>
+                            <td>{{user.ConnectedCount}}</td>
+                            <td>{{user.NotConnectedCount}}</td>-->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+      
+</section>

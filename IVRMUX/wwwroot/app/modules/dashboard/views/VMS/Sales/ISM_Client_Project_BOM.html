@@ -1,0 +1,183 @@
+﻿<style>
+    .colef {
+        margin-left: 16%;
+    }
+</style>
+<section class="content" data-ng-init="getAllDetail()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savetmpldata()" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Client Project Bill Of Materials</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-7 col-sm-offset-3 colef">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Client & Project:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel11" ng-model="ISMMCLTPR_Id" name="cltpjt" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="clt in clientproject_dd" value="{{clt.ISMMCLTPR_Id}}" ng-selected="{{clt.Selected==true}}">
+                                        {{clt.client_project_name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cltpjt)" ng-messages="myForm.cltpjt.$error">
+                                    <div ng-message="required">Select Client & Project Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                         <div class="form-group">
+                            <label class="control-label col-sm-3">Component Name:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel11" ng-model="ISMCLTC_Id" name="cmp" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="cmp in components_dd" value="{{cmp.ismcltC_Id}}" ng-selected="{{cmp.Selected==true}}"> {{cmp.ismcltC_Name}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cmp)" ng-messages="myForm.cmp.$error">
+                                    <div ng-message="required">Select Component Name</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Quantity:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" placeholder="Enter Quantity " name="qty" id="usr1" type="text"  data-ng-model="ISMCLTPRBOM_Qty" ng-pattern="/^[1-9]/" allow-pattern="\d" required>
+                                <div class="error-messages" ng-if="interacted(myForm.qty)" ng-messages="myForm.qty.$error">
+                                    <div ng-message="required">Enter Quantity</div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+
+                         <div class="form-group">
+                            <label class="control-label col-sm-3">Remarks:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" placeholder="Enter Remarks " id="usr2" type="text"  data-ng-model="ISMCLTPRBOM_Remarks">
+                               
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="Id" value="{{ISMCLTPRBOM_Id}}" />
+                
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Client Project Bill Of Materials List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th>Client & Project</th>
+                        <th>Components Name</th>
+                        <th>Quantity</th>
+                        <th>Remark</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    <tr dir-paginate="bm in filterValue1 = (bom_list | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}
+                        <td class="text-center">{{bm.client_project_name}}</td>
+                        <td class="text-center">{{bm.ISMCLTC_Name}}</td>
+                        <td class="text-center">{{bm.ISMCLTPRBOM_Qty}}</td>
+                        <td class="text-center">{{bm.ISMCLTPRBOM_Remarks}}</td>
+
+                        <td class="text-center">
+                            <span ng-if="bm.ISMCLTPRBOM_ActiveFlag === true">
+                                <a href="" ng-click="deactive(bm)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                            <span ng-if="bm.ISMCLTPRBOM_ActiveFlag === false">
+                                <a href="" ng-click="deactive(bm)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a class="text-aqua" href="" ng-click="edit(bm)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+

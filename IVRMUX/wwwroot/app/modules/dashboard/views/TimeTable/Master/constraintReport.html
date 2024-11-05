@@ -1,0 +1,840 @@
+﻿<section class="content">
+    <form class="form-horizontal" role="form" name="myForm" novalidate>
+        <div class="box box-primary" data-ng-init="LoadData()">
+            <div class="box-header with-border">
+                <h3 class="box-title">TimeTable Constraint Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" ng-click="ShowHide1()" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-3">
+                        <div class="well text-center" ng-init="ttconstrep==''">
+                            <label class="radio-inline">
+                                <input type="radio" value="F" data-ng-model="ttconstrep" name="fix1" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Fixing</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="R" data-ng-model="ttconstrep" name="fix1" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Restriction</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="C" data-ng-model="ttconstrep" name="fix1" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Consecutive</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="B" data-ng-model="ttconstrep" name="fix1" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Bifurcation</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="L" data-ng-model="ttconstrep" name="fix1" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Lab</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-8 col-sm-offset-3" ng-show="ttconstrep==='F'||ttconstrep==='R'">
+                        <div class="well text-center" ng-init="fixing1=='DP'">
+                            <label class="radio-inline">
+                                <input type="radio" value="DP" data-ng-model="fixing1" name="type" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Day Period</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="DS" data-ng-model="fixing1" name="type" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Day Staff</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="type" value="DSUB" data-ng-model="fixing1" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Day Subject</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="type" value="PS" data-ng-model="fixing1" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Period Staff</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="type" value="PSUB" data-ng-model="fixing1" data-ng-click="onclickrdo()" />
+                                <span class="lbl padding-8">Period Subject</span>
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel" name="acd" ng-model="asmaY_Id" ng-change="get_category()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="year in year_list" value="{{year.asmaY_Id}}" ng-selected="{{year.Selected == true}}">
+                                        {{year.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd)" ng-messages="myForm.acd.$error">
+                                    <div ng-message="required">Please Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="GetReport()">
+                        <i class="fa fa-file" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel()">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <!--<button type="button" class="btn btn-primary" id="print-btn" ng-click="printData();" aria-disabled="false">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </button>-->
+                </div>
+            </div>
+
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="ttconstrep==='F'&&fixing1==='DP'&&alldata1.length>0">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="A">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Categary Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Employee Name</th>
+                            <th>Subject Name</th>
+                            <th>Day Name</th>
+                            <th>No of Period</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata1 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.TTMC_CategoryName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMD_DayName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='F'&&fixing1==='DS'&&alldata2.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="B">
+                    <thead>
+
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Employee Name</th>
+                            <th>Subject Name</th>
+                            <th>Day Name</th>
+                            <th>No. Of Periods</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata2 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMD_DayName}}</td>
+                            <td>{{user.TTFDSCC_Periods}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='F'&&fixing1==='DSUB'&&alldata3.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="C">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Subject Name </th>
+                            <th>Day Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Employee Name</th>
+                            <th>No of Periods</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata3 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMD_DayName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.TTFDSUCC_Periods}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='F'&&fixing1==='PS'&&alldata4.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="D">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Staff Name</th>
+                            <th>Period Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Subject Name</th>
+                            <th>No of Days</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata4 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTFPSCC_Days}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='F'&&fixing1==='PSUB'&&alldata5.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="E">
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Subject Name</th>
+                            <th>Period Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Staff Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata5 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='R'&&fixing1==='DP'&&alldata6.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="F">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Categary Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Employee Name</th>
+                            <th>Subject Name</th>
+                            <th>Day Name</th>
+                            <th>No of Periods</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata6 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.TTMC_CategoryName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMD_DayName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+    </div>
+    <div class="box box-primary" ng-hide="header_display">
+        <div class="box-header with-border">
+            <h3 class="box-title">{{name}}  Constraints Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div ng-hide="fix_res" ui-grid-exporter ui-grid="gridOptions" ui-grid-pagination class="grid text-center" ng-if="gridOptions.data.length>0" style="height: 270px;"></div>
+
+            <div ng-hide="conscon" ui-grid-exporter ui-grid="gridOptions_cons" ui-grid-pagination class="grid text-center" ng-if="gridOptions_cons.data.length>0" style="height: 270px;"></div>
+            <div ng-hide="bifcon" ui-grid-exporter ui-grid="gridOptions_bif" ui-grid-pagination class="grid text-center" ng-if="gridOptions_bif.data.length>0" style="height: 270px;"></div>
+            <div ng-hide="labcon" ui-grid-exporter ui-grid="gridOptions_lab" ui-grid-pagination class="grid text-center" ng-if="gridOptions_lab.data.length>0" style="height: 270px;"></div>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='R'&&fixing1==='DS'&&alldata7.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="G">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Employee Name</th>
+                            <th>Subject Name</th>
+                            <th>Day Name</th>
+                            <th>No of Periods</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata7 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMD_DayName}}</td>
+                            <td>{{user.TTFDSCC_Periods}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='R'&&fixing1==='DSUB'&&alldata8.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table img-responsive" id="H">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Subject Name </th>
+                            <th>Day Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Employee Name</th>
+                            <th>Period Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata8 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMD_DayName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='R'&&fixing1==='PS'&&alldata9.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="I">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Staff Name</th>
+                            <th>Period Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Subject Name</th>
+                            <th>No of Days</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata9 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTRPSCC_Days}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='R'&&fixing1==='PSUB'&&alldata10.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="J">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Subject Name</th>
+                            <th>Period Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Staff Name</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata10 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='C'&&alldata11.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="K">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Categary Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Staff Name</th>
+                            <th>Subject Name</th>
+                            <th>No of Periods</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata11 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.TTMC_CategoryName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='B'&&alldata12.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="L">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Categary Name</th>
+                            <th>Bifurcaction Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Staff Name</th>
+                            <th>Subject Name</th>
+                            <th>No of Periods</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata12 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.TTMC_CategoryName}}</td>
+                            <td>{{user.TTB_BifurcationName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="box box-primary" ng-show="ttconstrep==='L'&&alldata13.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Constraint Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="M">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Categary Name</th>
+                            <th>Lab Name</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Subject Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (alldata13 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td>{{user.TTMC_CategoryName}}</td>
+                            <td>{{user.TTLAB_LABLIBName}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.ISMS_SubjectName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!--<div id="printareaId" ng-show="tadprint">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <center> <h4>Constraint Report</h4></center>
+        <br />
+        <table class="table table-bordered table-responsive" id="A">
+            <thead>
+                <tr>
+                    <th>Sl.No.</th>
+                    <th>Categary Name</th>
+                    <th>Class Name</th>
+                    <th>Section Name</th>
+                    <th>Employee Name</th>
+                    <th>Subject Name</th>
+                    <th>Day Name</th>
+                    <th>No of Period</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr dir-paginate="user in filterValue1 = (alldata1 | filter : filterValue123)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                    <td>{{user.TTMC_CategoryName}}</td>
+                    <td>{{user.ASMCL_ClassName}}</td>
+                    <td>{{user.ASMC_SectionName}}</td>
+                    <td>{{user.HRME_EmployeeFirstName}}</td>
+                    <td>{{user.ISMS_SubjectName}}</td>
+                    <td>{{user.TTMD_DayName}}</td>
+                    <td>{{user.TTMP_PeriodName}}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="16" class="col-sm-12 text-center ">
+                        <label>
+                            Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                        </label>
+                    </td>
+                </tr>
+
+            </tfoot>
+        </table>
+    </div>-->
+
+
+    <table class="table table-hover table-responsive table-bordered text-center" ng-hide="fix_res_print" id="fixing_print">
+        <thead>
+            <tr>
+                <th>
+                    <a href="" ng-click="sort('sno')">CategoryName</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Class Name</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Section</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Staff Name</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Subject Name</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Day</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Period</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in datafix">
+                <td>{{ user.ttmC_CategoryName}}</td>
+                <td>{{ user.asmcL_ClassName}}</td>
+                <td>{{ user.asmC_SectionName}}</td>
+                <td>{{ user.staffName}}</td>
+                <td>{{ user.ismS_SubjectName}}</td>
+                <td>{{ user.ttmD_DayName}}</td>
+                <td>{{ user.ttmP_PeriodName}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-hover table-responsive table-bordered text-center" ng-hide="conscon_print" id="cons_print">
+        <thead>
+            <tr>
+                <th>
+                    <a href="" ng-click="sort('sno')">CategoryName</a>
+
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Class Name</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Section</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Staff Name</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Subject Name</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Period Name</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in data_con">
+                <td>{{ user.categoryName}}</td>
+                <td>{{ user.className}}</td>
+                <td>{{ user.sectionName}}</td>
+                <td>{{ user.staffName}}</td>
+                <td>{{ user.subjectName}}</td>
+                <td>{{ user.noOfPeriods}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <table class="table table-hover table-responsive table-bordered text-center" ng-hide="bifcon_print" id="bif_print">
+        <thead>
+            <tr>
+                <th>
+                    <a href="" ng-click="sort('sno')">Category</a>
+
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Bifurcation Name</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Period</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in data_bifer">
+                <td>{{ user.categoryName1}}</td>
+                <td>{{ user.bifricationName}}</td>
+                <td>{{ user.periodname}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-hover table-responsive table-bordered text-center" ng-hide="labcon_print" id="lab_print">
+        <thead>
+            <tr>
+                <th>
+                    <a href="" ng-click="sort('sno')">Academic Year</a>
+
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Category Name</a>
+                </th>
+                <th>
+                    <a href="" ng-click="sort('sno')">Lab Name</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in data_lab">
+                <td>{{ user.asmayYear}}</td>
+                <td>{{ user.categoryName2}}</td>
+                <td>{{ user.ttlaB_LABLIBName}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</section>

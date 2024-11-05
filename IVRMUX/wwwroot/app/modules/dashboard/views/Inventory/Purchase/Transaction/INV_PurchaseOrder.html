@@ -1,0 +1,619 @@
+﻿
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Purchase Order</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-6 col-sm-offset-3">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Supplier :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div ng-show="!edits">
+                                    <ui-select id="sel1" name="supplier" ng-model="$parent.obj.invmS_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Supplier" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or Search Supplier in the list...">
+                                            {{$select.selected.invmS_SupplierName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="option in get_supplier | filter: $select.search " value="{{option.invmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.invmS_SupplierName | highlight: $select.search"></div>
+                                            <span>{{option.invmS_SupplierConatctNo}}</span>
+                                            <span>{{option.invmS_EmailId}}</span>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.supplier)" ng-messages="myForm.supplier.$error">
+                                        <div ng-message="required">Please Select Supplier</div>
+                                    </div>
+                                </div>
+                                <div ng-show="edits">
+                                    <span>
+                                        <label class="control-label col-sm-10">{{supname}}</label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+        <div class="col-sm-12">
+            <div class="well text-center" ng-init="selectiontype='P'">
+                <label class="radio-inline">
+                    <input type="radio" name="p" value="P" ng-change="radioSelection();" ng-disabled="editS" ng-model="selectiontype">
+                    <span class="lbl padding-8">Purchase Indent</span>
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="q" value="Q" ng-change="radioSelection();" ng-disabled="editS" ng-model="selectiontype">
+                    <span class="lbl padding-8">Quotation</span>
+                </label>
+            </div>
+        </div>
+    </div>-->
+
+                        <div ng-if="selectiontype=='P'">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Purchase Indent :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div ng-show="!edits">
+                                        <ui-select id="sel1" name="pi" ng-model="$parent.obj.invmpI_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Purchase Indent" ng-change="onQtselect($parent.obj.invmpI_Id)" ng-required="selectiontype=='P'">
+                                            <ui-select-match ng-trim="false" placeholder="Select or Search Purchase Indent in the list...">
+                                                {{$select.selected.invmpI_PINo}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="option in get_PI | filter: $select.search " value="{{option.invmpI_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.invmpI_PINo | highlight: $select.search"></div>
+                                            </ui-select-choices>
+
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interacted(myForm.pi)" ng-messages="myForm.pi.$error">
+                                            <div ng-message="required">Please Select urchase Indent</div>
+                                        </div>
+                                    </div>
+                                    <div ng-show="edits">
+                                        <span>
+                                            <input type="text" class="form-control active" ng-disabled="editS" name="pino" ng-model="pinum">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-if="selectiontype=='Q'">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Quotation Type :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <div class="well text-center" ng-init="qtype='0'">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="a" value="0" ng-change="radiochange();" ng-disabled="editS" ng-model="qtype">
+                                            <span class="lbl padding-8">All</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="c" value="1" ng-change="radiochange();" ng-disabled="editS" ng-model="qtype">
+                                            <span class="lbl padding-8">Compared</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Quotation No.:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div ng-show="!edits">
+                                        <div ng-if="qtype=='0'">
+                                            <ui-select id="sel1" name="qtno" ng-model="$parent.obj.invmsQ_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Quotation No" ng-change="onQtselect($parent.obj.invmsQ_Id)" ng-disabled="editS" ng-required="selectiontype=='Q'">
+                                                <ui-select-match ng-trim="false" placeholder="Select or Quotation No. in the list...">{{$select.selected.invmsQ_QuotationNo}} </ui-select-match>
+                                                <ui-select-choices repeat="option in get_quotationno | filter: $select.search " value="{{option.invmsQ_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.invmsQ_QuotationNo | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+                                        <div ng-if="qtype=='1'">
+                                            <ui-select id="sel1" name="qtno" ng-model="$parent.obj.invmsQ_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Quotation No" ng-change="onQtselect($parent.obj.invmsQ_Id)" ng-disabled="editS" ng-required="selectiontype=='Q'">
+                                                <ui-select-match ng-trim="false" placeholder="Select or Quotation No. in the list...">{{$select.selected.invmsQ_QuotationNo}} </ui-select-match>
+                                                <ui-select-choices repeat="option in get_comparequotationno | filter: $select.search " value="{{option.invmsQ_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.invmsQ_QuotationNo | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.qtno)" ng-messages="myForm.qtno.$error">
+                                            <div ng-message="required">Please Select Quotation No</div>
+                                        </div>
+                                    </div>
+                                    <div ng-show="edits">
+                                        <span>
+                                            <input type="text" class="form-control active" ng-disabled="editS" name="qtno" ng-model="quotationum">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Reference No.:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" name="refno" placeholder="Enter Reference No." ng-model="invmpO_ReferenceNo" step="0.01">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Purchase Order Date :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="invmpO_PODate" ng-disabled="editS" name="podate" md-placeholder="Select Date"></md-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                    <!--============================ Grid =====================================-->
+                    <div class="box-body" ng-show="get_qtdetails.length > 0 || pidetails.length > 0">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="well" ng-if="selectiontype=='P'">
+                                    <div ng-show="pidetails.length>0">
+                                        <div class="text-center">
+                                            <table class="table table-hover table-responsive table-bordered text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SL.NO.</th>
+                                                        <th style="width: 200px;"><a href="" ng-click="sort('invmI_ItemName')">Item</a></th>
+                                                        <th><a href="" ng-click="sort('invmuoM_Id')">UOM</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_RatePerUnit')">Unit Rate</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_POQty')">Quantity</a></th>
+                                                        <th><a href="" ng-click="sort('View')">Tax</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_TaxAmount')">Tax Amount</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_Amount')">Amount</a></th>
+                                                        <th>Expected Delivery Date</th>
+                                                        <th><a href="" ng-click="sort('invtpO_Remarks')">Remarks</a></th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr ng-repeat="objpi in pidetails track by $index" ng-form="dataform1">
+                                                        <td>{{$index+1}}</td>
+
+                                                        <td>
+                                                            {{objpi.invmI_ItemName}}
+                                                        </td>
+                                                        <td>
+                                                            {{objpi.invmuoM_UOMName}}
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="Rate" class="form-control active" ng-blur="countrate(objpi)" ng-model="objpi.invtpI_PIUnitRate" placeholder="Rate" />
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="aprovedquantity" class="form-control active" ng-blur="countPOAmt(objpi)" ng-model="objpi.invtpO_POQty" placeholder="Quantity" />
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0)" class="text-primary" ng-click="viewtx(objpi);">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                                            </a>
+                                                        </td>
+
+                                                        <td>
+                                                            <input type="text" name="txamt" class="form-control active" ng-model="objpi.invtpO_TaxAmount" ng-change="taxchange(objpi)" placeholder="Tax" required />
+                                                            <div class="error-messages" ng-if="interacted(dataform1.txamt)" ng-messages="dataform1.txamt.$error">
+                                                                <div ng-message="required">Enter Tax Value</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="amt" class="form-control active" ng-model="objpi.invtpO_Amount" placeholder="Amount" />
+                                                        </td>
+                                                        <td>
+                                                            <md-datepicker ng-model="objpi.invtpO_ExpectedDeliveryDate"  name="deliverydate" md-placeholder="Select Date"></md-datepicker>
+                                                        </td>
+                                                        <td>
+                                                            <textarea name="remarks" class="form-control active" rows="1" ng-model="objpi.invtpO_Remarks" placeholder="Remarks" />
+                                                        </td>
+                                                        <td hidden="hidden">{{user.invtpI_Id}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="well" ng-if="selectiontype=='Q'">
+                                    <div ng-show="get_qtdetails.length>0">
+                                        <div class="text-center">
+                                            <table class="table table-hover table-responsive table-bordered text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SL.NO.</th>
+                                                        <th style="width: 200px;"><a href="" ng-click="sort('invmI_ItemName')">Item</a></th>
+                                                        <th><a href="" ng-click="sort('invmuoM_Id')">UOM</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_RatePerUnit')">Unit Rate</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_POQty')">Quantity</a></th>
+                                                        <th><a href="" ng-click="sort('View')">Tax</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_TaxAmount')">Tax Amount</a></th>
+                                                        <th><a href="" ng-click="sort('invtpO_Amount')">Amount</a></th>
+                                                        <th>Expected Delivery Date</th>
+                                                        <th><a href="" ng-click="sort('invtpO_Remarks')">Remarks</a></th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr ng-repeat="objpo in get_qtdetails track by $index" ng-form="dataform1">
+                                                        <td>{{$index+1}}</td>
+
+                                                        <td>
+                                                            {{objpo.invmI_ItemName}}
+                                                        </td>
+                                                        <td>
+                                                            {{objpo.invmuoM_UOMName}}
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="Rate" class="form-control active" ng-blur="countrate(objpo)" ng-model="objpo.invtsQ_NegotiatedRate" placeholder="Rate" />
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="aprovedquantity" class="form-control active" ng-blur="countPOAmt(objpo)" ng-model="objpo.invtpO_POQty" placeholder="PO Quantity" />
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0)" class="text-primary" ng-click="viewtx(objpo);">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                                            </a>
+                                                        </td>
+
+                                                        <td>
+                                                            <input type="text" name="txamt" class="form-control active" ng-model="objpo.invtpO_TaxAmount" ng-change="taxchange(objpo)" placeholder="Tax" required />
+                                                            <div class="error-messages" ng-if="interacted(dataform1.txamt)" ng-messages="dataform1.txamt.$error">
+                                                                <div ng-message="required">Enter Tax Value</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="amt" class="form-control active" ng-model="objpo.invtpO_Amount" placeholder="Amount" />
+                                                        </td>
+                                                        <td>
+                                                            <md-datepicker ng-model="objpo.invtpO_ExpectedDeliveryDate" ng-disabled="editS" name="deliverydate" md-placeholder="Select Date"></md-datepicker>
+                                                        </td>
+                                                        <td>
+                                                            <textarea name="remarks" class="form-control active" rows="1" ng-model="objpo.invtpO_Remarks" placeholder="Remarks" />
+                                                        </td>
+                                                        <td hidden="hidden">{{user.invtpI_Id}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-top-10">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3">Remarks :</label>
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" rows="3" id="remarks" ng-model="invmpO_Remarks" placeholder="Enter Remarks"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Total Amount :</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control active" name="tamt" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" placeholder="Total Amount" ng-model="invmpO_TotAmount" step="0.01">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Total Rate :</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control active" name="trate" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" placeholder="Total Rate" ng-model="invmpO_TotRate" step="0.01">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Total Tax :</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control active" name="ttax" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" placeholder="Total Tax" ng-model="invmpO_TotTax" step="0.01">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+
+                <div class="text-center">
+                    <input type="hidden" ng-model="invmpI_Id" value="{{invmpI_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+
+
+    <div class="box box-primary" ng-show="get_purchaseorder.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Purchase Order </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('invmpO_PONo')">PO Number</a></th>
+                        <th><a href="" ng-click="sortBy('invmpO_PODate')">Date</a> </th>
+                        <th><a href="" ng-click="sortBy('invmpO_ReferenceNo')">Reference No</a> </th>
+                        <th><a href="" ng-click="sortBy('invmpO_TotRate')">Rate</a> </th>
+                        <th><a href="" ng-click="sortBy('invmpO_TotTax')"> Tax</a></th>
+                        <th><a href="" ng-click="sortBy('invmpO_TotAmount')"> Amount </a> </th>
+                        <th><a href="" ng-click="sortBy('invmpO_Remarks')"> Remarks </a> </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (get_purchaseorder | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.invmpO_PONo}}</td>
+                        <td>{{user.invmpO_PODate | date:'dd-MM-yyyy'}}</td>
+                        <td>{{user.invmpO_ReferenceNo}}</td>
+                        <td>{{user.invmpO_TotRate}}</td>
+                        <td>{{user.invmpO_TotTax}}</td>
+                        <td>{{user.invmpO_TotAmount}}</td>
+                        <td>{{user.invmpO_Remarks}}</td>
+
+                        <td class="text-center">
+                            <span>
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom"  title="Purchase Order" 
+                                    data-ng-click="onformclick(user)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">View</i>
+                                </a>
+                            </span>
+                            <!--<a class="text-aqua" href="" ng-click="edit(user,transrows)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>-->
+                            &nbsp;
+                            <span ng-if="user.invmpO_ActiveFlg === false">
+                                <a href="" ng-click="deactiveM(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i> Activate </i>
+                                </a>
+                            </span>
+                            <span ng-if="user.invmpO_ActiveFlg === true">
+                                <a href="" ng-click="deactiveM(user) "
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i> Deactivate</i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+    <!-- ======================================== Tax Model ============================================-->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">Tax Details</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Tax</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="box-body">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="">SLNO</a>
+                                        </th>
+                                        <th><a href="" ng-click="sort('invmI_ItemName')">Item </a> </th>
+                                        <th><a href="" ng-click="sort('invmT_TaxName')">Tax </a> </th>
+                                        <th><a href="" ng-click="sort('invmT_TaxAliasName')">Alias Name</a> </th>
+                                        <th><a href="" ng-click="sort('invmiT_TaxValue')">Value</a> </th>
+                                        <th><a href="" ng-click="sort('inv_TaxAmount')">Tax Amount</a> </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in get_itemTax">
+                                        <td class="text-center">{{ $index + 1}}</td>
+                                        <td>{{ user.invmI_ItemName}}</td>
+                                        <td>{{ user.invmT_TaxName}}</td>
+                                        <td>{{ user.invmT_TaxAliasName}}</td>
+                                        <td>{{ user.invmiT_TaxValue | number:2}}</td>
+                                        <td><input type="text" ng-model="user.inv_TaxAmount" allow-pattern="(\s|[0-9.])" maxlength="6" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" value="{{user.inv_TaxAmount}}" placeholder="Tax Amount"></td>
+                                        <td hidden="hidden">{{user.INVMT_Id}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="addtocart(get_itemTax)" data-dismiss="modal"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to Cart</md-button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==================================View PO Details Model========================================== -->
+    <div id="myModalGrid" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                       
+                        <h4 class="modal-title text-white">{{ponum}}</h4>
+                    </div>
+                    <div class="box-body">
+                        <div class="text-center">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                        </th>
+                                        <th><a href="" ng-click="sortBy('invmI_ItemName')">Item Name</a></th>
+                                        <th><a href="" ng-click="sortBy('invmuoM_UOMName')">UOM</a> </th>
+                                        <th><a href="" ng-click="sortBy('invtpO_POQty')">Quantity</a> </th>
+                                        <th><a href="" ng-click="sortBy('invtpO_RatePerUnit')"> Rate</a></th>
+                                        <th><a href="" ng-click="sortBy('invtpO_TaxAmount')"> Tax</a></th>
+                                        <th><a href="" ng-click="sortBy('invtpO_Amount')">Amount </a> </th>
+                                        <th><a href="" ng-click="sortBy('invtpO_Remarks')">Remarks </a> </th>
+
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in get_poDetail">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{user.invmI_ItemName}}</td>
+                                        <td>{{user.invmuoM_UOMName}}</td>
+                                        <td>{{user.invtpO_POQty}}</td>
+                                        <td>{{user.invtpO_RatePerUnit}}</td>
+                                        <td>{{user.invtpO_TaxAmount}}</td>
+                                        <td>{{user.invtpO_Amount}}</td>
+                                        <td>{{user.invtpO_Remarks}}</td>
+                                        <td class="text-center">
+                                            <span>
+                                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="PO Tax" data-ng-model="ViewOption"
+                                                   data-target="#myModaltax" data-ng-click="onformclick(user)">
+                                                    <i class="fa fa-eye fa-1x" aria-hidden="true">Tax</i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="user.invtpO_ActiveFlg === false">
+                                                <a href="" ng-click="deactive(user)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    <i> Activate </i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="user.invtpO_ActiveFlg === true">
+                                                <a href="" ng-click="deactive(user)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    <i> Deactivate</i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                           
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ========================View PO TAX Model========================= -->
+    <div id="myModaltax" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white">{{ponbr}}</h4>
+                        <h4 class="modal-title text-white">{{itm}}</h4>
+                    </div>
+                    <div class="box-body">
+                        <div class="text-center">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                        </th>
+                                        <th><a href="" ng-click="sortBy('invtpoT_TaxPercent')">Tax</a></th>
+                                        <th><a href="" ng-click="sortBy('invtpoT_TaxPercent')">Tax Percentage</a></th>
+                                        <th><a href="" ng-click="sortBy('invtpoT_TaxAmount')">Tax Amount</a> </th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in get_potax">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{user.invmT_TaxName}}</td>
+                                        <td>{{user.invtpoT_TaxPercent | number:2}}</td>
+                                        <td>{{user.invtpoT_TaxAmount | number:2}}</td>
+
+                                        <td class="text-center">
+                                            <a class="text-aqua" href="" ng-click="edittx(user,transrows)" ng-show="false" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            </a>
+                                            <span ng-if="user.invtpoT_ActiveFlg === false">
+                                                <a href="" ng-click="deactiveTx(user)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    <i> Activate </i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="user.invtpoT_ActiveFlg === true">
+                                                <a href="" ng-click="deactiveTx(user)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    <i> Deactivate</i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                           
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

@@ -1,0 +1,484 @@
+
+
+
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="ShowReportdata()" name="myform" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">PREADMISSION MONTH END REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="seluse" name="meracdyr" data-ng-model="academicyr" ng-change="get_years()" required>
+                                    <option value="">Select Academic Year</option>
+
+                                    <option ng-repeat="option in acayyearbind" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.meracdyr)" ng-messages="myform.meracdyr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Month :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="seluse" data-ng-model="monthmodel" name="mermon" required>
+                                    <option value="">Select Month</option>
+                                    <option value="0">All</option>
+                                    <option ng-repeat="mon in month_name" value="{{mon.ivrM_Month_Id}}"
+                                            ng-selected="{{mon.Selected == true}}">
+                                        {{mon.ivrM_Month_Name}}
+                                    </option>
+
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.mermon)" ng-messages="myform.mermon.$error">
+                                    <div ng-message="required">Select Month</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="seluse" name="meryr" data-ng-model="yearmodel" required>
+                                    <option value="">Select Year</option>
+                                    <option ng-repeat="option in years" value="{{option.asmaY_Year}}"
+                                            ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+
+                                <div class="error-messages" ng-if="interacted(myform.meryr)" ng-messages="myform.meryr.$error">
+                                    <div ng-message="required">Select Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">IE Name:</label>
+                            <div class="col-sm-8">
+                                <input type="text" ng-model="iename" class="form-control" name="IEName"/>
+                                <div class="error-messages" ng-if="interacted(myForm.IEName)" ng-messages="myForm.IEName.$error">
+                                    <div ng-message="required">Select IE Name</div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" ng-click="Clear_Details();" target="_blank" class="md-raised md-warn">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                    </md-button>
+                    <md-button type="button" ng-show="export_flag" target="_blank" class="md-raised md-primary" ng-click="exportToExcel('#printSectionIdexport')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export to Excel
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-warn" ng-show="export_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="box box-primary" ng-show="grid_flag">
+            <div class="box-header with-border">
+                <h3 class="box-title">PREADMISSION MONTH END REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" id="printSectionId">
+
+                <div class="baldwin text-center" ng-show="graphofmonth==true" >
+                    <img src="{{imgname}}" class="img-responsive" alt="">
+                </div>
+
+                <div class="text-center">
+                    <h3 class="">{{monthmodelvalue | uppercase }} PREADMISSION MONTH END REPORT</h3>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">IE Name</label>
+                            <label class="control-label">
+                                : {{iename}}
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Designation</label>
+                            <label class="control-label">
+                                : {{designation}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">Date</label>
+                            <label class="control-label">
+                                : {{ today | date }}
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">Academic Year</label>
+                            <label class="control-label">
+                                : {{acayearnow}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <table class="table table-bordered" id="Table">
+                        <thead style="border:0.5px solid #fff;">
+                            <tr>
+                                <th colspan="5" style="background: #fff;"></th>
+                                <th colspan="3" class="text-center">Missing Details</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">SL. No.</th>
+                                <th class="text-center">Name</th>
+                                <th class="text-center">Count</th>
+                                <th class="text-center">SMS Sent</th>
+                                <th class="text-center">Email Sent</th>
+                                <th class="text-center">Photo</th>
+                                <th class="text-center">Email Id</th>
+                                <th class="text-center">Contact No.</th>
+                                <th class="text-center">Online.</th>
+                                <th class="text-center">Offline.</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1.</td>
+                                <td style="text-align:center">Total Registered</td>
+                                <td>{{total_Reg}}</td>
+                                <td>{{sent_sms_count}}</td>
+                                <td>{{sent_email_count}}</td>
+                                <td>{{missing_photo}}</td>
+                                <td>{{missing_email}}</td>
+                                <td>{{missing_no}}</td>
+                                <td>---</td>
+                                <td>---</td>
+
+                            </tr>
+                            <tr>
+                                <td>2.</td>
+                                <td style="text-align:center">Total Filled</td>
+                                <td>{{total_filled}}</td>
+                                <td>{{total_filled}}</td>
+                                <td>{{total_filled}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+
+                            </tr>
+                            <tr>
+                                <td>3.</td>
+                                <td style="text-align:center">Reg. Not Filled</td>
+                                <td>{{total_notfilled}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>4.</td>
+                                <td style="text-align:center">Reg Payment Done</td>
+                                <td>{{total_regpaid}}</td>
+                                <td>{{total_regpaid - offline_pay}}</td>
+                                <td>{{total_regpaid - offline_pay}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>5.</td>
+                                <td style="text-align:center">Reg Payment Not Done</td>
+                                <td>{{total_notregpaid}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>6.</td>
+                                <td style="text-align:center">Total Transferred</td>
+                                <td>{{total_transferd}}</td>
+                                <td>{{total_transferd}}</td>
+                                <td>{{total_transferd}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>7.</td>
+                                <td style="text-align:center">Total Entries</td>
+
+                                <td>{{tot_entries}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>{{tot_online}}</td>
+                                <td>{{tot_offline}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="imageContainer" ng-show="img_graph">
+                        <img id="chartImage" width="1500" height="300">
+                    </div>
+                    <div class="col-sm-12" style="margin-top:10px">
+                        <div class="box box-success">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"></h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div id="rangeBarChat" style="height: 450px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <br />
+                    <div>
+                        <div class="row">
+
+                            <div class="col-sm-6">Implementation Engineer:_______________</div>
+                            <div class="col-sm-6">Nodal Officer:_______________</div>
+
+                        </div>
+                        <br />
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-6">End User:_______________</div>
+                            <div class="col-sm-6">Seal</div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+            <div class="box-body" id="printSectionIdexport" ng-show="false">
+
+                <div class="text-center">
+                    <h3 class="">{{monthmodelvalue | uppercase }} PREADMISSION MONTH END REPORT</h3>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">IE Name</label>
+                            <label class="control-label">
+                                : {{iename}}
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Designation</label>
+                            <label class="control-label">
+                                : {{designation}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">Date</label>
+                            <label class="control-label">
+                                : {{ today | date }}
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">Academic Year</label>
+                            <label class="control-label">
+                                : {{acayearnow}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <table class="table table-bordered" id="Table">
+                        <thead style="border:0.5px solid #fff;">
+                            <tr>
+                                <th colspan="5" style="background: #fff;"></th>
+                                <th colspan="3" class="text-center">Missing Details</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">SL. No.</th>
+                                <th class="text-center">Name</th>
+                                <th class="text-center">Count</th>
+                                <th class="text-center">SMS Sent</th>
+                                <th class="text-center">Email Sent</th>
+                                <th class="text-center">Photo</th>
+                                <th class="text-center">Email Id</th>
+                                <th class="text-center">Contact No.</th>
+                                <th class="text-center">Online.</th>
+                                <th class="text-center">Offline.</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1.</td>
+                                <td style="text-align:center">Total Registered</td>
+                                <td>{{total_Reg}}</td>
+                                <td>{{sent_sms_count}}</td>
+                                <td>{{sent_email_count}}</td>
+                                <td>{{missing_photo}}</td>
+                                <td>{{missing_email}}</td>
+                                <td>{{missing_no}}</td>
+                                <td>---</td>
+                                <td>---</td>
+
+                            </tr>
+                            <tr>
+                                <td>2.</td>
+                                <td style="text-align:center">Total Filled</td>
+                                <td>{{total_filled}}</td>
+                                <td>{{total_filled}}</td>
+                                <td>{{total_filled}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+
+                            </tr>
+                            <tr>
+                                <td>3.</td>
+                                <td style="text-align:center">Reg. Not Filled</td>
+                                <td>{{total_notfilled}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>4.</td>
+                                <td style="text-align:center">Reg Payment Done</td>
+                                <td>{{total_regpaid}}</td>
+                                <td>{{total_regpaid - offline_pay}}</td>
+                                <td>{{total_regpaid - offline_pay}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>5.</td>
+                                <td style="text-align:center">Reg Payment Not Done</td>
+                                <td>{{total_notregpaid}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>6.</td>
+                                <td style="text-align:center">Total Transferred</td>
+                                <td>{{total_transferd}}</td>
+                                <td>{{total_transferd}}</td>
+                                <td>{{total_transferd}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                            </tr>
+                            <tr>
+                                <td>7.</td>
+                                <td style="text-align:center">Total Entries</td>
+
+                                <td>{{tot_entries}}</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>{{tot_online}}</td>
+                                <td>{{tot_offline}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="imageContainer" ng-show="img_graph">
+                        <img id="chartImage" width="1500" height="300">
+                    </div>
+                    <div class="col-sm-12" style="margin-top:10px">
+                        <div class="box box-success">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"></h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div id="rangeBarChat" style="height: 450px; width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <br />
+                    <div>
+                        <div class="row">
+
+                            <div class="col-sm-6">Implementation Engineer:_______________</div>
+                            <div class="col-sm-6">Nodal Officer:_______________</div>
+
+                        </div>
+                        <br />
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-6">End User:_______________</div>
+                            <div class="col-sm-6">Seal</div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

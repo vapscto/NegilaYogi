@@ -1,0 +1,431 @@
+﻿
+<section class="content" data-ng-init="Binddata()">
+    <div class="box box-primary">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">STUDENT  BOOK Transaction Count Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <form class="form-horizontal" role="form" name="myForm" novalidate>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-8 col-lg-offset-2">
+
+                        <div class="col-sm-12">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Library Name:<span style="color:red;">*</span></label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" id="sm" name="year11" ng-model="LMAL_Id" ng-change="onSelectlibrary(LMAL_Id)" required>
+                                        <option value="">Select</option>
+                                        <option ng-repeat="year in msterliblist1" value="{{year.lmaL_Id}}" ng-selected="LMAL_Id == year.lmaL_Id">
+                                            {{year.lmaL_LibraryName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-5 error-messages" ng-if="interacted(myForm.year11)" ng-messages="myForm.year11.$error">
+                                    <div ng-message="required">Select Library</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <label class="control-label col-sm-3">Academic Year:<span style="color:red;">*</span></label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" id="sel1" ng-model="ASMAY_Id" name="yr1" required>
+                                        <!--ng-change="onselectacademic(yearlst)"-->
+                                        <option value="" label="Select Academic year"> </option>
+                                        <option ng-repeat="option in yearlt" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == ASMAY_Id}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.yr1)" ng-messages="myForm.yr1.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label class="control-label col-sm-3">&nbsp;&nbsp;</label>
+                                <div class="col-sm-4">
+                                    <label class="checkbox">
+                                        <input type="checkbox" data-ng-model="statuscount">
+                                        <span class="lbl padding-8">Status Count</span>
+                                    </label>
+                                </div>
+
+                            </div>
+                            <div class="">
+                                <h5>Issue  Date Between :-</h5>
+                            </div>
+                            <hr />
+                            <div class="form-group">
+                                <div class="col-sm-6">
+                                    <label class="control-label col-sm-4">From Date</label>
+                                    <md-datepicker name="sch_date" onkeydown="return false" ng-model="Issue_Datefrm" md-placeholder="Enter From date" md-min-date="minDate"></md-datepicker>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="control-label col-sm-3">To Date</label>
+                                    <md-datepicker name="sch_date11" onkeydown="return false" ng-model="IssueToDateto" md-placeholder="Enter To date" md-min-date="minDate" ng-required="IssueFromDate!=''"></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date11)" ng-messages="myForm.sch_date11.$error">
+                                    <div ng-message="required">Select Search date</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <div class="">
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-click="get_report()" id="save-btn">
+                                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                            <md-button type="button" ng-click="printData()" class="md-raised md-primary" ng-disabled="alldata.length==0">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                print
+                            </md-button>
+                            <md-button type="button" ng-click="exportToExcel()" target="_blank" class="md-raised md-primary" ng-disabled="alldata.length==0">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="box box-primary" ng-show="alldata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STUDENT  BOOK Transaction Count Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+
+        <div class="box-body" ng-show="statuscount==false">
+
+            <div class="row">
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{newarray.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="printtable">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL. No.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('ASMCL_ClassName')">CLASS : SECTION</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('seccount')">BOOKS ISSUED</a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="bkdata in filterValue =( newarray | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>
+                                <span ng-if="bkdata.ASMCL_ClassName=='TOTAL'">
+                                    <b> {{bkdata.ASMCL_ClassName}}</b>
+                                </span>
+                                <span ng-if="bkdata.ASMCL_ClassName!='TOTAL'">
+                                    {{bkdata.ASMCL_ClassName}}:{{bkdata.ASMC_SectionName}}
+                                </span>
+                            </td>
+                            <td>
+
+
+                                <span ng-if="bkdata.ASMCL_ClassName=='TOTAL'">
+                                    <b>   {{bkdata.seccount}}</b>
+                                </span>
+                                <span ng-if="bkdata.ASMCL_ClassName!='TOTAL'">
+                                    {{bkdata.seccount}}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <b> FINAL TOTAL</b>
+                            </td>
+                            <td>
+                                <b>{{finaltotal}}</b>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+
+
+        <div class="box-body" ng-show="statuscount==true">
+
+            <div class="row">
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{alldata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="printtable1">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL. No.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('ASMCL_ClassName')">Transaction Type</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('seccount')">NO. OF COPIES</a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="bkdata in filterValue =( alldata | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>
+                                {{bkdata.LBTR_Status}}
+
+                            </td>
+                            <td>
+                                {{bkdata.seccount}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <b>TOTAL</b>
+                            </td>
+                            <td>
+                                <b>{{finaltotal}}</b>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div id="printareaId" ng-show="tadprint">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <center> <h4>STUDENT  BOOK Transaction Report</h4></center>
+            <br />
+            <table class="table table-hover table-responsive table-bordered text-center" id="table11">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width:40px !important">
+                            SL.No.
+                        </th>
+
+
+                        <th class="text-center">
+                            CLASS : SECTION
+                        </th>
+                        <th class="text-center">
+                            BOOKS ISSUED
+                        </th>
+
+                    </tr>
+
+                </thead>
+                <tbody>
+                    <tr ng-repeat="rt in newarray">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-center">
+                            <span ng-if="rt.ASMCL_ClassName=='TOTAL'">
+                                <b> {{rt.ASMCL_ClassName}}</b>
+                            </span>
+                            <span ng-if="rt.ASMCL_ClassName!='TOTAL'">
+                                {{rt.ASMCL_ClassName}}:{{rt.ASMC_SectionName}}
+                            </span>
+                        </td>
+                        <td class="text-center">
+
+
+                            <span ng-if="rt.ASMCL_ClassName=='TOTAL'">
+                                <b>   {{rt.seccount}}</b>
+                            </span>
+                            <span ng-if="rt.ASMCL_ClassName!='TOTAL'">
+                                {{rt.seccount}}
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td class="text-center">
+                            <b> FINAL TOTAL</b>
+                        </td>
+                        <td class="text-center">
+                            <b>{{finaltotal}}</b>
+                        </td>
+                    </tr>
+
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="col-sm-12 text-center ">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+
+                </tfoot>
+            </table>
+        </div>
+
+        <div id="printareaId22" ng-show="tadprint">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <center> <h4> STUDENT  BOOK Transaction Report</h4></center>
+            <br />
+            <table class="table table-hover table-responsive table-bordered text-center" id="table1111">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width:40px !important">
+                            SL.No.
+                        </th>
+
+
+                        <th class="text-center">
+                            Transaction Type
+                        </th>
+                        <th class="text-center">
+                            NO. OF COPIES
+                        </th>
+
+                    </tr>
+
+                </thead>
+                <tbody>
+                    <tr ng-repeat="rt in alldata">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-center">
+                            {{rt.LBTR_Status}}
+
+                        </td>
+                        <td class="text-center">
+                            {{rt.seccount}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="text-center">
+                            <b>TOTAL</b>
+                        </td>
+                        <td class="text-center">
+                            <b>{{finaltotal}}</b>
+                        </td>
+                    </tr>
+
+                    
+
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="col-sm-12 text-center ">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+

@@ -1,0 +1,399 @@
+﻿<style>
+    thead {
+        color: black !important;
+        text-align: center;
+        background: white !important;
+    }
+
+    .trclasssubject {
+        height: 140px !important;
+        white-space: pre-wrap;
+    }
+
+    .pagelayout {
+        border: 1px solid black !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important
+    }
+
+    .huva {
+        font-size: 18px;
+    }
+
+    tr {
+        font-size: 15px !important
+    }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">1 to 8 Report Card</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Academic Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="acd1" ng-model="ASMAY_Id" ng-disabled="selected_temp.length>0"
+                                            ng-change="onyearchange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="acd in year_list" value="{{acd.asmaY_Id}}" ng-selected="{{acd.Selected==true}}">
+                                            {{acd.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd1)" ng-messages="myForm.acd1.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Class:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="class" ng-model="ASMCL_Id" ng-change="onclasschange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="clas in class_list" value="{{clas.asmcL_Id}}" ng-selected="{{clas.Selected==true}}">
+                                            {{clas.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Section:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="cat" ng-model="ASMS_Id" ng-disabled="selected_temp.length>0"
+                                            ng-change="onsectionchange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="section in section_list" value="{{section.asmS_Id}}" ng-selected="{{section.Selected==true}}">
+                                            {{section.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    <input name="allcheck" value="" ng-model="all" type="checkbox" ng-click="OnClickAll()">
+                                    <span class="lbl padding-8">
+                                        Student :
+                                    </span><span style="color:Red">*</span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                    <label ng-repeat="termdetails in getstudentlist | filter :filterchkbx">
+                                        <input name="option1" value="{{termdetails.amsT_Id}}" type="checkbox" ng-model="termdetails.AMST_Ids"
+                                               ng-required="isOptionsRequired1();" ng-click="individual()">
+                                        <span class="lbl padding-8">{{termdetails.studentname}}</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-8 error-messages" ng-if="interacted(myForm.option1)" ng-messages="myForm.option1.$error">
+                                    <div ng-message="required">Select Atleast One Student</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="text-center form-group">
+                            <input type="hidden" ng-model="EME_ID" />
+                            <md-button type="button" class="md-raised md-primary" ng-click="saveddata(obj)" ng-disabled="form.$invalid" id="save-btn">
+                                <i class="fa fa-list-alt " aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-click="print_HHS02();">
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary">
+            <div class="box-body">
+                <div class="" id="HHS02">
+                    <div ng-repeat="report in studentdetails">
+                        <div class="" style="page-break-before:always;">
+                            <!--<div class="row margin-top-5">
+                                <div class="col-sm-12">
+                                    <img src="{{imgname}}" style="width:100%; height:140px !important" />
+
+                                </div>
+                            </div>-->
+                            <table class="table" style="background-image:url('https://vapsclg.blob.core.windows.net/files/Logo02.jpg');background-repeat: no-repeat;background-size: contain;    background-size: 500px !important;background-position: center !important">
+                                <tr>
+                                    <td>
+                                        <div class="" style="border: thin solid  #727272;">
+                                            <table class="table-bordered table" style="background-color: transparent !important">
+                                                <tr>
+                                                    <th>
+                                                        <b>  TUNBRIDGE HIGH SCHOOL Report Card</b>
+                                                    </th>
+                                                    <th>
+                                                        <b>  {{report.studentname}}</b>
+                                                    </th>
+                                                    <th>
+                                                        <b>  {{report.classname}} &nbsp; {{report.sectionname}}</b>
+                                                    </th>
+                                                    <th>
+                                                        <b>   Adm &nbsp; {{report.admno}}  </b>
+                                                    </th>
+                                                    <th>
+                                                        <b> AY  &nbsp; {{Year}}</b>
+                                                    </th>
+                                                </tr>
+                                            </table>
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <table class="table-bordered table" style="font-family: 'Poppins', sans-serif !important;background-color: transparent !important ">
+                                                            <thead style="background-color: transparent !important">
+                                                                <tr>
+                                                                    <th>No</th>
+                                                                    <th width="100" class="text-center huva "><b>Subject</b></th>
+                                                                    <th class="text-center" style="word-wrap :break-word!important;" width="150" ng-repeat="grpexam in groupwiseexamlist">
+                                                                        <b>{{grpexam.examnamedisplay}}</b> <br />
+                                                                        <b>({{grpexam.EMPSGE_ForMaxMarkrs}})</b>
+                                                                    </th>
+                                                                    <th class="text-center" style="word-wrap :break-word!important;min-width: 100px !important;">
+                                                                        Yearly  Aggregate
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr ng-repeat="subj in report.studentsubjects">
+                                                                    <td>{{$index+1}}</td>
+                                                                    <td class="text-left" style="word-wrap:break-word;" width="400">{{subj.ISMS_SubjectName}}</td>
+
+                                                                    <td class="text-center ng-scope" ng-repeat="grpexam in groupwiseexamlist" ng-if="(subj.GropuFlag !=1 || grpexam.EME_Id!=9800001 ||  subj.colspan!=-1)" ng-init="(rowspan = subj.colspan > 1 && subj.GropuFlag==1  && grpexam.EME_Id !=9800000  && grpexam.EME_Id ==9800001 ? subj.colspan : -1)" rowspan="{{rowspan}}">
+                                                                        <span ng-repeat="mrks in report.studentmarks"
+                                                                              ng-if="subj.ISMS_Id==mrks.ISMS_Id && grpexam.EME_Id==mrks.EME_Id&& mrks.EMPSG_DisplayName==grpexam.EMPG_DistplayName">
+
+                                                                            <!--<span ng-if="mrks.PassFailFlag=='AB'||mrks.PassFailFlag=='M'||mrks.PassFailFlag=='L'">
+                                                                                <span ng-if="mrks.ObtainedMarks<0"> {{mrks.PassFailFlag}} </span>
+                                                                                <span ng-if="mrks.ObtainedMarks>0 && grpexam.EME_ExamName!='Term Average'">
+                                                                                    ({{mrks.ObtainedMarks}})
+                                                                                </span>
+                                                                            </span>-->
+
+
+
+                                                                            <span ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'&& grpexam.EME_ExamName!='Term Average' && mrks.EYCES_MarksDisplayFlg==true &&  mrks.EME_Id !=9800001 && mrks.ObtainedMarks > 0">
+                                                                                <span> {{mrks.ObtainedMarks}} </span>
+                                                                            </span>
+                                                                            <span ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'&& grpexam.EME_ExamName=='Term Average' && mrks.EYCES_MarksDisplayFlg==true &&  mrks.EME_Id !=9800001 && mrks.ObtainedMarks > 0">
+                                                                                <span> {{mrks.ObtainedMarks}} </span>
+                                                                            </span>
+                                                                            <span ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L' && mrks.EYCES_MarksDisplayFlg==false && mrks.EYCES_GradeDisplayFlg==true &&  mrks.EME_Id !=9800001 &&  mrks.EME_Id !=9800000">
+                                                                                <span> {{mrks.ObtainedGrade}} </span>
+                                                                            </span>
+                                                                            <span ng-if="mrks.PassFailFlag=='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L' ">
+                                                                                {{mrks.PassFailFlag}}
+                                                                            </span>
+
+
+                                                                            <!--//YearLygrate-->
+
+                                                                            <span ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L' && mrks.EYCES_MarksDisplayFlg==true &&  mrks.EME_Id ==9800001 && mrks.GropuFlag==1 && mrks.GroupMarks > 0">
+                                                                                <span> {{mrks.GroupMarks}}</span>
+                                                                            </span>
+                                                                            <span ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L' && mrks.EYCES_MarksDisplayFlg==true &&  mrks.EME_Id ==9800001 && mrks.GropuFlag==0 && mrks.ObtainedMarks > 0">
+                                                                                <span> {{mrks.ObtainedMarks}}</span>
+                                                                            </span>
+                                                                            <span ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'  && mrks.EYCES_GradeDisplayFlg==true && mrks.EYCES_MarksDisplayFlg==false &&  (mrks.EME_Id ==9800000 || mrks.EME_Id==9800001)">
+                                                                                <span> {{mrks.ObtainedGrade}} </span>
+                                                                            </span>
+
+                                                                        </span>
+                                                                        <span ng-if="subj.EYCES_MarksDisplayFlg==false && grpexam.EME_ExamName=='Term Average' && grpexam.EME_Id !=9800000 && grpexam.EME_Id !=9800001">
+                                                                            -
+                                                                        </span>
+                                                                    </td>
+                                                                    <td class="text-center">
+
+                                                                        <span ng-if="subj.EYCES_GradeDisplayFlg==true && subj.PassFailFlag !='AB' && subj.EYCES_MarksDisplayFlg==false">{{subj.ESTMPPSG_GroupObtGrade}}  </span>
+                                                                        <span ng-if="subj.EYCES_MarksDisplayFlg==true && subj.PassFailFlag !='AB'"> {{subj.ESTMPPSG_GroupObtMarks}} </span>
+                                                                        <span ng-if="subj.PassFailFlag =='AB'"> {{subj.PassFailFlag}} </span>
+
+
+
+
+                                                                    </td>
+
+
+                                                                </tr>
+
+                                                            </tbody>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th class="text-center" colspan="2">TOTAL MARKS</th>
+                                                                    <th class="text-center" ng-repeat="grpexam in groupwiseexamlist" ng-if="masterexamd.GradeExam !='Gradess' &&grpexam.EME_Id !=9800001" ng-init="rowspan = grpexam.EME_Id !=9800001  && grpexam.EME_Id ==9800000 ? grpexam.colspan : 1" colspan="{{rowspan}}">
+                                                                        <span ng-repeat="mrks in report.student_marks"
+                                                                              ng-if="grpexam.EME_Id==mrks.EME_Id && mrks.EMPSG_DisplayName==grpexam.EMPG_DistplayName">
+                                                                            <span>
+                                                                                {{mrks.ObtainedMarks}}/{{mrks.TotalMarks}}
+                                                                            </span>
+
+
+                                                                        </span>
+
+
+                                                                    </th>
+                                                                    <th>
+                                                                        <span ng-repeat="prm in  getstudentwisetermwisedetails" ng-if="prm.AMST_Id==report.AMST_Id"> {{prm.ESTMPP_TotalObtMarks}} /  {{prm.ESTMPP_TotalMaxMarks}} </span>
+
+                                                                    </th>
+
+                                                                </tr>
+                                                                <tr>
+                                                                    <th class="text-center" colspan="2">Percentage</th>
+                                                                    <th class="text-center" ng-repeat="grpexam in groupwiseexamlist" ng-if="masterexamd.GradeExam !='Gradess' &&grpexam.EME_Id !=9800001" ng-init="rowspan = grpexam.EME_Id !=9800001  && grpexam.EME_Id ==9800000 ? grpexam.colspan : 1" colspan="{{rowspan}}">
+                                                                        <span ng-repeat="mrks in report.student_marks"
+                                                                              ng-if="grpexam.EME_Id==mrks.EME_Id && mrks.EMPSG_DisplayName==grpexam.EMPG_DistplayName">
+                                                                            <span>{{mrks.TotalPercentage}}</span>
+                                                                        </span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <span ng-repeat="prm in  getstudentwisetermwisedetails" ng-if="prm.AMST_Id==report.AMST_Id"> {{prm.ESTMPP_Percentage}} </span>
+
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+
+                                                                    <th class="text-center" colspan="2">Attendance % </th>
+                                                                    <th class="text-center" ng-repeat="masterexamd in groupwiseexamlist" ng-if="masterexamd.GradeExam !='Gradess' &&masterexamd.EME_Id !=9800001" colspan="{{masterexamd.Attcolspan}}">
+                                                                        <span ng-repeat="att in  getstudentwiseattendancedetails" ng-if="masterexamd.EME_Id==att.EME_Id && att.AMST_Id==report.AMST_Id && masterexamd.EMPG_GroupName==att.EMPSG_DisplayName">
+                                                                            {{att.TOTALAttendancePercentage}}
+                                                                        </span>
+
+                                                                    </th>
+                                                                    <th rowspan="2">
+                                                                        {{report.TOTALAttendancePercentage}}
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th class="text-center" colspan="2">Cumulative Attendence/Days</th>
+                                                                    <th class="text-center" ng-repeat="masterexamd in groupwiseexamlist" ng-if="masterexamd.GradeExam !='Gradess' && masterexamd.EME_Id !=9800001" colspan="{{masterexamd.Attcolspan}}">
+                                                                        <span ng-repeat="att in  getstudentwiseattendancedetails" ng-if="masterexamd.EME_Id==att.EME_Id  && att.AMST_Id==report.AMST_Id && masterexamd.EMPG_GroupName==att.EMPSG_DisplayName">
+                                                                            {{att.TOTALPRESENTDAYS}} / {{att.TOTALWORKINGDAYS}}
+                                                                        </span>
+
+                                                                    </th>
+
+
+                                                                </tr>
+
+                                                            </tbody>
+
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th class="text-center" colspan="2">
+                                                                        Teacher's  Signature & Date
+                                                                    </th>
+                                                                    <th ng-repeat="grpexam in groupwiseexamlist" ng-if="masterexamd.GradeExam !='Gradess' &&grpexam.EME_Id !=9800001" ng-init="rowspan = grpexam.EME_Id !=9800001  && grpexam.EME_Id ==9800000 ? grpexam.colspan : 1" colspan="{{rowspan}}">
+
+                                                                    </th>
+                                                                    <th></th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th class="text-center" colspan="2">
+                                                                        Principal's  Signature & Date
+                                                                    </th>
+                                                                    <th ng-repeat="grpexam in groupwiseexamlist" ng-if="grpexam.EME_Id !=9800001" ng-init="rowspan = grpexam.EME_Id !=9800001  && grpexam.EME_Id ==9800000 ? grpexam.colspan : 1" colspan="{{rowspan}}">
+
+                                                                    </th>
+                                                                    <th></th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th class="text-center" colspan="2">
+                                                                        Parent's  Signature & Date
+                                                                    </th>
+                                                                    <th ng-repeat="grpexam in groupwiseexamlist" ng-if="grpexam.EME_Id !=9800001" ng-init="rowspan = grpexam.EME_Id !=9800001  && grpexam.EME_Id ==9800000 ? grpexam.colspan : 1" colspan="{{rowspan}}">
+
+                                                                    </th>
+                                                                    <th></th>
+
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                    <td style="vertical-align:top !important" width="250">
+
+                                                        <table class="table table-bordered table-condensed" style="font-family: 'Poppins', sans-serif !important;background-color: transparent !important">
+                                                            <thead>
+
+                                                                <tr>
+                                                                    <th style="height: 94px   !important">
+                                                                        Teacher's  Comments/Rank
+                                                                    </th>
+                                                                </tr>
+
+                                                            </thead>
+                                                            <tbody>
+
+                                                                <tr ng-repeat="dd in examwiseremarks" ng-if="dd.AMST_Id==report.AMST_Id && examwiseremarks.length > 0">
+                                                                    <td style="text-align:left !important">
+                                                                        {{dd.EME_ExamName}} &emsp; &emsp; RANK :{{dd.ESTMP_ClassRank}}
+                                                                        <br />
+
+                                                                        {{dd.EMER_Remarks}}
+                                                                    </td>
+
+                                                                </tr>
+                                                                <tr ng-repeat="ddd in getpromotionremarksdetails" ng-if="getpromotionremarksdetails.length > 0 && ddd.amsT_Id==report.AMST_Id">
+
+                                                                    <td style="text-align:left !important">
+                                                                        FINAL  REMARKS   & RESULT
+                                                                        <br />
+
+                                                                        {{ddd.eprD_Remarks}}
+                                                                        <br />
+                                                                        OVERALL RANK : {{ddd.eprD_ClassPromoted}}
+                                                                    </td>
+
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <!--<div class="row">
+                                                <div class="col-sm-9">
+
+                                                </div>
+
+                                            </div>-->
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</section>

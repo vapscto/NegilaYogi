@@ -1,0 +1,792 @@
+﻿<style>
+    thead {
+        color: black !important;
+        text-align: center;
+        background: white !important;
+    }
+
+    .trclasssubject {
+        height: 140px !important;
+        white-space: pre-wrap;
+    }
+
+    .pagelayout {
+        border: 1px solid black !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+        padding-bottom: 5px !important;
+        margin-top: 1% !important;
+    }
+
+    .tabled {
+        /* border: 0.8px solid #cad4de;*/
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 0px;
+        /* background: #95c7ef; */
+    }
+
+    .table4 {
+        border: 0 !important;
+    }
+
+    .table1 {
+        border: 0 !important;
+    }
+
+    .h3class {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        color: black !important;
+        font-family: "Times New Roman", Times, serif;
+        font-weight: bold !important;
+        font-size: x-large;
+    }
+</style>
+<link href="css/print/NDS/NDS_1_5_ReportCard.css" rel="stylesheet" />
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">1_5 Progress Card Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Academic Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="acd1" ng-model="ASMAY_Id" ng-disabled="selected_temp.length>0"
+                                            ng-change="onyearchange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="acd in year_list" value="{{acd.asmaY_Id}}" ng-selected="{{acd.Selected==true}}">
+                                            {{acd.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd1)" ng-messages="myForm.acd1.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Section:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="cat" ng-model="ASMS_Id" ng-disabled="selected_temp.length>0"
+                                            ng-change="onsectionchange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="section in section_list" value="{{section.asmS_Id}}" ng-selected="{{section.Selected==true}}">
+                                            {{section.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">School Re-open Date:</label>
+                                <md-datepicker ng-model="re_opendate" name="sch_date" md-placeholder="Enter Date"></md-datepicker>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Class:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="class" ng-model="ASMCL_Id" ng-change="onclasschange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="clas in class_list" value="{{clas.asmcL_Id}}" ng-selected="{{clas.Selected==true}}">
+                                            {{clas.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Student:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="classD" ng-model="AMST_Id" ng-change="Onchangestudent()" required>
+                                        <option value="">--Select Student--</option>
+                                        <option ng-repeat="clas in getstudentlist" value="{{clas.amsT_Id}}" ng-selected="{{clas.Selected==true}}">
+                                            {{clas.studentname}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.classD)" ng-messages="myForm.classD.$error">
+                                        <div ng-message="required">Select Student</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="text-center form-group">
+                            <input type="hidden" ng-model="EME_ID" />
+                            <md-button type="button" class="md-raised md-primary" ng-click="saveddata(obj)" ng-disabled="form.$invalid" id="save-btn">
+                                <i class="fa fa-list-alt " aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" ng-click="print_HHS02();">
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-if="studentdetails.length>0">
+            <!---->
+            <div class="box-body">
+                <div class="" id="HHS02">
+                    <section class="section01 pagelayout" style="page-break-after:always;">
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <img src="/images/NDSLogoexam.jpg" class="img-responsive" style="width:100%;" />
+                            </div>
+                        </div>
+                        <div class="row margin-top-30">
+                            <div class="col-sm-6 col-sm-offset-5">
+                                <div style="border:1px solid #000;width: 120px;height: 120px;">
+                                    <img ng-if="AMST_Photoname!=null && AMST_Photoname !=''" src="{{AMST_Photoname}}" class="img-responsive">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding-top-60 body-section">
+                            <table class="table table1 margin-top-20">
+                                <tr>
+                                    <td width="120" class="text-left"><h3 class="h3class">Student Profile :</h3></td>
+                                </tr>
+                            </table>
+                            <table class="table table1 margin-top-30">
+                                <tr>
+                                    <td width="200" class="text-left">Student Name </td>
+                                    <td width="10">:</td>
+                                    <td class="border-bottom" style="text-align:left">{{stuname}}</td>
+                                </tr>
+                            </table>
+                            <table class="table table1 margin-top-30">
+                                <tr>
+                                    <td width="200" class="text-left">Class</td>
+                                    <td width="10">:</td>
+                                    <td class="border-bottom" style="text-align:center">{{asmcL_ClassName}} {{asmC_SectionName}}</td>
+                                    <td width="85" class="text-center">Roll No :</td>
+                                    <td class="border-bottom" style="text-align:center">{{amaY_RollNo}}</td>
+                                </tr>
+                            </table>
+                            <table class="table table1 margin-top-30">
+                                <tr>
+                                    <td width="200" class="text-left">Academic Session </td>
+                                    <td width="10">:</td>
+                                    <td class="border-bottom" style="text-align:center">{{ASMAY_Year}}</td>
+                                </tr>
+                            </table>
+                            <table class="table table1 margin-top-30">
+                                <tr>
+                                    <td width="200" class="text-left">House </td>
+                                    <td width="10">:</td>
+                                    <td class="border-bottom" style="text-align:center">{{housename}}</td>
+                                </tr>
+                            </table>
+                            <table class="table table1 margin-top-30">
+                                <tr>
+                                    <td width="200" class="text-left">Date of Birth </td>
+                                    <td width="10">:</td>
+                                    <td class="border-bottom" style="text-align:center">
+                                        {{getdate}}<sup>{{index}}</sup>{{getmonth}} {{getyear}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table1 margin-top-30">
+                                <tr>
+                                    <td width="200" class="text-left">Residential Address </td>
+                                    <td width="10">:</td>
+                                    <td class="border-bottom" style="text-align:center">
+                                        <span ng-if="amsT_PerStreet!=''">{{amsT_PerStreet+', '}}</span>
+                                        <span ng-if="amsT_PerStreet==''"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table1 margin-top-30">
+                                <tr>
+                                    <td width="200" class="text-left"> </td>
+                                    <td width="10"></td>
+                                    <td class="border-bottom" style="text-align:center">
+                                        <span ng-if="amsT_PerArea!=''">{{amsT_PerArea+', '}}</span>
+                                        <span ng-if="amsT_PerArea==''"></span>
+                                        <span ng-if="amsT_PerCity!=''">{{amsT_PerCity+', '}}</span>
+                                        <span ng-if="amsT_PerCity==''"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table1 margin-top-30">
+                                <tr>
+                                    <td width="200" class="text-left">and Telephone No</td>
+                                    <td width="10">:</td>
+                                    <td class="border-bottom" style="text-align:center"><b>{{mobileno}}</b></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="section02 pagelayout" style="page-break-before:always;">
+                        <div ng-repeat="report in studentdetails">
+                            <div class="">
+                                <div class="row margin-top-10">
+                                    <div class="col-sm-12">
+                                        <h4><b>Part-1 : Academic Performance : Scholastic Areas (9 points scale)</b></h4>
+                                    </div>
+                                </div>
+
+                                <div class="row margin-top-10">
+                                    <div class="col-sm-12">
+                                        <table class="table-bordered table" style="width:100% !important">
+                                            <thead>
+                                                <tr>
+                                                    <th rowspan="2" style="word-break :break-word!important; width:5% !important">Sl.No</th>
+                                                    <th rowspan="2" class="text-center" style="word-break :break-word!important; width: 15% !important">
+                                                        <b>Subject Name</b>
+                                                    </th>
+                                                    <td ng-repeat="grp in getgroupdetails" colspan="{{grp.groupewiseexam.length}}" style="width:30% !important">
+                                                        <b>{{grp.empG_DistplayName}}</b>
+                                                    </td>
+                                                    <td rowspan="2" style="word-break :break-word!important ;width:10% !important"><b>Total</b></td>
+                                                    <td rowspan="2" style="word-break :break-word!important ;width: 10% !important"><b>Grade Point</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-center" style="word-break :break-word!important" width="150"
+                                                        ng-repeat="grpexam in groupwiseexamlist">
+                                                        <b>{{grpexam.examnamedisplay}}</b> <br />
+                                                        <b ng-if="grpexam.examnamedisplay !='Grade'">({{grpexam.EMPSGE_ForMaxMarkrs}})</b>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat="subj in report.studentsubjects" ng-if="subj.EMPS_AppToResultFlg">
+                                                <tr style="height: 100px !important;">
+                                                    <td class="text-center"><b>{{$index+1}}</b></td>
+                                                    <td class="text-left" style="word-break:break-word"><b>{{subj.ISMS_SubjectName}}</b></td>
+                                                    <td class="text-center" ng-repeat="grpexam in groupwiseexamlist">
+                                                        <span ng-repeat="mrks in report.studentmarks"
+                                                              ng-if="subj.ISMS_Id==mrks.ISMS_Id && grpexam.EME_Id==mrks.EME_Id
+                                                      && mrks.EMPSG_DisplayName==grpexam.EMPG_DistplayName">
+
+                                                            <label ng-if="mrks.PassFailFlag=='AB'||mrks.PassFailFlag=='M'||mrks.PassFailFlag=='L'">
+                                                                <b>  {{marks.PassFailFlag}}</b>
+                                                                <b ng-if="marks.ObtainedMarks>0 && grpexam.EME_ExamName!='Grade'">
+                                                                    ({{marks.ObtainedGrade}})
+                                                                </b>
+                                                            </label>
+                                                            <label ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'
+                                                           && grpexam.EME_ExamName!='Grade'">
+                                                                <b>  {{mrks.ObtainedGrade}}</b>
+                                                            </label>
+                                                            <label ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'
+                                                           && grpexam.EME_ExamName=='Grade'">
+                                                                <b>  {{mrks.ObtainedGrade}}</b>
+                                                            </label>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center"><b>{{subj.gradeobtained}}</b></td>
+                                                    <td class="text-center"><b>{{subj.obtainedgradepoints}}</b></td>
+                                                </tr>
+                                            </tbody>
+                                            <tbody ng-repeat="subj in report.studentsubjects" ng-if="!subj.EMPS_AppToResultFlg">
+                                                <tr>
+                                                    <td class="text-center"><b>{{$index+1}}</b></td>
+                                                    <td class="text-left" style="word-break:break-word"><b>{{subj.ISMS_SubjectName}}</b></td>
+                                                    <td class="text-center" ng-repeat="grpexam in groupwiseexamlist">
+                                                        <span ng-repeat="mrks in report.studentmarks"
+                                                              ng-if="subj.ISMS_Id==mrks.ISMS_Id && grpexam.EME_Id==mrks.EME_Id
+                                                      && mrks.EMPSG_DisplayName==grpexam.EMPG_DistplayName">
+
+                                                            <label ng-if="mrks.PassFailFlag=='AB'||mrks.PassFailFlag=='M'||mrks.PassFailFlag=='L'">
+                                                                <b>  {{marks.PassFailFlag}}</b>
+                                                                <b ng-if="marks.ObtainedMarks>0 && grpexam.EME_ExamName!='Grade'">
+                                                                    ({{marks.ObtainedGrade}})
+                                                                </b>
+                                                            </label>
+                                                            <label ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'
+                                                           && grpexam.EME_ExamName!='Grade'">
+                                                                <b>  {{mrks.ObtainedGrade}}</b>
+                                                            </label>
+                                                            <label ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'
+                                                           && grpexam.EME_ExamName=='Grade'">
+                                                                <b>  {{mrks.ObtainedGrade}}</b>
+                                                            </label>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center"><b>{{subj.gradeobtained}}</b></td>
+                                                    <td class="text-center"><b>{{subj.obtainedgradepoints}}</b></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section03 pagelayout" style="page-break-before:always;">
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <h4>A.Co-Scholastic Activites </h4>
+                            </div>
+                        </div>
+
+                        <div ng-repeat="dd in skill_list">
+                            <div class="row margin-top-15">
+                                <div class="col-sm-12">
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center"><b>{{dd.ECS_SkillName}} </b></td>
+                                                <td class="text-center" ng-repeat="cos in gettermdetails">
+                                                    <b>{{cos.ecT_TermName}}</b>
+                                                </td>
+                                            </tr>
+                                            <tr ng-repeat="d in  dd.skillarea">
+                                                <td class="text-left"><b>{{d.ECSA_SkillArea}}</b></td>
+                                                <td class="text-center" ng-repeat="cos in gettermdetails">
+                                                    <span ng-repeat="comraks in getstudentwiseskillslist"
+                                                          ng-if="dd.ECS_SkillName==comraks.ECS_SkillName && d.ECSA_SkillArea==comraks.ECSA_SkillArea
+                                                      && comraks.ECT_Id==cos.ecT_Id">
+                                                        <b>{{comraks.EMGD_Name}}</b>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row margin-top-15">
+                            <div class="col-sm-12">
+                                <h4>B.Personal Development </h4>
+                            </div>
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered">
+                                    <tbody ng-repeat="dd in activites_list">
+                                        <tr>
+                                            <td class="text-center"><b>{{dd.ECACT_SkillName}} </b></td>
+                                            <td class="text-center" ng-repeat="cos in gettermdetails">
+                                                <b>{{cos.ecT_TermName}}</b>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="d in  dd.activites_list_area_list">
+                                            <td class="text-left"><b>{{d.ECACTA_SkillArea}}</b></td>
+                                            <td class="text-center" ng-repeat="cos in gettermdetails">
+                                                <span ng-repeat="comraks in getstudentwiseactiviteslist"
+                                                      ng-if="dd.ECACT_SkillName==comraks.ECACT_SkillName && d.ECACTA_SkillArea==comraks.ECACTA_SkillArea
+                                                      && comraks.ECT_Id==cos.ecT_Id">
+                                                    <b>{{comraks.EMGD_Name}}</b>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row margin-top-15">
+                            <div class="col-sm-12">
+                                <h4>C.Health </h4>
+                            </div>
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-left"><b>ASPECTS</b></td>
+                                            <td class="text-center" ng-repeat="cos in gettermdetails">
+                                                <b>{{cos.ecT_TermName}}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left"><b>HEIGHT(CM)</b></td>
+                                            <td class="text-center" ng-repeat="cos in gettermdetails">
+                                                <span ng-repeat="obj in getstudentwisesportsdetails" ng-if="cos.ecT_Id==obj.ECT_Id">
+                                                    <b>{{obj.SPCCSHW_Height}}</b>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left"><b>WEIGHT(KG)</b></td>
+                                            <td class="text-center" ng-repeat="cos in gettermdetails">
+                                                <span ng-repeat="obj in getstudentwisesportsdetails" ng-if="cos.ecT_Id==obj.ECT_Id">
+                                                    <b>{{obj.SPCCSHW_Weight}}</b>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section04 pagelayout" style="page-break-before:always;">
+                        <div ng-repeat="cos in gettermdetails">
+                            <table class="table table4 margin-top-30">
+                                <tr>
+                                    <td width="118" style="text-align:left"> <b>{{cos.ecT_TermName}}</b></td>
+                                </tr>
+                            </table>
+                            <table class="table table4 margin-top-30">
+                                <tr>
+                                    <td width="160"> <b>Specific Participation : </b></td>
+                                    <td class="border-bottom"><b>{{cos.participate}}</b></td>
+                                </tr>
+                            </table>
+                            <table class="table table4 margin-top-30">
+                                <tr>
+                                    <td width="100"> <b>Attendance : </b></td>
+                                    <td width="220"><b>Total attendance of the students</b></td>
+                                    <td class="border-bottom"><b>{{cos.presentdays}}</b></td>
+                                </tr>
+                            </table>
+
+                            <table class="table table4 margin-top-30">
+                                <tr>
+                                    <td width="100"> <b>&nbsp; </b></td>
+                                    <td width="220"><b>Total working days</b></td>
+                                    <td class="border-bottom"><b>{{cos.workingdays}}</b></td>
+                                </tr>
+                            </table>
+                            <table class="table table4 margin-top-30">
+                                <tr>
+                                    <td width="140"> <b>General Remarks : </b></td>
+                                    <td class="border-bottom"><b>{{cos.generalremaks}}</b></td>
+                                </tr>
+                            </table>
+
+                            <div class="row margin-top-50">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-4 text-left">
+                                        <b>Class Teacher :</b>
+                                    </div>
+                                    <div class="col-sm-4 text-center">
+                                        <b>Principal :</b>
+                                    </div>
+                                    <div class="col-sm-4 text-right">
+                                        <b>Parent :</b>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="margin-top-20" style="color:black!important" />
+                        </div>
+
+                        <table class="table table4 margin-top-30">
+                            <tr>
+                                <td width="250"> <b>Congratulations : Promoted to Class :</b></td>
+                                <td class="border-bottom"><b>{{promotedclass}}</b></td>
+                            </tr>
+                        </table>
+
+                        <table class="table table4 margin-top-30">
+                            <tr>
+                                <td width="250"> <b>New Session begins on :</b></td>
+                                <td class="border-bottom"><b>{{re_opendate |date :'dd/MM/yyyy'}}</b></td>
+                            </tr>
+                        </table>
+
+                        <div class="row margin-top-50">
+                            <div class="col-sm-12">
+                                <div class="col-sm-4 text-left">
+                                    <b>Class Teacher :</b>
+                                </div>
+                                <div class="col-sm-4 text-center">
+                                    <b>Principal :</b>
+                                </div>
+                                <div class="col-sm-4 text-right">
+                                    <b>Parent :</b>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="pagelayout section04" style="page-break-before:always;">
+                        <div class="row">
+                            <h4 class="text-center"><b>GRADING SYSTEM </b></h4>
+                        </div>
+                        <div class="row">
+                            <h5 class="text-center"><b>Scholastic Areas</b>(Grading on 9 point scale)</h5>
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Grade</th>
+                                            <th colspan="2">Marks Range</th>
+                                            <th rowspan="2">Grade Point</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">100</th>
+                                            <th class="text-center">50</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center">A1</td>
+                                            <td class="text-center">91 - 100</td>
+                                            <td class="text-center">45 - 50</td>
+                                            <td class="text-center">10.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">A2</td>
+                                            <td class="text-center">81 - 90</td>
+                                            <td class="text-center">40 - 44</td>
+                                            <td class="text-center">9.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">B1</td>
+                                            <td class="text-center">71 - 80</td>
+                                            <td class="text-center">35 - 39</td>
+                                            <td class="text-center">8.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">B2</td>
+                                            <td class="text-center">61 - 70</td>
+                                            <td class="text-center">30 - 34</td>
+                                            <td class="text-center">7.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">C1</td>
+                                            <td class="text-center">51 - 60</td>
+                                            <td class="text-center">25 - 29</td>
+                                            <td class="text-center">6.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">C2</td>
+                                            <td class="text-center">41 - 50</td>
+                                            <td class="text-center">20 - 24</td>
+                                            <td class="text-center">5.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">D</td>
+                                            <td class="text-center">33 - 40</td>
+                                            <td class="text-center">17 - 19</td>
+                                            <td class="text-center">4.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">E1</td>
+                                            <td class="text-center">21 - 32</td>
+                                            <td class="text-center">10 - 16</td>
+                                            <td class="text-center">3.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">E2</td>
+                                            <td class="text-center">00 - 20</td>
+                                            <td class="text-center">0 - 9</td>
+                                            <td class="text-center">2.0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row margin-top-10">
+                            <h4 class="text-center"><b>Co - Scholastic Areas </b>(Grading on 5 point scale) </h4>
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="1">Grade</th>
+                                            <th colspan="3">Grade Point</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center"><b>A</b></td>
+                                            <td class="text-center" colspan="3"><b>5</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"><b>B</b></td>
+                                            <td class="text-center" colspan="3"><b>4</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"><b>C</b></td>
+                                            <td class="text-center" colspan="3"><b>3</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"><b>D</b></td>
+                                            <td class="text-center" colspan="3"><b>2</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"><b>E</b></td>
+                                            <td class="text-center" colspan="3"><b>1</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row margin-top-20">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td colspan="4" class="text-left" style="word-break:break-word !important">
+                                            Student must obtain the qualifying grade (minimum grade D) in all the subjects under Scholastic and Co-Scholastinc Domain.
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row  margin-top-20">
+                            <div class="text-center">
+                                <h4 style="text-decoration:underline">CONTINUOUS AND COMPREHENSIVE EVALUATION</h4>
+                            </div>
+                        </div>
+                        <div class="row  margin-top-20">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1">
+                                    <b>1.</b>
+                                </div>
+                                <div class="col-sm-11">
+                                    <b>Continuous And Comprehensive Evaluation is intended to provide a holistic profile of the learner through assessment of both scholastic and non scholastic aspects of education spread over the total span of instructional time in schools. </b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1">
+                                    <b>2.</b>
+                                </div>
+                                <div class="col-sm-11">
+                                    <b>Promotion is based on the day-to-day work of the students throughout the year and also on the performance in the terminal examination. </b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-20">
+                            <div class="col-sm-12">
+                                <div class="col-sm-3 text-left">
+                                    <b>*First Term </b>
+                                </div>
+                                <div class="col-sm-5 text-left">
+                                    <b>- FA1(10%) + FA2(10%) + SA1(30%)</b>
+                                </div>
+                                <div class="col-sm-4 text-right">
+                                    <b>= 50%</b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <div class="col-sm-3 text-left">
+                                    <b>*Second Term </b>
+                                </div>
+                                <div class="col-sm-5 text-left">
+                                    <b>- FA3(10%) + FA4(10%) + SA2(30%)</b>
+                                </div>
+                                <div class="col-sm-4 text-right">
+                                    <b>= 50%</b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <div class="col-sm-3 text-left">
+                                    <b>Formative assessment </b>
+                                </div>
+                                <div class="col-sm-7 text-left">
+                                    <b>- FA1(10%) + FA2(10%) + FA3(10%) + FA4(10%)</b>
+                                </div>
+                                <div class="col-sm-2 text-right">
+                                    <b>= 40%</b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-12">
+                                <div class="col-sm-3 text-left">
+                                    <b>Summative assessment </b>
+                                </div>
+                                <div class="col-sm-5 text-left">
+                                    <b>- SA1(30%) + SA2(30%)</b>
+                                </div>
+                                <div class="col-sm-4 text-right">
+                                    <b>= 60%</b>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section04 pagelayout" style="page-break-before:always!important">
+                        <div class="row margin-top-30">
+                            <h4 class="text-center" style="text-decoration:underline">FOR THE PARENTS</h4>
+                        </div>
+                        <div class="row margin-top-30">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1">
+                                    <b>1. </b>
+                                </div>
+                                <div class="col-sm-11">
+                                    <b>The object of the Report Book is to facilitate holistic learning in school in a stress free environment</b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-30">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1">
+                                    <b>2. </b>
+                                </div>
+                                <div class="col-sm-11">
+                                    <b>The Report Book keeps to parents constantly informed of your child's progress at school throughout the year. They are requested to make it a point to see the Record every term and sign it at the place provided for this purpose. </b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-30">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1">
+                                    <b>3. </b>
+                                </div>
+                                <div class="col-sm-11">
+                                    <b>The Report Book will not be issued if fees are in arrears. </b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-30">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1">
+                                    <b>4. </b>
+                                </div>
+                                <div class="col-sm-11">
+                                    <b>Children must preserve this progress Report carefully as it contains valuable records. In case it is lost during the course of the year they will have to pay a fine of Rs.50/-. </b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-30">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1">
+                                    <b>5. </b>
+                                </div>
+                                <div class="col-sm-11">
+                                    <b>I hope this system of recording your child's progress in school will led to a greater understanding and co-operation between the parents and the teachers.</b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row margin-top-80">
+                            <div class="col-sm-6 col-sm-offset-4">
+                                <img src="images/NDSExamLogo.jpg" class="img-responsive" />
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

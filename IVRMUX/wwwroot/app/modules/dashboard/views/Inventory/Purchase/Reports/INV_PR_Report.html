@@ -1,0 +1,319 @@
+﻿
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Purchase Requisition</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="All" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> All </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="PRno" name="PRno" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">PR Number</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Item" name="item" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Item-wise</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Requestedby" name="Requestedby" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Requested by</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-9" ng-show="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" ng-required="bw_dates" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ======================= PR No. ============================ -->
+                            <div class="form-group" ng-if="optionflag=='PRno'">
+                                <label class="control-label col-sm-4">Select or Search PR No:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_PRdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search PR No. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="prall" type="checkbox" ng-click="all_check(prall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMPR_Id" ng-repeat="pr in get_PRdetails | filter : searchValue">
+                                            <input name="prno" ng-model="pr.prck" type="checkbox" ng-click="togchkbxG();" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                {{pr.INVMPR_PRNo}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.prno)" ng-messages="myForm.prno.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ===========================ITEMS========================== -->
+                            <div class="form-group" ng-if="optionflag=='Item'">
+                                <label class="control-label col-sm-4">Select or Search Item :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_PRdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Item here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="itemall" type="checkbox" ng-click="all_checkI(itemall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMI_Id" ng-repeat="itm in get_PRdetails | filter : searchValue">
+                                            <input name="item" ng-model="itm.itemck" type="checkbox" ng-click="togchkbxI();" ng-required="isOptionsRequiredI()">
+                                            <span class="lbl padding-8">
+                                                {{itm.INVMI_ItemName}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ===========================Requested By========================== -->
+                            <!--<div class="form-group" ng-if="optionflag=='Requestedby'">
+                                <label class="control-label col-sm-4">Employee :<span style="color:Red">*</span></label>
+                                <div class="col-sm-6">
+                                    <ui-select id="sel1" name="emp" ng-model="obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Employee" ng-required="optionflag='Requestedby'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Employee in the list...">{{$select.selected.employeename}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_PRdetails | filter: $select.search " value="{{option.HRME_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.employeename  | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                        <div ng-message="required">Please Select Employee </div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group" ng-if="optionflag=='Requestedby'">
+                                <label class="control-label col-sm-4">Employee:<span style="color:Red">*</span></label>
+                                <div class="col-sm-6">
+                                    <ui-select id="sel1" name="emp" ng-model="$parent.obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Employee">
+                                        <!--ng-required="optionflag=='Requestedby'">-->
+                                        <ui-select-match ng-trim="false" placeholder="Select or Employee in the list...">{{$select.selected.employeename}} </ui-select-match>
+                                        <ui-select-choices repeat="option in get_PRdetails | filter: $select.search " value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.employeename | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                        <div ng-message="required">Please Select Employee Name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="get_PRreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="get_PRreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printpr')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+        <div class="box box-primary" ng-show="get_PRreport.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">PURCHASE REQUISITION REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-if="optionflag == 'Requestedby'">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Requested by :</b>
+                                <label>
+                                    {{reqname}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('INVMPR_PRNo')">PR Number.</a></th>
+                            <th><a href="" ng-click="sortBy('INVMPR_PRDate')">Date</a></th>
+                            <th ng-if="optionflag != 'Requestedby'"><a href="" ng-click="sortBy('requestedby')">Requested By</a></th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item</a> </th>
+                            <th><a href="" ng-click="sortBy('INVMUOM_UOMName')">UOM</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTPR_PRQty')">Quantity</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTPR_PRUnitRate')">Unit Rate</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTPR_ApproxAmount')">Amount</a> </th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_PRreport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.INVMPR_PRNo}}</td>
+                            <td>{{user.INVMPR_PRDate | date:'dd-MM-yyyy'}}</td>
+                            <td ng-if="optionflag != 'Requestedby'">{{user.requestedby}}</td>
+                            <td>{{user.INVMI_ItemName}}</td>
+                            <td>{{user.INVMUOM_UOMName}}</td>
+                            <td>{{user.INVTPR_PRQty | number :2}}</td>
+                            <td>{{user.INVTPR_PRUnitRate | number :2}}</td>
+                            <td>{{user.INVTPR_ApproxAmount | number :2}}</td>
+                        </tr>
+                        <tr ng-if="optionflag != 'Requestedby'">
+                            <td colspan="8" class="text-center"><b>Total</b></td>
+                            <td><b>{{totalamt | number :2}}</b></td>
+                        </tr>
+                        <tr ng-if="optionflag == 'Requestedby'">
+                            <td colspan="7" class="text-center"><b>Total</b></td>
+                            <td><b>{{totalamt | number :2}}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+        <div ng-hide="true">
+            <div id="printpr">
+
+                <div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="checkout" width="100%">
+                </div>
+                <h4 class="text-center">PURCHASE REQUISITION REPORT</h4>
+                <div class="row" ng-if="optionflag == 'Requestedby'">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+
+                            <label class="control-label col-sm-4"> Requested by  </label>
+                            <div class="col-sm-8">
+                                <label class="control-label">:   {{reqname}} </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('INVMPR_PRNo')">PR Number.</a></th>
+                            <th><a href="" ng-click="sortBy('INVMPR_PRDate')">Date</a></th>
+                            <th ng-if="optionflag != 'Requestedby'"><a href="" ng-click="sortBy('requestedby')">Requested By</a></th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item</a> </th>
+                            <th><a href="" ng-click="sortBy('INVMUOM_UOMName')">UOM</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTPR_PRQty')">Quantity</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTPR_PRUnitRate')">Unit Rate</a> </th>
+                            <th><a href="" ng-click="sortBy('INVTPR_ApproxAmount')">Amount</a> </th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_PRreport">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.INVMPR_PRNo}}</td>
+                            <td>{{user.INVMPR_PRDate | date:'dd-MM-yyyy'}}</td>
+                            <td ng-if="optionflag != 'Requestedby'">{{user.requestedby}}</td>
+                            <td>{{user.INVMI_ItemName}}</td>
+                            <td>{{user.INVMUOM_UOMName}}</td>
+                            <td>{{user.INVTPR_PRQty | number :2}}</td>
+                            <td>{{user.INVTPR_PRUnitRate | number :2}}</td>
+                            <td>{{user.INVTPR_ApproxAmount | number :2}}</td>
+                        </tr>
+                        <tr ng-if="optionflag != 'Requestedby'">
+                            <td colspan="8" class="text-center"><b>Total</b></td>
+                            <td><b>{{totalamt | number :2}}</b></td>
+                        </tr>
+                        <tr ng-if="optionflag == 'Requestedby'">
+                            <td colspan="7" class="text-center"><b>Total</b></td>
+                            <td><b>{{totalamt | number :2}}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</section>

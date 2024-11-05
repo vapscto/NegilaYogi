@@ -1,0 +1,250 @@
+﻿
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">STOCK REGISTER REPORT</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="All" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> All </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Item" name="item" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Item</span>
+                                    </label>
+                                    <!--<label class="radio-inline">
+                                        <input type="radio" value="Store" name="Store" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Store</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Group" name="Group" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Group</span>
+                                    </label>-->
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <div class="col-sm-8 col-sm-offset-2">
+                                    <div class="well">
+                                        <div class="text-center" ng-init="flagdate='upto'">
+                                            <label class="radio-inline">
+                                                <input type="radio" value="upto" ng-model="flagdate" ng-change="onrdochangetwo(flagdate)">
+                                                <span class="lbl padding-8">Upto Date</span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="BD" ng-model="flagdate" ng-change="onrdochangetwo(flagdate)">
+                                                <span class="lbl padding-8">Between Date</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group" ng-if="optionflag=='Item'">
+                                    <label class="control-label col-sm-4">Select or Search Item :<span style="color:Red">*</span></label>
+
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Item here...">
+
+                                        <label>
+                                            <input name="classes" value="1" ng-model="itemall" type="checkbox" ng-click="all_checkI(itemall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMI_Id" ng-repeat="itm in get_itemreportdetails | filter : searchValue">
+                                            <input name="item" ng-model="itm.itemck" type="checkbox" ng-click="togchkbxI();" ng-required="isOptionsRequiredI()">
+                                            <span class="lbl padding-8">
+                                                {{itm.INVMI_ItemName}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required"> Select Atleast One checkbox</div>
+                                    </div>
+
+                                </div>
+                              
+                            </div>
+                            <div class="col-sm-6">
+
+                                <div class="form-group" ng-show="flagdate=='BD'">
+                                    <div class="col-sm-6">
+                                        <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" ng-required="bw_dates" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" ng-required="bw_dates" ng-paste="$event.preventDefault()" onkeydown="return false"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="get_report.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="get_report.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printItem')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+
+        <div class="box box-primary" ng-show="get_report.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">ITEM REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                </th>
+                                <th><a href="" ng-click="sortBy('INVMI_ItemCode')">Item Code</a></th>
+                                <th><a href="" ng-click="sortBy('INVMI_ItemName')">Descriptions</a></th>
+                                <th><a href="" ng-click="sortBy('INVSTO_PurchaseDate')">Date</a></th>
+                                <th><a href="" ng-click="sortBy('INVSTO_PurOBQty')">Purchase</a></th>
+                                <th><a href="" ng-click="sortBy('INVSTO_PurchaseRate')">Rate</a></th>
+                                <th><a href="" ng-click="sortBy('Value')">Value</a></th>
+                                <th><a href="" ng-click="sortBy('INVSTO_SalesRate')">Sales Rate</a></th>
+                                <th><a href="" ng-click="sortBy('INVSTO_SalesQty')">Stock Updation</a></th>
+                                <th><a href="" ng-click="sortBy('INVSTO_AvaiableStock')">Total Qty</a></th>
+                                <th><a href="" ng-click="sortBy('TotalValue')">Total Value</a></th>
+                            </tr>
+                        </thead>
+                        <tbody dir-paginate="user in filterValue1 = (employeeid | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <tr>
+                                <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">{{user.INVMI_ItemCode}}</td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">
+                                    {{user.INVMI_ItemName}}
+                                </td>
+
+                            </tr>
+                            <tr ng-repeat="planner in user.plannerdetails">
+                                <td>{{planner.INVSTO_PurchaseDate}}</td>
+                                <td>{{planner.INVSTO_PurOBQty}}</td>
+                                <td>{{planner.INVSTO_PurchaseRate}}</td>
+                                <td>{{planner.Value}}</td>
+                                <td>{{planner.INVSTO_SalesRate}}</td>
+                                <td>{{planner.INVSTO_SalesQty}}</td>
+                                <td>{{planner.INVSTO_AvaiableStock}}</td>
+                                <td>{{planner.TotalValue}}</td>                               
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+        <div ng-hide="true">
+            <div id="printItem">
+                <div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="checkout" width="100%">
+                </div>
+                <h4 class="text-center">STOCK REGISTER REPORT</h4>
+                <div style="overflow-x:auto">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No.
+                                </th>
+                                <th>Item Code</th>
+                                <th>Descriptions</th>
+                                <th>Date</th>
+                                <th>Purchase</th>
+                                <th>>Rate</th>
+                                <th>Value</th>
+                                <th>Sales Rate</th>
+                                <th>Stock Updation</th>
+                                <th>Total Qty</th>
+                                <th>Total Value</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in employeeid">
+                            <tr>
+                                <td class="text-center" rowspan="{{user.plannerdetails.length+1}}">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">{{user.INVMI_ItemCode}}</td>
+                                <td class="text-left" rowspan="{{user.plannerdetails.length+1}}">
+                                    {{user.INVMI_ItemName}}
+                                </td>
+
+                            </tr>
+                            <tr ng-repeat="planner in user.plannerdetails">
+                                <td>{{planner.INVSTO_PurchaseDate}}</td>
+                                <td>{{planner.INVSTO_PurOBQty}}</td>
+                                <td>{{planner.INVSTO_PurchaseRate}}</td>
+                                <td>{{planner.Value}}</td>
+                                <td>{{planner.INVSTO_SalesRate}}</td>
+                                <td>{{planner.INVSTO_SalesQty}}</td>
+                                <td>{{planner.INVSTO_AvaiableStock}}</td>
+                                <td>{{planner.TotalValue}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

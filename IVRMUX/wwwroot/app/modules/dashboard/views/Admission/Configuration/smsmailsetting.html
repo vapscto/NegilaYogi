@@ -1,0 +1,875 @@
+﻿<style>
+    .file-blue:before {
+        content: 'Upload File';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+</style>
+<section class="content" data-ng-init="load()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" ng-submit="saveSmsEmailSettings()" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Common Setting</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" ng-click="ShowHide()"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHidden">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Module:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="module" ng-model="IVRMIM_Id" ng-change="getModulePage(module)" required>
+                                    <option value="">--Select--</option><!--ng-disabled="disble"-->
+                                    <option ng-repeat="module in institutionModuleList" value="{{module.ivrmiM_Id}}" ng-selected="{{module.Selected==true}}">
+                                        {{module.ivrmM_ModuleName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.module)" ng-messages="myForm.module.$error">
+                                    <div ng-message="required">Please Select Module Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Module Page:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="pagename" ng-model="IVRMIMP_Id" ng-change="getHeader(modulePages)" required>
+                                    <option value="">--Select--</option> <!--ng-disabled="disble"-->
+                                    <option ng-repeat="modulePages in institutionPageLists" value="{{modulePages.ivrmimP_Id}}" ng-selected="{{modulePages.Selected==true}}">
+                                        {{modulePages.ivrmmP_PageName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.pagename)" ng-messages="myForm.pagename.$error">
+                                    <div ng-message="required">Please Select Module Page Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Header:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select ng-model="ISES_Template_Name" name="templatename" class="form-control" ng-change="getParameter()" required>
+                                    <option value="">--Select--</option><!--ng-disabled="disble"-->
+                                    <option ng-repeat="header in pageWiseHeaderList" value="{{header.ivrmhE_Id}}" ng-selected="{{header.ivrmhE_Id==ISES_Template_Name}}">
+                                        {{header.ivrmhE_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.templatename)" ng-messages="myForm.templatename.$error">
+                                    <div ng-message="required">Please Select Header Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="screen1">
+            <div class="box-header with-border">
+                <h3 class="box-title">Sms Setting</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" ng-click="ShowHide1()"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHidden1">
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Template-Id:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control active" name="template" id="" type="text" ng-model="ISES_TemplateId" ng-required="ISES_SMSActiveFlag=='On'">
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.template)" ng-messages="myForm.template.$error">
+                                <div ng-message="required">Enter Subject</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Parameter:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select multiple="multiple" ng-model="ISES_Parameter" class="form-control">
+                                    <option ng-repeat="d in data" value="{{d.ismP_NAME}}">{{d.ismP_NAME}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Message:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <txt-area class="form-control" name="msg" data="ISES_Parameter" rows="3" property="ismP_NAME" ng-model='ISES_SMSMessage' ng-trim='false' ng-required="ISES_SMSActiveFlag=='On'"></txt-area>
+
+                                <div class="error-messages" ng-if="interacted(myForm.msg)" ng-messages="myForm.msg.$error">
+                                    <div ng-message="required">Enter Message Body</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="well">
+                            <div class="text-center">
+                                <!--<label class="">Operation</label>-->
+                                <label class="radio-inline">
+                                    <input name="optradiosd" type="radio" value="On" ng-model="ISES_SMSActiveFlag" required>
+                                    <span class="lbl padding-8">Enable SMS Template</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input name="optradiosd" type="radio" ng-model="ISES_SMSActiveFlag" value="Off" required>
+                                    <span class="lbl padding-8">Disable SMS Template</span>
+                                </label>
+                                <div class="error-messages" ng-if="interacted(myForm.optradiosd)" ng-messages="myForm.optradiosd.$error">
+                                    <div ng-message="required">Select any one of the radio button</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="col-sm-12">
+                            <div class="form-group ">
+                                <div class="col-sm-12">
+                                    <label class="checkbox">
+                                        <input type="checkbox" data-ng-model="ISES_EnableSMSCCFlg">
+                                        <span class="lbl padding-8"><b>ENABLE SMS CC</b></span>
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <div class="form-group" data-ng-repeat="mobilestd in mobilesstd  track by $index|filter:nameText">
+                            <!--ng-form="myForm1"--> <!--ng-disabled="!myForm1"-->
+                            <label class="control-label col-sm-4">
+                                SMS CC Mobile No.:<!--<strong style="color:red;">*</strong>-->
+                            </label>
+
+                            <div class="col-sm-8 input-group" style="">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-tablet"></i>
+
+                                </div>
+
+                                <input name="vhcle{{$index}}" type="text" id="reservation" class="form-control"
+                                       ng-model="mobilestd.hrmemnO_MobileNo" maxlength="10" ng-minlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/"
+                                       allow-pattern="\d" ng-blur="chkdup_mob(mobilesstd[$index],$index)" ng-required="ISES_EnableSMSCCFlg==true">
+
+                                <span ng-show="$last" class="input-group-addon" ng-hide="mobilesstd.length ==5">
+                                    <a href="" ng-click="addNewMobile1std(curval1std)" style="color:#000;">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </span>
+                                <span class="input-group-addon" id="remove" ng-hide="mobilesstd.length ==1">
+                                    <a href="" ng-click="removeNewMobile1std($index,mobilesstd[$index])" style="color:#000;">
+                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+
+
+
+                            </div>
+
+                            <div class="col-sm-8  col-sm-offset-4 error-messages" ng-if="interacted(myForm['vhcle'+$index])" ng-messages="myForm['vhcle'+$index].$error">
+                                <div ng-message="pattern">Enter Valid Mobile number</div>
+                                <div ng-message="required">Enter mobile number</div>
+                                <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                <div ng-message="show">Both are Same</div>
+
+
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="screen1">
+            <div class="box-header with-border">
+                <h3 class="box-title">Mail Setting</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" ng-click="ShowHide2()"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div ng-show="IsHidden2">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Email Template:</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="sel111" name="templ" ng-model="ISMHTML_Id" ng-required="ISES_MailActiveFlag=='On'">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="tt in emailtemplatelist" value="{{tt.ismhtmL_Id}}" ng-selected="{{tt.Selected==true}}">
+                                            {{tt.ismhtmL_HTMLName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.templ)" ng-messages="myForm.templ.$error">
+                                        <div ng-message="required"> Select Email Template</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2" ng-show="ISMHTML_Id !=undefined && ISMHTML_Id!=''">
+                                    <a href="" data-toggle="modal" data-target="#myModal3" data-backdrop="" data-ng-click="viewtempate(ISMHTML_Id)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </a>
+
+
+
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Subject:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control active" name="sub" id="" type="text" ng-model="ISES_MailSubject" ng-required="ISES_MailActiveFlag=='On'">
+
+                                    <div class="error-messages" ng-if="interacted(myForm.sub)" ng-messages="myForm.sub.$error">
+                                        <div ng-message="required">Enter Subject</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                            <label class="control-label col-sm-4">Mail Body:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control active" id="" name="mailbody" type="text" ng-model="ISES_MailBody">
+                            </div>
+                        </div>-->
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Mail Footer:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control active" id="" type="text" ng-model="ISES_MailFooter">
+                                </div>
+                            </div>
+                            <div class="well">
+                                <div class="text-center">
+                                    <!--<label class="">
+                                    Operation
+                                </label>-->
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="ISES_MailActiveFlag" value="On" required>
+                                        <span class="lbl padding-8">Enable Email Template</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="ISES_MailActiveFlag" value="Off" required>
+                                        <span class="lbl padding-8">Disable Email Template</span>
+                                    </label>
+                                    <div class="error-messages" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                                        <div ng-message="required"> Select any of the radio button</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!--<div class="box-header with-border">
+                            <h3 class="box-title"> Files Upload </h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>-->
+                            <div class="col-sm-12">
+                                <table class="table table-responsive table-bordered clearfix">
+                                    <thead>
+                                        <tr>
+                                            <th>SL.NO.</th>
+                                            <th>UPLOAD</th>
+                                            <!--<th>DESCRIPTION</th>-->
+                                            <th>VIEW</th>
+                                            <th>ACTION</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="materal in materaldocuupload" ng-class-odd="'odd'">
+                                            <td class="text-center">{{ $index + 1 }}</td>
+                                            <td class="text-center lessonplanner">
+                                                <input class="custom-file-input file-blue text-center" id="{{materal.cfilepath}}"
+                                                       data-ng-model="materal.cfilepath" type="file"
+                                                       accept="image/*, application/pdf,application/msword,video/mp4,application/vnd.ms-powerpoint,
+                                                               application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                                               application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                                               application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                               application/vnd.ms-excel"
+                                                       name="filetypematerial{{$index}}"
+                                                       onchange="angular.element(this).scope().uploadmateraldocuments(this, angular.element(this).scope().materal)" style="width:120px">
+                                                <div class="error-messages" ng-if="interacted11(myForm['filetypematerial'+$index])"
+                                                     ng-messages="myForm['filetypematerial'+$index].$error">
+                                                    <div ng-message="required">Upload File</div>
+                                                </div>
+                                            </td>
+                                            <!--<td>
+                                        <textarea class="form-control" data-ng-model="materal.cfiledesc">
+
+                                        </textarea>
+                                                                                    </td>-->
+                                            <td>
+                                                <span ng-if="materal.cfilepath !=null && materal.cfilepath !=''">
+                                                    <a ng-if="materal.filetype=='jpg' || materal.filetype=='png' ||
+                                                               materal.filetype=='svg'|| materal.filetype=='jpeg'
+                                                               || materal.filetype=='gif'"
+                                                       style="color:red;display:inline; font-weight: bolder;"
+                                                       data-ng-click="showmothersign(materal.cfilepath,materal.cfilename)">
+                                                        Image
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='mp4' || materal.filetype=='mp4'"
+                                                       style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                                       ng-click="showGuardianPhotonew(materal)">
+                                                        Video
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='pdf'" style="color:blue;display:inline;" ng-click="onview(materal.cfilepath,materal.cfilename)">
+                                                        <!--ng-click="downloadview(materal.cfilepath,materal.cfilename)">-->
+
+                                                        <b style="color:red;display:inline; ">Pdf</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='doc'|| materal.filetype=='docx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:red;display:inline;">Document</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='ppt'|| materal.filetype=='pptx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:red;display:inline;">PPT</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='xls'|| materal.filetype=='xlsx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:red;display:inline;">Excel</b>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+
+
+
+                                                <span class="" ng-hide="materaldocuupload.length > 9">
+                                                    <a href="" ng-show="$last" ng-click="addmateral()">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="" id="remove" ng-hide="materaldocuupload.length ==1 && (materal.cfilename ==null || materal.cfilename =='')">
+                                                    <a href="" ng-click="removemateral($index)">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            <!--<div class="form-group">
+                            <label class="control-label col-sm-4">Attachment</label>
+                            <div class="col-sm-8">
+                                <input type="file" name="file" accept="image/png,image/gif,image/jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().document)">
+                                {{ISES_MailHTMLTemplate}}
+                            </div>
+                        </div>-->
+
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group ">
+                                        <div class="col-sm-12">
+                                            <label class="checkbox">
+                                                <input type="checkbox" data-ng-model="ISES_EnableMailCCFlg">
+                                                <span class="lbl padding-8"><b>ENABLE EMAIL CC</b></span>
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+
+                                    <div class="form-group" data-ng-repeat="emailstd in emailsstd track by $index|filter:nameText">
+                                        <label class="control-label col-sm-4">
+                                            CC EMAIL ID:<!--<strong style="color:red;">*</strong>-->
+                                        </label>
+
+                                        <div class="col-sm-8 input-group" style="">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-envelope-o"></i>
+
+                                            </div>
+
+                                            <input class="form-control active" name="vhcle1{{$index}}" id="reservation33" type="email"
+                                                   data-ng-model="emailstd.hrmeM_EmailId" maxlength="50"
+                                                   ng-blur="chkdup_email(emailsstd[$index],$index)"
+                                                   ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" ng-required="ISES_EnableMailCCFlg==true">
+                                            <span ng-show="$last" ng-disabled="!myForm1" class="input-group-addon" ng-hide="emailsstd.length ==5">
+                                                <a href="" ng-show="showAddEmail1std(emailstd)" ng-click="addNewEmail1std()" style="color:#000;">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="input-group-addon" id="remove" ng-hide="emailsstd.length ==1">
+                                                <a href="" ng-click="removeNewEmail1std($index,emailsstd[$index])" style="color:#000;">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+
+
+
+                                        </div>
+
+                                        <div class="col-sm-8  col-sm-offset-4 error-messages" ng-if="interacted(myForm['vhcle1'+$index])" ng-messages="myForm['vhcle1'+$index].$error">
+                                            <div ng-message="required">Enter Email-Id</div>
+                                            <div ng-message="pattern">Enter Valid Email-id</div>
+                                            <div ng-message="show">Both are Same</div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <hr />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group ">
+                                        <div class="col-sm-12">
+                                            <label class="checkbox">
+                                                <input type="checkbox" data-ng-model="ISES_EnableMailBCCFlg">
+                                                <span class="lbl padding-8"><b>ENABLE EMAIL BCC</b></span>
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group" data-ng-repeat="emailstd2 in emailsstd2 track by $index|filter:nameText">
+                                        <label class="control-label col-sm-4">
+                                            BCC EMAIL ID:<!--<strong style="color:red;">*</strong>-->
+                                        </label>
+
+                                        <div class="col-sm-8 input-group" style="">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-envelope-o"></i>
+
+                                            </div>
+
+                                            <input class="form-control active" name="vhcle2{{$index}}" id="reservation" type="email"
+                                                   data-ng-model="emailstd2.hrmeM_EmailId" maxlength="50"
+                                                   ng-blur="chkdup_email2(emailsstd[$index],$index)"
+                                                   ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" ng-required="ISES_EnableMailBCCFlg==true">
+                                            <span ng-show="$last" ng-disabled="!myForm1" class="input-group-addon" ng-hide="emailsstd2.length ==5">
+                                                <a href="" ng-show="showAddEmail1std2(emailstd2)" ng-click="addNewEmail1std2()" style="color:#000;">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="input-group-addon" id="remove" ng-hide="emailsstd2.length ==1">
+                                                <a href="" ng-click="removeNewEmail1std2($index,emailsstd2[$index])" style="color:#000;">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+
+
+
+                                        </div>
+
+                                        <div class="col-sm-8  col-sm-offset-4 error-messages" ng-if="interacted(myForm['vhcle2'+$index])" ng-messages="myForm['vhcle2'+$index].$error">
+                                            <div ng-message="required">Enter Email-Id</div>
+                                            <div ng-message="pattern">Enter Valid Email-id</div>
+                                            <div ng-message="show">Both are Same</div>
+                                        </div>
+
+                                    </div>
+
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+                        <!--<div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Parameter:</label>
+                            <div class="col-sm-8">
+                                <select multiple="multiple" ng-model="ISES_Parameter_email" class="form-control">
+                                    <option ng-repeat="d in data" value="{{d.ismP_NAME}}">{{d.ismP_NAME}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Message:</label>
+                            <div class="col-sm-8">
+                                <txt-area class="form-control" name="message" rows="3"  data="ISES_Parameter_email" property="ismP_NAME" ng-model="ISES_Mail_Message" ng-trim='false' required></txt-area>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.message)" ng-messages="myForm.message.$error">
+                                <div ng-message="required">Enter Email Message</div>
+                            </div>
+                        </div>
+
+
+                    </div>-->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-show="screen1">
+            <div class="box-header with-border">
+                <h3 class="box-title">Other Parameters</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible" ng-click="ShowHide4()"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body" ng-show="IsHidden4">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Parameter:</label>
+                        <div class="col-sm-8">
+                            <select multiple="multiple" ng-model="ISES_Parameter1" class="form-control">
+                                <option ng-repeat="d in data" value="{{d.ismP_NAME}}">{{d.ismP_NAME}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">IVRS Text Message:</label>
+                        <div class="col-sm-8">
+                            <txt-area class="form-control" name="msgww" data="ISES_Parameter1" rows="3" property="ismP_NAME" ng-model='ISES_IVRSTextMsg' ng-trim='false'></txt-area>
+
+                            <div class="error-messages" ng-if="interacted(myForm.msgww)" ng-messages="myForm.msgww.$error">
+                                <div ng-message="required">Enter Text Message</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Upload voice Message :</label>
+                        <div class="col-sm-8">
+                            <label class="custom-file-input file-blue" style="width:70%;margin:auto;">
+                                <input type="file" name="stufile" accept="sound/*" data-ng-model="urlimage" onchange="angular.element(this).scope().UploadSoundfile(this)">
+                            </label>
+                            <div class="error-messages" ng-if="interacted1(myFormnew1.stufile)" ng-messages="myFormnew1.stufile.$error">
+                                <div ng-message="required">Upload Sound File</div>
+                            </div>
+
+
+                        </div>
+                        </div>
+                        <div class="form-group" ng-show="urlimage!=undefined && urlimage!=null && urlimage!=''">
+                            <div style="margin-top:20px" class="col-sm-2">
+                                &nbsp; &nbsp;
+                            </div>
+                            <div style="margin-top:20px" class="col-sm-8">
+                                <audio controls id="blah">
+                                    Your browser does not support the
+                                    <code>audio</code> element.
+                                </audio>
+                            </div>
+                        </div>
+                    </div>
+                <div class="col-sm-6">
+                    <div class="col-sm-12">
+                        <div class="form-group ">
+                            <div class="col-sm-12">
+                                <label class="checkbox">
+                                    <input type="checkbox" data-ng-model="ISES_PNActiveFlg">
+                                    <span class="lbl padding-8"><b>ENABLE PUSH NOTIFICATION</b></span>
+                                </label>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Alert Reminder Days:</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" id="asdf" type="text" ng-model="ISES_AlertBeforeDays" name="rmss" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/"
+                                       allow-pattern="\d" >
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Parameter:</label>
+                        <div class="col-sm-8">
+                            <select multiple="multiple" ng-model="ISES_Parameter3" class="form-control">
+                                <option ng-repeat="d in data" value="{{d.ismP_NAME}}">{{d.ismP_NAME}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Notification Message:</label>
+                        <div class="col-sm-8">
+                            <txt-area class="form-control" name="msgwwee" data="ISES_Parameter3" rows="3" property="ismP_NAME" ng-model='ISES_PNMessage' ng-trim='false' ng-required="ISES_PNActiveFlg==true"></txt-area>
+
+                            <div class="error-messages" ng-if="interacted(myForm.msgwwee)" ng-messages="myForm.msgwwee.$error">
+                                <div ng-message="required">Enter Notification Message</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Role:</label>
+                        <div class="col-sm-8">
+                        <div class="multiselect">
+                            <span ng-show="rolelist.length>0">
+                                <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="search Role here...">
+                            </span>
+                            <!--<label>
+            <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+            <span class="lbl padding-8">
+                All
+            </span>
+        </label>-->
+                            <label ng-repeat="user in rolelist | filter : searchValueUEM">
+                                <input name="emp" ng-model="user.empck" type="checkbox" title="Select Role">
+                                <span class="lbl padding-8">
+                                    <b>  {{user.ivrmrT_Role}}</b>
+                                </span>
+                            </label>
+                        </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="screen1">
+            <!--<div class="box-header with-border">
+                <h3 class="box-title">Other Parameters</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible" ng-click="ShowHide5()"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>-->
+
+            <div class="box-body"  ng-show="IsHidden5">
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="ises" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$valid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">SMS &amp; Email Setting Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible" ng-click="ShowHide3()"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="overflow:scroll" ng-show="IsHidden3">
+                <div class="">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sort('sno')">SLNO</a>
+                            </th>
+                            <!--<th>
+                            <label>
+                                <input type="checkbox" value="" ng-model="all">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>-->
+                            <th><a href="" ng-click="sort('iseS_Template_Name')">Header</a> </th>
+                            <th><a href="" ng-click="sort('iseS_SMSMessage')">SMS Message</a> </th>
+                            <th><a href="" ng-click="sort('iseS_Mail_Message')">Email Message</a> </th>
+                            <th>SMS Active</th>
+                            <th>Email Active</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in emailSmsSettingList | orderBy:sortKey:reverse|filter:search|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <!--<td class="text-center">
+                            <label>
+                                <input type="checkbox" value="" ng-checked="all">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>-->
+                            <td>{{ user.iseS_Template_Name}}</td>
+                            <td style="overflow-wrap:break-word">{{ user.iseS_SMSMessage}}</td>
+                            <td>
+                                <!--{{ user.iseS_Mail_Message}}-->
+
+                                <a href="" data-toggle="modal" data-target="#myModal3" data-backdrop="" data-ng-click="viewemailtempate(user.iseS_Mail_Message)">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>View Email Template
+                                </a>
+                            </td>
+
+                            <td class="text-center" ng-if="user.iseS_SMSActiveFlag === true">
+                                <a href="javascript:void(0)" ng-click="activedeactivesms(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="De-Activate">
+                                    De-Activate
+                                </a>
+                            </td>
+                            <td class="text-center" ng-if="user.iseS_SMSActiveFlag === false">
+                                <a href="javascript:void(0)" ng-click="activedeactivesms(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </td>
+                            <td class="text-center" ng-if="user.iseS_MailActiveFlag === true">
+                                <a href="javascript:void(0)" ng-click="activedeactiveemail(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="De-Activate">
+                                    De-Activate
+                                </a>
+                            </td>
+                            <td class="text-center" ng-if="user.iseS_MailActiveFlag === false">
+                               
+                                <a href="javascript:void(0)" ng-click="activedeactiveemail(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </td>
+
+                            <td class="text-center">
+                                <a href="javascript:void(0)" ng-click="EditDetails(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                <!--<a href="javascript:void(0)" ng-click="Delete(user)"
+                               class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>-->
+                            </td>
+                            <!--<td class="text-center">
+                            <label>
+                                <input type="checkbox" value="">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>-->
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+                <!--<pagination total-items="totalItems" ng-model="currentPage"
+                        max-size="5" boundary-links="true"
+                        items-per-page="numPerPage" class="pagination-sm">
+            </pagination>-->
+            </div>
+        </div>
+
+
+
+
+
+    </form>
+</section>
+<div class="modal fade" id="myModal3" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times text-white" aria-hidden="true"></i>
+                </button>
+                <h4 class="modal-title text-white">Template</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12" style="text-align:center">
+                        <div id="test"></div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="myModalimg" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="preview" class="img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-small" id="popup15" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+        </div>
+
+        <div class="modal-content">
+            <div class="modal-body">
+                <div ng-repeat="vi1 in view_videos" style="padding-bottom:20px">
+                    <video width="320" height="240" controls="controls" crossorigin="anonymous" controlsList="nodownload" oncontextmenu="return false;">
+                        <source ng-src="{{vi1.coeeV_Videos | trustUrl}}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="clearpopupgrid15()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+
+            <!--<embed ng-src="{{content}}" style="width: 100%;" height="1000" />
+            <div class="modal-body" oncontextmenu="return false"></div>-->
+            <div id="pdfId">
+
+            </div>
+        </div>
+    </div>
+</div>
+

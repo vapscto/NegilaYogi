@@ -1,0 +1,237 @@
+﻿<style>
+    div.scrollTable {
+        overflow: auto;
+        /*white-space: nowrap;*/
+    }
+
+        div.scrollTable a {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px;
+            text-decoration: none;
+        }
+
+            div.scrollTable a:hover {
+                background-color: #777;
+            }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Data Import</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body import">
+                <div class="col-sm-6 col-sm-offset-3">
+                    <div class="text-center" ng-init="impall='import'">
+                        <label class="radio-inline">
+                            <input name="optradio" type="radio" value="import" ng-model="impall">
+                            <span class="lbl padding-8">Import data from Excel</span>
+                        </label>
+                        <label class="radio-inline" ng-hide="vm.gridOptions.data.length>0">
+                            <input name="optradio" type="radio" value="sample" ng-model="impall">
+                            <span class="lbl padding-8">Download Sample Excel</span>
+                        </label>
+                       
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+        <div class="box box-primary">
+
+            <div class="box-header with-border" ng-if="impall=='import'">
+                <h3 class="box-title">Import Data From Excel</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-12" ng-if="impall=='import'">
+                    <div class="col-sm-2 pull-left padding-left-none">
+                        <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                            <input type="file" name="impfile" class="btn btn-success" value="Import" ng-model="imp.file" accept=".xlsx"
+                                   onchange="angular.element(this).scope().selectFileforUploadzdd(this, angular.element(this).scope().vm.gridOptions)"
+                                   style="padding-top: 1px;padding-bottom: 2px;" filereads="" opts="vm.gridOptions" />
+                        </label>
+                    </div>
+                </div>
+                <div class="" ng-if="vm.gridOptions.data.length>0">
+                    <div class="col-sm-12">
+                        <div class="col-sm-2 pull-left">
+                            <h4>Imported Data</h4>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="scrollTable">
+                            <div class="margin-top-20 margin-bottom-10">
+                                <table class="table-bordered text-center margin-bottom-10">
+                                    <thead>
+                                        <tr ng-repeat="item in vm.gridOptions.data  | limitTo:1">
+                                            <th>
+                                                <a href="" ng-click="order('sno')">SL. NO.</a>
+                                            </th>
+
+                                            <th ng-repeat="key in item | keys">
+                                                <a href="" ng-click="order(key)">{{key}}</a>
+
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in vm.gridOptions.data |orderBy:sortKey:reverse| filter:search ">
+                                            <td>{{ $index + 1}}</td>
+                                            <td ng-repeat="key in item | keys " ng-init="value = item[key]">{{value}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <pagination total-items="totalItems" ng-model="currentPage"
+                                            max-size="5" boundary-links="true"
+                                            items-per-page="numPerPage" class="pagination-sm">
+                                </pagination>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="text-center">
+
+
+                    <md-button type="submit" class="md-raised md-warn" ng-click="emp_reg();">
+                        <i class="fa fa-chevron-circle-left ng-scope" aria-hidden="true"></i> Employee Registration Page
+                    </md-button>
+
+
+                    <md-button type="submit" class="md-raised md-primary" ng-if="vm.gridOptions.data.length>0" id="save-btn"
+                               ng-click="savedata(vm.gridOptions.data,'#failedtable')">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-if="impall=='sample'"
+                               ng-click="download_excelfile()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Download Sample Excel File
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-if="failedlist.length>0"
+                               ng-click="export('#failedtable')">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Export Failed Records
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <!--show failed records-->
+
+                    <div class="col-sm-12 clearfix" style="overflow:scroll;" ng-show="hide1">
+                        <table class="table table-hover table-responsive table-bordered text-center" id="failedtable">
+                            <thead>
+                                <tr>
+                                    <th ng-repeat="header in headerdlist">
+                                        {{header.value}}
+
+                                    </th>
+                                </tr>
+                                <!--<tr>
+                                    <th>EmployeeType</th>
+                                    <th>EmployeeGroupType</th>
+                                    <th>DepartmentName</th>
+                                    <th>DesignationName</th>
+                                    <th>GradeName</th>
+                                    <th>EmployeeFirstName</th>
+                                    <th>EmployeeMiddleName</th>
+                                    <th>EmployeeLastName</th>
+                                    <th>EmployeeCode</th>
+                                    <th>Marital_Status</th>
+                                    <th>Gender_Name</th>
+                                    <th>CasteCategory_Name</th>
+                                    <th>Caste_Name</th>
+                                    <th>Religion_Name</th>
+
+
+                                </tr>-->
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="fail in failedlist">
+                                    <td>{{fail.employeeType}}</td>
+                                    <td>{{fail.employeeGroupType}}</td>
+                                    <td>{{fail.departmentName}}</td>
+                                    <td>{{fail.designationName}}</td>
+                                    <td>{{fail.gradeName}}</td>
+                                    <td>{{fail.employeeFirstName}}</td>
+                                    <td>{{fail.employeeMiddleName}}</td>
+                                    <td>{{fail.employeeLastName}}</td>
+                                    <td>{{fail.employeeCode}}</td>
+                                    <td>{{fail.marital_Status}}</td>
+                                    <td>{{fail.gender_Name}}</td>
+                                    <td>{{fail.casteCategory_Name}}</td>
+                                    <td>{{fail.caste_Name}}</td>
+                                    <td>{{fail.religion_Name}}</td>
+                                    <td>{{fail.MobileNo}}</td>
+                                    <td>{{fail.EmailID}}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <div class="col-sm-12 clearfix" style="overflow:scroll;" ng-show="hide">
+                        <table class="table table-hover table-responsive table-bordered text-center" id="table_Id">
+                            <thead>
+
+                                <tr>
+                                    <th>EmployeeType</th>
+                                    <th>EmployeeGroupType</th>
+                                    <th>DepartmentName</th>
+                                    <th>DesignationName</th>
+                                    <th>GradeName</th>
+                                    <th>EmployeeFirstName</th>
+                                    <th>EmployeeMiddleName</th>
+                                    <th>EmployeeLastName</th>
+                                    <th>EmployeeCode</th>
+                                    <th>Marital_Status</th>
+                                    <th>Gender_Name</th>
+                                    <th>CasteCategory_Name</th>
+                                    <th>Caste_Name</th>
+                                    <th>Religion_Name</th>
+                                    <th>MobileNo</th>
+                                    <th>EmailID</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </form>
+</section>

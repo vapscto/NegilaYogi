@@ -1,0 +1,191 @@
+﻿
+<section class="content">
+    <div class="box box-primary" data-ng-init="BindData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">Route Location Mapping</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <form class="form-horizontal" role="form" name="myForm" data-ng-submit="saveddata()" novalidate>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Area:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="ayra" ng-change="getlocationsarea()" ng-model="TRMA_Id" required ng-disabled="asmaY_Id_flag">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="optlst12 in routedetailsarea" value="{{optlst12.trmA_Id}}" ng-selected="{{optlst12.Selected == true}}">
+                                        {{optlst12.trmA_AreaName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.ayra)" ng-messages="myForm.ayra.$error">
+                                    <div ng-message="required">Please Select Area</div>
+                                </div>
+                            </div>
+                        </div>
+                   
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Route:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="ayr" ng-change="getlocations()" ng-model="TRMR_Id" required ng-disabled="asmaY_Id_flag">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="optlst1 in routedetails" value="{{optlst1.trmR_Id}}" ng-selected="{{optlst1.Selected == true}}">
+                                        {{optlst1.trmR_RouteName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.ayr)" ng-messages="myForm.ayr.$error">
+                                    <div ng-message="required">Please Select Route</div>
+                                </div>
+                            </div>
+                        </div>
+                 
+                      <div class="form-group">
+                            <label class="control-label col-sm-4">Location/Boarding Point:<strong style="color:red;">*</strong></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                <label ng-repeat="className in locationdetails | filter:search">
+                                    <input type="checkbox" ng-model="className.Selected" name="loc"
+                                           ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8"> {{className.trmL_LocationName}}  </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages pull-right" ng-if="interacted(myForm.loc)" ng-messages="myForm.loc.$error">
+                                <div ng-message="required">Select Atleast One Location</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <input type="hidden" ng-model="trmrL_Id" />
+                <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="save()">
+                    <i class="fa fa-save" aria-hidden="true"></i> Save
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="clear()">
+                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                </md-button>
+                <md-button type="button" class="md-raised md-primary" data-toggle="modal" data-target="#myModal">
+                    Set  order
+                </md-button>
+            </div>
+        </form>
+    </div>
+    <div class="box box-primary" ng-show="masterlist">
+        <div class="box-header with-border">
+            <h3 class="box-title">Route Location Mapping List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th><a href="">SL.No.</a></th>
+                        <th><a href="" ng-click="sort('routename')">Route Name</a></th>
+                        <th><a href="" ng-click="sort('locationname')">Location/Boarding Point Name</a> </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (routelocation | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.routename}}</td>
+                        <td>{{user.locationname}}</td>
+                        <td class="text-center">
+                            <span ng-if="user.trmrL_ActiveFlag === false">
+                                <a href="" ng-click="deactive(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i> Activate </i>
+                                </a>
+                            </span>
+                            <span ng-if="user.trmrL_ActiveFlag === true">
+                                <a href="" ng-click="deactive(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i> Deactivate</i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">MASTER List</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SLNO
+                                </th>
+                                <th>Route Name</th>
+                                <th>Location Name</th>
+                            </tr>
+                        </thead>
+                        <tbody ui-sortable="sortableOptions" ng-model="getdetails1">
+                            <tr ng-repeat="user in getdetails1">
+                                <td>{{$index+1}}</td>
+                                <td>{{user.routename}}</td>
+                                <td>{{user.locationname}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="getOrder(getdetails1);">Save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

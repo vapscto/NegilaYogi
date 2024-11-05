@@ -1,0 +1,309 @@
+﻿<section class="content" ng-init="loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Inventory Configuration </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Store :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <div class="multiselect col-sm-8">
+                                    <span ng-show="get_store.length>0">
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search Store here...">
+                                    </span>
+                                    <label>
+                                        <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="user in get_store | filter : searchValue">
+                                        <input name="emp" ng-model="user.storeck" type="checkbox" ng-click="togchkbx();" title="Select Store" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            <b> {{user.invmS_StoreName}}</b>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                <div ng-message="required" class="col-sm-8 col-sm-offset-3">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="well">
+                                <div class="text-center" ng-init="invmiC_StuOtherFlg='Staff'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="LIFO" name="lifo" ng-model="invC_ProcessApplFlg">
+                                        <span class="lbl padding-8"> LIFO </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="FIFO" name="fifo" ng-model="invC_ProcessApplFlg">
+                                        <span class="lbl padding-8">FIFO</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" value="1" name="PR" data-ng-model="invC_PRApplicableFlg">
+                                <span class="lbl padding-4"> Purchase Requisition </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="ismmclT_Id" value="{{ismmclT_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="get_configdetails.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Configuration Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.NO</th>
+                        <th>Store Name</th>
+                        <th>LIFO/FIFO</th>
+                        <th>Process Flag </th>
+                        <th>Purchase Requisition </th>                       
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in get_configdetails ">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user.INVMS_StoreName}}</td>
+                        <td class="text-left">{{user.INVC_LIFOFIFOFlg}}</td>
+                        <td class="text-left"><span></span>
+                        {{user.INVC_ProcessApplFlg}}</td>
+                        <td class="text-left">{{user.INVC_PRApplicableFlg}}</td>                       
+                    </tr>
+                </tbody>
+            </table>            
+        </div>
+    </div>
+
+
+
+
+    <div class="box box-primary" ng-show="get_blockedEmplist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Blocked Employee Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{blocked.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValueU" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">SL NO</th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Company Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Department Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Employee Name</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Employee Code</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Blocked</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleDesc')">Block Reason </a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Blocked Date</a></th>
+                            <th class="text-center"><a href="" ng-click="sortBy('ivrmM_ModuleName')">Unblocked Date</a></th>
+
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="UserB in filtervalue = (get_blockedEmplist | filter : searchValueU)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPageU"
+                            current-page="currentPageU" ng-class-odd="'odd'">
+                            <td class="text-center">{{itemsPerPageU *(currentPageU-1)+$index+1}}</td>
+                            <td class="text-left">{{UserB.MI_Name}}</td>
+                            <td class="text-left">{{UserB.HRMD_DepartmentName}}</td>
+                            <td class="text-left">{{UserB.employeeName}}</td>
+                            <td class="text-left">{{UserB.HRME_EmployeeCode}}</td>
+
+                            <td class="text-center">
+                                <i ng-if="UserB.ISMBE_BlockFlg==true" class="fa fa-check text-green" title="Blocked"></i>
+                                <i ng-if="UserB.ISMBE_BlockFlg==false" class="fa fa-times text-red" title="Unblocked"></i>
+                            </td>
+                            <td class="text-left">{{UserB.ISMBE_Reason}}</td>
+                            <td class="text-left">{{UserB.ISMBE_BlockDate | date:'dd/MM/yyyy'}}</td>
+                            <td class="text-left">
+                                <span ng-if="UserB.ISEBE_UnblockDate==null" class="text-center">--</span>
+                                <span ng-if="UserB.ISEBE_UnblockDate!==null">{{UserB.ISEBE_UnblockDate | date:'dd/MM/yyyy'}}</span>
+                            </td>
+
+                            <td class="text-center">
+                                <span ng-if="UserB.ISMBE_BlockFlg==true">
+                                    <a href="javascript:void(0)" class="text-primary text-danger" data-placement="bottom" data-toggle="modal" title="Un-block" data-ng-model="Unblock"
+                                       data-target="#myModalUnblock" data-ng-click="viewunblock(UserB)">
+                                        <b> <i class="fa fa-eye" aria-hidden="true">Unblock</i></b>
+                                    </a>
+                                </span>
+                                <span ng-if="UserB.ISMBE_BlockFlg==false">
+                                    <a href="javascript:void(0)" class="text-primary text-green" data-placement="bottom" data-toggle="modal" title="View Details" data-ng-model="View"
+                                       data-target="#myModalUnblockDetails" data-ng-click="viewunblock(UserB)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true">View</i>
+                                    </a>
+                                </span>
+                            </td>
+                            <td hidden="hidden">{{UserB.ISMBE_Id}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+
+    <!-- *******************************************Model Unblock************************************************ -->
+    <div id="myModalUnblock" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" style="z-index:9999;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">	Unblock </h4>
+                    <h4 class="modal-title text-white">	{{emplname}} : {{emplcode}}</h4>
+                </div>
+                <div class="box-body">
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5" style="font-size:17px;">Blocked Date :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{blockeddate | date:'dd/MM/yyyy'}}</b></label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label text-head col-sm-5" style="font-size:17px;">Blocked Reason :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-head text-left" style="font-size:18px;"><b>{{blockedreason}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <b class="control-label text-head col-sm-5 col-sm-offset-3" style="font-size:17px;">Unblock Date</b>
+                                <div class="col-sm-7 col-sm-offset-3">
+                                    <h4>{{isebE_UnblockDate | date:'dd/MM/yyyy'}}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+            <div class="modal-footer text-center">
+                <md-button type="button" class="md-raised md-warn" aria-disabled="false" ng-click="unblockEmployee()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>Unblock
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- *******************************************Model Unblock Details************************************************ -->
+    <div id="myModalUnblockDetails" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" style="z-index:9999;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">	Unblock Details </h4>
+                </div>
+                <div class="box-body">
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5" style="font-size:17px;">Employee Name :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{emplname}}</b></label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-5" style="font-size:17px;">Blocked Date :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{blockeddate | date:'dd/MM/yyyy'}}</b></label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label text-head col-sm-5" style="font-size:17px;">Blocked Reason :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-head text-left" style="font-size:18px;"><b>{{blockedreason}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5" style="font-size:17px;">Employee Code :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{emplcode}}</b></label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-head col-sm-5" style="font-size:17px;">Unblocked Date  :</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" style="font-size:18px;"><b>{{unblockeddate | date:'dd/MM/yyyy'}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+    </div>
+
+
+</section>

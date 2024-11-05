@@ -1,0 +1,837 @@
+
+<style>
+    .multiselection {
+        width: 16.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+
+<div data-ng-init="formload()">
+    <section class="content">
+        <form name="myform" class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savedata(totalgrid,finslab1,finslab2)" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fee Reciept</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="ASMAY_Id" ng-change="selectacademicyear(ASMAY_Id)" name="yrrr" required>
+                                        <option value="" label="">--Select Academic Year--<!--: <span style="color:red;">*</span>--></option>
+                                        <option ng-repeat="option in yearlst" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == ASMAY_Id}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myform.yrrr)" ng-messages="myform.yrrr.$error">
+                                        <div ng-message="required">Select Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Course:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="AMCO_Id" ng-change="onselectcourse(AMCO_Id)" name="curnc1" required>
+                                        <option value="" label="">--Select Course--</option>
+                                        <option value="0">--All--</option>
+                                        <option ng-repeat="option in Fillcourse" value="{{option.amcO_Id}}">
+                                            {{option.amcO_CourseName}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myform.curnc1)" ng-messages="myform.curnc1.$error">
+                                        <div ng-message="required">Select Course</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Branch:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="AMB_Id" ng-change="onselectbranch(AMB_Id)" name="crrr" required>
+                                        <option value="" label="">--Select Branch--<!--: <span style="color:red;">*</span>--></option>
+                                        <option value="0">--All--</option>
+                                        <option ng-repeat="option in Branch" value="{{option.amB_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.amB_BranchName}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myform.crrr)" ng-messages="myform.crrr.$error">
+                                        <div ng-message="required">Select Branch</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Semester:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="AMSE_Id" name="sem1" required ng-change="onsemselection()">
+                                        <option value="" label="">--Select Semester--<!--: <span style="color:red;">*</span>--></option>
+                                        <option value="0">--All--</option>
+                                        <option ng-repeat="option in fillsemester" value="{{option.amsE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.amsE_SEMName}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myform.sem1)" ng-messages="myform.sem1.$error">
+                                        <div ng-message="required">Select semister</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="ACMS_Id" required ng-change="onselectsec()" name="curnc">
+                                        <option value="" label="">--Select Section--</option>
+                                        <option value="0" label="">ALL</option>
+                                        <option ng-repeat="option in fillsection" value="{{option.acmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.acmS_SectionName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.curnc)" ng-messages="myform.curnc.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-pull-4" style="margin-left:20px;">
+                                    <input type="checkbox" ng-click="receiptClick();" ng-model="reciptno" ng-disabled="dateclick==true">
+                                    <span class="lbl padding-8">Receipt No:<span style="color:red;">*</span></span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+
+                                <div class="col-sm-8" ng-show="reciptno==true">
+                                    <div class="multiselect col-sm-8 multiselection">
+                                        <input type="checkbox" name="allrcbx1" data-ng-model="allrecptchk" ng-click="allreceiptcheck();">
+                                        <span class="lbl padding-4" ng-show="reciptno==true">ALL RECEIPT</span>
+                                        <hr />
+                                        <input class="form-control" ng-model="searrcpkbx1" type="text" placeholder="search here..." style="margin-top:-10px;" />
+
+                                        <ul class="padding-left-none">
+                                            <li ng-repeat="options in installmentcount |filter:searrcpkbx1" value="{{options.fyP_Id}}">
+                                                <div class="col-sm-4">
+                                                    <input type="checkbox" name="selrcpchbx1" data-ng-model="options.receipt">
+                                                    <span class="lbl padding-8">{{ options.fyP_Receiptno }}</span>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div ng-if="Employee.hrmE_PFApplicableFlag == true">
+        <div class="form-group" ng-if="hrC_AsPerEmpFlag == true">
+            <label class="col-sm-4">PF Max / Fixed:</label>
+            <div class="col-sm-8">
+                <label class="radio-inline">
+                    <input type="checkbox" ng-model="Employee.hrmE_PFMaxFlag" ng-change="Employee.hrmE_PFFixedFlag=false;" />
+                    <span class="lbl padding-8">PF Max Amount</span>
+                </label>
+                <label class="radio-inline">
+                    <input type="checkbox" ng-model="Employee.hrmE_PFFixedFlag" ng-change="Employee.hrmE_PFMaxFlag = false;" />
+                    <span class="lbl padding-8">PF Fixed Amount</span>
+                </label>
+                <div class="error-messages" ng-if="interacted1(myForm1.PFMaxFlag)" ng-messages="myForm1.PFMaxFlag.$error">
+                    <div ng-message="required">Select PF Max</div>
+                </div>
+            </div>
+        </div>-->
+                            <!--<div class="form-group">
+            <label class="control-label col-sm-4">
+                <input type="checkbox" ng-model="route" ng-true-value="1" ng-false-value="0" ng-checked="false" ng-change="route_id()" />
+                <span class="lbl padding-8">Receipt No<span ng-if="route == true" style="color:red;">*</span></span>
+            </label>
+            <div class="col-sm-8">
+                <select class="form-control" id="route" ng-model="fyP_Id" name="routewise" ng-disabled="route == false"
+                        ng-required="route == true">
+                    <option value="">Select Receipt</option>
+                    <option ng-repeat="options in installmentcount" value="{{options.fyP_Id}}">
+                        {{options.fyP_Receiptno}}
+                    </option>
+                </select>
+                <div class="error-messages" ng-if="interacted(myForm.routewise)" ng-messages="myForm.routewise.$error">
+                    <div ng-message="required">Please Select the Receipt</div>
+                </div>
+            </div>
+        </div>-->
+                            <!--<div class="form-group">
+            <div class="error-messages" ng-if="interacted(myForm.selrcpchbx1)" ng-messages="myForm.selrcpchbx1.$error">
+                <div ng-message="required">Select At Least One Checkbox</div>
+            </div>
+
+            <input type="checkbox" name="checkbox" />
+            <label class="control-label col-sm-4">Receipt No: <span style="color:red;">*</span> </label>
+            <div class="col-sm-8">
+                <div class="multiselect col-sm-8 multiselection">
+                    <input type="checkbox" name="allrcbx1" data-ng-model="allrecptchk" ng-click="allreceiptcheck();">
+                    <span class="lbl padding-4">ALL RECEIPT</span>
+                    <hr />
+                    <input class="form-control" ng-model="searrcpkbx1" type="text" placeholder="search here..." style="margin-top:-10px;" />
+
+                    <ul class="padding-left-none">
+                        <li ng-repeat="options in installmentcount |filter:searrcpkbx1" value="{{options.fyP_Id}}">
+                            <div class="col-sm-4">
+                                <input type="checkbox" name="selrcpchbx1" data-ng-model="options.receipt">
+                                <span class="lbl padding-8">{{ options.fyP_Receiptno }}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>-->
+                            <div class="form-group">
+                                <label class="control-label col-sm-pull-4" style="margin-left:20px;">
+                                    <input type="checkbox" ng-model="dateclick" ng-disabled="reciptno==true" ng-click="ngdt()">
+                                    <span class="lbl padding-8">Date:<span style="color:red;">*</span></span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" ng-show="frdt">
+                                <label class="control-label col-sm-4">From Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="FMCB_fromdt" name="From_Date" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myform.From_Date)" ng-messages="myform.From_Date.$error">
+                                        <div ng-message="required">Please Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="tdt">
+                                <label class="control-label col-sm-4">To Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="FMCB_toDt" name="To_Date" id="date2" md-placeholder="Enter  date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myform.To_Date)" ng-messages="myform.To_Date.$error">
+                                        <div ng-message="required">Please Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--ng-show="dateclick==true &&reciptno==false;"-->
+                            <!--<div class="form-group" ng-if="dateclick==true &&reciptno==false;">
+            <label class="control-label col-sm-4">From Date:<span style="color:red;">*</span></label>
+            <div class="col-sm-8">
+                <md-datepicker ng-model="FMCB_fromdt" name="From_Date" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+                <div class="error-messages" ng-if="interacted(myform.From_Date)" ng-messages="myform.From_Date.$error">
+                    <div ng-message="required">Please Select Date</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" ng-if="dateclick==true &&reciptno==false;">
+            <label class="control-label col-sm-4">To Date:<span style="color:red;">*</span></label>
+            <div class="col-sm-8">
+                <md-datepicker ng-model="FMCB_toDt" name="To_Date" id="date2" md-placeholder="Enter  date" required></md-datepicker>
+                <div class="error-messages" ng-if="interacted(myform.To_Date)" ng-messages="myform.To_Date.$error">
+                    <div ng-message="required">Please Select Date</div>
+                </div>
+            </div>
+        </div>-->
+
+
+                        </div>
+
+
+                        <div class="col-sm-4">
+                            <div class="error-messages" ng-if="interacted(myForm.selcolchbx)" ng-messages="myForm.selcolchbx.$error">
+                                <div ng-message="required">Select At Least One Checkbox</div>
+                            </div>
+                            <md-subheader> Group List </md-subheader>
+                            <div class="form-group">
+                                <div class="multiselect col-sm-10" style="height:250px;width: 26.1em;">
+                                    <input type="checkbox" style="float:left;" name="allchbx" data-ng-model="allcheck" ng-click="allgroupcheck();">
+                                    <span class="lbl padding-8">ALL GROUP</span>
+                                    <hr />
+                                    <label><span style="color:red;">{{msg}}</span></label>
+                                    <ul class="padding-left-none">
+                                        <li ng-repeat="usr in grouplst | filter:query | orderBy: 'usr'">
+                                            <div class="col-sm-12">
+
+
+                                                <div style="float:left;margin-right:8px;font-size:18px;" ng-click="collapsed=!collapsed"><span ng-if="!collapsed">+</span><span ng-if="collapsed">-</span></div>
+                                                <input type="checkbox" style="float:left;" name="selcolchbx" data-ng-model="usr.checkedgrplst" ng-click="firstfnc(usr);" ng-disabled="allcheck"><!--ng-required="isOptionsRequired1()"-->
+                                                <!--<input hidden="hidden" data-ng-model="usr.fmG_Id" />-->
+                                                <span class="lbl padding-8">{{ usr.fmG_GroupName }}</span>
+                                            </div>
+
+                                            <ul ng-show="collapsed">
+                                                <li ng-repeat="usr1 in headlst" ng-if="usr.fmG_Id==usr1.fmG_Id">
+                                                    <div class="col-sm-12">
+                                                        <!--<div style="float:left;margin-right:8px;font-size:18px;" ng-click="collapsed1=!collapsed1"><span ng-if="!collapsed1">+</span><span ng-if="collapsed1">-</span></div>-->
+                                                        <input style="float:left;" type="checkbox" data-ng-model="usr1.checkedheadlst" ng-click="secfnc(usr1);" ng-disabled="allcheck">
+                                                        <!--<input hidden="hidden" data-ng-model="usr.fmH_Id" />-->
+                                                        <span class="lbl padding-8">{{ usr1.fmH_FeeName }}</span>
+                                                    </div>
+
+
+                                                    <!--<ul ng-show="collapsed1">
+
+                                    <li ng-repeat="usr2 in installlst" ng-if="usr.fmG_Id==usr2.fmG_Id && usr1.fmH_Id==usr2.fmH_Id">
+                                        <div class="col-sm-12">
+                                            <input type="checkbox" data-ng-model="usr2.checkedinstallmentlst" ng-click="trdfnc(usr2,usr1);">
+                                            <span class="lbl padding-8">{{ usr2.ftI_Name }}</span>
+                                        </div>
+                                    </li>
+                                </ul>-->
+                                                </li>
+                                            </ul>
+
+
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="col-sm-4" ng-show="dateclick==false && reciptno==true">
+                            <div class="error-messages" ng-if="interacted(myForm.selcolchbx1)" ng-messages="myForm.selcolchbx1.$error">
+                                <div ng-message="required">Select At Least One Checkbox</div>
+                            </div>
+                            <md-subheader> Student List </md-subheader>
+                            <div class="form-group">
+                                <div class="multiselect col-sm-10" style="margin-left: 4.2%;height:250px;width: 26.1em;">
+                                    <input type="checkbox" style="float:left;" name="allchbx1" data-ng-model="allstdcheck" ng-click="allstudentcheck();">
+                                    <span class="lbl padding-8">ALL STUDENT</span>
+                                    <hr />
+                                    <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+
+                                    <ul class="padding-left-none">
+
+                                        <li ng-repeat="usr1 in fillstudent |filter:searchchkbx1" value="{{usr1.amcsT_Id}}">
+                                            <div class="col-sm-12">
+
+                                                <input type="checkbox" style="float:left;" name="selcolchbx1" data-ng-model="usr1.checkedgrplst1" ng-click="firstfnc1(usr1);">
+                                                <span class="lbl padding-8">{{ usr1.amcsT_FirstName }}&nbsp; {{ usr1.amcsT_MiddleName }} &nbsp; {{ usr1.amcsT_LastName }}:{{usr1.amcsT_AdmNo}}</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                    </div>
+                    <div class="row">
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-click="getreceiptreport();">
+                                <i class="fa fa fa-credit-card" aria-hidden="true"></i>
+                                REPORT
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                CANCEL
+                            </md-button>
+                        </div>
+                    </div>
+                            <!--<div class="form-group">
+        <label class="control-label col-sm-4">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+
+        <div class="col-sm-4 input-group text-right" style="">
+            <md-datepicker ng-model="FMCB_fromDATE" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+        </div>
+        <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+            <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-4">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+
+        <div class="col-sm-4 input-group text-right" style="">
+            <md-datepicker ng-model="FMCB_toDATE" onkeydown="return false" name="To_Date" id="date2" md-placeholder="Enter  date" required></md-datepicker>
+        </div>
+        <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+            <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+        </div>
+
+    </div>-->
+
+
+                     
+                </div>
+
+            </div>
+
+            <div class="box box-primary" ng-show="feereceipt">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fee Reciept</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printData();">Print</button>
+                        <!--<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closedata();">Close</button>-->
+                    </div>
+                    <div id="printmodal">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="printmodal clearfix" ng-repeat="std in fiestreciept" style="margin-right:9px !important;page-break-after:always">
+                                    <div class="">
+                                        <div class="baldwin text-center">
+                                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 text-center">
+                                        <label style="font-size:15px !important"><b style="font-size:15px !important">FEE RECEIPT</b></label>
+                                    </div>
+                                    <div class="row margin-bottom-5">
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-2" style="font-size:15px !important">NAME</label>
+                                                <div class="col-sm-8">  <label class="control-label" style="font-size:15px !important;margin-left:11px">: {{std.StudentName}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:14px !important">COURSE</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMCO_CourseName |uppercase}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5" style="font-size:14px !important">ADM NO</label>
+                                                <div class="col-sm-7">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMCST_AdmNo |uppercase}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:14px !important">BRANCH</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">:  {{std.AMB_BranchName |uppercase}}  </label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5" style="font-size:14px !important">YEAR</label>
+                                                <div class="col-sm-7">                                            <label class="control-label" style="font-size:15px !important">: {{yearname}}</label>                                        </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:14px !important">SEM</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMSE_SEMName}} </label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5" style="font-size:14px !important">DATE</label>
+                                                <div class="col-sm-7">                                            <label class="control-label" style="font-size:15px !important">: {{std.FYP_DOE}}</label>                                        </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <table class="table table-hover table-responsive table-bordered text-center table-width">
+                                        <tr>
+                                            <td><b>FEE HEAD NAME</b></td>
+                                            <td><b>RECEIPT NO.</b></td>
+                                            <td><b>AMOUNT</b></td>
+                                        </tr>
+                                        <tr ng-repeat="fh in  std.stdheadlst">
+                                            <td style="text-align:left">{{fh.FMH_FeeName}}</td>
+                                            <td>{{fh.FYP_ReceiptNo}}</td>
+                                            <td>{{fh.Amount}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <b> NET AMOUNT</b>
+                                            </td>
+                                            <td>
+                                                <b> {{std.total}}</b>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div class="form-group" style="font-size:15px !important">
+                                        <label class="control-label col-sm-4" style="font-size:15px !important"><b>Amount Received </b></label>
+                                        <div class="col-sm-8">                                    <label class="control-label" style="font-size:15px !important">: {{std.words |uppercase}} ONLY/-</label>                                </div>
+                                    </div>
+                                    <div class="form-group" style="font-size:15px !important">
+                                        <label class="control-label col-sm-4" style="font-size:15px !important"><b>Payment Mode </b></label>
+                                        <div class="col-sm-8">
+                                            <label class="control-label" style="font-size:15px !important">:<label ng-if="std.mode=='C'"> CASH</label>  </label>   <label ng-if="std.mode=='B'"> BANK</label>
+                                            <label ng-if="std.mode=='O'"> ONLINE</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-offset-7 col-sm-5" style="font-size:15px !important">
+                                            <h5 style="font-size:15px !important"> AUTHORISED SIGNATORY</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="printmodal clearfix" ng-repeat="std in secondreciept" style="margin-right:9px !important;page-break-after:always">
+                                    <div class="">
+                                        <div class="baldwin text-center">
+                                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 text-center">
+                                        <label style="font-size:15px !important"><b style="font-size:15px !important">FEE RECEIPT</b></label>
+                                    </div>
+                                    <div class="row margin-bottom-5">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-2" style="font-size:15px !important">NAME</label>
+                                                <div class="col-sm-8">  <label class="control-label" style="font-size:15px !important;margin-left:11px">: {{std.StudentName}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:14px !important">COURSE</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMCO_CourseName |uppercase}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5" style="font-size:14px !important">ADM NO</label>
+                                                <div class="col-sm-7">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMCST_AdmNo |uppercase}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:14px !important">BRANCH</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">:  {{std.AMB_BranchName |uppercase}}  </label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5" style="font-size:14px !important">YEAR</label>
+                                                <div class="col-sm-7">                                            <label class="control-label" style="font-size:15px !important">: {{yearname}}</label>                                        </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:14px !important">SEM</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMSE_SEMName}} </label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5" style="font-size:14px !important">DATE</label>
+                                                <div class="col-sm-7">                                            <label class="control-label" style="font-size:15px !important">: {{std.FYP_DOE}}</label>                                        </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <table class="table table-hover table-responsive table-bordered text-center table-width">
+                                        <tr>
+                                            <td><b>FEE HEAD NAME</b></td>
+                                            <td><b>RECEIPT NO.</b></td>
+                                            <td><b>AMOUNT</b></td>
+                                        </tr>
+                                        <tr ng-repeat="fh in  std.stdheadlst">
+                                            <td style="text-align:left">{{fh.FMH_FeeName}}</td>
+                                            <td>{{fh.FYP_ReceiptNo}}</td>
+                                            <td>{{fh.Amount}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <b> NET AMOUNT</b>
+                                            </td>
+                                            <td>
+                                                <b> {{std.total}}</b>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div class="form-group" style="font-size:15px !important">
+                                        <label class="control-label col-sm-4" style="font-size:15px !important"><b>Amount Received </b></label>
+                                        <div class="col-sm-8">                                    <label class="control-label" style="font-size:15px !important">: {{std.words |uppercase}} ONLY/-</label>                                </div>
+                                    </div>
+                                    <div class="form-group" style="font-size:15px !important">
+                                        <label class="control-label col-sm-4" style="font-size:15px !important"><b>Payment Mode </b></label>
+                                        <div class="col-sm-8">
+                                            <label class="control-label" style="font-size:15px !important">:<label ng-if="std.mode=='C'"> CASH</label>  </label>   <label ng-if="std.mode=='B'"> BANK</label>
+                                            <label ng-if="std.mode=='O'"> ONLINE</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-offset-7 col-sm-5" style="font-size:15px !important">
+                                            <h5 style="font-size:15px !important"> AUTHORISED SIGNATORY</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="col-sm-6">
+                                <div class="printmodal clearfix" style="margin-right:9px !important">
+                                    <div class="">
+                                        <div class="baldwin text-center">
+                                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 text-center">
+                                        <label style="font-size:15px !important"><b style="font-size:15px !important">FEE RECEIPT</b></label>
+                                    </div>
+                                    <div class="row margin-bottom-5">
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:15px !important">ADM NO</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMCST_AdmNo |uppercase}} </label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:15px !important">A. YEAR</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{yearname}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:15px !important">NAME</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.StudentName}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:15px !important">DATE</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.FYP_DOE}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:15px !important">COU/BRANCH</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMCO_CourseName |uppercase}} / {{std.AMB_BranchName |uppercase}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4" style="font-size:15px !important">SEM</label>
+                                                <div class="col-sm-8">                                            <label class="control-label" style="font-size:15px !important">: {{std.AMSE_SEMName}}</label>                                        </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table class="table table-hover table-responsive table-bordered text-center table-width">
+                                        <tr>
+                                            <td><b>FEE HEAD NAME</b></td>
+                                            <td><b>RECEIPT NO.</b></td>
+                                            <td><b>AMOUNT</b></td>
+                                        </tr>
+                                        <tr ng-repeat="fh in  std.stdheadlst">
+                                            <td>{{fh.FMH_FeeName}}</td>
+                                            <td>{{fh.FYP_ReceiptNo}}</td>
+                                            <td>{{fh.Amount}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <b> NET AMOUNT</b>
+                                            </td>
+                                            <td>
+                                                <b> {{std.total}}</b>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div class="form-group" style="font-size:15px !important">
+                                        <label class="control-label col-sm-4" style="font-size:15px !important"><b>Amount Received </b></label>
+                                        <div class="col-sm-8">                                    <label class="control-label" style="font-size:15px !important">: {{std.words |uppercase}} ONLY/-</label>                                </div>
+                                    </div>
+                                    <div class="form-group" style="font-size:15px !important">
+                                        <label class="control-label col-sm-4" style="font-size:15px !important"><b>Payment Mode </b></label>
+                                        <div class="col-sm-8">
+                                            <label class="control-label" style="font-size:15px !important">:<label ng-if="std.mode=='C'"> CASH</label>  </label>   <label ng-if="std.mode=='B'"> BANK</label>
+                                            <label ng-if="std.mode=='O'"> ONLINE</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-offset-7 col-sm-5" style="font-size:15px !important">
+                                            <h5 style="font-size:15px !important"> AUTHORISED SIGNATORY</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <br />
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--//modal-->
+            <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                            <h4 class="modal-title text-white">Fee Slab Details</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <div class="well text-center">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" data-ng-model="typeofstudentregular" value="R" data-ng-click="clicktypeofstudent()">
+                                        <span class="lbl padding-8">Regular</span>
+                                    </label>
+                                    <label class="checkbox-inline" ng-if="stuchk=='stud'">
+                                        <input type="checkbox" data-ng-model="typeofstudentecs" value="E" data-ng-click="clicktypeofstudent()">
+                                        <span class="lbl padding-8">ECS</span>
+                                    </label>
+                                </div>
+                                <!-- /.box-header -->
+                                <!--regularslab-->
+
+                                <div class="box box-primary" ng-show="slab1">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Regular Slab</h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-body">
+                                        <table class="table table-responsive table-bordered text-center">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <a href="">SLNO</a>
+                                                    </th>
+                                                    <th>
+                                                        <!--<label>
+                                                            <input type="checkbox" ng-model="selectedAll" ng-click="checkAll()">
+                                                            <span class="lbl padding-8"></span>
+                                                        </label>-->
+                                                    </th>
+                                                    <th><a href="" ng-click="order('amsT_FirstName')">Slab Name</a> </th>
+                                                    <th><a href="" ng-click="order('amsT_AdmNo')">From</a> </th>
+                                                    <th><a href="" ng-click="order('amaY_RollNo')">To</a> </th>
+                                                    <th><a href="" ng-click="order('amaY_RollNo')">Type</a> </th>
+                                                    <th><a href="" ng-click="order('amaY_RollNo')">Amount</a> </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="user in finslab1">
+                                                    <!--ng-if="user.FMFS_FineType=='R'"-->
+                                                    <td class="text-center">{{ $index + 1}}</td>
+                                                    <td class="text-center">
+                                                        <label>
+                                                            <input type="hidden" ng-model="user.fmfS_Id">
+                                                            <input type="checkbox" ng-model="user.isSelected"> <!--ng-checked="user.ftfS_Amount != null ||user.ftfS_Amount != ''"-->
+                                                            <span class="lbl padding-8"></span>
+                                                        </label>
+                                                    </td>
+
+                                                    <td>{{ user.fmfS_FineType}}</td>
+                                                    <td>{{ user.fmfS_FromDay}}</td>
+                                                    <td>{{ user.fmfS_ToDay}}</td>
+
+                                                    <td>
+                                                        <select class="form-control" id="sel1" ng-model="user.FTFS_FineType">
+                                                            <option value="">Select</option>
+                                                            <option ng-repeat="usr in fineslb" ng-selected="usr.FTFS_FineType==user.ftfS_FineType" value={{usr.FTFS_FineType}}> {{usr.FTFS_FineType}} </option>
+                                                        </select>
+                                                    </td>
+
+                                                    <td><input type="text" ng-model="user.ftfS_Amount" value="{{user.ftfS_Amount}}" placeholder="Enter Amount" maxlength="8" allow-pattern="(\s|[0-9])"></td>
+                                                    <td hidden="hidden">{{user.ftfS_Id}}</td>
+                                                    <td hidden="hidden">{{user.fmH_ID}}</td>
+                                                    <td hidden="hidden">{{user.ftI_ID}}</td>
+
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+
+                                <br />
+                                <!--regularslab-->
+                                <!--ecsslab-->
+                                <div class="box box-primary" ng-show="slab2">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">ECS Slab</h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-body">
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <a href="">SLNO</a>
+                                                    </th>
+                                                    <th>
+                                                        <!--<label>
+                                                            <input type="checkbox" ng-model="selectedAll" ng-click="checkAll()">
+                                                            <span class="lbl padding-8"></span>
+                                                        </label>-->
+                                                    </th>
+                                                    <th><a href="" ng-click="sort('amsT_FirstName')">Slab Name</a> </th>
+                                                    <th><a href="" ng-click="sort('amsT_AdmNo')">From</a> </th>
+                                                    <th><a href="" ng-click="sort('amaY_RollNo')">To</a> </th>
+                                                    <th><a href="" ng-click="sort('amaY_RollNo')">Type</a> </th>
+                                                    <th><a href="" ng-click="sort('amaY_RollNo')">Amount</a> </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="user in finslab2">
+                                                    <!--ng-if="user.FMFS_FineType=='E'"-->
+                                                    <td class="text-center">{{ $index + 1}}</td>
+                                                    <td class="text-center">
+                                                        <label>
+                                                            <input type="hidden" ng-model="user.fmfS_Id">
+                                                            <input type="checkbox" ng-model="user.isSelected">
+                                                            <span class="lbl padding-8"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td>{{ user.fmfS_FineType}}</td>
+                                                    <td>{{ user.fmfS_FromDay}}</td>
+                                                    <td>{{ user.fmfS_ToDay}}</td>
+                                                    <td>
+                                                        <select class="form-control" id="sel1" ng-model="user.FTFSE_FineType">
+                                                            <option value=""> Select </option>
+                                                            <option ng-repeat="usr in fineslbecs" ng-selected="usr.FTFSE_FineType==user.ftfsE_FineType" value={{usr.FTFSE_FineType}}> {{usr.FTFSE_FineType}} </option>
+
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="text" ng-model="user.ftfsE_Amount" value="{{user.ftfsE_Amount}}" placeholder="Enter Amount" maxlength="8"></td>
+
+
+                                                    <td hidden="hidden">{{user.ftfsE_Id}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!--ecsslab-->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <md-button type="button" class="md-raised md-primary" data-ng-click="addtocart(finslab1)" data-dismiss="modal"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to Cart</md-button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--//modal-->
+
+        </form>
+    </section>
+</div>

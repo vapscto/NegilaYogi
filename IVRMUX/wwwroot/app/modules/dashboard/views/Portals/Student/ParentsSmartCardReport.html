@@ -1,0 +1,325 @@
+<link href="css/print/baldwin/BBHS/BBHSBUSSFORM/BBHSBUSSFORM.css" rel="stylesheet" />
+<link href="css/print/Smartcard/BaldwinSmartcard.css" rel="stylesheet" />
+<link href="css/print/Smartcard/BaldwinSmartcardPdf.css" rel="stylesheet" />
+
+
+<section class="content" data-ng-init="loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">STUDENT SMART CARD UPDATE REPORT </h3>
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal" role="form" method="post" name="myForm" novalidate>
+                <div class="row">
+
+                    <!--<div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="sel1" data-ng-model="ASMAY_Id" name="acd_year" required>
+                                    <option value="">Select Year</option>
+                                    <option ng-repeat="academic in acamiclist" value="{{academic.asmaY_Id}}" ng-selected="{{academic.Selected == true}}">{{academic.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>-->
+
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" data-ng-init="sts1 ='ALL'">Status: <span style="color:red;">*</span></label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="sel12" ng-model="STP_FLAG" name="sts">
+                                    <option value="ALL">ALL</option>
+                                    <option value="APPROVED">APPROVED</option>
+                                    <!--<option value="CONFIRMED">CONFIRMED</option>-->
+                                    <option value="PENDING">PENDING</option>
+                                    <!--<option value="REJECTED">REJECTED</option>-->
+
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sts)" ng-messages="myForm.sts.$error">
+                                    <div ng-message="required" style="margin-left:185px;">Please Select the Status</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">Request Sent from Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-7 input-group">
+                                <!--<md-datepicker name="sch_date1" onkeypress="return false" data-ng-model="FromDate" placeholder="Enter date" required></md-datepicker>-->
+
+                                <md-datepicker ng-model="FromDate" onkeydown="return false" name="sch_date1" md-max-date="maxDatemf" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date1)" ng-messages="myForm.sch_date1.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">Request Sent To Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-7 input-group">
+
+                                <md-datepicker ng-model="ToDate" onkeydown="return false" name="sch_date" md-min-date="minDatemf" md-max-date="maxDatemf" ng-click="gettodate()" id="date2" md-placeholder="Enter  date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="ASTUREQ_Id" />
+                    <md-button type="submit" ng-click="getreport()" class="md-raised md-primary">
+                        <i class="fa fa-check-square-o" aria-hidden="true"></i> REPORT
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="printData()" ng-show="updatestudetailslist.length>0">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        PRINT
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#printtable')" ng-show="updatestudetailslist.length>0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> EXCEL
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i> CLEAR
+                    </md-button>
+                </div>
+
+
+
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Grid -->
+    <div class="box box-primary" ng-show="updatestudetailslist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STUDENT SMART CARD UPDATE REPORT  </h3>
+        </div>
+        <div class="box-body" ng-show="updatestudetailslist.length>0" style="overflow:scroll">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{updatestudetailslist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered" style="width:2000px">
+                <thead>
+                    <tr style="text-align:center">
+                        <th style="text-align:center">
+                            SL.NO
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" hi ng-click="order('Updateddate')">DATE</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" hi ng-click="order('studentname')">Student Details</a>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" hi ng-click="order('studentname')">Date of Birth</a>
+                        </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('STP_SBLOOD')">Blood Group</a> </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('STP_SMOBILENO')">Mobile No</a> </th>
+
+                        <th style="text-align:center"><a href="" hi ng-click="order('STP_SEMAIL')">Email</a> </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('trmL_PickLocationName')">Father Name </a> </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('trmL_PickLocationName')">Father Mobile No</a> </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('trmL_PickLocationName')">Father Email</a> </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('STP_FMOBILENO')">Mother Name</a> </th>  
+                        <th style="text-align:center"><a href="" hi ng-click="order('STP_FMOBILENO')">Mother Mobile No</a> </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('STP_MEMAIL')">Mother Email</a> </th>
+
+                        <th style="text-align:center"><a href="" hi ng-click="order('trmL_PickLocationName')">Present Address</a> </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('trmL_PickLocationName')">Permanent Address</a> </th>
+                        <th style="text-align:center"><a href="" hi ng-click="order('trmL_PickLocationName')">Status</a> </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (updatestudetailslist | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.Updateddate |date:'dd/MM/yyyy'}}</td>
+                        <td>
+                            Name:{{user.STP_SNAME}}<br />
+                            Class:{{user.ASMCL_ClassName}}<br />
+                            Section:{{user.ASMC_SectionName}}<br />
+
+                        </td>
+                        <td>{{user.STP_DOB |date:'dd/MM/yyyy'}}</td>
+                        <td>{{user.STP_SBLOOD}}</td>
+                        <td>{{user.STP_SMOBILENO}}</td>
+                        <td>{{user.STP_SEMAIL}}</td>
+                        <td>{{user.STP_FNAME}}</td>
+                        <td>{{user.STP_FMOBILENO}}</td>
+                        <td>{{user.STP_FEMAIL}}</td>
+                        <td>{{user.STP_MNAME}}</td>
+                        <td>{{user.STP_MMOBILENO}}</td>
+                        <td>{{user.STP_MEMAIL}}</td>
+
+                        <td>
+                            Street:   {{user.STP_PERSTREET}},<br />
+                            Area: {{user.STP_PERAREA}},<br />
+
+                            City: {{user.STP_PERCITY}},<br />
+                            State: {{user.pstate}},<br />
+                            Country: {{user.pcountry}},<br />
+                            Pin code: {{user.STP_PERPIN}}<br />
+                        </td>
+                        <td>
+                            Street:   {{user.STP_CURSTREET}},<br />
+                            Area: {{user.STP_CURAREA}},<br />
+
+                            City: {{user.STP_CURCITY}},<br />
+                            State: {{user.cstate}},<br />
+                            Country: {{user.ccountry}},<br />
+                            Pin code: {{user.STP_CURPIN}}<br />
+                        </td>
+                        <td>{{user.STP_STATUS}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="15" pagination-id="page1"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+
+
+    </div>
+
+    <div id="printtable" ng-show="false">
+        <div>
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+         
+            <h3 class="text-center">STUDENT REQUEST DETAILS REPORT</h3>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr style="text-align:center">
+                        <th style="text-align:center">
+                            SL.NO
+                        </th>
+                        <th style="text-align:center">
+                            DATE
+                        </th>
+                        <th style="text-align:center">
+                           Student Details
+                        </th>
+                        <th style="text-align:center">
+                           Date of Birth
+                        </th>
+                        <th style="text-align:center">Blood Group </th>
+                        <th style="text-align:center">Mobile No</th>
+
+                        <th style="text-align:center">Email </th>
+                        <th style="text-align:center">Father Name </th>
+                        <th style="text-align:center">Father Mobile No </th>
+                        <th style="text-align:center">Father Email </th>
+                        <th style="text-align:center">Mother Name </th>
+                        <th style="text-align:center">Mother Mobile No </th>
+                        <th style="text-align:center">Mother Email </th>
+
+                        <th style="text-align:center">Present Address </th>
+                        <th style="text-align:center">Permanent Address</th>
+                        <th style="text-align:center">Status </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in filterValue1">
+
+                        <td>{{$index+1}}</td>
+
+                        <td style="overflow-wrap:break-word">{{user.Updateddate |date:'dd/MM/yyyy'}}</td>
+                        <td style="overflow-wrap:break-word">
+                            {{user.STP_SNAME}}<br />
+                            Class:{{user.ASMCL_ClassName}}<br />
+                            Section:{{user.ASMC_SectionName}}<br />
+
+                        </td>
+                        <td style="overflow-wrap:break-word" >{{user.STP_DOB |date:'dd/MM/yyyy'}}</td>
+                        <td style="overflow-wrap:break-word" >{{user.STP_SBLOOD}}</td>
+                        <td style="overflow-wrap:break-word" >{{user.STP_SMOBILENO}}</td>
+                        <td style="overflow-wrap:break-word" >{{user.STP_SEMAIL}}</td>
+                        <td style="overflow-wrap:break-word">{{user.STP_FNAME}}</td>
+                        <td style="overflow-wrap:break-word" >{{user.STP_FMOBILENO}}</td>
+                        <td style="overflow-wrap:break-word" >{{user.STP_FEMAIL}}</td>
+                        <td style="overflow-wrap:break-word">{{user.STP_MNAME}}</td>
+                        <td style="overflow-wrap:break-word">{{user.STP_MMOBILENO}}</td>
+                        <td style="overflow-wrap:break-word" >{{user.STP_MEMAIL}}</td>
+
+                        <td style="overflow-wrap:break-word">
+                            Street:   {{user.STP_PERSTREET}},<br />
+                            Area: {{user.STP_PERAREA}},<br />
+
+                            City: {{user.STP_PERCITY}},<br />
+                            State: {{user.pstate}},<br />
+                            Country: {{user.pcountry}},<br />
+                            Pin code: {{user.STP_PERPIN}}<br />
+                        </td>
+                        <td style="overflow-wrap:break-word">
+                            Street:   {{user.STP_CURSTREET}},<br />
+                            Area: {{user.STP_CURAREA}},<br />
+
+                            City: {{user.STP_CURCITY}},<br />
+                            State: {{user.cstate}},<br />
+                            Country: {{user.ccountry}},<br />
+                            Pin code: {{user.STP_CURPIN}}<br />
+                        </td>
+                        <td style="overflow-wrap:break-word">{{user.STP_STATUS}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="16" class="text-center">
+                            <label>
+
+                                Date:{{ddate|date:'dd/MM/yyyy'}} &nbsp;&nbsp; UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</section>

@@ -1,0 +1,815 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        /*border: 1px solid #3e85a0;*/
+        padding: 12px;
+        /*min-height: 371px;*/
+        /*border-radius: 5px;*/
+    }
+
+    .file-bluedd:before {
+        content: 'Download Template';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .file-bluenew:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .lessonplanner .file-blue:before {
+        content: 'Browse';
+        font-size: 13px;
+        text-align: center
+    }
+
+    .box-label {
+        list-style-type: none;
+        position: relative;
+        border: 3px solid #3e85a0;
+        padding: 5px;
+        min-height: 34px;
+        border-radius: 5px;
+        margin: 3px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+        .box-label:hover {
+            box-shadow: 0px 37px 20px -10px rgba(0,0,0,0.2);
+            transform: translate(0px, -5px) scale(1.0);
+        }
+</style>
+<head>
+    <script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="js/mdb.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.18.1/moment.min.js"></script>
+</head>
+
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Task Creation</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+               
+
+                <div class="box-content">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                     
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Create Issues On:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="stdnamere" ng-model="$parent.Dept" ng-change="get_category1()" theme="bootstrap" title=" Select Department" required>
+                                        <ui-select-match ng-trim="false" style="outline: 0;font-weight: 700 !important;" placeholder="Select/Search Department">{{$select.selected.hrmD_DepartmentName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in get_department | filter: $select.search" value="{{name.hrmD_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.hrmD_DepartmentName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.stdnamere)" ng-messages="myForm.stdnamere.$error">
+                                        <div ng-message="required"> Select Department</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Project:<span style="color:red;">*</span></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="project" ng-model="obj.ismmpR_Id" ng-change="onprojectChange();" required>
+                                        <option value="">--Select Project--</option>
+                                        <option ng-repeat="option in get_project" ng-selected="{{option.Selected == true}}" value="{{option.ismmpR_Id}}">
+                                            {{option.ismmpR_ProjectName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.project)" ng-messages="myForm.project.$error">
+                                        <div ng-message="required">Please Select Project</div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Project:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="project" ng-model="$parent.Project" ng-change="onprojectChange()" theme="bootstrap" title=" Select/Search Project" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select/Search Project">{{$select.selected.ismmpR_ProjectName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in get_project | filter: $select.search" value="{{name.ismmpR_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.ismmpR_ProjectName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.project)" ng-messages="myForm.project.$error">
+                                        <div ng-message="required"> Select Project</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Client :<span style="color:red;">*</span></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="client" ng-model="obj.ismmclT_Id" ng-change="onclientchange()" required>
+                                        <option value="">--Select Client--</option>
+                                        <option ng-repeat="option in get_client" ng-selected="{{option.Selected == true}}" value="{{option.ismmclT_Id}}">
+                                            {{option.ismmclT_ClientName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.client)" ng-messages="myForm.client.$error">
+                                        <div ng-message="required">Please Select client</div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Client:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="Client" ng-model="$parent.Client" ng-change="onclientchange()" theme="bootstrap" title=" Select/Search Client" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select/Search Client">{{$select.selected.ismmclT_ClientName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in get_client | filter: $select.search" value="{{name.ismmclT_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.ismmclT_ClientName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Client)" ng-messages="myForm.Client.$error">
+                                        <div ng-message="required"> Select Client</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Category :<span style="color:red;">*</span></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="cat" ng-model="ISMMTCAT_Id" ng-change="onclientchange()" required>
+                                        <option value="">--Select Category--</option>
+                                        <option ng-repeat="cat in get_category" ng-selected="{{cat.Selected == true}}" value="{{cat.ismmtcaT_Id}}">
+                                            {{cat.ismmtcaT_TaskCategoryName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                        <div ng-message="required">Please Select Category</div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Category:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="Category" ng-model="$parent.Category" ng-change="oncategorychange($parent.Category)" theme="bootstrap" title="Select/Search Category" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select/Search Category">{{$select.selected.ismmtcaT_TaskCategoryName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in get_category | filter: $select.search" value="{{name.ismmtcaT_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.ismmtcaT_TaskCategoryName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Category)" ng-messages="myForm.Category.$error">
+                                        <div ng-message="required"> Select Category</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Issue/Task Title :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <!--<input type="text" class="form-control active" name="taskname" placeholder="Enter Task Title" maxlength="70" ng-model="ismtcR_Title" required>-->
+                                    <textarea class="form-control" name="taskname" type="text" placeholder="Enter Task Title .... " ng-model="ismtcR_Title" rows="3" maxlength="70" style="resize:none" required></textarea>
+                                    <div class="error-messages" ng-if="interacted(myForm.taskname)" ng-messages="myForm.taskname.$error">
+                                        <div ng-message="required">Please Enter Task </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Description :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="description" type="text" placeholder="Description .... " ng-model="ismtcR_Desc" rows="5" required style="resize:none"></textarea>
+                                    <div class="error-messages" ng-if="interacted(myForm.description)" ng-messages="myForm.description.$error">
+                                        <div ng-message="required">Please Enter Description </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="g_date" ng-model="ismtcR_CreationDate" o md-placeholder="Enter date" md-min-date="mindate" ng-disabled="true"></md-datepicker>
+                                    <!--<md-datepicker name="g_date" ng-model="ismtcR_CreationDate" md-placeholder="Enter date" md-min-date="plMaxdate" md-max-date="maxdate" ng-disabled="plannerextapproval" required></md-datepicker>-->
+                                    <div class="error-messages" ng-if="interacted(myForm.g_date)" ng-messages="myForm.g_date.$error">
+                                        <div ng-message="required">Select Date</div>
+                                        <div ng-message="valid">The entered value is not a date!</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">Module :<strong style="color:red;">*</strong></label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="module" ng-model="obj.ivrmM_Id" required>
+                                        <option value="">--Select Module--</option>
+                                        <option ng-repeat="option in get_module" ng-selected="{{option.Selected == true}}" value="{{option.ivrmM_Id}}">
+                                            {{option.ivrmM_ModuleName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.module)" ng-messages="myForm.module.$error">
+                                        <div ng-message="required">Please Select Module</div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Module:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="Module" ng-model="$parent.Module" theme="bootstrap" title=" Select Module" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select/Search Module">{{$select.selected.ivrmM_ModuleName}}</ui-select-match>
+                                        <ui-select-choices repeat="name in get_module | filter: $select.search" value="{{name.ivrmM_Id}}"
+                                                           ng-selected="{{name.Selected == true}}">
+                                            <div ng-bind-html="name.ivrmM_ModuleName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Module)" ng-messages="myForm.Module.$error">
+                                        <div ng-message="required"> Select Module</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">Priority :<span style="color:red;">*</span></label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="priority" ng-model="hrmpR_Id" required>
+                                            <option value="">--Select Priority--</option>
+                                            <option ng-repeat="option in get_priority" ng-selected="{{option.Selected == true}}" value="{{option.hrmpR_Id}}">
+                                                {{option.hrmP_Name}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.priority)" ng-messages="myForm.priority.$error">
+                                            <div ng-message="required">Please Select Priority</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group margin-top-10" ng-if="roletype!='ClientUser'">
+                                    <label class="control-label col-sm-4" style="font-weight: 700;">Assign This Task :</label>
+                                    <div class="col-sm-8" style="font-weight: 700;" ng-init="obj.selfassign='N'">
+                                        <div class="well text-left">
+                                            <label class="radio-inline">
+                                                <input type="radio" value="Y" name="stask" ng-change="ondatechange()" ng-model="obj.selfassign">
+                                                <span class="lbl padding-8" style="font-weight: 700;"> Yes </span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="N" name="stask" ng-change="ondatechange()" ng-model="obj.selfassign">
+                                                <span class="lbl padding-8" style="font-weight: 700;"> No </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">Status :<span style="color:red;">*</span></label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="status" ng-disabled="true" ng-value="Open" ng-model="ismtcR_Status">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="well form-group margin-top-15">
+                                <div class="text-center" ng-init="ismtcR_BugOREnhancementFlg='B'">
+                                    <label class="radio-inline" style="padding-left:2%">
+                                        <input type="radio" value="B" name="bugs" ng-model="ismtcR_BugOREnhancementFlg">
+                                        <span class="lbl padding-5" style="font-weight: 700;"> Bugs/Complaints </span>
+                                    </label>
+                                    <label class="radio-inline" style="padding-left:2%" ng-show="roletype!='ClientUser'">
+                                        <input type="radio" value="T" name="task" ng-change="ondatechange()" ng-model="ismtcR_BugOREnhancementFlg">
+                                        <span class="lbl padding-5" style="font-weight: 700;"> Task (Periodicity) </span>
+                                    </label>
+                                    <label class="radio-inline" style="padding-left:2%">
+                                        <input type="radio" value="E" name="enhc" ng-model="ismtcR_BugOREnhancementFlg">
+                                        <span class="lbl padding-5" style="font-weight: 700;">Enhancement</span>
+                                    </label>
+                                    <label class="radio-inline" style="padding-left:2%">
+                                        <input type="radio" value="O" name="others" ng-model="ismtcR_BugOREnhancementFlg">
+                                        <span class="lbl padding-5" style="font-weight: 700;">Other's</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group margin-top-15">
+                                <!--<label class="control-label col-sm-4"><b>Attachment :</b></label>-->
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL NO</th>
+                                            <th>Upload File</th>
+                                            <th>File Name</th>
+                                            <th>View</th>
+                                            <th>Action </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="other in documentListOtherDetails track by $index" ng-form="myForm13">
+                                            <td>{{$index+1}}</td>
+
+                                            <td>
+                                                <div class="col-sm-12 UploadEmpDoc1">
+                                                    <div class="form-group text-center">
+                                                        <label class="custom-file-input file-bluenew" style="width:100%;margin:auto;">
+                                                            <input type="file" name="doc" accept="image/*, application/pdf" data-ng-model="documentListOtherDetails[$index].file" onchange="angular.element(this).scope().selectFileforUploadzdOtherDetail(this, angular.element(this).scope().other)">
+                                                        </label>
+                                                        <div class="error-messages" ng-if="interacted13(myForm13.doc)" ng-messages="myForm13.doc.$error">
+                                                            <div ng-message="required">Please upload the file</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="other.FileName" disabled />
+                                            </td>
+                                            <td>
+                                                <a ng-if="other.file  !=null && other.file !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(other.file)"> view</a>
+                                            </td>
+                                            <td>
+                                                <span class="input-group-addon" ng-hide="documentListOtherDetails.length > 30">
+                                                    <a href="" ng-show="$last" ng-click="addNewDocumentOtherDetail()" style="color:#000;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="input-group-addon" id="remove" ng-hide="documentListOtherDetails.length ==1">
+                                                    <a href="" ng-click="removeNewDocumentOtherDetail($index,other)" style="color:#000;">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                            <!--<div class="form-group" ng-if="files.length>0">
+                                <div class="col-sm-12">
+                                    <div ng-repeat="fl in files" class="col-sm-6">
+                                        <b class="control-label col-sm-8" style="margin-left:90px;color: #3a5999 !important;">
+                                            {{fl.name}}
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group col-sm-10" style="margin-left: 100px;" ng-if="files.length>0">
+                                <table class="table table-bordered text-left">
+                                    <tbody>
+                                        <tr ng-repeat="fl in files">
+                                            <td class="text-left">
+                                                <b class="control-label" style="color: #3a5999 !important;">
+                                                    {{fl.name}}
+                                                </b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <button type="button" class="close margin-bottom-10" style="color:red;float:right" ng-if="files.length>0">
+                                    <b><i class="fa fa-times" aria-hidden="true" ng-click="remove_file()">Clear</i></b>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="box-body" ng-show="obj.selfassign=='Y' || ismtcR_BugOREnhancementFlg=='T'">
+                    <div class="">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h4 class="modal-title col-sm-10">Assign Issue/Task/Enhancement</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="overflow:auto;width:100%;">
+                        <table class="table table-responsive table-bordered clearfix">
+                            <thead>
+                                <tr>
+                                    <th ng-if="ismtcR_BugOREnhancementFlg=='T'"><a href="">Periodicity</a></th>
+                                    <th ng-if="obj.periodicity=='Yearly Once' || obj.periodicity=='Specific Day'"><a href="">Date</a></th>
+                                    <th ng-if="obj.periodicity=='Weekly' || obj.periodicity=='Once in Fortnight'"><a href="">Task Day</a></th>
+                                    <th><a href="">Start and End Date</a></th>
+                                    <th><a href="">Effort for each task</a></th>
+                                    <th width="32%"><a href="">Assign To</a></th>
+                                    <th><a href="">Remarks</a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-left" ng-if="ismtcR_BugOREnhancementFlg=='T'">
+                                        <select class="form-control" name="periodicity" ng-model="obj.periodicity" ng-change="periodicity_change()" required>
+                                            <option value="">--Select Periodicity--</option>
+                                            <option value="Daily">Daily</option>
+                                            <option value="Weekly">Weekly</option>
+                                            <option value="Once in Fortnight">Once in Fortnight</option>
+                                            <option value="Yearly Once">Yearly Once</option>
+                                            <option value="Specific Day">Specific Day</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.periodicity)" ng-messages="myForm.periodicity.$error">
+                                            <div ng-message="required">Please Select Periodicity</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-left" ng-if="obj.periodicity=='Yearly Once' || obj.periodicity=='Specific Day'">
+                                        <md-datepicker name="Yearly" onkeypress="return false" md-min-date="taskDate" md-max-date="enddate" id="date1" ng-model="obj.Yearly" md-placeholder="Yearly date" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm['Yearly'])"
+                                             ng-messages="myForm['Yearly'].$error">
+                                            <div ng-message="required">Select Yearly Date</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-left" ng-if="obj.periodicity=='Weekly' || obj.periodicity=='Once in Fortnight'">
+                                        <input class="form-control" type="text" allow-pattern="[0-9]" min="0" max="31" name="taskday" ng-model="obj.taskday" required ng-disabled="maxtime>0" style="margin-top: 15%;" /><br />
+                                        <div class="error-messages" ng-if="interacted(myForm['taskday'])"
+                                             ng-messages="myForm['taskday'].$error">
+                                            <div ng-message="required">Enter The Taskday </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-left">
+                                        <md-datepicker name="t1_Start_Date" onkeypress="return false" md-min-date="plMaxdate" md-max-date="enddate" id="date1" ng-model="obj.startDate" ng-change="ondatechangesta()" md-placeholder="Start date" ng-required="obj.selfassign=='Y' || ismtcR_BugOREnhancementFlg=='T'"></md-datepicker>
+                                        <div class="error-messages text-center" ng-if="interacted(myForm['t1_Start_Date'])"
+                                             ng-messages="myForm['t1_Start_Date'].$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                        <br /><span style="margin-left: 40%;">To</span><br />
+                                        <md-datepicker onkeypress="return false" name="t1_End_Date_" ng-model="obj.endDate" md-placeholder="End date" md-min-date="obj.startDate" ng-required="obj.selfassign=='Y' || ismtcR_BugOREnhancementFlg=='T'"></md-datepicker>
+                                        <div class="error-messages text-center" ng-if="interacted(myForm['t1_End_Date_'])"
+                                             ng-messages="myForm['t1_End_Date_'].$error">
+                                            <div ng-message="required">Select End Date </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-left">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <!--<select class="form-control" name="t1_effort" ng-model="obj.durationFlg"
+                                                        required ng-disabled="maxtime>0">
+                                                    <option value="">Select Hrs/Mins</option>
+                                                    <option value="HOURS">Hours</option>
+                                                    <option value="MINUTES">Minutes</option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted(myForm['t1_effort'])"
+                                                     ng-messages="myForm['t1_effort'].$error">
+                                                    <div ng-message="required">Select Efforts Type</div>
+                                                </div>-->
+
+                                                <div class="">
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="number" ng-init="obj.effhrs=0" ng-disabled="fixedtime" class="form-control active" name="effort" min="0" ng-model="obj.effhrs" minlength="1" maxlength="2" allow-pattern="(\s|[0-9])" style="width:65px" required>
+                                                            </td>
+                                                            <td style="padding-left:5px">
+                                                                <input type="number" ng-init="obj.effmin=0" ng-disabled="fixedtime" class="form-control active" name="effmin" min="0" ng-model="obj.effmin" minlength="1" maxlength="2" allow-pattern="(\s|[0-9])" style="width:65px" required>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">
+                                                                HH
+                                                            </td>
+                                                            <td class="text-center">
+                                                                MM
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                <div class="error-messages" ng-if="interacted(myForm.effort)"
+                                                     ng-messages="myForm.effort.$error">
+                                                    <div ng-message="required">Enter The Hours </div>
+                                                    <div ng-message="maxlength">Hours Maxlenth exceeded </div>
+                                                </div>
+                                                <div class="error-messages" ng-if="interacted(myForm.effmin)"
+                                                     ng-messages="myForm.effmin.$error">
+                                                    <div ng-message="required">Enter The Minutes </div>
+                                                    <div ng-message="maxlength">Minutes Maxlenth exceeded </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--<br />
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <input class="form-control" type="text" allow-pattern="[0-9.]" min="0" max="100" name="t1_effortsd_" ng-model="obj.eachTaskMaxDuration"
+                                                       required ng-disabled="maxtime>0" /><br />
+                                                <div class="error-messages" ng-if="interacted(myForm['t1_effortsd_'])"
+                                                     ng-messages="myForm['t1_effortsd_'].$error">
+                                                    <div ng-message="required">Enter The Efforts </div>
+                                                </div>
+                                            </div>
+                                        </div>-->
+                                    </td>
+                                    <td class="text-left">
+                                        <div class="multiselect col-sm-8">
+                                            <span>
+                                                <input class="form-control" ng-model="searchValueE" type="text" placeholder="Search Employee here...">
+                                            </span>
+                                            <label ng-show="emplist.length>1">
+                                                <input name="all" value="1" ng-model="checkall" type="checkbox" ng-click="all_check(checkall)">
+                                                <span class="lbl padding-8">
+                                                    <b>  All Employees</b>
+                                                </span>
+                                            </label>
+                                            <label ng-repeat="option in filterValue3=(emplist  | filter:filterValue2)">
+                                                <input name="t322" ng-model="option.checked" ng-click="togchkbx();" type="checkbox" value="{{option.id}}">
+                                                <!--ng-change="employeecheck(option)"-->
+                                                <span class="lbl padding-8">
+                                                    <b> {{option.employeeName}}</b> : {{option.hrmdeS_DesignationName}}
+                                                </span>
+                                            </label>
+                                            <div class="error-messages" ng-if="interacted(myForm.t322)"
+                                                 ng-messages="myForm.t322.$error">
+                                                <div ng-message="required">Select any employee </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-left">
+                                        <textarea class="form-control" name="remarks" type="text" placeholder="Remarks.... " ng-model="obj.remarks" rows="6"></textarea>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="ismtcR_Id" value="{{ismtcR_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="createtask(obj)" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Create
+                    </md-button>
+                    <!--<md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="nearme()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Location
+                    </md-button>-->
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="get_taskdetails.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Task Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div style="overflow:auto;width:100%;">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="" ng-click="sort('sno')">SL.No.</a>
+                                </th>
+                                <th width="30%"><a href="" ng-click="sort('ISMTCR_TaskNo')">Task Details</a></th>
+                                <th width="25%"><a href="" ng-click="sort('ISMMCLT_ClientName')">Client-Module-Category </a> </th>
+                                <!--<th width="15%" ng-if="roletype!='ClientUser'"><a href="" ng-click="sort('HRMD_DepartmentName')">Department</a></th>-->
+                                <!--<th><a href="" ng-click="sort('ISMTCR_Title')">Title</a> </th>-->
+                                <th width="9%"><a href="" ng-click="sort('ISMTCR_CreationDate')">Date</a> </th>
+                                <!--<th><a href="" ng-click="sort('ISMTCR_BugOREnhancementFlg')">Task Type</a></th>
+                                <th><a href="" ng-click="sort('HRMP_Name')">Priority</a> </th>
+                                <th><a href="" ng-click="sort('ISMTCR_Status')">Status</a></th>-->
+                                <th width="50%"><a href="" ng-click="sort('ISMTCR_Desc')">Description </a> </th>
+
+                                <!--<th>Action</th>-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue = (get_taskdetails | filter : searchValue)  | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-left">
+                                    <span>
+                                        <label class="control-label col-sm-12 text-left" style="padding-left:0 !important">
+                                            <span class="col-sm-12 text-left">
+                                                <b> {{user.ISMTCR_TaskNo}}</b><br />
+                                                {{user.ISMTCR_Title}} <br />
+                                                <label class="control-label"><b>{{user.ISMTCR_BugOREnhancementFlg}}</b></label>
+                                                <span ng-if="user.HRMP_Name!=null && user.HRMP_Name!=''"><label style="color:red;"><b>-{{user.HRMP_Name}}</b></label></span>
+                                                <!--<span ng-if="(user.HRMP_Name=='High')|| (user.HRMP_Name=='HIGH')"><label style="color:red;"><b>-{{user.HRMP_Name}}</b></label></span>
+                                                <span ng-if="(user.HRMP_Name=='Normal')||(user.HRMP_Name=='NORMAL')">
+                                                    <label style="color:orange;"><b>-{{user.HRMP_Name}}</b></label>
+                                                </span>
+                                                <span ng-if="(user.HRMP_Name=='Low')||(user.HRMP_Name=='LOW')">
+                                                    <label style="color:green;"><b>-{{user.HRMP_Name}}</b></label>
+                                                </span>-->
+                                                <span ng-if="user.ISMTCR_Status=='Open' || user.ISMTCR_Status=='ReOpen'">
+                                                    - <span style="font-weight:500 !important;font-size: larger;color: red;">{{user.ISMTCR_Status}}</span>
+                                                </span>
+                                                <span ng-if="user.ISMTCR_Status!='Open' && user.ISMTCR_Status!='ReOpen'">
+                                                    - <span style="font-weight:500 !important;font-size: larger;color: blue;">{{user.ISMTCR_Status}}</span>
+                                                </span><br />
+                                                <span ng-if="roletype!='ClientUser'">
+                                                    <span style="font-weight:bold !important;">Dept : {{user.HRMD_DepartmentName}}</span>
+                                                </span>
+                                            </span>
+                                        </label>
+                                    </span>
+
+                                </td>
+                                <td class="text-left">
+                                    <span>
+                                        Client: {{user.ISMMCLT_ClientName}}
+                                    </span><br />
+                                    <span>
+                                        Module:   {{user.IVRMM_ModuleName}}
+                                    </span><br />
+                                    <span>
+                                        Category: <span style="font-weight: 500 !important;font-size: larger;color: blue;">{{user.ISMMTCAT_TaskCategoryName}}</span>
+                                    </span>
+                                </td>
+                                <!--<td class="text-left" ng-if="roletype!='ClientUser'">{{user.HRMD_DepartmentName}}</td>-->
+                                <!--<td class="text-left">{{user.ISMTCR_Title}}</td>-->
+                                <td class="text-left">{{user.ISMTCR_CreationDate}}</td>
+                                <!--<td class="text-left">{{user.ISMTCR_BugOREnhancementFlg}}</td>
+                                <td class="text-left">{{user.HRMP_Name}}</td>
+                                <td class="text-left">{{user.ISMTCR_Status}}</td>-->
+
+                                <td class="text-left">{{user.ISMTCR_Desc}}</td>
+
+                                <!--<td class="text-center">
+                                    <span ng-if="user.ismtcR_ActiveFlg === true">
+                                        <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                    &nbsp;
+                                    <span ng-if="user.ismtcR_ActiveFlg === false">
+                                        <a href="" ng-click="deactive(user)"
+                                           class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                            <i> Activate </i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="user.ismtcR_ActiveFlg === true">
+                                        <a href="" ng-click="deactive(user)"
+                                           class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                            <i> Deactivate</i>
+                                        </a>
+                                    </span>
+                                </td>-->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!--==================== Image Preview Model ===========================-->
+    <div id="myimagePreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:55%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h3>{{filenames}}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--=====================video play===============-->
+    <div id="myvideoPreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:60%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">Videos </h4>
+                </div>
+                <div class="modal-body">
+                    <div ng-repeat="vd in view_videos">
+                        <div class="row">
+
+                            <div class="col-sm-6 col-sm-offset-2 vdoleft1">
+                                <video width="420" height="240" controls="controls">
+                                    <source ng-src="{{vd.ihw_video | trustUrl}}" type="video/mp4">
+                                    Your browser does not support HTML5 video.
+                                </video>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--=====================audio play===============-->
+    <div id="myaudioPreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:60%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">Audio/Mp3 </h4>
+                </div>
+                <div class="modal-body">
+
+                    <div ng-repeat="vd in view_videos">
+                        <div class="row">
+
+                            <div class="col-sm-6 col-sm-offset-2 vdoleft1">
+                                <audio width="420" height="240" controls="controls">
+                                    <source ng-src="{{vd.ihw_video | trustUrl}}" type="audio/mp3">
+                                    Your browser does not support HTML5 Audio.
+                                </audio>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <!--====================PDF view========-->
+    <div id="showpdf" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <form id="qqqq">
+
+                <div class="modal-content">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+
+
+                    <div id="pdfIdzz">
+
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</section>

@@ -1,0 +1,494 @@
+﻿<section class="content" data-ng-init="BindData()">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Groupwise Subject List Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="well text-center" ng-init="masteryearly='master'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="masteryearly" ng-change="onselectmasteryearly()" value="master" name="radio1" id="radio1">
+                                <span class="lbl padding-8">Master Group</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="masteryearly" ng-change="onselectmasteryearly()" value="yearly" name="radio1" id="radio2">
+                                <span class="lbl padding-8">Yearly Group</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="well text-center">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="qualification_type" ng-change="onselectradio()" value="all" name="radio2" id="radio3">
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="qualification_type" ng-change="onselectradio()" value="individual" name="radio2" id="radio4">
+                                <span class="lbl padding-8">Group Wise</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="well text-center" ng-init="examwiseorwithout='withoutexam'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="examwiseorwithout" ng-change="examwise()" value="exam" name="radio3" id="radio5"
+                                       ng-disabled="masteryearly=='master'">
+                                <span class="lbl padding-8">Exam Wise </span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="examwiseorwithout" ng-change="examwise()" value="withoutexam" name="radio3" id="radio6"
+                                       ng-disabled="masteryearly=='master'">
+                                <span class="lbl padding-8">With Out Exam Wise</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel2" name="cls" ng-model="ASMAY_Id" ng-change="onchangeyear()" ng-disabled="masteryearly=='master'"
+                                        ng-required="masteryearly=='yearly'">
+                                    <option value="" label="Select Academic Year"> </option>
+                                    <option ng-repeat="option2 in yearlist" value="{{option2.asmaY_Id}}" ng-selected="{{option2.Selected == true}}">
+                                        {{option2.asmaY_Year}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                <div ng-message="required">Select Academic Year</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Group :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="Year" ng-disabled="qualification_type=='all'" ng-model="EMG_Id"
+                                        data-ng-change="onchangegroup()" ng-required="qualification_type!='all'">
+                                    <option value="" label="Select Group"> </option>
+                                    <option ng-repeat="option1 in group" value="{{option1.emG_Id}}" ng-selected="{{option1.Selected == true}}">
+                                        {{option1.emG_GroupName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.Year)" ng-messages="myForm.Year.$error">
+                                <div ng-message="required">Select Group</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Exam Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel2" name="cls" ng-model="EME_Id" ng-disabled="masteryearly=='master' || examwiseorwithout =='withoutexam'"
+                                        ng-change="onchangeexam()">
+                                    <option value="" label="Select Exam Name"> </option>
+                                    <option ng-repeat="option2 in examlist" value="{{option2.emE_Id}}" ng-selected="{{option2.Selected == true}}">
+                                        {{option2.emE_ExamName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                <div ng-message="required"> Select Exam Name</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button ng-hide="gridOptions.data.length>0" type="submit" class="md-raised md-warn" ng-click="cancel()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="reportname==true" id="save-btn" ng-click="printData()">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="reportname==true" id="save-btn" ng-click="exportToExcel()">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Excel
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="grouplist.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Groupwise Subject List Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="table" ng-if="masteryearly=='master'">
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th><a href="">Sl No.</a></th>
+                                <th><a href="">Group Name</a></th>
+                                <th><a href="">Total Subjects</a></th>
+                                <th><a href="">Max Subject</a></th>
+                                <th><a href="">Min Subject</a></th>
+                                <th><a href="">Best Off</a></th>
+                                <th><a href="">Elective Flag</a></th>
+                                <th><a href="">Subject</a></th>
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="exm in grouplist">
+                            <tr>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{$index+1}}</td>
+                                <td class="text-left" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_GroupName}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_TotSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MaxAplSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MinAplSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_BestOff}}</td>
+                                <td class="text-left" rowspan="{{exm.subjectlist.length+1}}">
+                                    <span ng-if="exm.EMG_ElectiveFlg==true">Elective Group</span>
+                                    <span ng-if="exm.EMG_ElectiveFlg==false">Not Elective Group</span>
+                                </td>
+                            </tr>
+                            <tr ng-repeat="sub123 in exm.subjectlist">
+                                <td class="text-left">
+                                    {{sub123.ISMS_SubjectName}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="box-body" id="table" ng-if="masteryearly=='yearly' && examwiseorwithout == 'withoutexam'">
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th><a href="">Sl No.</a></th>
+                                <th><a href="">Group Name</a></th>
+                                <th><a href="">Total Subjects</a></th>
+                                <th><a href="">Max Subject</a></th>
+                                <th><a href="">Min Subject</a></th>
+                                <th><a href="">Best Off</a></th>
+                                <th><a href="">Elective Flag</a></th>
+                                <th><a href="">Subject</a></th>
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="exm in grouplist">
+                            <tr>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{$index+1}}</td>
+                                <td class="text-left" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_GroupName}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_TotSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MaxAplSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MinAplSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_BestOff}}</td>
+                                <td class="text-left" rowspan="{{exm.subjectlist.length+1}}">
+                                    <span ng-if="exm.EMG_ElectiveFlg==true">Elective Group</span>
+                                    <span ng-if="exm.EMG_ElectiveFlg==false">Not Elective Group</span>
+                                </td>
+                            </tr>
+                            <tr ng-repeat="sub123 in exm.subjectlist">
+                                <td class="text-left">
+                                    {{sub123.ISMS_SubjectName}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="box-body" id="table" ng-if="masteryearly=='yearly' && examwiseorwithout != 'withoutexam'">
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th><a href="">Sl No.</a></th>
+                                <th><a href="">Group Name</a></th>
+                                <th><a href="">Total Subjects</a></th>
+                                <th><a href="">Max Subject</a></th>
+                                <th><a href="">Min Subject</a></th>
+                                <th><a href="">Best Off</a></th>
+                                <th><a href="">Subject</a></th>
+                                <th><a href="">App.Result </a></th>
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="exm in grouplist">
+                            <tr>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{$index+1}}</td>
+                                <td class="text-left" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_GroupName}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_TotSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MaxAplSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MinAplSubjects}}</td>
+                                <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_BestOff}}</td>
+                            </tr>
+                            <tr ng-repeat="sub123 in exm.subjectlist">
+                                <td class="text-left">
+                                    {{sub123.ISMS_SubjectName}}
+                                </td>
+                                <td class="text-left">
+                                    <span ng-if="sub123.EYCES_AplResultFlg==true">Apply To Result</span>
+                                    <span ng-if="sub123.EYCES_AplResultFlg==false">Not Apply To Result</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div id="printSectionIdmaster" ng-show="table_flag">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <center><h4> <b> Master Group Wise Subject List </b></h4></center>
+            <center><h4> <b>{{reportdetails}}</b></h4></center>
+            <br />
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th>Group Name</th>
+                        <th>Total Subjects</th>
+                        <th>Max Subject</th>
+                        <th>Min Subject</th>
+                        <th>Best Off</th>
+                        <th>Elective Flag</th>
+                        <th>Subject</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="exm in grouplist">
+                    <tr>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_GroupName}}</td>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_TotSubjects}}</td>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MaxAplSubjects}}</td>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MinAplSubjects}}</td>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_BestOff}}</td>
+                        <td class="text-left" rowspan="{{exm.subjectlist.length+1}}">
+                            <span ng-if="exm.EMG_ElectiveFlg==true">Elective Group</span>
+                            <span ng-if="exm.EMG_ElectiveFlg==false">Not Elective Group</span>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="sub123 in exm.subjectlist">
+                        <td class="text-left">
+                            {{sub123.ISMS_SubjectName}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="printSectionIdecelmaster" ng-show="table_flag">
+            <table class="table-bordered">
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" style="text-align:center;">
+                        <b> {{institutename}}</b>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" style="text-align:center;">
+                        <b> {{instituteaddress}}</b>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8">
+                        &nbsp;
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" style="text-align:center;">
+                        <b> Master Group Wise Subject List </b>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" style="text-align:center;">
+                        <b> {{reportdetails}} </b>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="table-bordered" id="table">
+                <thead>
+                    <tr style="border : solid 0.5px black;">
+                        <th>Sl.No.</th>
+                        <th>Group Name</th>
+                        <th>Total Subjects</th>
+                        <th>Max Subject</th>
+                        <th>Min Subject</th>
+                        <th>Best Off</th>
+                        <th>Elective Flag</th>
+                        <th>
+                            <table>
+                                <tr style="border : solid 0.5px black;">
+                                    <th>Subject</th>
+                            </table>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="exm in grouplist">
+                    <tr style="border : solid 0.5px black;">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{exm.EMG_GroupName}}</td>
+                        <td class="text-center">{{exm.EMG_TotSubjects}}</td>
+                        <td class="text-center">{{exm.EMG_MaxAplSubjects}}</td>
+                        <td class="text-center">{{exm.EMG_MinAplSubjects}}</td>
+                        <td class="text-center">{{exm.EMG_BestOff}}</td>
+                        <td class="text-left">
+                            <span ng-if="exm.EMG_ElectiveFlg==true">Elective Group</span>
+                            <span ng-if="exm.EMG_ElectiveFlg==false">Not Elective Group</span>
+                        </td>
+                        <td>
+                            <table>
+                                <tr style="border : solid 0.5px black;" ng-repeat="sub123 in exm.subjectlist">
+                                    <td class="text-left">
+                                        {{sub123.ISMS_SubjectName}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div id="printSectionIdyearly" ng-show="table_flag">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <center><h4> <b> Master Group Wise Subject List </b></h4></center>
+            <center><h4> <b>{{reportdetails}}</b></h4></center>
+            <br />
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th><a href="">Sl No.</a></th>
+                        <th><a href="">Group Name</a></th>
+                        <th><a href="">Total Subjects</a></th>
+                        <th><a href="">Max Subject</a></th>
+                        <th><a href="">Min Subject</a></th>
+                        <th><a href="">Best Off</a></th>
+                        <th><a href="">Subject</a></th>
+                        <th><a href="">App.Result </a></th>
+
+                    </tr>
+                </thead>
+                <tbody ng-repeat="exm in grouplist">
+                    <tr>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_GroupName}}</td>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_TotSubjects}}</td>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MaxAplSubjects}}</td>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_MinAplSubjects}}</td>
+                        <td class="text-center" rowspan="{{exm.subjectlist.length+1}}">{{exm.EMG_BestOff}}</td>
+                    </tr>
+                    <tr ng-repeat="sub123 in exm.subjectlist">
+                        <td class="text-left">
+                            {{sub123.ISMS_SubjectName}}
+                        </td>
+                        <td class="text-left">
+                            <span ng-if="sub123.EYCES_AplResultFlg==true">Apply To Result</span>
+                            <span ng-if="sub123.EYCES_AplResultFlg==false">Not Apply To Result</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="printSectionIdecelyearly" ng-show="table_flag">
+            <table class="table-bordered">
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" style="text-align:center;">
+                        <b> {{institutename}}</b>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" style="text-align:center;">
+                        <b> {{instituteaddress}}</b>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8">
+                        &nbsp;
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" style="text-align:center;">
+                        <b> Master Group Wise Subject List </b>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" style="text-align:center;">
+                        <b> {{reportdetails}} </b>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="table-bordered" id="table">
+                <thead>
+                    <tr style="border : solid 0.5px black;">
+                        <th>Sl.No.</th>
+                        <th>Group Name</th>
+                        <th>Total Subjects</th>
+                        <th>Max Subject</th>
+                        <th>Min Subject</th>
+                        <th>Best Off</th>
+                        <th>
+                            <table>
+                                <tr style="border : solid 0.5px black;">
+                                    <th>Subject</th>
+                                    <th>App.Result</th>
+                            </table>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="exm in grouplist">
+                    <tr style="border : solid 0.5px black;">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{exm.EMG_GroupName}}</td>
+                        <td class="text-center">{{exm.EMG_TotSubjects}}</td>
+                        <td class="text-center">{{exm.EMG_MaxAplSubjects}}</td>
+                        <td class="text-center">{{exm.EMG_MinAplSubjects}}</td>
+                        <td class="text-center">{{exm.EMG_BestOff}}</td>                        
+                        <td>
+                            <table>
+                                <tr style="border : solid 0.5px black;" ng-repeat="sub123 in exm.subjectlist">
+                                    <td class="text-left">
+                                        {{sub123.ISMS_SubjectName}}
+                                    </td>
+                                    <td class="text-left">
+                                        <span ng-if="sub123.EYCES_AplResultFlg==true">Apply To Result</span>
+                                        <span ng-if="sub123.EYCES_AplResultFlg==false">Not Apply To Result</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+
+
+
+    </form>
+</section>

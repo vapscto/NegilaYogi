@@ -1,0 +1,442 @@
+<script>
+    n = new Date();
+    yyyy = n.getFullYear();
+    mm = n.getMonth() + 1;
+    dd = n.getDate();
+    document.getElementById("date").innerHTML = dd + "/" + mm + "/" + yyyy;
+</script>
+<link href="css\print\pfchallan\PFChallan.css" rel="stylesheet" />
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Bank / Cash Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <!--All or Individual-->
+                    <div class="form-group well">
+                        <div class="text-center">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="Employee.AllOrIndividual" value="All" name="AllOrIndividual" required ng-change="disableGrid()">
+                                <span class="lbl padding-8">All<strong style="color:red;display:inline; font-weight: bolder;">*</strong></span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="Employee.AllOrIndividual" value="Individual" name="AllOrIndividual" required ng-change="disableGrid()">
+                                <span class="lbl padding-8">Individual<strong style="color:red;display:inline; font-weight: bolder;">*</strong></span>
+                            </label>
+                        </div>
+                        <span class="error-messages col-sm-offset-5" ng-if="interacted(myForm.AllOrIndividual)" ng-messages="myForm.AllOrIndividual.$error">
+                            <span ng-message="required">Select All / Individual</span>
+                        </span>
+
+                    </div>
+                    <!--Bank or Cash-->
+                    <div class="form-group well">
+                        <div class="text-center">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="Employee.BankCash" value="Bank" name="BankCash" required ng-change="disableGrid()">
+                                <span class="lbl padding-8">Bank<strong style="color:red;display:inline; font-weight: bolder;">*</strong></span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="Employee.BankCash" value="Cash" name="BankCash" required ng-change="disableGrid()">
+                                <span class="lbl padding-8">Cash<strong style="color:red;display:inline; font-weight: bolder;">*</strong></span>
+                            </label>
+                        </div>
+                        <span class="error-messages col-sm-offset-5" ng-if="interacted(myForm.BankCash)" ng-messages="myForm.BankCash.$error">
+                            <span ng-message="required">Select Bank / Cash</span>
+                        </span>
+                    </div>
+                    <!--Month,year-->
+                    <div class="form-group well">
+                        <div class="text-center">
+                            <label class="radio-inline">
+                                <span class="lbl padding-3">
+                                    Month :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                </span>
+                            </label>
+                            <label class="radio-inline">
+                                <span class="lbl padding-3">
+                                    <select class="form-control" id="sel1" data-ng-model="Employee.hreS_Month" name="hreS_Month" required ng-change="SetFromDateAndToDateByMonth(Employee.hreS_Month,Employee.hreS_Year)">
+                                        <option value="">Select</option>
+                                        <option ng-repeat="month in monthdropdown" value="{{month.ivrM_Month_Name}}" ng-selected="{{month.Selected===true}}">
+                                            {{month.ivrM_Month_Name}}
+                                        </option>
+                                    </select>
+                                    <span class="error-messages" ng-if="interacted(myForm.hreS_Month)" ng-messages="myForm.hreS_Month.$error">
+                                        <span ng-message="required">Select Month</span>
+                                    </span>
+                                </span>
+                            </label>
+                            <label class="radio-inline">
+                                <span class="lbl padding-3">
+                                    Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                </span>
+                            </label>
+                            <label class="radio-inline">
+                                <span class="lbl padding-3">
+                                    <select class="form-control" id="sel2" data-ng-model="Employee.hreS_Year" name="hreS_Year" required ng-change="SetMonthByYear(Employee.hreS_Year)">
+                                        <option value="">Select</option>
+                                        <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.hrmlY_LeaveYear}}" ng-selected="{{leaveyear.Selected===true}}">
+                                            {{leaveyear.hrmlY_LeaveYear}}
+                                        </option>
+                                    </select>
+                                    <span class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                        <span ng-message="required">Select Year</span>
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center" ng-show="Employee.AllOrIndividual == 'Individual'">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group" style="text-align:left;">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="groupType in groupTypedropdown">
+                                        <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType)">
+                                        <span class="lbl padding-8">
+                                            {{groupType.hrmgT_EmployeeGroupType}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group" style="text-align:left;">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-12">
+                                        <label class="control-label">
+                                            Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </label>
+                                        <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </div>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="department in departmentdropdown">
+                                            <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)" />
+                                            <span class="lbl padding-8">
+                                                {{department.hrmD_DepartmentName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="EmployeeDis">
+            <div class="box-header with-border">
+                <h3 class="box-title">Bank / Cash Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div style="overflow:scroll;width:1200px;">
+                    <div id="kindogridBankCash"></div>
+                </div>
+
+                <div class="PFChallan" id="Baldwin" ng-show="false">
+                    <div id="PFChallan">
+
+
+
+                        <!--<div class="text-center">-->
+                        <!--<h4>{{institutionDetails.mI_Name}}</h4>
+            <h6> {{CurrentInstuteAddress}}</h6>
+            <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>-->
+                        <!--<h5> Bank / Cash Report : {{selectedMonth}} {{selecteexportToExceldYear}}</h5>-->
+                        <!--</div>-->
+
+                        <div class="text-left">
+                            <h5 style="font-size:15px;font-family: 'Caveat', cursive;font-family: 'Yellowtail', cursive;">{{institutionDetails.mI_Name}}</h5>
+                            <h6 style="font-size:5px;font-family: 'Caveat', cursive;font-family: 'Yellowtail', cursive;">{{CurrentInstuteAddress}}</h6>
+                            <h6 style="font-size:5px;font-family: 'Caveat', cursive;font-family: 'Yellowtail', cursive;">{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                            <h5 style="font-size:10px;color:blue;font-family: 'Satisfy', cursive;">
+                                <u>  Salary Statment For The Month of  {{selectedMonth}} {{selectedYear}}</u>
+                            </h5>
+                            <h5 style="font-size:10px;color:blue;font-family: 'Satisfy', cursive;"> <u>Type-Non Teaching,Teaching</u> </h5>
+                        </div>
+
+                        <table class="table">
+                            <tr>
+                                <td class="pull-left">
+                                    TO,
+                                </td>
+                                <td class="text-right" style="font-size:14px">
+                                    Date:
+                                    <label id="date" style="font-size:14px;font-weight: 600;"></label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pull-left">
+                                    The Manager,
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pull-left">
+                                    Punjab National Bank
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pull-left">
+                                    B.R.S Nagar Ludhiana
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pull-left">
+                                    Sub: Debit our current bank A/C No 08601131001199
+                                </td>
+                            </tr>
+                        </table>
+                        <br />
+                        <table class="table" style="font-size:14px;padding-left:50px;">
+                            <tr>
+                                <td class="pull-left">
+                                    Dear Sir,
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:50px;">
+                                    Please debit our current a/c 08601131001199 with Rs. {{totalgrp}} and Credit the same as per the details mention below.
+                                </td>
+                            </tr>
+                        </table>
+                        <br />
+                    </div>
+
+                    <table class="table table-responsive table-bordered text-left" border="1">
+                        <thead>
+                            <tr> </tr>
+                            <tr>
+                                <th width="50" class="text-center">SL.No</th>
+                                <th width="300" class="text-center">EMP CODE</th>
+                                <th width="300" class="text-center">NAME OF THE STAFF</th>
+                                <th width="200" class="text-center" ng-if="Employee.BankCash =='Bank'">S.B A/c No.</th>
+                                <th width="200" class="text-center">AMOUNT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="employee in employeeDetails">
+                                <td style="text-align:center">{{$index +1}}</td>
+                                <td class="text-left">{{employee.employeeCode}}</td>
+                                <td class="text-left">{{employee.employeeName}}</td>
+                                <td class="text-right" ng-if="Employee.BankCash =='Bank'">{{employee.bankAcNumber}} </td>
+                                <td class="text-right">{{employee.netSalary}}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-right">
+                                    <span>Total</span>
+                                    <img src="css/print/pfchallan/Indian_Rupee_symbol.png" class="rupee" />
+                                </td>
+
+                                <td class="text-right">
+                                    {{totalgrp}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <br />
+                    <table>
+                        <tr>
+                            <td>
+                                <b>
+                                    <img src="css/print/pfchallan/Indian_Rupee_symbol.png" class="rupee" style="width: 1.5% !important;">
+                                    Rupees:  {{NetAmountInwords}}
+                                </b>
+                            </td>
+                        </tr>
+                    </table>
+                    <br />
+                    <br />
+                    <table>
+                        <tr>
+                            <td class="text-right" style="padding-right:50px;">
+                                <b>Manager</b>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+
+                <div class="PFChallan" id="Baldwin1" ng-show="false">
+                    <div id="PFChallan">
+
+                        <!--<div class="text-center">-->
+                        <!--<h4>{{institutionDetails.mI_Name}}</h4>
+            <h6> {{CurrentInstuteAddress}}</h6>
+            <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>-->
+                        <!--<h5> Bank / Cash Report : {{selectedMonth}} {{selecteexportToExceldYear}}</h5>-->
+                        <!--</div>-->
+
+                        <div class="text-left">
+                            <h5 style="font-size:15px;font-family: 'Caveat', cursive;font-family: 'Yellowtail', cursive;">{{institutionDetails.mI_Name}}</h5>
+                            <h6 style="font-size:5px;font-family: 'Caveat', cursive;font-family: 'Yellowtail', cursive;">{{CurrentInstuteAddress}}</h6>
+                            <h6 style="font-size:5px;font-family: 'Caveat', cursive;font-family: 'Yellowtail', cursive;">{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                            <h5 style="font-size:10px;color:blue;font-family: 'Satisfy', cursive;">
+                                <u>  Salary Statment For The Month of  {{selectedMonth}} {{selectedYear}}</u>
+                            </h5>
+                            <h5 style="font-size:10px;color:blue;font-family: 'Satisfy', cursive;"> <u>Type-Non Teaching,Teaching</u> </h5>
+                        </div>
+
+                        <table class="table">
+                            <tr>
+                                <td class="pull-left">
+                                    TO,
+                                </td>                                
+                            </tr>
+                            <tr>
+                                <td class="pull-left">
+                                    The Manager,
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pull-left">
+                                    Punjab National Bank
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pull-left">
+                                    B.R.S Nagar Ludhiana
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pull-left">
+                                    Sub: Debit our current bank A/C No 08601131001199
+                                </td>
+                            </tr>
+                        </table>
+                        <br />
+                        <table class="table" style="font-size:14px;padding-left:50px;">
+                            <tr>
+                                <td class="pull-left">
+                                    Dear Sir,
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:50px;">
+                                    Please debit our current a/c 08601131001199 with Rs. {{totalgrp}} and Credit the same as per the details mention below.
+                                </td>
+                            </tr>
+                        </table>
+                        <br />
+                    </div>
+
+                    <table class="table table-responsive table-bordered text-left" border="1">
+
+                        <thead>
+                            <tr> </tr>
+                            <tr>
+                                <th width="50" class="text-center">SL.No</th>
+                                <th width="300" class="text-center">EMP CODE</th>
+                                <th width="300" class="text-center">NAME OF THE STAFF</th>
+                                <th width="200" class="text-center" ng-if="Employee.BankCash =='Bank'">S.B A/c No.</th>
+                                <th width="200" class="text-center">AMOUNT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="employee in employeeDetails">
+                                <td style="text-align:center">{{$index +1}}</td>
+                                <td class="text-left">{{employee.employeeCode}}</td>
+                                <td class="text-left">{{employee.employeeName}}</td>
+                                <td class="text-right" ng-if="Employee.BankCash =='Bank'">{{employee.bankAcNumber}} </td>
+                                <td class="text-right">{{employee.netSalary}}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-right">
+                                    <span>Total</span>
+                                    <img src="css/print/pfchallan/Indian_Rupee_symbol.png" class="rupee" />
+                                </td>
+
+                                <td class="text-right">
+                                    {{totalgrp}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <br />
+                    <table>
+                        <tr>
+                            <td>
+                                <b>
+                                    <img src="css/print/pfchallan/Indian_Rupee_symbol.png" class="rupee" style="width: 1.5% !important;">
+                                    Rupees:  {{NetAmountInwords}}
+                                </b>
+                            </td>
+                        </tr>
+                    </table>
+                    <br />
+                    <br />
+                    <table>
+                        <tr>
+                            <td class="text-right" style="padding-right:50px;">
+                                <b>Manager</b>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+
+
+                <div class="text-center">
+                    <md-button type="button" ng-click="printToCart('Baldwin')" class="md-raised md-primary">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#Baldwin1')">
+                        <i class="fa fa-file-excel-o"></i>
+                        Export to Excel
+                    </md-button>
+                </div>
+
+
+
+            </div>
+        </div>
+    </form>
+</section>

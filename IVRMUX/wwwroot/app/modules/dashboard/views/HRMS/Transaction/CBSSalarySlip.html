@@ -1,0 +1,685 @@
+﻿<style>
+    .center {
+        margin: auto;
+        width: 60px;
+        border: 3px solid #73AD21;
+        padding: 10px;
+    }
+
+    .page-break {
+        page-break-before: always;
+    }
+
+    #EmpPaySlip .table-bordered > thead > tr > th, #EmpPaySlip .table-bordered > tbody > tr > th, #EmpPaySlip .table-bordered > tfoot > tr > th, #EmpPaySlip .table-bordered > thead > tr > td, #EmpPaySlip .table-bordered > tbody > tr > td, #EmpPaySlip .table-bordered > tfoot > tr > td {
+        vertical-align: middle;
+        font-weight: 900;
+        font-size: 16px;
+    }
+</style>
+<link href="css/print/Vikasa/VikasaHallticket.css" rel="stylesheet" />
+<link href="css/print/EmpSalarySlip/EmpPaySlip.css" rel="stylesheet" />
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Generate Employee Salary Slip</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="groupType in groupTypedropdown">
+                                        <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType)">
+                                        <span class="lbl padding-8">
+                                            {{groupType.hrmgT_EmployeeGroupType}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-right-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="department in departmentdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)">
+                                        <span class="lbl padding-8">
+                                            {{department.hrmD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="designation in designationdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                        <span class="lbl padding-8">
+                                            {{designation.hrmdeS_DesignationName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> Month</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" data-ng-model="Employee.hreS_Month" name="hreS_Month" required ng-change="SetFromDateAndToDateByMonth(Employee.hreS_Month,Employee.hreS_Year)">
+                                            <option value="" label="Select">Select</option>
+                                            <option ng-repeat="month in monthdropdown" value="{{month.ivrM_Month_Name}}" ng-selected="{{month.Selected===true}}">
+                                                {{month.ivrM_Month_Name}}
+                                            </option>
+                                        </select>
+                                        <span class="error-messages" ng-if="interacted(myForm.hreS_Month)" ng-messages="myForm.hreS_Month.$error">
+                                            <span ng-message="required">Select Month</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">  Year</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" data-ng-model="Employee.hreS_Year" name="hreS_Year" required ng-change="GetEmployeeList()">
+                                            <!--ng-change="SetMonthByYear(Employee.hreS_Year)"-->
+                                            <option value="" label="Select">Select Year</option>
+                                            <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.hrmlY_LeaveYear}}" ng-selected="{{leaveyear.Selected===true}}">
+                                                {{leaveyear.hrmlY_LeaveYear}}
+                                            </option>
+                                        </select>
+                                        <span class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                            <span ng-message="required">Select Year</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="col-sm-10 col-sm-offset-2">
+                                    <label class="radio-inline">
+                                        <input type="checkbox" ng-model="Emp.LeaveDetails" value="{{Emp.LeaveDetails}}" name="WorkingLeft" defaultChecked>
+                                        <span class="lbl padding-8">Leave Details</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> Slip/page </label>
+                                    <div class="col-sm-8">
+
+                                        <select class="form-control col-sm-4" id="sel1" data-ng-model="Employee.salcount" name="salcount" required>
+                                            <!--ng-change="SetMonthByYear(Employee.hreS_Year)"-->
+                                            <option value="" label="Select">Select type</option>
+                                            <option value="1">
+                                                1
+                                            </option>
+                                            <option value="2">
+                                                2
+                                            </option>
+                                        </select>
+                                        <span class="error-messages" ng-if="interacted(myForm.salcount)" ng-messages="myForm.salcount.$error">
+                                            <span ng-message="required">Select option</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earning , Deduction -->
+                        <!--<div class="well">
+                            <div class="">
+                                <label class="radio-inline">
+                                    <input type="checkbox" ng-model="Emp.LOPDays" value="{{Emp.LOPDays}}" name="WorkingLeft">
+                                    <span class="lbl padding-8">LOP Days</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="checkbox" ng-model="Emp.LeaveDetails" value="{{Emp.LeaveDetails}}" name="WorkingLeft">
+                                    <span class="lbl padding-8">Leave Details</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="checkbox" ng-model="Emp.PanCardNo" value="{{Emp.PanCardNo}}" name="WorkingLeft">
+                                    <span class="lbl padding-8">Pan Card No.</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="checkbox" ng-model="Emp.BankACNo" value="{{Emp.BankACNo}}" name="WorkingLeft">
+                                    <span class="lbl padding-8">Bank Details</span>
+                                </label>
+                            </div>
+                        </div>-->
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="">
+
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </div>
+                                        <input class="form-control" ng-model="search" type="text" placeholder="search here..">
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table table-responsive  text-left">
+                                <thead>
+                                    <tr>
+                                        <th>SL. No</th>
+                                        <th><a href="">Employee Code</a></th>
+                                        <th><a href="">Employee Name</a></th>
+
+                                        <th class="text-left">
+                                            <label style="margin-left:5px;">
+                                                <input type="checkbox" ng-model="employeeSelectedAll" ng-true-value="true" ng-false-value="false" ng-change="chk_employeeall(employeeSelectedAll)">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="employee in employeedropdown  |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                        <td class="text-right">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td class="text-left">{{employee.hrmE_EmployeeCode}}</td>
+                                        <td class="text-left">{{employee.hrmE_EmployeeFirstName}} {{employee.hrmE_EmployeeMiddleName}} {{employee.hrmE_EmployeeLastName}}</td>
+                                        <td class="text-left">
+                                            <label style="margin-left:5px;">
+                                                <input type="checkbox" ng-model="employee.selected" ng-true-value="true" ng-false-value="false" ng-change="chk_employee(employee)">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="5"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="GenerateSalarySlip()" aria-disabled="false">
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Generate Slip
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+        <div id="salaryslip" class="box box-primary" ng-show="EmployeeDis">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Salary Slip</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="margin-top-0" pdf-save-content="idOneGraph" id="EmpPaySlip">
+
+
+                <section class="printmodal" ng-repeat="employee in all_employees">
+                    <table class="table" id="table{{employee.hrmE_Id}}" style="">
+                        <tr>
+                            <td>
+                                <div class="row text-center">
+                                    <div class="col-sm-12 border-none " id="border-none">
+                                        <img src="{{employee.institutionDetails.mI_Logo}}" style="width:100%;height:150px !important ;object-fit:contain !important" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <table class="table border-none">
+                                            <tr style="line-height:0px;">
+                                                <td width="150" style="text-align:left !important;font-size:16px!important;padding-left: 10px;">
+                                                    <b>
+                                                        Name:
+                                                        {{employee.currentemployeeDetails.hrmE_EmployeeFirstName}} {{employee.currentemployeeDetails.hrmE_EmployeeMiddleName}} {{employee.currentemployeeDetails.hrmE_EmployeeLastName}}&nbsp;
+                                                    </b>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <table class="table border-none">
+                                            <tr style="line-height:0px;">
+                                                <td class="text-right"> <b> No. of Pay days :{{employee.empsaldetail.hreS_WorkingDays}}</b></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <table class="table border-none"></table>
+                                <div class="">
+                                    <div class="text-center margin-top-0 margin-bottom-0">
+                                        <div class="row" style="border-top:0.5px solid !important;    border-bottom: 0.5px solid;">
+
+                                            <div class="col-sm-6 border-none" id="border-none">
+                                                <table class="table" style="font-size:16px !important;">
+                                                    <tbody>
+
+                                                        <tr style="line-height:0px;">
+                                                            <td width="150" style="text-align:left !important;font-size:16px!important;padding-left: 10px;"> Employee Number </td>
+                                                            <td>:</td>
+                                                            <td style="text-align:left !important;" class="text-left">
+                                                                {{employee.currentemployeeDetails.hrmE_EmployeeCode}}&nbsp;&nbsp;
+                                                            </td>
+                                                        </tr>
+                                                        <tr style="line-height:0px;">
+                                                            <td width="150" style="text-align:left !important;font-size:16px!important;padding-left: 10px;">  Bank Details</td>
+                                                            <td>:</td>
+                                                            <td style="text-align:left !important;" class="text-left">
+                                                                {{employee.empsaldetail.hreS_AccountNo}}&nbsp;&nbsp;
+                                                            </td>
+                                                        </tr>
+                                                        <tr style="line-height:0px;">
+                                                            <td width="150" style="text-align:left !important;font-size:16px!important;padding-left: 10px;">  Date Of Joining </td>
+
+                                                            <td>:</td>
+                                                            <td style="text-align:left !important;" class="text-left">
+                                                                {{employee.currentemployeeDetails.hrmE_DOJ|date: 'dd-MM-yyyy'}}&nbsp;&nbsp;
+                                                            </td>
+                                                        </tr>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-sm-6 border-none" id="border-none">
+                                                <table class="table">
+                                                    <tbody>
+
+                                                        <tr style="line-height:0px;">
+                                                            <td width="200" style="text-align:left !important;font-size:16px!important;padding-left: 10px;"> Income Tax Number(PAN)  </td>
+
+                                                            <td>:</td>
+                                                            <td style="text-align:left !important;" class="text-left">
+                                                                {{employee.currentemployeeDetails.hrmE_PANCardNo}}&nbsp;&nbsp;
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align:left !important;font-size:16px!important;padding-left: 10px;">PF NO </td>
+
+                                                            <td>:</td>
+                                                            <td style="text-align:left !important;" class="text-left">
+                                                                {{employee.currentemployeeDetails.hrmE_PFAccNo}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align:left !important;font-size:16px!important;padding-left: 10px;">UAN No.</td>
+                                                            <td>:</td>
+                                                            <td style="text-align:left !important;" class="text-left">
+                                                                {{employee.currentemployeeDetails.hrmE_UINumber}}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="row">
+                                                <div class="col-sm-6" style="border-right:0.5px solid !important;width: 49.5% !important ">
+                                                    <table class="table border-none">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align:left !important;border:none !important" width="150">Earnings</th>
+                                                                <th style="text-align:right!important;border:none !important" width="150">Amount</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <table class="table border-none">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align:left !important;border:none !important" width="150">Deductions</th>
+                                                                <th style="text-align:right!important;border:none !important" width="150">Amount</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class=" border-none" id="border-none" style="padding: 0px !important;">
+                                                <div class="row" style="border:0.5px solid !important">
+                                                    <div class="col-sm-6 border-none" style="width: 49.5% !important;border-right:0.5px solid !important">
+                                                        <div class=" border-none" id="border-none">
+                                                            <table class="table border-none">
+                                                                <tbody style="">
+                                                                    <tr ng-repeat='item in employee.esary.out'>
+                                                                        <td style="text-align:left;">&nbsp;{{item.HRMED_Name}}</td>
+                                                                        <td style="text-align:right !important;">{{item.Amount | number : 2}}&nbsp;</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-6 border-none">
+                                                        <div class=" border-none" id="border-none">
+                                                            <table class="table border-none">
+                                                                <tbody>
+                                                                    <tr ng-repeat='item in employee.dsary.out'>
+                                                                        <td style="text-align:left;">&nbsp;{{item.HRMED_Name}}</td>
+                                                                        <td style="text-align:right;">{{item.Amount | number : 2}}&nbsp;</td>
+                                                                    </tr>
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row" style="    border-bottom: 0.5px solid;">
+                                                    <div class="col-sm-6" style="border-right:0.5px solid !important;width:49.5% !important">
+                                                        <table class="table">
+                                                            <tr style="">
+                                                                <td ng-repeat-start='item in employee.earningtotal' style='text-align:left;'>
+                                                                    <label ng-if="$index==0">&nbsp;<b>Total Earnings:</b></label>
+                                                                </td>
+                                                                <td ng-repeat-end style='text-align:right !important;'>{{item | number : 0}}&nbsp;</td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <table class="table border-none">
+                                                            <tr style="">
+                                                                <td ng-repeat-start='item in employee.deducttotal' style='text-align:left;'>
+
+                                                                    <label ng-if="$index==0">&nbsp;<b>Total Deductions:</b></label>
+                                                                </td>
+                                                                <td ng-repeat-end style='text-align:right !important;'>{{item | number : 1}}&nbsp;</td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="row " style="    border-bottom: 0.5px solid;">
+                                                    <div class="col-sm-6" style="border-right:0.5px solid !important;width:49.5% !important">
+                                                        &nbsp;
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <table class="table">
+                                                            <tr style="">
+                                                                <td style='font-weight: bold;text-align:left;'> <label><b>Net Salary</b></label></td>
+                                                                <td ng-repeat-end style='font-weight: bold;text-align:right !important;'> {{employee.NetSalary | number : 2}} </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p style='text-align:left;'> Amount(in Words) : {{employee.NetAmountInwords}} </p>
+                                <p style='text-align:left;'>Note : THIS IS A COMPUTER GENERATED SALARY SLIP, HENCE SIGNATURE IS NOT REQUIRED</p>
+                                <br />
+                                <div class="text-center margin-top-20 margin-bottom-10" ng-if="Emp.LeaveDetails == true">
+                                    <div class="col-sm-9 col-sm-offset-1" id="border-none">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td> <h4> Leave Details :</h4> </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table-bordered text-center margin-bottom-10">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">
+                                                        Serial No.
+                                                    </th>
+                                                    <th class="text-center">
+                                                        Leave Name
+                                                    </th>
+                                                    <th class="text-center">
+                                                        Total Leaves
+                                                    </th>
+                                                    <th class="text-center">
+                                                        Availed Leaves
+                                                    </th>
+                                                    <th class="text-center">
+                                                        Balance Leaves
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="employeeLeave in employee.employeeLeaveDetails">
+                                                    <td>{{$index+1}}</td>
+                                                    <td>{{employeeLeave.hrmL_LeaveName}}</td>
+                                                    <td>{{employeeLeave.hrelS_TotalLeaves}}</td>
+                                                    <td>{{employeeLeave.hrelS_TransLeaves}}</td>
+                                                    <td>{{employeeLeave.hrelS_CBLeaves}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div style="page-break-after: always;"><span style="display: none;">&nbsp;</span></div>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+            </div>
+            <div class="container" pdf-save-content="idOneGraph" id="source-html" ng-hide="EmployeeDis">
+                <section class="printmodal" ng-repeat="employee in all_employees">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Employee Salary Slip</h3>
+                    </div>
+                    <table class="table" id="table{{employee.hrmE_Id}}">
+                        <tr>
+                            <td>
+                                <div class="row text-center">
+                                    <div class="col-sm-12 border-none">
+                                        <img class="logo" src="https://dcampusstrg.blob.core.windows.net/files/1/InstitutionLogo/8cbb50ea-cc86-4e9c-bfff-0a553bbfacea.jpg" alt="Logo" />
+                                        
+
+                                          <!--<img src="{{employee.institutionDetails.mI_Logo}}" style="width:250px !important;height:150px !important ;" />-->
+
+                                      
+
+
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="row border-top border-bottom">
+                                        <div class="col-sm-6 border-none">
+                                            
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+                                                        <td><b>Name:</b> {{employee.currentemployeeDetails.hrmE_EmployeeFirstName}} {{employee.currentemployeeDetails.hrmE_EmployeeMiddleName}} {{employee.currentemployeeDetails.hrmE_EmployeeLastName}}</td>
+                                                        <td class="text-right"><b>No. of Pay days:</b> {{employee.empsaldetail.hreS_WorkingDays}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Employee Number:</b> {{employee.currentemployeeDetails.hrmE_EmployeeCode}}</td>
+                                                        <td class="text-right"><b>Income Tax Number(PAN):</b> {{employee.currentemployeeDetails.hrmE_PANCardNo}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Bank Details:</b> {{employee.empsaldetail.hreS_AccountNo}}</td>
+                                                        <td class="text-right"><b>PF NO:</b> {{employee.currentemployeeDetails.hrmE_PFAccNo}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Date Of Joining:</b> {{employee.currentemployeeDetails.hrmE_DOJ | date: 'dd-MM-yyyy'}}</td>
+                                                        <td class="text-right"><b>UAN No.:</b> {{employee.currentemployeeDetails.hrmE_UINumber}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="col-sm-6 border-right">
+                                                                <table class="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Earnings</th>
+                                                                            <th class="text-right">Amount</th>
+                                                                        </tr>
+                                                                        <tr ng-repeat="item in employee.esary.out">
+                                                                            <td>{{item.HRMED_Name}}</td>
+                                                                            <td class="text-right">{{item.Amount | number : 2}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td><b>Total Earnings:</b></td>
+                                                                            <td class="text-right">{{employee.earningtotal[0] | number : 0}}</td>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="col-sm-6">
+                                                                <table class="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Deductions</th>
+                                                                            <th class="text-right">Amount</th>
+                                                                        </tr>
+                                                                        <tr ng-repeat="item in employee.dsary.out">
+                                                                            <td>{{item.HRMED_Name}}</td>
+                                                                            <td class="text-right">{{item.Amount | number : 2}}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td><b>Total Deductions:</b></td>
+                                                                            <td class="text-right">{{employee.deducttotal[0] | number : 1}}</td>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6"></div>
+                                        <div class="col-sm-6">
+                                            <table class="table">
+                                                <tr>
+                                                    <td><b>Net Salary:</b></td>
+                                                    <td class="text-right">{{employee.NetSalary | number : 2}}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p><b>Amount(in Words):</b> {{employee.NetAmountInwords}}</p>
+                                <p><b>Note:</b> THIS IS A COMPUTER GENERATED SALARY SLIP, HENCE SIGNATURE IS NOT REQUIRED</p>
+                                <div class="text-center margin-top-20 margin-bottom-10" ng-if="Emp.LeaveDetails == true">
+                                    <div class="col-sm-9 col-sm-offset-1" id="border-none">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td> <h4> Leave Details :</h4> </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table-bordered text-center margin-bottom-10">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">
+                                                        Serial No.
+                                                    </th>
+                                                    <th class="text-center">
+                                                        Leave Name
+                                                    </th>
+                                                    <th class="text-center">
+                                                        Total Leaves
+                                                    </th>
+                                                    <th class="text-center">
+                                                        Availed Leaves
+                                                    </th>
+                                                    <th class="text-center">
+                                                        Balance Leaves
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="employeeLeave in employee.employeeLeaveDetails">
+                                                    <td>{{$index+1}}</td>
+                                                    <td>{{employeeLeave.hrmL_LeaveName}}</td>
+                                                    <td>{{employeeLeave.hrelS_TotalLeaves}}</td>
+                                                    <td>{{employeeLeave.hrelS_TransLeaves}}</td>
+                                                    <td>{{employeeLeave.hrelS_CBLeaves}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div style="page-break-before:always !important ">
+                        &nbsp;
+                    </div>
+                </section>
+            </div>
+
+
+            <div class="text-center">
+                <md-button id="btn-export" type="button" ng-click="exportHTML()" class="md-raised md-primary">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Export to word
+                </md-button>
+                <md-button type="button" ng-click="printData(Employee)" class="md-raised md-primary">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    print
+                </md-button>
+
+                <md-button type="button" class="md-raised md-accent" data-ng-click="SendMail(all_employees)">
+                    <i class="fa fa-envelope" aria-hidden="true"></i>
+                    Send Mail
+                </md-button>
+
+                <md-button type="button" class="md-raised md-accent" data-ng-click="SendSMS()">
+                    <i class="fa fa-mobile" aria-hidden="true"></i>
+                    Send SMS
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+                <!--<md-button type="button" class="md-raised md-warn" ng-click="export()">Download PDF</md-button>-->
+            </div>
+
+        </div>
+    </form>
+</section>
+

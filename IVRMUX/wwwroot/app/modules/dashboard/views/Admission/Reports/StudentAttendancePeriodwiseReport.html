@@ -1,0 +1,777 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="LoadData();" novalidate name="myForm">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Attendance Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="well text-center">
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="obj.type" value="Date" name="all" ng-change="OnChangeFlag();">
+                            <span class="lbl padding-8">Date Wise</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="obj.type" value="Year" name="all" ng-change="OnChangeFlag();">
+                            <span class="lbl padding-8">Year Wise</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="obj.type" value="StudentWise" name="all" ng-change="OnChangeFlag();">
+                            <span class="lbl padding-8">Student Wise</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="obj.type" value="MonthDateWise" name="all" ng-change="OnChangeFlag();">
+                            <span class="lbl padding-8">Month Date Wise</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMAY_Id" ng-change="OnChangeYear()" name="acd_year" required>
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="academic in yearDropdown" ng-selected="{{academic.asmaY_Id == ASMAY_Id}}" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required" style="color:red">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMCL_Id" name="cls" ng-change="OnChangeClass()" required>
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="class in classDropdown" value="{{class.asmcL_Id}}">{{class.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                    <div ng-message="required" style="color:red">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMS_Id" name="sec" required ng-change="OnChangeSection()">
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="section in sectionDropdown" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                    <div ng-message="required" style="color:red">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-if="obj.type !='StudentWise' && obj.type !='MonthDateWise' ">
+                            <label class="control-label col-sm-4">Subject :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="obj.ISMS_Id" name="secd" ng-required="obj.type !='StudentWise'
+                                        && obj.type !='MonthDateWise' ">
+                                    <option value="">Select Subject</option>
+                                    <option ng-repeat="section in subjectDropdown" value="{{section.ismS_Id}}">{{section.ismS_SubjectName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.secd)" ng-messages="myForm.secd.$error">
+                                    <div ng-message="required" style="color:red">Select Subject</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="obj.type=='Date'">
+                            <label class="control-label col-sm-4">
+                                From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="obj.fromdate" onkeydown="return false" name="from_date" id="FromDate" ng-change='setTodate(obj)'
+                                               md-min-date="minDatef" md-max-date="maxDatef" md-placeholder="Enter date" ng-required="obj.type=='Date'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.from_date)" ng-messages="myForm.from_date.$error">
+                                    <div ng-message="required" style="color:red">Select From Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="obj.type=='Date'">
+                            <label class="control-label col-sm-4">
+                                To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="obj.todate" onkeydown="return false" ng-change='setTodate1(obj)' name="to_date" id="todate"
+                                               md-min-date="minDatet" md-max-date="maxDatet" md-placeholder="Enter date" ng-disabled="obj.fromdate==null"
+                                               ng-required="obj.type=='Date'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.to_date)" ng-messages="myForm.to_date.$error">
+                                    <div ng-message="required" style="color:red">Select To Date</div>
+                                </div>
+                            </div>
+                            <span style="color:red;">{{errMessage}}</span>
+                        </div>
+
+                        <div class="form-group" ng-if="obj.type=='StudentWise'">
+                            <label class="control-label col-sm-4">Student :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="obj.AMST_Id" name="secdff" ng-required="obj.type =='StudentWise'">
+                                    <option value="">Select Student</option>
+                                    <option ng-repeat="section in getstudentlist" value="{{section.amsT_Id}}">{{section.amsT_FirstName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.secdff)" ng-messages="myForm.secdff.$error">
+                                    <div ng-message="required" style="color:red">Select Student</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="obj.type=='MonthDateWise'">
+                            <label class="control-label col-sm-4">
+                                Month :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="obj.MonthId" name="secdmonth" ng-required="obj.type =='MonthDateWise'">
+                                    <option value="">Select Month</option>
+                                    <option ng-repeat="section in monthList" value="{{section.amM_ID}}">{{section.amM_NAME}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.secdmonth)" ng-messages="myForm.secdmonth.$error">
+                                    <div ng-message="required" style="color:red">Select Month</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="obj.type=='MonthDateWise'">
+                            <label class="control-label col-sm-4">
+                                Year Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="obj.YearId" name="secdmonthyear" ng-required="obj.type =='MonthDateWise'">
+                                    <option value="">Select Year</option>
+                                    <option ng-repeat="section in yearlist" value="{{section.id}}">{{section.value}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.secdmonthyear)" ng-messages="myForm.secdmonthyear.$error">
+                                    <div ng-message="required" style="color:red">Select Year Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="OnReport(obj);">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#table')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-warn" ng-disabled="excel_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="excel_flag==false">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Attendance Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body" ng-if="obj.type=='Date'">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div style="overflow-x:scroll;width:100%;">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Student Name</th>
+                                        <th>Admno</th>
+                                        <th>RollNo</th>
+                                        <th ng-repeat="col in columnlist">{{col.columname}}</th>
+                                        <th>Total Class Held</th>
+                                        <th>Present Count</th>
+                                        <th>Absent Count</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tr dir-paginate="user1 in filterValue2 = (newarray_total | filter : searchValue1)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page2">
+                                    <td class="text-center">{{ itemsPerPage*(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">{{ user1.StuName}}</td>
+                                    <td class="text-left">{{ user1.AMST_AdmNo}}</td>
+                                    <td class="text-center">{{ user1.AMAY_RollNo}}</td>
+                                    <td class="text-center" ng-repeat="column in columnlist">
+                                        <span ng-repeat="att in user1.attendance" ng-if="column.columname==att.AMonthName">
+                                            {{att.ASA_Class_Attended}}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                                    <td class="text-center">{{ user1.ASA_Class_Attended}}</td>
+                                    <td class="text-center">{{ user1.Absentcount}}</td>
+                                    <td class="text-center">{{ user1.StudentPercentage}}</td>
+                                </tr>
+                            </table>
+                            <dir-pagination-controls max-size="10" pagination-id="page2"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-body" ng-if="obj.type=='Year'">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div style="overflow-x:scroll;width:100%;">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Student Name</th>
+                                        <th>Admno</th>
+                                        <th>RollNo</th>
+                                        <th ng-repeat="col in getbtwn_monthsname">{{col.columnname}}</th>
+                                        <th>Total Class Held</th>
+                                        <th>Present Count</th>
+                                        <th>Absent Count</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tr dir-paginate="user1 in filterValue2 = (newarray | filter : searchValue1)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                                    <td class="text-center">{{ itemsPerPage*(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">{{ user1.StuName}}</td>
+                                    <td class="text-left">{{ user1.AMST_AdmNo}}</td>
+                                    <td class="text-center">{{ user1.AMAY_RollNo}}</td>
+                                    <td class="text-center" ng-repeat="column in getbtwn_monthsname">
+                                        {{user1[column.columnname]}}
+                                    </td>
+                                    <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                                    <td class="text-center">{{ user1.TotalClassAttended}}</td>
+                                    <td class="text-center">{{ user1.absent}}</td>
+                                    <td class="text-center">{{ user1.per}}</td>
+                                </tr>
+                            </table>
+                            <dir-pagination-controls max-size="10" pagination-id="page1"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-body" ng-if="obj.type=='StudentWise'">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div style="overflow-x:scroll;width:100%;">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Month</th>
+                                        <th ng-repeat="col in getsubjectlist">{{col.ismS_SubjectName}}</th>
+                                        <th>Total Class Held</th>
+                                        <th>Present Count</th>
+                                        <th>Absent Count</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tr dir-paginate="user1 in filterValue2 = (newarray | filter : searchValue1)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page3">
+                                    <td class="text-center">{{ itemsPerPage*(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">{{ user1.ASA_FromDate}}</td>
+                                    <td class="text-center" ng-repeat="column in getsubjectlist">
+                                        {{user1[column.ismS_SubjectName]}}
+                                    </td>
+                                    <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                                    <td class="text-center">{{ user1.ASA_Class_Attended}}</td>
+                                    <td class="text-center">{{ user1.AbsentDays}}</td>
+                                    <td class="text-center">{{ user1.AttendancePer}}</td>
+                                </tr>
+                            </table>
+                            <dir-pagination-controls max-size="10" pagination-id="page3"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box-body" ng-if="obj.type=='MonthDateWise'">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <div style="overflow-x:scroll;width:100%;">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">Sl.No</th>
+                                        <th rowspan="2">Student Name</th>
+                                        <th rowspan="2">Adm.No</th>
+                                        <th rowspan="2">Class Section</th>
+                                        <th colspan="2" ng-repeat="col in daysOfMonth">{{col.columnname}} {{col.Total_ClassHeld}}</th>
+                                    </tr>
+                                    <tr>
+                                        <th ng-repeat="dd in daysOfMonth_pre_abs">{{dd.sub_columnname}}</th>
+                                    </tr>
+                                </thead>
+                                <tr ng-repeat="user1 in StudentList | orderBy:propertyName:reverse" ng-class-odd="'odd'" pagination-id="page34">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{ user1.Studentname}}</td>
+                                    <td class="text-left">{{ user1.Admno}}</td>
+                                    <td class="text-left">{{ user1.class}}</td>
+                                    <td ng-repeat="col in daysOfMonth_pre_abs">
+                                        <span ng-repeat="dd in user1.stu_att_details" ng-if="col.date==dd.date">
+                                            <label ng-if="col.sub_columnname=='Present'">{{dd.PresentCount}}</label>
+                                            <label ng-if="col.sub_columnname=='Absent'">{{dd.AbsentCount}}</label>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div ng-show="dfdsfdsfdsfsd" id="printsection">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3 class="text-center"> Subject Wise Attendance - From : {{obj.fromdate | date:'dd/MM/yyyy'}} To - {{obj.todate | date:'dd/MM/yyyy'}} </h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Year : {{yearname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Class : {{classname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Section : {{sectionname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Subject : {{subjectname}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <b>Note : P- Present , A- Absent</b>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No</th>
+                                <th>Student Name</th>
+                                <th>Admno</th>
+                                <th>RollNo</th>
+                                <th ng-repeat="col in columnlist">{{col.columname}}</th>
+                                <th>Total Class Held</th>
+                                <th>Present Count</th>
+                                <th>Absent Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="user1 in newarray_total">
+                            <td class="text-center">{{ $index+1}}</td>
+                            <td class="text-left" style="word-break:break-word">{{ user1.StuName}}</td>
+                            <td class="text-left">{{ user1.AMST_AdmNo}}</td>
+                            <td class="text-center">{{ user1.AMAY_RollNo}}</td>
+                            <td class="text-center" ng-repeat="column in columnlist">
+                                <span ng-repeat="att in user1.attendance" ng-if="column.columname==att.AMonthName">
+                                    {{att.ASA_Class_Attended}}
+                                </span>
+                            </td>
+                            <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                            <td class="text-center">{{ user1.ASA_Class_Attended}}</td>
+                            <td class="text-center">{{ user1.Absentcount}}</td>
+                            <td class="text-center">{{ user1.StudentPercentage}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="dfdsfdsfdsfsdd" id="excelid">
+        <div class="row">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="8" style="text-align:center"><b>Subject Wise Attendance - From : {{obj.fromdate | date:'dd/MM/yyyy'}} To - {{obj.todate | date:'dd/MM/yyyy'}}</b></td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="2" style="text-align:left"><b>Year : {{yearname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Class : {{classname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Section : {{sectionname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Subject : {{subjectname}}</b></td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="8">
+                        <b>Note : P- Present , A- Absent</b>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th>Sl.No</th>
+                        <th>Student Name</th>
+                        <th>Admno</th>
+                        <th>RollNo</th>
+                        <th ng-repeat="col in columnlist">{{col.columname}}</th>
+                        <th>Total Class Held</th>
+                        <th>Present Count</th>
+                        <th>Absent Count</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tr style="border:0.5px solid black" ng-repeat="user1 in newarray_total">
+                    <td class="text-center">{{ $index+1}}</td>
+                    <td class="text-left">{{ user1.StuName}}</td>
+                    <td class="text-left">{{ user1.AMST_AdmNo}}</td>
+                    <td class="text-center">{{ user1.AMAY_RollNo}}</td>
+                    <td class="text-center" ng-repeat="column in columnlist">
+                        <span ng-repeat="att in user1.attendance" ng-if="column.columname==att.AMonthName">
+                            {{att.ASA_Class_Attended}}
+                        </span>
+                    </td>
+                    <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                    <td class="text-center">{{ user1.ASA_Class_Attended}}</td>
+                    <td class="text-center">{{ user1.Absentcount}}</td>
+                    <td class="text-center">{{ user1.StudentPercentage}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div ng-show="dfdsfdsfdsfsd" id="printsectiond">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3 class="text-center"> Subject Wise Attendance</h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Year : {{yearname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Class : {{classname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Section : {{sectionname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Subject : {{subjectname}}</label>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No</th>
+                                <th>Student Name</th>
+                                <th>Admno</th>
+                                <th>RollNo</th>
+                                <th ng-repeat="col in getbtwn_monthsname">{{col.columnname}}</th>
+                                <th>Total Class Held</th>
+                                <th>Present Count</th>
+                                <th>Absent Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="user1 in newarray">
+                            <td class="text-center">{{ $index+1}}</td>
+                            <td class="text-left" style="word-break:break-word">{{ user1.StuName}}</td>
+                            <td class="text-left">{{ user1.AMST_AdmNo}}</td>
+                            <td class="text-center">{{ user1.AMAY_RollNo}}</td>
+                            <td class="text-center" ng-repeat="column in getbtwn_monthsname">
+                                {{user1[column.columnname]}}
+                            </td>
+                            <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                            <td class="text-center">{{ user1.TotalClassAttended}}</td>
+                            <td class="text-center">{{ user1.absent}}</td>
+                            <td class="text-center">{{ user1.per}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="dfdsfdsfdsfsdd" id="excelidd">
+        <div class="row">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="8" style="text-align:center"><b>Subject Wise Attendance</b></td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="2" style="text-align:left"><b>Year : {{yearname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Class : {{classname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Section : {{sectionname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Subject : {{subjectname}}</b></td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="8">
+                        &nbsp;
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th>Sl.No</th>
+                        <th>Student Name</th>
+                        <th>Admno</th>
+                        <th>RollNo</th>
+                        <th ng-repeat="col in getbtwn_monthsname">{{col.columnname}}</th>
+                        <th>Total Class Held</th>
+                        <th>Present Count</th>
+                        <th>Absent Count</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tr style="border:0.5px solid black" ng-repeat="user1 in newarray">
+                    <td class="text-center">{{ $index+1}}</td>
+                    <td class="text-left">{{ user1.StuName}}</td>
+                    <td class="text-left">{{ user1.AMST_AdmNo}}</td>
+                    <td class="text-center">{{ user1.AMAY_RollNo}}</td>
+                    <td class="text-center" ng-repeat="column in getbtwn_monthsname">
+                        {{user1[column.columnname]}}
+                    </td>
+                    <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                    <td class="text-center">{{ user1.TotalClassAttended}}</td>
+                    <td class="text-center">{{ user1.absent}}</td>
+                    <td class="text-center">{{ user1.per}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div ng-show="dfdsfdsfdsfsd" id="printsectiondd">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3 class="text-center"> Subject Wise Attendance</h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Year : {{yearname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Class : {{classname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Section : {{sectionname}}</label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="col-sm-12 control-label">Student Details : {{studentname}}</label>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No</th>
+                                <th>Month</th>
+                                <th style="word-break:break-word" ng-repeat="col in getsubjectlist">{{col.ismS_SubjectName}}</th>
+                                <th>Total Class Held</th>
+                                <th>Present Count</th>
+                                <th>Absent Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="user1 in newarray">
+                            <td class="text-center">{{ $index+1}}</td>
+                            <td class="text-left">{{ user1.ASA_FromDate}}</td>
+                            <td class="text-center" ng-repeat="column in getsubjectlist">
+                                {{user1[column.ismS_SubjectName]}}
+                            </td>
+                            <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                            <td class="text-center">{{ user1.ASA_Class_Attended}}</td>
+                            <td class="text-center">{{ user1.AbsentDays}}</td>
+                            <td class="text-center">{{ user1.AttendancePer}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="dfdsfdsfdsfsdd" id="exceliddd">
+        <div class="row">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="8" style="text-align:center"><b>Subject Wise Attendance</b></td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="2" style="text-align:left"><b>Year : {{yearname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Class : {{classname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Section : {{sectionname}}</b></td>
+                    <td colspan="2" style="text-align:left ; word-break:break-word"><b>Student Details : {{studentname}}</b></td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="8">
+                        &nbsp;
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th>Sl.No</th>
+                        <th>Month</th>
+                        <th style="word-break:break-word" ng-repeat="col in getsubjectlist">{{col.ismS_SubjectName}}</th>
+                        <th>Total Class Held</th>
+                        <th>Present Count</th>
+                        <th>Absent Count</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tr style="border:0.5px solid black" ng-repeat="user1 in newarray">
+                    <td class="text-center">{{ $index+1}}</td>
+                    <td class="text-left">{{ user1.ASA_FromDate}}</td>
+                    <td class="text-center" ng-repeat="column in getsubjectlist">
+                        {{user1[column.ismS_SubjectName]}}
+                    </td>
+                    <td class="text-center">{{ user1.ASA_ClassHeld}}</td>
+                    <td class="text-center">{{ user1.ASA_Class_Attended}}</td>
+                    <td class="text-center">{{ user1.AbsentDays}}</td>
+                    <td class="text-center">{{ user1.AttendancePer}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <div ng-show="dfdsfdsfdsfsd" id="printsectiondd_month">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3 class="text-center"> Month Date Wise Attendance Present Absent Count Report -- {{yearname}}</h3>
+        </div>        
+        <br />
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Sl.No</th>
+                                <th rowspan="2">Student Name</th>
+                                <th rowspan="2">Adm.No</th>
+                                <th rowspan="2">Class Section</th>
+                                <th colspan="2" style="word-wrap:break-word !important" ng-repeat="col in daysOfMonth">{{col.columnname}} {{col.Total_ClassHeld}}</th>
+                            </tr>
+                            <tr>
+                                <th style="word-wrap:break-word !important" ng-repeat="dd in daysOfMonth_pre_abs">{{dd.sub_columnname}}</th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="user1 in StudentList | orderBy:propertyName:reverse" ng-class-odd="'odd'" pagination-id="page34">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td style="word-wrap:break-word !important" class="text-left">{{ user1.Studentname}}</td>
+                            <td style="word-wrap:break-word !important" class="text-left">{{ user1.Admno}}</td>
+                            <td style="word-wrap:break-word !important" class="text-left">{{ user1.class}}</td>
+                            <td ng-repeat="col in daysOfMonth_pre_abs">
+                                <span ng-repeat="dd in user1.stu_att_details" ng-if="col.date==dd.date">
+                                    <label ng-if="col.sub_columnname=='Present'">{{dd.PresentCount}}</label>
+                                    <label ng-if="col.sub_columnname=='Absent'">{{dd.AbsentCount}}</label>
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="dfdsfdsfdsfsdd" id="exceliddd_month">
+        <div class="row">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="4" style="text-align:center"><b>Month Date Wise Attendance Present Absent Count Report -- {{yearname}}</b></td>
+                </tr>                 
+            </table>
+            <table class="table table-bordered">
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th rowspan="2">Sl.No</th>
+                        <th rowspan="2">Student Name</th>
+                        <th rowspan="2">Adm.No</th>
+                        <th rowspan="2">Class Section</th>
+                        <th colspan="2" ng-repeat="col in daysOfMonth">{{col.columnname}} {{col.Total_ClassHeld}}</th>
+                    </tr>
+                    <tr style="border:0.5px solid black">
+                        <th ng-repeat="dd in daysOfMonth_pre_abs">{{dd.sub_columnname}}</th>
+                    </tr>
+                </thead>
+                <tr style="border:0.5px solid black" ng-repeat="user1 in StudentList | orderBy:propertyName:reverse" ng-class-odd="'odd'" pagination-id="page34">
+                    <td class="text-center">{{$index+1}}</td>
+                    <td class="text-left">{{ user1.Studentname}}</td>
+                    <td class="text-left">{{ user1.Admno}}</td>
+                    <td class="text-left">{{ user1.class}}</td>
+                    <td ng-repeat="col in daysOfMonth_pre_abs">
+                        <span ng-repeat="dd in user1.stu_att_details" ng-if="col.date==dd.date">
+                            <label ng-if="col.sub_columnname=='Present'">{{dd.PresentCount}}</label>
+                            <label ng-if="col.sub_columnname=='Absent'">{{dd.AbsentCount}}</label>
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</section>

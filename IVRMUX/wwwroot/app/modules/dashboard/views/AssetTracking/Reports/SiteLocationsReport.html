@@ -1,0 +1,191 @@
+﻿
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Sites-Location</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+
+                            <!--<div class="form-group" ng-show="selectionflag=='I'">
+                                <label class="control-label col-sm-4">Site/Building :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="site" ng-model="obj.invmsI_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Site/Building" ng-required="selectionflag=='I'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Site/Building in the list...">{{$select.selected.invmsI_SiteBuildingName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_sites | filter: $select.search " value="{{option.invmsI_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.invmsI_SiteBuildingName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Site)" ng-messages="myForm.Site.$error">
+                                        <div ng-message="required">Please Select Site </div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-3">Site/Building : <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search Student here...">
+                                        <label>
+                                            <input name="classes" value="1" ng-model="allcheck" type="checkbox" ng-click="all_check(allcheck)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-model="invmsI_Id" ng-repeat="site in get_sites | filter : searchValue">
+                                            <input name="sites" ng-model="site.siteck" type="checkbox" ng-click="togchkbx();" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                {{site.invmsI_SiteBuildingName}}
+                                            </span>
+                                        </label>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.sites)" ng-messages="myForm.sites.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="text-center">
+                        <input type="hidden" ng-model="invmsI_Id" value="{{invmsI_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-click="getreport()" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-list-alt" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Clear
+                        </md-button>
+
+                        <md-button ng-show="get_sitereport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="get_sitereport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printSLLL')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="box box-primary" ng-show="get_sitereport.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">CHECK-OUT ASSETS DETAILS</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="sitelocation">
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">Site/Building</a> </th>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">Location</a> </th>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRemarks')">Remarks </a></th>
+                            <th><a href="" ng-click="sortBy('invmlO_InchargeName')">Location Incharge </a> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_sitereport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+
+                            <td> {{user.invmsI_SiteBuildingName}}</td>
+
+                            <td>{{user.invmlO_LocationRoomName}}</td>
+                            <td>{{user.invmlO_LocationRemarks}}</td>
+                            <td>{{user.invmlO_InchargeName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+
+        <div ng-hide="true">
+            <div id="printSL">
+                <div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="sitelocation" width="100%">
+                </div>
+                <h4 class="text-center">SITE LOCATION REPORT</h4>
+                <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">Site/Building</a> </th>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">Location</a> </th>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRemarks')">Remarks </a></th>
+                            <th><a href="" ng-click="sortBy('invmlO_InchargeName')">Location Incharge </a> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_sitereport">
+
+                            <td> {{user.invmsI_SiteBuildingName}}</td>
+                            <td>{{user.invmlO_LocationRoomName}}</td>
+                            <td>{{user.invmlO_LocationRemarks}}</td>
+                            <td>{{user.invmlO_InchargeName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+<div ng-hide="true">
+    <div id="printSLLL">
+        
+        <h4 class="text-center">SITE LOCATION REPORT</h4>
+        <table class="table table-hover table-responsive table-bordered text-center" id="table">
+            <thead>
+                <tr>
+                    <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">Site/Building</a> </th>
+                    <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">Location</a> </th>
+                    <th><a href="" ng-click="sortBy('invmlO_LocationRemarks')">Remarks </a></th>
+                    <th><a href="" ng-click="sortBy('invmlO_InchargeName')">Location Incharge </a> </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in get_sitereport">
+
+                    <td> {{user.invmsI_SiteBuildingName}}</td>
+                    <td>{{user.invmlO_LocationRoomName}}</td>
+                    <td>{{user.invmlO_LocationRemarks}}</td>
+                    <td>{{user.invmlO_InchargeName}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

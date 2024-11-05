@@ -1,0 +1,324 @@
+﻿<style>
+    .multiselect {
+        width: 25.1em;
+        height: 12em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="onLoadGetData()" name="myForm" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">PF Summary REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="form-group well">
+                        <div class="text-center">
+                            <label class="control-label" ng-init="rdopunch='PFTotalReport'">
+                                <input type="radio" name="vf31" value="PFTotalReport" ng-click="cleararray()" ng-model="rdopunch">
+                                <span class="lbl padding-8">PF Summary Report</span>
+                            </label>
+                            <label class="control-label">
+                                <input type="radio" name="vf32" value="PFGrandTotalReport" ng-click="cleararray()" ng-model="rdopunch">
+                                <span class="lbl padding-8">PF Grand Total Report</span>
+                            </label>
+                            <label class="control-label">
+                                <input type="radio" name="vf32" value="PFStatementReport" ng-click="cleararray()" ng-model="rdopunch">
+                                <span class="lbl padding-8">PF Statement Report</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group well">
+                        <div class="col-sm-3">
+                            Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="sel1" ng-model="IMFY_Id" name="hreS_Year" required>
+                                <option value="" label="Select">Select Year</option>
+                                <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.imfY_Id}}" ng-selected="{{leaveyear.Selected===true}}">
+                                    {{leaveyear.imfY_FinancialYear}}
+                                </option>
+                            </select>
+                            <span class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                <span ng-message="required">Select Year</span>
+                            </span>
+                            <!--<span class="lbl padding-3">
+
+                            </span>-->
+                        </div>
+                    </div>
+
+
+                    <div class="form-group well">
+                        <label class="control-label col-sm-3">
+                            Employee : &nbsp;
+                            <input type="checkbox" name="ckeckempl" ng-model="empl" ng-true-value="true" ng-false-value="false" data-ng-click="all_check_empl()">
+                            <span class="lbl padding-8"> All</span>
+                        </label>
+                        <div class="multiselect col-sm-8" style="height:150px !important">
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                            <label data-ng-model="PASR_Id" ng-repeat="emp in employeelist | filter:search" value="{{emp.hrmE_Id}}">
+                                <input name="emp1" value="1" ng-model="emp.selected" type="checkbox" ng-required="isOptionsRequired3()" ng-true-value="true" ng-false-value="false" ng-change="addColumn4()">
+                                <span class="lbl padding-8"> {{emp.hrmE_EmployeeFirstName}} </span>
+                            </label>
+                            <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                <div ng-message="required" style="padding-left: 30px;">Please Select Employee</div>
+                            </div>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.emp1)" ng-messages="myForm.emp1.$error">
+                            <div ng-message="required" style="color:red;">Select Employee</div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <hr />
+
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Generate
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="box box-primary" ng-if="pfreport.length>0">
+            <div class="box-header with-border" ng-if="rdopunch=='PFTotalReport'">
+                <h3 class="box-title">PF Summary Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-header with-border" ng-if="rdopunch=='PFGrandTotalReport'">
+                <h3 class="box-title">PF GrandTotal Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-header with-border" ng-if="rdopunch=='PFStatementReport'">
+                <h3 class="box-title">PF Statement Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="EMPPFScheme" id="Baldwin">
+                    <div id="EMPPFScheme">
+                        <table class="" border="1">
+                            <tr>
+                                <td>
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-4 text-center">
+                                            <div class="row">&nbsp;</div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="row text-center">
+                                                <h3>{{MI_Name}}</h3>
+                                            </div>
+                                            <div class="row text-center" ng-if="rdopunch=='PFTotalReport'">
+                                                <h3>PF SUMMARY financial year <br />{{financialyear}}</h3>
+                                            </div>
+                                            <div class="row text-center" ng-if="rdopunch=='PFGrandTotalReport'">
+                                                <h3>PF GRAND TOTAL financial year <br />{{financialyear}}</h3>
+                                            </div>
+                                            <div class="row text-center" ng-if="rdopunch=='PFStatementReport'">
+                                                <h3>PF Statement for financial year <br />{{financialyear}}</h3>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4 ">
+
+                                        </div>
+                                    </div>
+
+
+                                    <table border="1" ng-if="rdopunch=='PFTotalReport'">
+                                        <thead>
+                                            <tr>
+                                                <th> </th>
+                                                <th colspan="2" style="text-align:center"> <b>OPENING BALANCE</b> </th>
+                                                <th colspan="2" style="text-align:center"> <b>CONTRIBUTION</b> </th>
+                                                <th colspan="2" style="text-align:center"> <b>INTEREST</b> </th>
+                                                <th colspan="2" style="text-align:center"> <b>TOTAL</b> </th>
+                                                <th colspan="2" style="text-align:center"> <b>SETTLEMENT</b> </th>
+                                                <th colspan="2" style="text-align:center"> <b>CLOSING BALANCE</b> </th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="1" style="text-align:center"> <b>Employee Name</b> </th>
+                                                <th colspan="1" style="text-align:center"> <b>Own</b> </th>
+                                                <th colspan="1" style="text-align:center"> <b>School</b></th>
+                                                <th colspan="1" style="text-align:center"> <b>Own</b> </th>
+                                                <th colspan="1" style="text-align:center"> <b>School</b></th>
+                                                <th colspan="1" style="text-align:center"> <b>Own</b> </th>
+                                                <th colspan="1" style="text-align:center"> <b>School</b></th>
+                                                <th colspan="1" style="text-align:center"> <b>Own</b> </th>
+                                                <th colspan="1" style="text-align:center"> <b>School</b></th>
+                                                <th colspan="1" style="text-align:center"> <b>Own</b> </th>
+                                                <th colspan="1" style="text-align:center"> <b>School</b></th>
+                                                <th colspan="1" style="text-align:center"> <b>Own</b> </th>
+                                                <th colspan="1" style="text-align:center"> <b>School</b></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr><td colspan="12"></td></tr>
+                                            <tr ng-repeat="user in pfreport">
+                                                <td colspan="1" style="text-align:center">{{user.HRME_EmployeeFirstName}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREPFST_OBOwnAmount}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREPFST_OBInstituteAmount}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREVPFST_Contribution}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREPFST_IntstituteContribution}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREVPFST_Intersest}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREPFST_InstituteInterest}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.OWN_GRANDTOTAL}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.INST_GRANDTOTAL}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREPFST_OwnSettlementAmount}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREPFST_InstituteLSettlementAmount}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREPFST_OwnClosingBalance}}</td>
+                                                <td colspan="1" style="text-align:center">{{user.HREPFST_InstituteClosingBalance}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="1" style="text-align:center"> <b>GRAND TOTAL</b> </td>
+                                                <td colspan="1" style="text-align:center"> {{totownopeningbal}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totschoolopeningbal}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totowncontribution}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totschoolcontribution}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totowninterest}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totschoolinterest}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totowntotal}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totschooltotal}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totownsettlement}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totschoolsettlement}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totownclosingbal}} </td>
+                                                <td colspan="1" style="text-align:center"> {{totschoolclosingbal}} </td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+
+
+
+                                    <div class=" clearfix col-sm-12" ng-if="rdopunch=='PFGrandTotalReport'">
+                                        <table class="table margin-top-5 table-bordered" border="1">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Own Total</th>
+                                                    <th>School Total</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table">
+                                                <tr ng-repeat="item in pfreport">
+                                                    <td style="text-align:center;">OPENING BALANCE</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_OBOwnAmount}}</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_OBInstituteAmount}}</td>
+                                                </tr>
+                                                <tr ng-repeat="item in pfreport">
+                                                    <td style="text-align:center;">PF CONTRIBUTION</td>
+                                                    <td style="text-align:center;">{{item.HREVPFST_Contribution}}</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_IntstituteContribution}}</td>
+                                                </tr>
+                                                <tr ng-repeat="item in pfreport">
+                                                    <td style="text-align:center;">PF TRANSFER</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_OwnTransferAmount}}</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_InstituteTransferAmount}}</td>
+                                                </tr>
+                                                <tr ng-repeat="item in pfreport">
+                                                    <td style="text-align:center;">INTEREST</td>
+                                                    <td style="text-align:center;">{{item.HREVPFST_Intersest}}</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_InstituteInterest}}</td>
+                                                </tr>
+                                                <tr ng-repeat="item in pfreport">
+                                                    <td style="text-align:center;">NON REFUNDABLE LOAN</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_OwnWithdrwanAmount}}</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_InstituteWithdrawnAmount}}</td>
+                                                </tr>
+                                                <tr ng-repeat="item in pfreport">
+                                                    <td style="text-align:center;">SETTLEMENT</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_OwnSettlementAmount}}</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_InstituteLSettlementAmount}}</td>
+                                                </tr>
+                                                <tr ng-repeat="item in pfreport">
+                                                    <td style="text-align:center;">CLOSING BALANCE{{}}</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_OwnClosingBalance}}</td>
+                                                    <td style="text-align:center;">{{item.HREPFST_InstituteClosingBalance}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class=" clearfix col-sm-12" ng-if="rdopunch=='PFStatementReport'">
+                                        <table class="table margin-top-5 table-bordered" border="1">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:10%">SL NO.</th>
+                                                    <th style="width:30%">EMPLOYEE NAME</th>
+                                                    <th style="width:20%">PF AC NO</th>
+                                                    <th style="width:10%">SLIP NO</th>
+                                                    <th style="width:30%">SIGNATURE</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table">
+                                                <tr ng-repeat="item in pfreport">
+                                                    <td style="text-align:center;">{{$index+1}}</td>
+                                                    <td style="text-align:center;">{{item.HRME_EmployeeFirstName}}</td>
+                                                    <td style="text-align:center;">{{item.HRME_PFAccNo}}</td>
+                                                    <td style="text-align:center;">{{item.HRME_EmployeeOrder}}</td>
+                                                    <td style="text-align:center;"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </td>
+                            </tr>
+
+
+                        </table>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-click="printToCart('Baldwin')">
+                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#Baldwin')" ng-hide="EmployeePFreportDetails.length==0">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Export
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

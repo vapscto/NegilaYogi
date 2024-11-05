@@ -1,0 +1,256 @@
+﻿<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+<!--<style type="text/css">
+    h4 {
+        display: :inline !important;
+    }
+
+    .table {
+        border: 0px;
+    }
+
+    table > tbody > tr > td {
+        padding: 8px;
+        line-height: 1.42857143;
+        vertical-align: center;
+        border-top: 0px !important;
+    }
+
+    .border {
+        border: 1px solid #000;
+        padding: 10px;
+        width: 50%;
+        margin: auto;
+    }
+</style>-->
+
+
+<script>
+
+    var n = new Date();
+    yyyy = n.getFullYear();
+    mm = n.getMonth() + 1;
+    dd = n.getDate();
+    hh = n.getHours();
+    tt = n.getMinutes();
+    ss = n.getSeconds();
+
+    //document.getElementById("date").innerHTML = dd + "." + mm + "." + yyyy + "  "+ "  " + hh + ":" + tt + ":" + ss;
+    //document.getElementById("date34").innerHTML = dd + "." + mm + "." + yyyy + "  "+ "  " + hh + ":" + tt + ":" + ss;
+
+</script>
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Gate Pass Form</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-offset-4 col-sm-4 text-center">
+                    <div class="well" data-ng-init="dailybtedates ='daily'">
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="radiotype" value="studentgp" name="scldbet" ng-click="onselectradio()" required>
+                            <span class="lbl padding-8">Student Gate Pass</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="radiotype" value="employeegp" name="scldbet" ng-click="onselectradio()" required>
+                            <span class="lbl padding-8">Employee Gate Pass</span>
+                        </label>
+                    </div>
+                    <div class="error-messages" ng-if="interacted(myForm.scldbet)" ng-messages="myForm.scldbet.$error">
+                        <div ng-message="required">Select Student or Employee</div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="stud">
+                            <label class="control-label col-sm-4">Student Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel123" data-ng-model="AMST_Id" name="des" ng-required="radiotype==studentgp">
+                                    <option value="">Select Student</option>
+                                    <option ng-repeat="Visitor in studentlist" value="{{Visitor.amsT_Id}}">{{Visitor.amsT_FirstName}}&nbsp;:&nbsp;{{Visitor.amsT_AdmNo}}&nbsp;:&nbsp;{{Visitor.asmcL_ClassName}}&nbsp;:&nbsp;{{Visitor.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.des)" ng-messages="myForm.des.$error">
+                                    <div ng-message="required" style="color:red">Select Student</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="emp">
+                            <label class="control-label col-sm-4">Employee Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="HRME_Id" name="empl" ng-required="radiotype==employeegp">
+                                    <option value="">Select Employee</option>
+                                    <option ng-repeat="Visitor in employeelist" value="{{Visitor.hrmE_Id}}">{{Visitor.hrmE_EmployeeFirstName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.empl)" ng-messages="myForm.empl.$error">
+                                    <div ng-message="required" style="color:red">Select Employee</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="remarks">
+                            <label class="control-label col-sm-4">Remarks:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" name="remarks" ng-model="AGPH_Remark" required maxlength="250" />
+                                <div class="error-messages" ng-if="interacted(myForm.remarks)" ng-messages="myForm.remarks.$error">
+                                    <div ng-message="required">Enter Remarks</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+
+            <div class="box-body">
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Get Data
+                    </md-button>
+                    <md-button class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="sttud">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Gate Pass</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="border" id="printSectionId">
+            <br />
+            <center>
+                <table class="table" style="height: 300px;width: 450px;">
+                    <thead style="background-color:white;">
+                        <tr>
+                            <th> <img style="height: 100px;width: 150px;" src="{{SchoolLogo}}" class="img-responsive"></th>
+                            <th colspan="2">
+                                <label style="font-size:20px;">Student Gatepass </label>
+                                <br /><hr />
+                                <label style="font-size:15px;">{{SchollName}}</label>
+                                <br />
+                                <label style="font-size:10px;text-align:center">{{SchollAdd}}</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="exm in student" style="padding-left:10px">
+                        <tr>
+                            <td align="left"><a href="">Name</a></td>
+                            <td align="left" colspan="2">{{exm.amsT_FirstName}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Class</a></td>
+                            <td align="left" colspan="2">{{exm.asmcL_ClassName}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Mobile</a></td>
+                            <td align="left" colspan="2">{{exm.amsT_MobileNo}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Date & Time</a></td>
+                            <!--<td align="left" colspan="2"> <label id="date"></label></td>-->
+                            <td align="left" colspan="2">{{exm.date}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Address</a></td>
+                            <td align="left" colspan="2">{{exm.address}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Reason</a></td>
+                            <td align="left" colspan="2">{{exm.remarks}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td align="left">Signature of Incharge</td>
+                            <!--<td align="left">sign.OffSup</td>-->
+                            <td align="left">Signature of Principal/Manager</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </center>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="empp">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Gate Pass</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="border" id="printSectionId1">
+            <br />
+            <center>
+                <table class="table" style="height: 300px;width: 450px;">
+                    <thead style="background-color:white;">
+                        <tr>
+                            <th> <img style="height: 100px;width: 150px;" src="{{SchoolLogo}}" class="img-responsive"></th>
+                            <th colspan="2">
+                                <label style="font-size:20px;">Employee Gatepass </label>
+                                <br /><hr />
+                                <label style="font-size:15px;">{{SchollName}}</label>
+                                <br />
+                                <label style="font-size:10px;text-align:center">{{SchollAdd}}</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="exm in employ">
+                        <tr>
+                            <td align="left"><a href="">Name</a></td>
+                            <td align="left" colspan="2">{{exm.hrmE_EmployeeFirstName}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Department</a></td>
+                            <td align="left" colspan="2">{{exm.hrmD_DepartmentName}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Designation</a></td>
+                            <td align="left" colspan="2">{{exm.hrmdeS_DesignationName}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Mobile No</a></td>
+                            <td align="left" colspan="2">{{exm.hrmE_MobileNo}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Date & Time</a></td>
+                            <!--<td align="left" colspan="2"><label id="date34"></label></td>-->
+                            <td align="left" colspan="2">{{exm.date}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><a href="">Reason</a></td>
+                            <td align="left" colspan="2">{{exm.remarks}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td align="left">Signature of Incharge</td>
+                            <!--<td align="left">sign.OffSup</td>-->
+                            <td align="left">Signature of Principal/Manager</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </center>
+        </div>
+    </div>
+</section>

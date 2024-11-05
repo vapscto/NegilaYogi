@@ -1,0 +1,289 @@
+﻿<link href="../../../../../../../css/print/BBKV/Progresscard/BBKVReportCard.css" rel="stylesheet" />
+<style>
+    .verticalth {
+        transform: rotate(270deg);
+        height: 100px !important;
+        width: 5%;
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <!-- Selection -->
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Process Card Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="yeardd" ng-model="asmaY_Id" ng-change="get_classes(asmaY_Id)" required>
+                                        <option value="">Select Academic Year</option>
+                                        <option ng-repeat="year in yearlt" value="{{year.asmaY_Id}}" ng-selected="year.Selected == true">{{year.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yeardd)" ng-messages="myForm.yeardd.$error">
+                                        <div ng-message="required">Please Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">class :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="cls" ng-model="asmcL_Id" data-ng-change="get_cls_sections(asmcL_Id)" required>
+                                        <option value="" label="Select class"> </option>
+                                        <option ng-repeat="option in classarray" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                    <div ng-message="required">Select Class </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="sec" ng-model="asmS_Id" data-ng-change="OnSection(asmS_Id)" required>
+                                        <option value="" label="Select Section"> </option>
+                                        <option ng-repeat="option in section" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                    <div ng-message="required">Enter Section</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Student Name :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="stuname" ng-model="amsT_Id" data-ng-change="onselectcategory(FMCC_Id,ASMCL_Id)" required>
+                                        <option value="" label="Select Student Name"> </option>
+                                        <option ng-repeat="option in fillstudents" value="{{option.amsT_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.amsT_FirstName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.stuname)" ng-messages="myForm.stuname.$error">
+                                    <div ng-message="required">Select Student Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="">
+                        <div class="">
+                            <div class="text-center">
+                                <input type="hidden" ng-model="EME_ID" />
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="getbbkvreport()">
+                                    <i class="fa fa-list-alt " aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" ng-click="print_HHS02();">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Student Details -->
+        <div class="box box-primary" ng-show="HHS_I_IV_grid">
+            <div class="box-body">
+                <div class="ProgressReport-bbkv" id="HHS02">
+
+                    <div class="header text-center">
+                        <img src="/images/stplogo1.jpg" class="img-responsive" />
+                    </div>
+                    <div class="margin-top-5">
+                        <table class="table text-center">
+                            <tr>
+                                <td><h3 class="box1">PROGRESS REPORT</h3></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="row margin-top-5">
+                        <div class="col-sm-6">
+
+                            <table class="table">
+                                <tr>
+                                    <td width="100"><b>STUDENT NAME</b></td>
+                                    <td><b>: {{stuname}}</b> </td>
+                                </tr>
+                                <tr>
+                                    <td><b>ROLL NO </b></td>
+                                    <td><b>: {{asmcL_ClassName}} </b> </td>
+                                </tr>
+                                <tr>
+                                    <td><b> FATHER'S NAME </b></td>
+                                    <td><b>: {{amsT_FatherName}} </b> </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-sm-4">
+                            <table class="table">
+                                <tr>
+                                    <td width="100"><b>CLASS</b></td>
+                                    <td><b>: {{asmcL_ClassName}}</b> </td>
+                                </tr>
+                                <tr>
+                                    <td><b>SECTION </b>   </td>
+                                    <td><b>: {{asmC_SectionName}}</b> </td>
+                                </tr>
+                                <tr>
+                                    <td><b>Adm.No</b>  </td>
+                                    <td><b>: {{amsT_AdmNo}} </b> </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-sm-2">
+                            <div style="border:1px solid #333;width:100px;height:100px;box-sizing:border-box;">
+                                <img src="{{photoname}}" class="img-responsive">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="margin-top-5">
+                        <h3>ACADEMIC REPORT FOR {{asmaY_Year}}</h3>
+                    </div>
+
+                    <div class="margin-top-10">
+                        <table class="table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="20" rowspan="2">
+                                        <b>S.No </b>
+                                    </th>
+                                    <th rowspan="2" class="text-center">
+                                        <a href="" hi ng-click="order('ismS_Id')"><b> SUBJECT</b></a>
+                                    </th>
+                                    <th colspan="1" class="verticalth" ng-repeat="role in exam_list">
+                                        <a href=""><b>{{role.emE_ExamName}}</b></a>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center" ng-repeat="role in exam_list">
+                                        <b> Marks Obtained </b>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="subj in subject_list" ng-if="subj.flag">
+                                    <td class="text-center"><b>{{$index+1}}</b></td>
+                                    <td><b>{{subj.subjectname}} </b> </td>
+                                    <td ng-repeat="y in exam_list track by $index" class="text-center">
+                                        <div ng-repeat="marks in exm_sub_mrks_list">
+                                            <span ng-if="marks.emeid==y.emE_Id && marks.subid==subj.ISMS_Id && marks.ssubj=='' && marks.SubsubjectName==''">
+                                                <label ng-if="marks.PassFailFlg!='AB' && marks.PassFailFlg!='M' && marks.PassFailFlg !='L'">{{marks.obtainmarks}}</label>
+                                                <label ng-if="marks.PassFailFlg=='AB'||marks.PassFailFlg=='M'||marks.PassFailFlg=='L'">{{marks.PassFailFlg}}({{marks.obtainmarks}})</label>
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="text-center"><b>TOTAL MARKS</b></td>
+                                    <td ng-repeat="key in exam_list" class="text-center">
+                                        <span ng-repeat="mm in exmtpr">
+                                            <label ng-if="mm.emE_Id==key.emE_Id"><b>{{mm.estmP_TotalObtMarks}}</b></label>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="subj in subject_list" ng-if="!subj.flag">
+                                    <td class="text-center"><b>{{$index+1}}</b></td>
+                                    <td><b>{{subj.subjectname}} </b> </td>
+                                    <td ng-repeat="y in exam_list track by $index" class="text-center">
+                                        <div ng-repeat="marks in exm_sub_mrks_list">
+                                            <span ng-if="marks.emeid==y.emE_Id && marks.subid==subj.ISMS_Id && marks.ssubj=='' && marks.SubsubjectName==''">
+                                                <label ng-if="marks.PassFailFlg!='AB' && marks.PassFailFlg!='M' && marks.PassFailFlg !='L' && marks.Marksdispaly=='1' ">
+                                                    {{marks.obtainmarks}}
+                                                </label>
+
+                                                <label ng-if="marks.PassFailFlg!='AB' && marks.PassFailFlg!='M' && marks.PassFailFlg !='L' && marks.Gradedisplay=='1' ">
+                                                    {{marks.ObtainedGrade}}
+                                                </label>
+
+                                                <label ng-if="marks.PassFailFlg=='AB'||marks.PassFailFlg=='M'||marks.PassFailFlg=='L'">
+                                                    {{marks.PassFailFlg}}
+                                                </label>
+                                                <label ng-if="marks.PassFailFlg!='AB' && marks.PassFailFlg!='M' && marks.PassFailFlg !='L' &&  marks.obtainmarks== ''">
+                                                    &nbsp;
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>                           
+                        </table>                      
+                    </div>
+
+                    <div class="margin-top-10">
+                        <h3>ATTENDANCE</h3>
+                        <table class="table-bordered margin-top-10">
+                            <tbody>
+                                <tr>
+                                    <td><b>WORKING DAYS </b> </td>
+                                    <td class="padding-4"><b>{{totalworkingdays}} </b> </td>
+                                </tr>
+                                <tr>
+                                    <td><b>PRESENT DAYS </b> </td>
+                                    <td class="padding-4"><b>{{totalpresentdays}} </b></td>
+                                </tr>
+                                <tr>
+                                    <td><b> PERCENTAGE</b> </td>
+                                    <td class="padding-4"><b> {{percentage}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="margin-top-10">
+                        <h3>REMARKS</h3>
+                        <div class="box2 margin-top-10">
+                            <table class="table">
+                                <tr>
+                                    <td> </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="row margin-top-80">
+                            <div class="col-sm-12">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td class="margin-top-20 text-center">
+                                            <b>PARENTS SIGNATURE </b>
+                                        </td>
+                                        <td class="margin-top-20 text-center">
+                                            <b>CLASS TEACHER </b>
+                                        </td>
+                                        <td class="margin-top-20 text-center">
+                                            <b> PRINCIPAL </b>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

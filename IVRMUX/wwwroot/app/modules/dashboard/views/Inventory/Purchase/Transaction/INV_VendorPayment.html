@@ -1,0 +1,427 @@
+﻿
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Vendor Payment</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Supplier.:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="supplier" ng-model="$parent.obj.invmS_Id" theme="bootstrap" ng-disabled="editS" ng-keyup="searchfilter($select);" title="Select Supplier" ng-change="onsupplierchange($parent.obj.invmS_Id.invmS_Id)" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or Search Supplier in the list...">{{$select.selected.invmS_SupplierName}} </ui-select-match>
+                                        <ui-select-choices repeat="option in get_supplier | filter: $select.search " value="{{option.invmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.invmS_SupplierName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.supplier)" ng-messages="myForm.supplier.$error">
+                                        <div ng-message="required">Please Select Supplier</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Mode of Payment :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="invspT_ModeOfPayment" name="mop" required>
+                                        <option value="">--Select Payment Mode-- </option>
+                                        <option ng-repeat="option in get_paymentMode" value="{{option.ivrmmoD_ModeOfPayment}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.ivrmmoD_ModeOfPayment}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages col-sm-6 col-sm-offset-4" ng-if="interacted(myForm.mop)" ng-messages="myForm.mop.$error">
+                                    <div ng-message="required">Please Select Mode of Payment</div>
+                                </div>
+                            </div>
+                            <div ng-show="invspT_ModeOfPayment=='Bank' || invspT_ModeOfPayment=='RTGS/NEFT' || invspT_ModeOfPayment=='SWIPE/CARD'">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Bank Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="bank" placeholder="Bank Name" ng-model="invspT_BankName" ng-required="invspT_ModeOfPayment=='Bank' || invspT_ModeOfPayment=='RTGS/NEFT' || invspT_ModeOfPayment=='SWIPE/CARD'">
+                                    </div>
+                                    <div class="error-messages col-sm-6 col-sm-offset-4" ng-if="interacted(myForm.bank)" ng-messages="myForm.bank.$error">
+                                        <div ng-message="required">Enter Bank Name</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Cheque DD No.:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control active" name="cqno" placeholder="Cheque DD Number" ng-model="invspT_ChequeDDNo">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Cheque Date:</label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker ng-model="invspT_ChequeDDDate" name="cqdate" md-placeholder="Cheque Date"></md-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Payment Reference :</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control active" name="pref" placeholder="Payment Reference" ng-model="invspT_PaymentReference">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Payment Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="invspT_PaymentDate" name="pdate" md-placeholder="Enter Date"></md-datepicker>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div ng-show="get_SuplierGRNno.length>0">
+                            <!--<div class="col-sm-6 col-sm-offset-3" ng-show="!editS">
+                                <div class="well">
+                                    <div class="text-center" ng-init="paymenttype='A'">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="A" name="auto" ng-model="paymenttype" ng-click="radiochange()">
+                                            <span class="lbl padding-8"> Auto </span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="M" name="manual" ng-model="paymenttype" ng-click="radiochange()">
+                                            <span class="lbl padding-8">Manual</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div class="col-sm-12">
+                                <!--<div class="form-group" ng-show="paymenttype=='A' || !editS">
+                                    <label class="control-label col-sm-2"><span style="font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight: 600; font-size: 15px; color: black;"> Enter Amount :<span style="color:Red">*</span></span></label>
+                                    <div class="col-sm-3">
+                                        <input type="text" class="form-control active" name="amt" placeholder="Enter Amount" ng-blur="countAutoAmount(payamount)" ng-model="payamount" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/">
+                                    </div>
+                                </div>-->
+                                <div class="" ng-show="get_SuplierGRNno.length>0">
+                                    <table class="table table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th ng-if="paymenttype=='M'"></th>
+                                                <th>SL.NO</th>
+                                                <th style="width: 20%;"><a href="" ng-click="sort('INVMGRN_Id')">GRN Number</a></th>
+                                                <th><a href="" ng-click="sort('INVMGRN_PurchaseValue')">Purchase Value/Amount</a></th>
+                                                <th><a href="" ng-click="sort('INVMGRN_TotalPaid')">Paid Amount</a></th>
+                                                <th><a href="" ng-click="sort('INVSPTGRN_Balance')">Balance Amount</a></th>
+                                                <th><a href="" ng-click="sort('INVSPTGRN_Remarks')">Remarks</a></th>
+                                                <th><a>Action</a></th>
+                                                <th style="width: 8%;"><a>Status</a></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="objs in get_SuplierGRNno track by $index" ng-form="dataform1">
+                                                <td ng-if="paymenttype=='M'">
+                                                    <label>
+                                                        <input type="checkbox" name="adcheckt" value="{{objs.payck}}" ng-disabled="objs.paystatus=='0'" ng-model="objs.checkedvalue" ng-change="onGRNcheck(objs)">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </td>
+                                                <td>{{$index+1}}</td>
+                                                <td class="text-left">
+                                                    <span>
+                                                        <label class="control-label col-sm-10" ng-model="objs.INVMGRN_Id"><b>{{objs.INVMGRN_GRNNo}}</b></label>
+                                                    </span>
+                                                </td>
+                                                <td class="text-left">
+                                                    <input type="text" name="Purchaseav" class="form-control active" ng-disabled="true" value="objs.INVMGRN_PurchaseValue" ng-model="objs.INVMGRN_PurchaseValue" placeholder="Purchase Amount" />
+                                                </td>
+                                                <td class="text-left">
+                                                    <!--<input type="text" name="paid" class="form-control active" ng-disabled="!objs.checkedvalue" ng-blur="countManualAmount(objs)" ng-model="objs.INVSPTGRN_Amount" placeholder="Paid Amount" />-->
+                                                    <div class="row">
+                                                        <div class="col-sm-5 padding-right-none">
+                                                            <input type="text" name="paidamt" class="form-control active" allow-pattern="(\s|[0-9.])" ng-disabled="!objs.checkedvalue" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" ng-model="objs.finalamount" ng-blur="countManualAmount(objs)" placeholder="Amount" />
+                                                        </div>
+
+                                                        <div class="col-sm-7 padding-left-none">
+                                                            <input type="text" name="paid" class="form-control active" ng-disabled="true" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" ng-model="objs.INVSPTGRN_Amount" placeholder="Paid Amount" />
+                                                        </div>
+                                                    </div>
+
+                                                </td>
+                                                <td class="text-left">
+                                                    <input type="text" name="amount" class="form-control active" ng-disabled="true" ng-model="objs.INVMGRN_TotalBalance" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" placeholder="Balance" />
+                                                </td>
+                                                <td class="text-left">
+                                                    <input type="text" name="remrks" class="form-control active" ng-model="objs.INVSPTGRN_Remarks" placeholder="Remarks" />
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Payment Details" data-ng-model="payment" data-target="#myModalpayment" data-ng-click="ongrnpaymentmodel(objs)">
+                                                        <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                                    </a>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span ng-if="objs.paystatus=='0'">
+                                                        <label class="text-center"><span style="font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight: 600; font-size: 15px; color: green;"> Full Paid </span></label>
+                                                    </span>
+                                                    <span ng-if="objs.paystatus=='1'">
+                                                        <label class="text-center"><span style="font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight: 600; font-size: 15px; color: #3a5999;"> Half Paid </span></label>
+                                                    </span>
+                                                    <span ng-if="objs.paystatus=='2'">
+                                                        <label class="text-center"><span style="font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight: 600; font-size: 15px; color: red;"> Not Paid </span></label>
+                                                    </span>
+
+                                                </td>
+                                                <td hidden="hidden">{{objs.INVSPTGRN_Id}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td ng-if="paymenttype=='M'"></td>
+                                                <td colspan="2" class="text-center">Total</td>
+                                                <td><b>{{totalpurhase}}</b></td>
+                                                <td><b>{{totalpaid}}</b></td>
+                                                <td><b>{{totalbalance}}</b></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                            <div class="margin-top-10">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-1">Remarks :</label>
+                                    <div class="col-sm-4">
+                                        <textarea class="form-control" rows="3" id="comment" ng-model="invspT_Remarks"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <hr />
+                </div>
+                <div class="text-center">
+                    <input type="hidden" ng-model="invspT_Id" value="{{invspT_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+
+    <div class="box box-primary" ng-show="get_vendorpayment.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Vendor Payment Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue10.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier</a></th>
+                        <th><a href="" ng-click="sortBy('INVSPT_PaymentDate')">Payment Date</a></th>
+                        <th><a href="" ng-click="sortBy('INVSPT_ModeOfPayment')">Mode Of Payment</a> </th>
+                        <th><a href="" ng-click="sortBy('INVSPT_PaymentReference')">Payment Reference</a> </th>
+                        <th><a href="" ng-click="sortBy('INVSPT_Amount')">Amount No</a> </th>
+                        <th><a href="" ng-click="sortBy('INVSPT_Remarks')">Remarks</a> </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue = (get_vendorpayment | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.invmS_SupplierName}}</td>
+                        <td>{{user.invspT_PaymentDate | date:'dd-MM-yyyy'}}</td>
+                        <td>{{user.invspT_ModeOfPayment}}</td>
+                        <td>{{user.invspT_PaymentReference}}</td>
+                        <td>{{user.invspT_Amount}}</td>
+                        <td>{{user.invspT_Remarks}}</td>
+
+                        <td class="text-center">
+                            <span>
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Payment" data-ng-model="paymentdetail" data-target="#myModal" data-ng-click="onmodelclick(user)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">View</i>
+                                </a>
+                            </span>
+                            &nbsp;
+                            <span ng-if="user.invspT_ActiveFlg === true">
+                                <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                            &nbsp;
+                            <!--<span ng-if="user.invspT_ActiveFlg === false">
+                                <a href="" ng-click="deactive(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i> Activate </i>
+                                </a>
+                            </span>
+                            <span ng-if="user.invspT_ActiveFlg === true">
+                                <a href="" ng-click="deactive(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i> Deactivate</i>
+                                </a>
+                            </span>-->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+
+    <!--=============================== Transcation Model ==================================-->
+    <div id="myModalpayment" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg" style="width: 75%;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white">{{grno}}</h4>
+                        <h4 class="modal-title text-white">Payment Mode: {{paymode}}</h4>
+                        <h4 class="modal-title text-white">Payment Date: {{paydate | date:'dd-MM-yyyy'}}</h4>
+                    </div>
+                    <div class="box-body">
+                        <div class="text-center">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th><a href="" ng-click="sort('INVMGRN_PurchaseValue')">Amount </a></th>
+                                        <th><a href="" ng-click="sort('invsptgrN_Amount')">Paid </a></th>
+                                        <th><a href="" ng-click="sort('INVMGRN_TotalBalance')">Balance </a></th>
+                                        <th><a href="" ng-click="sort('INVSPTGRN_Remarks')">Remarks </a></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="useri in get_GRNpayment | orderBy:sortKey:reverse |filter:searchValue">
+                                        <td>{{$index+1}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invmgrN_PurchaseValue | number : 2}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invsptgrN_Amount | number : 2}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invmgrN_TotalBalance | number : 2}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invsptgrN_Remarks}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--=============================== Model ==================================-->
+    <div id="myModal" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg" style="width: 92%;">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white">Payment Details</h4>
+                    </div>
+                    <div class="box-body">
+                        <div class="text-center">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th><a href="" ng-click="sort('INVMGRN_GRNNo')">GRN Number</a></th>
+                                        <th><a href="" ng-click="sort('INVMGRN_PurchaseValue')">Amount </a></th>
+                                        <th><a href="" ng-click="sort('INVMGRN_TotalPaid')">Paid </a></th>
+                                        <th><a href="" ng-click="sort('INVMGRN_TotalBalance')">Balance </a></th>
+                                        <th><a href="" ng-click="sort('INVSPTGRN_Remarks')">Remarks </a></th>
+                                        <!--<th>Action</th>-->
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="useri in get_modeldetails | orderBy:sortKey:reverse |filter:searchValue">
+                                        <td>{{$index+1}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invmgrN_GRNNo}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invmgrN_PurchaseValue | number : 2}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invmgrN_TotalPaid | number : 2}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invmgrN_TotalBalance | number : 2}}</td>
+                                        <td style="overflow-wrap:break-word">{{ useri.invsptgrN_Remarks}}</td>
+                                        <!--<td>
+                                            <span ng-if="useri.invsptgrN_ActiveFlg === false">
+                                                <a href="" ng-click="deactiveGRN(useri)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    <i> Activate </i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="useri.invsptgrN_ActiveFlg === true">
+                                                <a href="" ng-click="deactiveGRN(useri)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    <i> Deactivate</i>
+                                                </a>
+                                            </span>
+                                        </td>-->
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

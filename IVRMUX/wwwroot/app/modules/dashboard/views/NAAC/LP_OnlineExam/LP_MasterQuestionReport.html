@@ -1,0 +1,366 @@
+<style>
+    .margin-top-10 {
+        margin-top: 10px !important;
+    }
+
+    .padding-right-30 {
+        padding-right: 30px !important;
+    }
+
+    .padding-left-10 {
+        padding-left: 10px;
+    }
+
+    .headerfixed {
+        position: fixed;
+        padding: 8em;
+        left: 75%;
+        top: 0%;
+        width: 60%;
+        transform: translateX(-50%);
+    }
+
+    .questionstyle {
+        padding-left: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        font-family: Times New Roman !important;
+    }
+
+    .optionssytle {
+        font-size: 16px !important;
+        font-weight: bold !important;
+        font-family: Times New Roman !important;
+    }
+
+    .imgdisplay {
+        height: 100px !important;
+        width: 200px !important;
+    }
+
+    .imgdisplayoptions {
+        height: 100px !important;
+        width: 155px !important;
+        border: 0.5px solid black;
+    }
+
+    .padding-left0px {
+        padding-left: 0px;
+    }
+
+    .levelheading {
+        font-size: 25px !important;
+        font-weight: bold !important;
+        color: black !important;
+        text-transform: none;
+    }
+
+    .padding-left12px {
+        padding-left: 12px;
+    }
+
+    .padding-left18px {
+        padding-left: 18px !important;
+    }
+
+    .padding-left-35 {
+        padding-left: 35px;
+    }
+
+    .styleborder {
+        border: 1px solid black;
+        border-radius: 10px;
+        margin-top: 10px !important;
+    }
+
+    .padding-left12px {
+        padding-left: 12px;
+    }
+</style>
+
+<section class="content" data-ng-init="LoadReport()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Online Exam Master Question Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="text-center well" ng-init="entry='OverAll'">
+                                <label class="radio-inline">
+                                    <input name="optradio" type="radio" ng-model="entry" value="OverAll" ng-change="OnChangeRadiobtn()">
+                                    <span class="lbl padding-8">Class Wise Count</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input name="optradio" type="radio" ng-model="entry" value="SubjectWiseCount" ng-change="OnChangeRadiobtn()">
+                                    <span class="lbl padding-8">Subject Wise Count</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input name="optradio" type="radio" ng-model="entry" value="ClassSubjectWise" ng-change="OnChangeRadiobtn()">
+                                    <span class="lbl padding-8">Class & Subject Wise Count</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6" ng-if="entry!='OverAll'">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">
+                                    <input name="option[]" value="1" type="checkbox" ng-model="obj.all2" ng-click="Toggle_header()">
+                                    <span class="lbl padding-12">Select All Class : </span><strong class="text-red">*</strong>
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-12" style="height:15em">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                        <label ng-repeat="role in getclasslist | filter:filterchkbx">
+                                            <input type="checkbox" value="{{role.asmcL_Id}}" name="check" ng-model="role.selected" ng-click="addColumn(role)"
+                                                   data-ng-checked="checked" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">{{role.asmcL_ClassName}}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="error-messages col-sm-12" ng-if="interacted(myForm.check)" ng-messages="myForm.check.$error">
+                                    <div ng-message="required">Please Select the Above Fields</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="GetReport()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#excelSectionId')"
+                               ng-disabled="reportbtn==true" ng-if="entry=='OverAll' || entry=='SubjectWiseCount'">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData(printSectionId);" 
+                               ng-disabled="reportbtn==true">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-if="GetReportDetails.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Online Exam Master Question Report </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                        data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body" ng-if="entry=='OverAll' || entry=='SubjectWiseCount'">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th ng-if="entry=='OverAll'">Class Name</th>
+                        <th ng-if="entry!='OverAll'">Subject Name</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="dd in GetReportDetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{dd.name}}</td>
+                        <td class="text-center">{{dd.count}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><b>Total</b></td>
+                        <td colspan="2"><b>{{finalamt}}</b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="box-body" ng-if="entry=='ClassSubjectWise'">
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <td>Class</td>
+                                <td>Subject</td>
+                                <td>Count</td>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="cls in  classlist">
+                            <tr>
+                                <td class="text-left" rowspan="{{cls.details.length+1}}">{{cls.ASMCL_ClassName}}</td>
+                            </tr>
+                            <tr ng-repeat="sub in cls.details">
+                                <td class="text-left">{{sub.ISMS_SubjectName}}</td>
+                                <td class="text-center">{{sub.count}}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left" colspan="2"><b>Total</b></td>
+                                <td class="text-center">{{cls.classtotalcount}}</td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td class="text-left" colspan="2"><b>Total Questions Uploaded</b></td>
+                                <td class="text-center">{{finalcount}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div id="printSectionId" ng-show="export_table_flag">
+    <div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>
+    <br />
+    <center> <h4><u> Online Exam Master Questions Created Count Report </u></h4></center>
+    <br />
+    <table class="table table-bordered" id="table1" ng-show="tadprint">
+        <thead>
+            <tr>
+                <th>Sl.No</th>
+                <th ng-if="entry=='OverAll'">Class Name</th>
+                <th ng-if="entry!='OverAll'">Subject Name</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="dd in GetReportDetails">
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-left">{{dd.name}}</td>
+                <td class="text-center">{{dd.count}}</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>Total</b></td>
+                <td colspan="2"><b>{{finalamt}}</b></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="excelSectionId" ng-show="export_table_flag">
+    <table>
+        <tr style="border:0.5px solid black">
+            <td colspan="3" style="text-align:center">
+                Online Exam Master Questions Created Count Report
+            </td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+            <tr style="border:0.5px solid black">
+                <th>Sl.No</th>
+                <th ng-if="entry=='OverAll'">Class Name</th>
+                <th ng-if="entry!='OverAll'">Subject Name</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border:0.5px solid black" ng-repeat="dd in GetReportDetails">
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-left">{{dd.name}}</td>
+                <td class="text-center">{{dd.count}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div id="excelclasssubjectId" ng-show="export_table_flag1">
+    <table>
+        <tr style="border:0.5px solid black">
+            <td colspan="4" style="text-align:center">
+                <b>Online Exam Master Questions Created Count Report</b>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+            <tr style="border:0.5px solid black">
+                <th>Sl.No</th>
+                <th>Class Name</th>
+                <th>Subject Name</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody ng-repeat="cls in  classlist">
+            <tr style="border:0.5px solid black">
+                <td class="text-center" rowspan="{{cls.details.length+1}}">{{$index+1}}</td>
+                <td class="text-left" rowspan="{{cls.details.length+1}}">{{cls.ASMCL_ClassName}}</td>
+            </tr>
+            <tr style="border:0.5px solid black" ng-repeat="sub in cls.details">
+                <td class="text-left">{{sub.ISMS_SubjectName}}</td>
+                <td class="text-center">{{sub.count}}</td>
+            </tr>
+            <tr style="border:0.5px solid black">
+                <td class="text-left" colspan="3"><b>Total</b></td>
+                <td class="text-center">{{cls.classtotalcount}}</td>
+            </tr>
+        </tbody>
+        <tbody>
+            <tr style="border:0.5px solid black">
+                <td class="text-left" colspan="3"><b>Total Questions Uploaded</b></td>
+                <td class="text-center">{{finalcount}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div id="printclasssubjectId" ng-show="export_table_flag1">
+    <div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>
+    <br />
+    <center> <h4><u> Online Exam Master Questions Created Count Report </u></h4></center>
+    <br />
+    <table class="table table-bordered">
+        <thead style="border : solid 0.5px black;">
+            <tr style="border : solid 0.5px black;">
+                <th>Sl.No</th>
+                <th>Class Name</th>
+                <th>Subject Name</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody style="border : solid 0.5px black;" ng-repeat="cls in  classlist">
+            <tr style="border : solid 0.5px black;">
+                <td class="text-center" rowspan="{{cls.details.length+1}}">{{$index+1}}</td>
+                <td class="text-left" rowspan="{{cls.details.length+1}}">{{cls.ASMCL_ClassName}}</td>
+            </tr>
+            <tr ng-repeat="sub in cls.details" style="border : solid 0.5px black;">
+                <td class="text-left">{{sub.ISMS_SubjectName}}</td>
+                <td class="text-center">{{sub.count}}</td>
+            </tr>
+            <tr style="border : solid 0.5px black;">
+                <td class="text-left" colspan="3"><b>Total</b></td>
+                <td class="text-center">{{cls.classtotalcount}}</td>
+            </tr>
+        </tbody>
+        <tbody style="border : solid 0.5px black;">
+            <tr style="border : solid 0.5px black;">
+                <td class="text-left" colspan="3"><b>Total Questions Uploaded</b></td>
+                <td class="text-center">{{finalcount}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

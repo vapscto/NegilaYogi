@@ -1,0 +1,248 @@
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="ShowReportdata(arrlistchk)"  name="myForm" validate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee ThirdParty Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="row">
+
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="seluse" data-ng-model="academicyr" name="acd_year" required>
+                                    <option value="" label="Select Year"> </option>
+                                    <option ng-repeat="option in userlistarray" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required">Please Select the Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From Date:<strong style="color:red;">*</strong></label>
+
+                            <div class="col-sm-6">
+                                <md-datepicker ng-model="FMCB_fromDATE" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+
+
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required">Please Select From Date</div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="control-label col-sm-4">To Date:<strong style="color:red;">*</strong></label>
+
+                            <div class="col-sm-6">
+                                <md-datepicker ng-model="FMCB_toDATE" onkeydown="return false" name="To_Date" id="date2" md-placeholder="Enter  date" required></md-datepicker>
+
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required">Please Select To Date</div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" id="clear-btn" ng-click="Clear_Details()">
+                                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#table1')" target="_blank" ng-show="export_flag">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+
+                            <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData(printSectionId);" ng-show="print_flag">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="report">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Third Party Report Grid View</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th><a href="" ng-click="order('sno')">Sl.No</a></th>
+
+                            <th>
+                                <a href="" ng-click="sort('name')">Students Name</a>
+                            </th>
+                            <th><a href="" ng-click="sort('receiptno')">Receipt.No</a></th>
+
+                            <th>
+                                <a href="" ng-click="sort('fypdate')">Date</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('bankorcash')">Bank/Cash</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('bankname')">Bank Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('chequno')">Cheque.No</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('chequedate')">ChequeDate</a>
+                            </th>
+
+                            <th>
+                                <a href="" ng-click="sort('towords')">Remarks</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('paidamt')">Amount</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in students | orderBy:propertyName:reverse | filter:search |orderBy:sortKey:reverse">
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.selected" ng-change="optionToggled(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{$index+1}}</td>
+                            <td>{{user.name}}</td>
+                            <td>{{user.receiptno}}</td>
+                            <td>{{user.fypdate}}</td>
+                            <td>{{user.bankorcash}}</td>
+                            <td>{{user.bankname}}</td>
+                            <td>{{user.chequno}}</td>
+                            <td>{{user.chequedate}}</td>
+                            <td>{{user.towords}}</td>
+                            <td>{{user.paidamt}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="10"><b>Total:</b></td>
+                            <td><b>{{tot}}</b></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <pagination total-items="totalItems" ng-model="currentPage"
+                            max-size="5" boundary-links="true"
+                            items-per-page="numPerPage" class="pagination-sm">
+                </pagination>
+            </div>
+
+        </div>
+        <div id="printSectionId" ng-show="export_table_flag">
+
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <center> <h4><u> Fee Third Party Report</u></h4></center>
+            <table ng-show="tadprint" class="table table-hover table-responsive table-bordered text-center" id="table1">
+                <thead>
+                    <tr>
+
+                        <th>SL.NO</th>
+                        <th>
+                            Students Name
+                        </th>
+                        <th>
+                            Receipt.No
+                        </th>
+                        <th>
+                            Date
+                        </th>
+                        <th>
+                            Bank/Cash
+                        </th>
+                        <th>
+                            Bank Name
+                        </th>
+                        <th>
+                            Cheque.No
+                        </th>
+                        <th>
+                            ChequeDate
+                        </th>
+
+                        <th>
+                            Remarks
+                        </th>
+                        <th>
+                            Amount
+                        </th>
+
+                    </tr>
+
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in printdatatable | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                        <td>{{$index+1}}</td>
+                        <td>{{user.name}}</td>
+                        <td>{{user.receiptno}}</td>
+                        <td>{{user.fypdate}}</td>
+                        <td>{{user.bankorcash}}</td>
+                        <td>{{user.bankname}}</td>
+                        <td>{{user.chequno}}</td>
+                        <td>{{user.chequedate}}</td>
+                        <td>{{user.towords}}</td>
+                        <td>{{user.paidamt}}</td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="9"><b>Total:</b></td>
+                        <td><b>{{tot}}</b></td>
+                        
+                    </tr>
+
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="16" class="col-sm-12 text-center ">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+
+                </tfoot>
+            </table>
+        </div>
+    </form>
+</section>

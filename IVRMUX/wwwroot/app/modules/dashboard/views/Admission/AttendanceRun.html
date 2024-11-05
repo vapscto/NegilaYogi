@@ -1,0 +1,173 @@
+﻿<section class="content" ng-init="Loaddata()">
+
+    <form class="form-horizontal" role="form" name="myForm" novalidate>
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Entry</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="tpaay" ng-model="obj.ASMAY_Id" required>
+                                    <option value="">Select Academic year</option>
+                                    <option ng-repeat="option in academic" value="{{option.asmaY_Id}}" ng-selected="option.Selected==true">
+                                        {{option.asmaY_Year}}
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.tpaay)" ng-messages="myForm.tpaay.$error">
+                                    <div ng-message="required">Please Select Academic year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="Fromdate" onkeypress="return false" name="Fromdate"
+                                               md-placeholder="Enter Date" required>
+                                </md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.Fromdate)" ng-messages="myForm.Fromdate.$error">
+                                <div ng-message="required" class="col-sm-8">Select From Date</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+            </div>
+            <div class="row text-center">
+                <md-button type="submit" ng-model="submitted" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="SaveData()" id="save-btn">
+                    <i class="fa fa-file" aria-hidden="true"></i>
+                    Run
+                </md-button>
+
+                <md-button type="button" class="md-raised md-primary" ng-disabled="griddto.length==0" ng-show="viewlist.length>0" ng-click="exportToExceldetails('#BankCash')" id="save-btn">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Excel
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+    </form>
+
+
+
+    <div class="box box-primary" ng-show="griddto.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Attendance Run</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{griddto.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 pull-right">
+                    <div class="">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model=" SearchHere" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="overflow-x:scroll;">
+                <div>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SL.No</th>
+                                <th>Student Name</th>
+                                <th>Admission No</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="x in filterValue = (griddto| filter : SearchHere) |orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td>{{itemsPerPage*(currentPage-1)+$index+1}}</td>
+                                <td>{{x.StudentName}}</td>
+                                <td>{{x.AMST_AdmNo}}</td>
+                                <td>{{x.ASMCL_ClassName}}</td>
+                                <td>{{x.ASMC_SectionName}}</td>
+                                <td>{{x.ASA_FromDate | date : "dd/MM/yyyy"}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <div style="overflow-x:scroll;" id="printDeviation" ng-show="ak">
+        <div id="BankCash">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No</th>
+                        <th>Student Name</th>
+                        <th>Admission No</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in griddto">
+                        <td>{{$index+1}}</td>
+                        <td>{{x.StudentName}}</td>
+                        <td>{{x.AMST_AdmNo}}</td>
+                        <td>{{x.ASMCL_ClassName}}</td>
+                        <td>{{x.ASMC_SectionName}}</td>
+                        <td>{{x.ASA_FromDate | date : "dd/MM/yyyy"}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+
+</section>
+

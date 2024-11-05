@@ -1,0 +1,365 @@
+﻿<!--<link type="text/css" media="print" rel="stylesheet" href="css/print/BBKV/BBKVTC/BBKVTCPdf.css" />-->
+
+<style>
+    table {
+        border-collapse: collapse;
+        border-style: double;
+    }
+
+
+    table {
+        width: 100%;
+        height: auto;
+    }
+
+    .table-bordered {
+        border: 5px double #5786d2;
+    }
+
+        .table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
+            border: 0.8px solid #111417;
+            padding: 5px;
+            vertical-align: middle;
+        }
+</style>
+
+
+<div data-ng-init="loaddata()" class="challan">
+    <section class="content">
+        <form class="form-horizontal" role="form" method="post" name="myform">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TC Custom Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Last Year:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="stcrclstyr" required>
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                        <div ng-message="required">Select Last Year.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="well text-center">
+                                <label class="radio-inline">
+                                    <input type="radio" value="regno" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Admno</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="stdname" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Name</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" ng-show="std_name">
+                                <label class="control-label col-sm-4">Student Name:</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="amsT_Id" ng-change="stdnamechange()" required>
+                                        <option value="" label="Select Student"> </option>
+                                        <option ng-repeat="student in studentDropdown" value="{{student.amsT_Id}}" ng-selected="{{student.Selected == true}}">
+                                            {{student.studentname}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="well text-center" ng-init="tctempper='per'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="temp" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Temp Student</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="per" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Permanent Student</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Promoted Class:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmcL_Id" name="stcrclstyrd">
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="classs in class" value="{{classs.asmcL_Id}}">{{classs.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyrd)" ng-messages="myform.stcrclstyrd.$error">
+                                        <div ng-message="required">Select Class.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="well text-center" ng-init="tctempperformat='bbs'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="bbs" name="stcrcradtcc" ng-model="tctempperformat"  required>
+                                        <span class="lbl padding-8">Balabharathi Format</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="viv" name="stcrcradtcc" ng-model="tctempperformat"  required>
+                                        <span class="lbl padding-8">Vivekanad Format</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-show="report_flag" ng-click="savetmpldata();">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-primary" ng-click="printToCart()"  ng-show="report">
+                            <!--ng-show="Print_flag"-->
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+
+            <link href="css/print/balabarathi/TC/VivekanandaTC.css" rel="stylesheet" />
+            <div ng-show="report">
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Student TC</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div id="VivekanandaTC">
+                                <table class="table-bordered">
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td colspan="6" class="margin-bottom-10">
+                                                        <img src="{{header}}" class="img-responsive" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="50">SNO:</td>
+                                                    <td width="500"></td>
+                                                    <td width="50">Date:</td>
+                                                    <td class="border-bottom-dotted">{{todaydate | date:'dd/MM/yyyy'}}</td>
+                                                    <td width="50">NO:</td>
+                                                    <td class="border-bottom-dotted">{{tcno}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td width="400">
+                                            1). Name of the School
+                                        </td>
+                                        <td width="400">
+                                            <img src="{{schoolname}}" class="img-responsive" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            2). Admission No :  {{admno}}
+                                        </td>
+                                        <td>
+                                            3). Cummulative Record No.:
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            4). Name of the Pupil in full
+                                        </td>
+                                        <td>
+                                            {{lblstdname}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <label>5). Sex : </label>  &nbsp;&nbsp; {{geder}}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            6). Nationality : {{lblnationality}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td>7). Religian :  {{lblreligioncaste}}</td>
+                                                    <td>Caste : {{studcaste}}</td>
+                                                    <td>Sub-Caste : {{subcaste}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td>8). Place of Birth :  {{lblpobirth}}</td>
+                                                    <td>Tq :</td>
+                                                    <td>Dist. :</td>
+                                                    <td>State :</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td colspan="2">9).Name of the Father :  {{lblfathername}}</td>
+                                                    <td colspan="2">10). Name of the Mother :  {{lblmothername}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td colspan="4">11).Whether the Candidate belongs to Scheduled Caste or Scheduled Tribes:YES/NO :</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td colspan="4">12). DateofBirth: {{lbldob | date :'dd/MM/yyyy'}} 	(Inwords):  {{lbldobwords}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td colspan="4">13). Standard in which the Pupil was studying at the time of leaving the School: {{laststudiedinwords}}	</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            14).In case of Pupil of Higher Standards:	<br />
+                                            &nbsp; &nbsp;&nbsp; a) Languages Studied:   {{subjectsstudied}}<br />
+                                            &nbsp; &nbsp;&nbsp;  b) Electives Studied:  {{elective}}
+                                        </td>
+                                        <td>
+                                            21). Whether Medically Examined or Not :
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            15).Medium of Instruction:  {{medium}}
+
+                                        </td>
+                                        <td>
+                                            22). Date of Pupil's last attendance at School :  {{last_date_attended |date:'dd/MM/yyyy'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            16).Date Of Admission or Promotion to that <br />
+                                            Class or Standard :  {{lbldoa |date:'dd/MM/yyyy'}}
+
+                                        </td>
+                                        <td>
+                                            23).Date of which the application for the transfer<br />
+                                            certificate was Recived :  {{ASTC_TCApplicationDate |date :'dd/MM/yyyy'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            17).weather Qualified for Promotion to High Std:  {{promotionflag}}
+
+                                        </td>
+                                        <td>
+                                            24). Date of issue of Transfer Certificate :  {{lbldate |date:'dd/MM/yyyy'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            18).weather The pupil have paid all the Fees Due to the school:  {{feedue}}
+
+                                        </td>
+                                        <td>
+                                            25). Number Of school Days Upto the date of Leaving :  {{totalworkingdays}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            19).Fee consession if any <br>
+                                            (Nature and Period to be specified ) :  {{feeconcession}}
+
+                                        </td>
+                                        <td>
+                                            26).Number of School days the Pupil attended :   {{noworkingdays}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            20).Scholarship, if any <br />
+                                            (Nature and Period to be specified ) :
+
+                                        </td>
+                                        <td>
+                                            27).Charecter and Conduct :   {{lblconduct}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table margin-top-50">
+                                                <tr>
+                                                    <td colspan="4" class="float-right">Signature of Head of the Institution</td>
+                                                </tr>
+                                            </table>
+                                            <table class="table margin-top-50">
+                                                <tr>
+                                                    <td colspan="4">Signature of the Parents/Student</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--<div class="text-center">
+                                <md-button type="button" ng-click="VivekanandaTC(Vivekananda)" class="md-raised md-primary">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    print
+                                </md-button>
+                            </div>-->
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+        </form>
+    </section>
+</div>
+

@@ -1,0 +1,465 @@
+﻿
+
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="saveYearlyGroupdata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Fee Groups Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="cfg.ASMAY_Id" ng-change="get_courses()">
+                                    <option value="" label="">--Select--</option>
+                                    <option ng-repeat="option in yearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == cfg.ASMAY_Id}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-4">Course : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                <label data-ng-model="FMG_GroupName" ng-repeat="role in courselist|filter:searchchkbx1" value="{{role.amcO_Id}}">
+                                    <input type="checkbox" name="crsoption" ng-model="role.selected" ng-checked="all" ng-required="isOptionsRequired()" ng-change="get_branches()" />
+                                    <span class="lbl padding-8">{{role.amcO_CourseName}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.crsoption)" ng-messages="myForm.crsoption.$error">
+                                <div ng-message="required">Please Select Course</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Scheme Type:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="schemetype" data-ng-model="ACST_Id" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="type in schemeType" value="{{type.acsT_Id}}" ng-selected="{{type.Selected == true}}">
+                                        {{type.acsT_SchmeType}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.schemetype)" ng-messages="myForm1.schemetype.$error">
+                                    <div ng-message="required">Select Scheme Type</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Quota :<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="Quota" data-ng-model="ACQ_Id" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="type in QuotaCategory" value="{{type.acQ_Id}}" ng-selected="{{type.Selected == true}}">
+                                        {{type.acQ_QuotaName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted1(myForm1.Quota)" ng-messages="myForm1.Quota.$error">
+                                    <div ng-message="required">Select Quota</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-4">Branch : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx2" type="text" placeholder="search here..." />
+                                <label data-ng-model="FMG_GroupName" ng-repeat="role in branchlist|filter:searchchkbx2" value="{{role.amB_Id}}">
+                                    <input type="checkbox" name="brcoption" ng-model="role.selected" ng-checked="all" ng-required="isOptionsRequired_1()" ng-change="get_semisters()" />
+                                    <span class="lbl padding-8">{{role.amB_BranchName}}</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-4">  </div>
+                            <div class="col-sm-8">
+                                <div class="error-messages" ng-if="interacted(myForm.brcoption)" ng-messages="myForm.brcoption.$error">
+                                    <div ng-message="required">Please Select Branch</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-4">Semester : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx3" type="text" placeholder="search here..." />
+                                <label data-ng-model="FMG_GroupName" ng-repeat="role in semesterlist|filter:searchchkbx3" value="{{role.amsE_Id}}">
+                                    <input type="checkbox" name="semoption" ng-model="role.selected1" ng-required="isOptionsRequired_2()" ng-change="clar_sem(role)" />
+                                    <span class="lbl padding-8">{{role.amsE_SEMName}}</span>
+                                </label>
+
+                            </div>
+                            <div class="col-sm-4">  </div>
+                            <div class="col-sm-8">
+                                <div class="error-messages" ng-if="interacted(myForm.semoption)" ng-messages="myForm.semoption.$error">
+                                    <div ng-message="required">Please Select Semester</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" id="save-btn"ng-show="show_btn"  ng-click="get_report()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Show
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()" ng-show="show_cancel">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="" ng-show="show_grid">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Student Fee Group Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        <b> Total Grid Records :</b>
+                                        <label class="badge">
+                                            {{Recordlength}}
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group" ng-if="searchValue!=''">
+                                    <label class="control-label">
+                                        <b>Total Records Searched : </b>
+                                        <label class="badge">
+                                            {{filterValue.length}}
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group searchbox">
+                                    <div class="input-group">
+                                        <input class="form-control" ng-model="searchValue" type="text" ng-change="searh_box();" placeholder="search here...">
+                                        <!--<span class="input-group-addon">
+                                            <button class="btn" type="submit" ng-disabled="searc_button" ng-click="searchByColumn(searchValue,searchColumn)"><i class="fa fa-search"></i></button>
+                                        </span>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-offset-4"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>
+                                            <a href="" ng-click="sort('amcsT_FirstName')"> Student Name </a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort(amcsT_RegistrationNo)"> Registration No.</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('amcsT_AdmNo')"> Admission</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('acysT_RollNo')"> Roll.No</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('amcO_CourseName')">Course</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('amB_BranchName')"> Branch </a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('amsE_SEMName')"> Semester </a>
+                                        </th>
+                                        <th>
+                                            All
+                                            <label>
+                                                <input name="option[]" value="1" type="checkbox" ng-click="toggleAll(all)" ng-model="all" ng-disabled="allcheck  || filterdata=='Challan_No' ||amount_check">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                              
+                                <tbody>
+                                    <tr dir-paginate="role in filterValue = (studentlist | filter : searchValue)  | orderBy:sortKey1:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                                        <!--ng-repeat="role in studentlist"-->
+                                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td>{{role.amcsT_FirstName+' '+role.amcsT_MiddleName+' '+role.amcsT_LastName}}</td>
+                                        <td>{{role.amcsT_RegistrationNo}}</td>
+                                        <td>{{role.amcsT_AdmNo}}</td>
+                                        <td>{{role.acysT_RollNo}}</td>
+                                        <td>{{role.amcO_CourseName}}</td>
+                                        <td>{{role.amB_BranchName}}</td>
+                                        <td>{{role.amsE_SEMName}}</td>
+                                        <td>
+                                            <label>
+                                                <input type="checkbox" name="selcolchbx" ng-model="role.studchecked" />
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                            <!--<a class="text-aqua" href="" ng-click="edit(role)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        </a>-->
+                                            <a href="" data-toggle="modal" data-target="#editmodal" ng-click="edit(role);" data-backdrop="static"><i class="fa fa-edit text-blue" ng-cl></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="error-messages" ng-if="interacted(myForm.selcolchbx)" ng-messages="myForm.selcolchbx.$error">
+                                <div ng-message="required">Select At Least One Checkbox</div>
+                            </div>
+                            <md-subheader> Group List </md-subheader>
+                            <div class="form-group">
+                                <div class="multiselect col-sm-10" style="margin-left: 4.2%;height:250px;">
+
+                                    <ul class="padding-left-none">
+
+                                        <li ng-repeat="usr in grouplst | filter:query | orderBy: 'usr'">
+                                            <div class="col-sm-12">
+                                                <div style="float:left;margin-right:8px;font-size:18px;" ng-click="collapsed=!collapsed"><span ng-if="!collapsed">+</span><span ng-if="collapsed">-</span></div>
+                                                <input type="checkbox" style="float:left;" name="selcolchbx" data-ng-model="usr.checkedgrplst" ng-click="firstfnc(usr);" ><!--ng-required="isOptionsRequired1()"-->
+                                                <!--<input hidden="hidden" data-ng-model="usr.fmG_Id" />-->
+                                                <span class="lbl padding-8">{{ usr.fmG_GroupName }}</span>
+                                            </div>
+
+                                            <ul ng-show="collapsed">
+                                                <li ng-repeat="usr1 in headlst" ng-if="usr.fmG_Id==usr1.fmG_Id">
+                                                    <div class="col-sm-12">
+                                                        <div style="float:left;margin-right:8px;font-size:18px;" ng-click="collapsed1=!collapsed1"><span ng-if="!collapsed1">+</span><span ng-if="collapsed1">-</span></div>
+                                                        <input style="float:left;" type="checkbox" data-ng-model="usr1.checkedheadlst" ng-click="secfnc(usr1);">
+                                                        <!--<input hidden="hidden" data-ng-model="usr.fmH_Id" />-->
+                                                        <span class="lbl padding-8">{{ usr1.fmH_FeeName }}</span>
+                                                    </div>
+
+
+                                                    <ul ng-show="collapsed1">
+                                                        <!--ng-if="usr2.fmH_Id==usr1.fmH_Id"-->
+                                                        <li ng-repeat="usr2 in installlst" ng-if="usr.fmG_Id==usr2.fmG_Id && usr1.fmH_Id==usr2.fmH_Id">
+                                                            <div class="col-sm-12">
+                                                                <input type="checkbox" data-ng-model="usr2.checkedinstallmentlst" ng-click="trdfnc(usr2,usr1);">  <!--ng-if="usr1.fmH_Id==usr2.fmH_Id && usr.fmG_Id==usr2.fmG_Id-->
+                                                                <!--<input hidden="hidden" data-ng-model="usr.ftI_Id" />-->
+                                                                <span class="lbl padding-8">{{ usr2.ftI_Name }}</span>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" id="save-btn" data-ng-click="savedata(studentlist,grouplst,headlst,installlst)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="box box-primary">
+                <!--ng-show="StudentReport.length>0"-->
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">Student Fee Group Head Mapping List</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+
+                    <!--<div class="row">-->
+
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{Recordlength2}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue1!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group searchbox">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue1" type="text" ng-change="search_box1();" placeholder="search here...">
+                                <!--<span class="input-group-addon">
+                                    <button class="btn" type="submit" ng-disabled="searc_button1" ng-click="searchByColumn(searchValue1,searchColumn)"><i class="fa fa-search"></i></button>
+                                </span>-->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--</div>-->
+                    <!--<div class="row">-->
+
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SLNO</th>
+                                <th><a href="" ng-click="sort1('amscT_FirstName')">Student Name</a></th>
+                                <th><a href="" ng-click="sort1('amcsT_RegistrationNo')">Registration No</a> </th>
+                                <th><a href="" ng-click="sort1('amcsT_AdmNo')">AdmNo</a> </th>
+                                <th><a href="" ng-click="sort1('acysT_RollNo')"> Roll No</a> </th>
+                                <th><a href="" ng-click="sort1('acysT_RollNo')">Academic Year </a></th>
+                                <th><a href="" ng-click="sort1('fmG_GroupName')">Group Name</a> </th>
+                                <th> Action </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1=(StudentReport | filter : searchValue1)| orderBy:sortKey:reverse1 |itemsPerPage:itemsPerPage" current-page="currentPage2" ng-class-odd="'odd'" pagination-id="page2" >
+
+                                <td>{{itemsPerPage *(currentPage2-1)+$index+1}}</td>
+                                <td> {{ user.amcsT_FirstName+''+user.amcsT_MiddleName+''+ user.amcsT_LastName}}  </td>
+                                <td>{{ user.amcsT_RegistrationNo}}</td>
+                                <td>{{ user.amcsT_AdmNo}}</td>
+                                <td>{{ user.acysT_RollNo}}</td>
+                                <td>{{user.asmaY_Year}}</td>
+                                <td>{{ user.fmG_GroupName}}</td>
+
+                                <td class="text-center">
+                                    
+                                    <a class="text-danger" href="" ng-click="DeleteRecord(user)" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+
+                                </td>
+                                <td hidden="hidden">{{ user.fcmsgH_Id}}</td>
+                                <td hidden="hidden">{{ user.amcsT_Id}}</td>
+                                <td hidden="hidden">{{ user.fmG_Id}}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <dir-pagination-controls max-size="5" pagination-id="page2"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+
+                    <!--</div>-->
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+<div class="modal fade" id="editmodal" role="dialog">
+    <div class="modal-dialog modal-md">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="cllose();">×</button>
+                <h4 class="modal-title text-white">Group List</h4>
+            </div>
+            <div class="modal-body">
+                <!--edit checkbox-->
+                <div class="row">
+                    <div class="col-sm-offset-2 col-sm-8">
+                        <div class="error-messages" ng-if="interacted(myForm.selcolchbxedit)" ng-messages="myForm.selcolchbxedit.$error">
+                            <div ng-message="required">Select At Least One Checkbox</div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="multiselect col-sm-10" style="margin-left: 4.2%;height:250px;">
+
+                                <ul class="padding-left-none">
+
+                                    <li ng-repeat="usree in grouplstedit | filter:query | orderBy: 'usree'">
+                                        <div class="col-sm-12">
+                                            <div style="float:left;margin-right:8px;font-size:18px;" ng-click="collapsededit=!collapsededit"><span ng-if="!collapsededit">+</span><span ng-if="collapsededit">-</span></div>
+                                            <input type="checkbox" style="float:left;" name="selcolchbxedit" data-ng-model="usree.checkedgrplstedit" ng-disabled="usree.disablegrp" ng-click="firstfncedit(usree);"> <!--ng-required="isOptionsRequirededit1()"-->
+                                            <!--<input hidden="hidden" data-ng-model="usr.fmG_Id" />-->
+                                            <span class="lbl padding-8">{{ usree.fmG_GroupName }}</span>
+                                        </div>
+
+                                        <ul ng-show="collapsededit">
+                                            <li ng-repeat="usree1 in headlstedit" ng-if="usree.fmG_Id==usree1.fmG_Id">
+
+                                                <div class="col-sm-12">
+                                                    <div style="float:left;margin-right:8px;font-size:18px;" ng-click="collapsededit1=!collapsededit1"><span ng-if="!collapsededit1">+</span><span ng-if="collapsededit1">-</span></div>
+                                                    <input style="float:left;" type="checkbox" data-ng-model="usree1.checkedheadlstedit" ng-disabled="usree1.disablehead" ng-click="secfncedit(usree1);">
+                                                    <!--<input hidden="hidden" data-ng-model="usr.fmH_Id" />-->
+                                                    <span class="lbl padding-8">{{ usree1.fmH_FeeName }}</span>
+                                                </div>
+
+                                                <ul ng-show="collapsededit1">
+                                                    <!--ng-if="usr2.fmH_Id==usr1.fmH_Id"-->
+                                                    <li ng-repeat="usree2 in installlstedit" ng-if="usree.fmG_Id==usree2.fmG_Id && usree1.fmH_Id==usree2.fmH_Id">
+                                                        <div class="col-sm-12">
+                                                            <input type="checkbox" data-ng-model="usree2.checkedinstallmentlstedit" ng-disabled="usree2.disableins" ng-click="trdfncedit(usree2);">  <!--ng-if="usr1.fmH_Id==usr2.fmH_Id && usr.fmG_Id==usr2.fmG_Id-->
+                                                            <!--<input hidden="hidden" data-ng-model="usr.ftI_Id" />-->
+                                                            <span class="lbl padding-8">{{ usree2.ftI_Name }}</span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <div hidden>{{AMCST_idedit}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--edit checkbox-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="cllose();" data-dismiss="modal">Close</button>
+                <!--<button type="button" class="btn btn-default" ng-click="savedata(studentlist,grouplstedit,headlstedit,installlstedit);">Save</button>-->
+                <button type="button" class="btn btn-default" ng-click="saveeditdata(grouplstedit,headlstedit,installlstedit);">Save</button>
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+            </div>
+        </div>
+
+    </div>
+</div>

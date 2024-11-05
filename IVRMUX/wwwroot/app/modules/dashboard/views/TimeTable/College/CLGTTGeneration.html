@@ -1,0 +1,783 @@
+﻿
+<section class="content" data-ng-init="BindData()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Time Table Generation</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="ayr" ng-model="asmaY_Id" ng-change="get_category()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="optlst1 in academic" value="{{optlst1.asmaY_Id}}" ng-selected="{{optlst1.Selected == true}}">
+                                        {{optlst1.asmaY_Year}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--<md-subheader>Period Condition</md-subheader>-->
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Category Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="cat" ng-model="ttmC_Id" ng-change="get_count()" required>
+                                    <option value="">--Select--</option>
+                                    <option value="all">All</option>
+                                    <option ng-repeat="optlst in categorylst" value="{{optlst.ttmC_Id}}" ng-selected="{{optlst.Selected == true}}">
+                                        {{optlst.ttmC_CategoryName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">Total No of periods:<span style="color:Red">*</span></label>
+                            <div class="col-sm-2">
+                                <input class="form-control" type="text" ng-model="totalperiods" disabled />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">Total No of period alloted:<span style="color:Red">*</span></label>
+                            <div class="col-sm-2">
+                                <input class="form-control" type="text" ng-model="totalalloted" disabled />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-6">No of period not alloted:<span style="color:Red">*</span></label>
+                            <div class="col-sm-2">
+                                <input class="form-control" type="text" ng-model="totalnotalloted" disabled />
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Not Confirmed Periods:<span style="color:Red">*</span></label>
+                            <div class="col-sm-2">
+                                <input class="form-control" type="text" ng-model="totalpending" disabled />
+                            </div>
+                            <div class="col-sm-2" ng-if="totalpending>0">
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#pendingReplacementDialog">Show</button>
+                            </div>
+                            <div class="col-sm-3">
+                                <button class="btn btn-primary" ng-click="exportToExcel(asmaY_Id,ttmC_Id)" target="_blank">Check WorkLoad</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br />
+
+                <div class="row">
+                    <div class="col-sm-12">
+                 
+                   
+
+                    <div class="col-sm-6">
+                        <div class="checkbox  well">
+                            <label>
+                                <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="FXPRD">
+                                <span class="lbl padding-8">Fixed Period</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="CLSFXPRD">
+                                <span class="lbl padding-8">Class Teacher Constraints</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="subwell text-bold">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="BFPRD" ng-disabled="bifflg">
+                                    <span class="lbl padding-8"> Bifurcation Constraints</span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="CNSPRD" ng-disabled="bifflg">
+                                    <span class="lbl padding-8"> Consecutive Constraints </span>
+                                </label>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+
+                        <div class="subwell text-bold">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="THREESDC" ng-disabled="allasdcflg">
+                                    <span class="lbl padding-8"> 3-SDC Constraints</span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="THREESDCREP" ng-disabled="allasdcflg">
+                                    <span class="lbl padding-8"> 3-SDC Replacement </span>
+                                </label>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-6">
+
+                        <div class="subwell text-bold">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="TWOSDC" ng-disabled="allasdcflg">
+                                    <span class="lbl padding-8"> 2-SDC Constraints</span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="TWOSDCREP" ng-disabled="allasdcflg">
+                                    <span class="lbl padding-8">  2-SDC Replacement </span>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="subwell text-bold">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="ONESDC" ng-disabled="allasdcflg">
+                                    <span class="lbl padding-8"> 1-SDC Constraints</span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="ONESDCREP" ng-disabled="allasdcflg">
+                                    <span class="lbl padding-8">  1-SDC Replacement </span>
+                                </label>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="subwell text-bold">
+                            <div class="checkbox">
+
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="NONSDC" ng-disabled="allasdcflg">
+                                    <span class="lbl padding-8">  Without SDC  </span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="AVLPRD" ng-disabled="allasdcflg">
+                                    <span class="lbl padding-8">  Available Periods Distribution  </span>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+
+            
+                </div>
+                </div>
+
+               
+                </div>
+
+
+                
+
+
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-4" ng-hide="hidecons">
+                        <div class="">
+                            <div class="checkbox  well">
+                                <label>
+                                    <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="clsteacherCon">
+                                    <span class="lbl padding-8">Class Teacher Constraints</span>
+                                </label>
+                            </div>
+                            <div class="subwell text-bold">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="UDCflag">
+                                        <span class="lbl padding-8"> UDC Constraints</span>
+                                    </label>
+                                    <label ng-hide="udcrflag">
+                                        <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="UDCReplaceflag">
+                                        <span class="lbl padding-8"> UDC Replacement </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="SDCflag">
+                                        <span class="lbl padding-8"> SDC Constraints</span>
+                                    </label>
+                                    <label ng-hide="rflag">
+                                        <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="SDCReplaceflag">
+                                        <span class="lbl padding-8">  Replacement </span>
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-sm-4" ng-hide="hidecons">
+                        <div class="">
+                            <div class="subwell" style="padding:6px !important">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="staffSDK" disabled>
+                                        <span class="lbl padding-8"> Staff Wise Uniform Distribution</span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="clsSDK" disabled>
+                                        <span class="lbl padding-8"> Subject Wise Uniform Distribution</span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="conSDK" disabled>
+                                        <span class="lbl padding-8"> Staff Wise Rest and Continue</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+
+
+                    </div>
+                </div>
+                <br />
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-warn" ng-click="clearid()">
+                        Cancel TT <i class="fa fa-times" aria-hidden="true"></i>
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="generate()">
+                        Generate TT <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </md-button>
+                    <md-button type="button" ng-if="ttmC_Id=='all'" class="md-raised md-primary" data-ng-click="resetTT()">
+                        Reset TT <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </md-button>
+                </div>
+            </div>
+            </div>
+
+    </form>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Time Table Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div ui-grid="gridOptions" ui-grid-pagination ui-grid-edit class="grid text-center" id="style-4" style="height: 270px;"></div>
+        </div>
+    </div>
+</section>
+
+
+
+<div ng-show="Workload_table">
+    <table id="Table_Excel">
+        <tr>
+            <td>
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table123">
+                    <thead>
+                        <tr style="border: 1px solid black;background-color:sandybrown">
+                            <th>
+                                SL NO
+                            </th>
+                            <th>
+                                EMPLOYEE NAME
+                            </th>
+                            <th>
+                             COURSE
+                            </th>
+                            <th>
+                              BRANCH
+                            </th>
+                            <th>
+                               SEMESTER
+                            </th>
+                            <th>
+                               SECTION
+                            </th>
+                            <th>
+                              SUBJECT
+                            </th>
+                            <th>
+                               TOTAL PERIODS
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="user in printdatatable" style="border: 1px solid;">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td>{{ user.employeeName}}</td>
+                            <td>{{ user.amcO_CourseName}}</td>
+                            <td>{{ user.amB_BranchName}}</td>
+                            <td>{{ user.amsE_SEMName}}</td>
+                            <td>{{ user.acmS_SectionName}}</td>
+                            <td>{{ user.ismS_SubjectName}}</td>
+                            <td>{{ user.totalNoOfPeriods}}</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </td>
+        </tr>
+        <tr>
+<td colspan="8"> &nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table1234">
+                    <thead>
+                        <tr style="border: 1px solid black;background-color:sandybrown">
+                            <th>
+                              SL NO
+                            </th>
+                            <th>
+                                COURSE
+                            </th>
+                            <th>
+                               BRANCH
+                            </th>
+                            <th>
+                              SEMESTER
+                            </th>
+                            <th>
+                                SECTION
+                            </th>
+                            <th>
+                              TOTAL PERIODS
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="user in printdatatable1" style="border: 1px solid;">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{ user.amcO_CourseName}}</td>
+                            <td>{{ user.amB_BranchName}}</td>
+                            <td>{{ user.amsE_SEMName}}</td>
+                            <td>{{ user.acmS_SectionName}}</td>
+                            <td>{{ user.total_workload}}</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </td>
+        </tr>
+
+    </table>
+
+
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade modal-medium" data-ng-init="BindDataclasssection()" id="pendingReplacementDialog" role="dialog">
+    <div class="modal-dialog  modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="clearidpendding()" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white" style="color:#fff">Generate Pending periods Temprory</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box box-primary" ng-show="viewPending_entry">
+                    <form class="form-horizontal" role="form" name="myFormd1" data-ng-submit="GetReport()" novalidate>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="">
+
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="staffSDKP">
+                                                <span class="lbl padding-8"> Staff Wise Uniform Distribution</span>
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="clsSDKP">
+                                                <span class="lbl padding-8"> Subject Wise Uniform Distribution</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="">
+
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="conSDKP">
+                                                <span class="lbl padding-8"> Staff Wise Rest and Continue</span>
+                                            </label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <md-button type="submit" class="md-raised md-primary" data-ng-click="viewtemprecords()">
+                                    View TT <i class="fa fa-eye" aria-hidden="true"></i>
+                                </md-button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="box box-primary tt" ng-show="grid_viewPending">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Report Grid View</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="box-body" style="overflow:scroll;">
+
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sort('ASMCL_ClassName')">SLNO</a>
+                                    </th>
+                                    <th>
+                                        <label>
+                                            <input type="checkbox" value="" ng-click="toggleAll1()" ng-model="all1">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </th>
+
+                                    <th>
+                                        <a href="" ng-click="sort('ASMCL_ClassName')">Class</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('ASMC_SectionName')">Section</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('staffName')">Staff</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('ismS_SubjectName')">Subject</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="sort('TTMD_DayName')">Day</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="sort('TTMP_PeriodName')">Period</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="sort('TTMP_PeriodName')">View Staff TT</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="sort('TTMP_PeriodName')">Replacement Staff TT</a>
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="user in tempTTdata_list" current-page="currentPage">
+                                    <td>{{$index+1}}</td>
+                                    <td class="text-center">
+                                        <label>
+                                            <input type="checkbox" name="adcheckt" value="{{user.ttfgD_Id}}" ng-model="user.checkedvalue" ng-change="optionToggled1()">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td>{{ user.asmcL_ClassName}}</td>
+                                    <td>{{ user.asmC_SectionName}}</td>
+                                    <td>{{ user.staffName}}</td>
+                                    <td>{{ user.ismS_SubjectName}}</td>
+                                    <td>{{ user.ttmD_DayName}}</td>
+                                    <td>{{ user.ttmP_PeriodName}}</td>
+                                    <td style="display:none;">{{ user.hrmE_Id}}</td>
+                                    <td class="text-center">
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#Dialogpopup" data-backdrop="static" ng-click="viewrecordspopup(user);">
+                                            <i class="fa fa-eye text-purple"></i>
+                                        </a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#ReplacementDialog" data-backdrop="static" ng-click="Replacementfunction(user);">
+                                            <i class="fa fa-eye text-purple"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+
+                        </table>
+                        <hr />
+                        <div class="text-center">
+                            <input type="hidden" ng-model="hrmE_Id" value="{{hrmE_Id}}" />
+                            <md-button type="submit" class="md-raised md-primary" ng-click="SaveTempTTdata(tempTTdata_list)">
+                                <i class="fa fa-save" aria-hidden="true"></i> ADD & Close
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="clear1()">
+                                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                            </md-button>
+                        </div>
+
+
+                        <pagination total-items="totalItems" ng-model="currentPage"
+                                    max-size="5" boundary-links="true"
+                                    items-per-page="numPerPage" class="pagination-sm">
+                        </pagination>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-ng-click="clearidpendding()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Modal -->
+<!--<div class="modal fade"  id="Dialogpopup"  data-ng-init="viewrecordspopup(user)" role="dialog">
+    <div class="modal-dialog  modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+                <h4 class="modal-title">View Staff TimeTable</h4>
+            </div>
+            <div class="modal-body">
+                    <div class="box-body">
+                        <div ui-grid="gridOptions" ui-grid-pagination ui-grid-edit class="grid text-center" id="style-4" style="height: 270px;"></div>
+                    </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-ng-click="clearidpendding()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>-->
+
+<div class="modal fade modal-medium" id="Dialogpopup" data-ng-init="viewrecordspopup(user)" role="dialog">
+    <div class="modal-dialog  modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="popupclre()" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">View Staff TimeTable</h4>
+            </div>
+            <div class="modal-body">
+                <div id="table">
+                    <div ng-repeat="table_list in table_list_sub_wise" style="padding-bottom:20px">
+                        <!--class="margin-top-20"-->
+                        <div class="row">
+                            <div class="col-sm-12" style="text-align:center">
+                                <lable class="control-label text-bold" style="font-weight: bold; font-size:large;color:darkgreen">Staff Name : {{table_list.header}}</lable>
+                            </div>
+                        </div>
+                        <table class="table table-hover table-responsive table-bordered text-center" ng-show="grid_view" border="1" style="border-collapse:collapse" id="table{{table_list.id}}">
+                            <thead style="font-weight: bold;">
+                                <tr>
+                                    <!--<th><a href="" ng-click="sort('Name')">Day / Period</a></th>
+                                    <th ng-repeat="period in period_list"><a href="" ng-click="sort('period.ttmP_PeriodName')">Period {{period.ttmP_PeriodName}}</a><input type="hidden" value="{{period.ttmP_Id}}" /></th>-->
+                                    <th>Day / Peri
+od
+                                    </th>
+                                    ri
+                                    <th ng-repeat="period in period_list">Period {{period.ttmP_PeriodName}}<input type="hidden" value="{{period.ttmP_Id}}" /></th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr ng-repeat="table in table_list.array |orderBy:sortKey:reverse | filter:paginate | filter:search" ng-class-odd="'odd'">
+
+                                    <td style="color:blue">{{table[0].dayname}}</td>
+                                    <td ng-repeat="i in table" style="color:{{i.color}};" width="120px">
+                                        <div data-ng-click="cell_click(i.dayid,i.pedid,i.dayname,i.pedname)">
+                                            <!--allow-drag="true" allow-drop="true" drag-drop="onDragDrop(e)" draggable="true"-->
+                                            <input type="hidden" value="{{i.pedid}}" /><input type="hidden" value="{{i.dayid}}" /> {{i.value}}
+                                        </div>
+                                        <div data-ng-click="cell_click(i.dayid,i.pedid,i.dayname,i.pedname)">
+                                            <!--allow-drag="true" allow-drop="true" drag-drop="onDragDrop(e)" draggable="true"-->
+                                            <input type="hidden" value="{{i.pedid}}" /><input type="hidden" value="{{i.dayid}}" /> {{i.value_}}
+                                        </div>
+                                    </td>
+
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-ng-click="popupclre()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade modal-medium" data-ng-init="BindDataclasssection()" id="ReplacementDialog" role="dialog">
+    <div class="modal-dialog  modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="clearid_Replace()" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Replacement</h4>
+            </div>
+            <div class="modal-body" ng-show="grid_view">
+                <div class="box box-primary">
+                    <form class="form-horizontal" role="form" name="myFormd4" novalidate>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="staffSDKP_Replace">
+                                                <span class="lbl padding-8"> Staff Wise Uniform Distribution</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="clsSDKP_Replace">
+                                                <span class="lbl padding-8"> Subject Wise Uniform Distribution</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="conSDKP_Replace">
+                                                <span class="lbl padding-8"> Staff Wise Rest and Continue</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="table">
+                                <div ng-repeat="table_list in secondview" style="padding-bottom:20px">
+                                    <!--class="margin-top-20"-->
+                                    <div class="row">
+                                        <div class="col-sm-12" style="text-align:center">
+                                            <lable class="control-label text-bold" style="font-weight: bold; font-size:large;color:darkgreen">Staff Name : {{table_list.header}}</lable>
+                                        </div>
+                                    </div>
+                                    <table class="table table-hover table-responsive table-bordered text-center" ng-show="grid_view" border="1" style="border-collapse:collapse" id="table{{table_list.id}}">
+                                        <thead style="font-weight: bold;">
+                                            <tr>
+                                                <th>Day / Period</th>
+                                                <th ng-repeat="period in period_list">Period {{period.ttmP_PeriodName}}<input type="hidden" value="{{period.ttmP_Id}}" /></th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr ng-repeat="table in table_list.array |orderBy:sortKey:reverse | filter:paginate | filter:search" ng-class-odd="'odd'">
+
+                                                <td style="color:blue">{{table[0].dayname}}</td>
+                                                <td ng-repeat="i in table" style="color:{{i.color}};background:{{i.background}};" width="120px">
+                                                    <div data-ng-click="cell_click_2(i.dayid,i.pedid,i.dayname,i.pedname)">
+                                                        <input type="hidden" value="{{i.pedid}}" /><input type="hidden" value="{{i.dayid}}" /> {{i.value}}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!--<div class="col-sm-6" ng-show="datareport">-->
+                            <div class="col-sm-8" ng-show="grid_view">
+                                <div class="">
+                                    <div class="subwell" style="line-height:30px;">
+                                        <div class="row">
+                                            <label class="col-sm-4">
+                                                Replacement From:
+                                            </label>
+                                            <label class="col-sm-8">
+                                                {{from}}
+                                                <input type="hidden" name="day_from_Id" ng-model="day_from_Id" value="{{day_from_Id}}" />
+                                                <input type="hidden" name="period_from_Id" ng-model="period_from_Id" value="{{period_from_Id}}" />
+                                            </label>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-sm-4">
+                                                Replacement To
+                                            </label>
+                                            <label class="col-sm-8">
+                                                {{to}}
+                                                <input type="hidden" name="day_to_Id" ng-model="day_to_Id" value="{{day_to_Id}}" />
+                                                <input type="hidden" name="period_to_Id" ng-model="period_to_Id" value="{{period_to_Id}}" />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div ng-show="datareport">-->
+                            <div ng-show="grid_view">
+                                <md-button type="submit" class="md-raised md-warn" ng-click="replacement_to_save()">
+                                    <i class="fa fa-refresh" aria-hidden="true"></i> Replace
+                                </md-button>
+                            </div>
+                          
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-ng-click="clearid_Replace()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>

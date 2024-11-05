@@ -1,0 +1,136 @@
+<style>
+    .file-blue:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .imgpfgdownload {
+        width: 30px;
+        height: 30px;
+    }
+
+    .textareaclass {
+        resize: none;
+    }
+</style>
+
+<section class="content">
+    <div ng-init="loaddatadeactivate()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Question Deactivate </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myForm" novalidate>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Class:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel2" ng-model="ASMCL_Id" name="clsid" required
+                                            ng-change="getsubjectlistdeactivate()">
+                                        <option value="">Select Class </option>
+                                        <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}"
+                                                ng-selected="{{option.asmcL_Id == ASMCL_Id}}">
+                                            {{option.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.clsid)" ng-messages="myForm.clsid.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>                           
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Subject:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel3" ng-model="ISMS_Id" name="subj" required
+                                            ng-change="gettopiclist()">
+                                        <option value="">Select Subject </option>
+                                        <option ng-repeat="option in getSubjects" value="{{option.ismS_Id}}"
+                                                ng-selected="{{option.ismS_Id == ISMS_Id}}">
+                                            {{option.ismS_SubjectName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.subj)" ng-messages="myForm.subj.$error">
+                                        <div ng-message="required">Select Subject</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">From Date:<strong style="color:red;">*</strong></label>
+                                    <md-datepicker name="sch_date" ng-model="FromDate" onkeydown="return false" required md-max-date="today" 
+                                                   ng-change="onchangefromdate()"></md-datepicker>
+                                    <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                        <div ng-message="required">From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">To Date:<strong style="color:red;">*</strong></label>
+                                    <md-datepicker name="to_date" ng-model="ToDate" onkeydown="return false" required md-min-date="FromDate" 
+                                                   md-max-date="today" ng-change="GetQuestionList()"></md-datepicker>
+                                    <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm.to_date)" ng-messages="myForm.to_date.$error">
+                                        <div ng-message="required">From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="hdTH">
+                                            <label>
+                                                <input type="checkbox" data-ng-model="obj.checkall" ng-click="toggleAll_S(obj.checkall)">
+                                                <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                                            </label>
+                                        </th>
+                                        <td>Sl.No</td>
+                                        <td>Question</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ques in getquestionlist">
+                                        <td class="text-center">
+                                            <input type="checkbox" ng-model="ques.checked" ng-change="optionToggled_S()" name="adcheckt">
+                                            <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                                        </td>
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">{{ques.lpmoeQ_Question}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <input type="hidden" ng-model="LPMOEQ_Id" value="{{LPMOEQ_Id}}" />
+                        <md-button type="button" class="md-raised md-primary" ng-click="SaveDeactiveQuestionDetails()"
+                                   ng-disabled="btn">
+                            <i class="fa fa-save" aria-hidden="true"></i> Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cleartabl1()" ng-disabled="form.$invalid">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+                </form>                
+            </div>
+        </div>
+    </div>
+</section>

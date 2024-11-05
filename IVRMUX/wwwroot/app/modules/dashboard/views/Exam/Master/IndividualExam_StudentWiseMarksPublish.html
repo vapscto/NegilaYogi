@@ -1,0 +1,252 @@
+﻿<style>
+    .multiselect {
+        width: 23.1em !important;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Student Wise Publish Marks</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-12">
+                        <div class="text-center well" ng-init="radiotype='Exam'">
+                            <label class="radio-inline">
+                                <input name="Cumulative" value="Exam" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                <span class="lbl padding-8">Exam Wise</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="Cumulative" value="Promotion" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                <span class="lbl padding-8">Promotion</span>
+                            </label>                             
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="yeardd" ng-model="obj.asmaY_Id" ng-change="OnAcdyear()" required>
+                                        <option value="">Select Academic Year</option>
+                                        <option ng-repeat="year in yearlt" value="{{year.asmaY_Id}}" ng-selected="year.Selected == true">{{year.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yeardd)" ng-messages="myForm.yeardd.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">class :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="classssss" ng-model="obj.asmcL_Id" data-ng-change="get_cls_sections(asmcL_Id)" required>
+                                        <option value="">Select class</option>
+                                        <option ng-repeat="cls in clslist" value="{{cls.asmcL_Id}}" ng-selected="{{cls.Selected == true}}">{{cls.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.classssss)" ng-messages="myForm.classssss.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="secionnnnn" ng-model="obj.asmS_Id" ng-change="ChangeOfSection()" required>
+                                        <option value="" label="Select Section"> </option>
+                                        <option ng-repeat="option in seclist" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">{{option.asmC_SectionName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.secionnnnn)" ng-messages="myForm.secionnnnn.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Exam Name :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="exammmm" ng-model="obj.emE_Id" ng-required="radiotype=='Exam'"
+                                            ng-change="CheckMarksCalculated()" ng-disabled="radiotype!='Exam'">
+                                        <option value=""> Select Exam Name</option>
+                                        <option ng-repeat="option in exsplt" value="{{option.emE_Id}}" ng-selected="{{option.Selected == true}}">{{option.emE_ExamName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.exammmm)" ng-messages="myForm.exammmm.$error">
+                                        <div ng-message="required">Select Exam</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">
+                                    <input type="checkbox" value="" ng-model="obj.feeinstallmentcheckbox">
+                                    <span class="lbl padding-8">Exclude Fee Defaulters : </span><span style="color:Red">*</span>
+                                </label>
+                                <div class="col-sm-7">
+                                    <select class="form-control" id="sm" name="feedd" ng-model="obj.FMT_Id" ng-change="OnChangeInstallment()"
+                                            ng-required="obj.feeinstallmentcheckbox" ng-disabled="!obj.feeinstallmentcheckbox">
+                                        <option value="">Select Fee Term</option>
+                                        <option ng-repeat="fee in Feetermlist" value="{{fee.fmT_Id}}" ng-selected="fee.Selected == true">{{fee.fmT_Name}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.feedd)" ng-messages="myForm.feedd.$error">
+                                        <div ng-message="required">Select Fee Term</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    <input name="allcheck" value="" ng-model="all" type="checkbox" ng-disabled="!obj.feeinstallmentcheckbox" ng-click="OnClickAll()">
+                                    <span class="lbl padding-8">
+                                        Fee Group :
+                                    </span><span style="color:Red">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                        <label data-ng-model="FMG_Id" ng-repeat="sub in Feegrouplist | filter:filterchkbx" value="{{sub.fmG_Id}}">
+                                            <input name="Subjectoption" value="" ng-click="individual()" ng-model="sub.checkedsub" type="checkbox" ng-required="isOptionsRequired3()" ng-disabled="!obj.feeinstallmentcheckbox">
+                                            <span class="lbl padding-8">
+                                                {{sub.fmG_GroupName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.Subjectoption)" ng-messages="myForm.Subjectoption.$error">
+                                        <div ng-message="required">Select Student</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <hr />
+                    <div class="text-center row">
+                        <input type="hidden" ng-model="EME_ID" />
+                        <md-button type="button" class="md-raised md-primary" ng-click="SearchStudent(obj)"
+                                   ng-disabled="form.$invalid" id="save-btn" ng-if="processbtn==true">
+                            <i class="fa fa-calculator" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-if="datareport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Details </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal" role="form" name="myForm123" novalidate>               
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Sl.No.</th>
+                                    <th class="text-center">
+                                        <label>
+                                            <input type="checkbox" value="" ng-click="toggleAll123(obj.all123)" ng-model="obj.all123">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </th>
+                                    <th class="text-center">Student Name</th>
+                                    <th class="text-center">Admno</th>
+                                    <th class="text-center">Roll No.</th>
+                                    <th class="text-center">Marks</th>
+                                    <th class="text-center">Publish Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in datareport">
+                                    <td>{{$index+1}}</td>
+                                    <td class="text-center">
+                                        <label>
+                                            <input type="checkbox" name="adcheckt" value="{{user.amsT_Id}}" ng-model="user.checkedvalue"
+                                                   ng-change="optionToggled123()">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-left">{{ user.amsT_FirstName}}</td>
+                                    <td class="text-left">{{ user.amsT_AdmNo}}</td>
+                                    <td class="text-center">{{ user.amaY_Rollno}}</td>
+                                    <td class="text-left">
+                                        <div class="row">
+                                            <div class="col-sm-6 text-bold">
+                                                Obtained Marks
+                                            </div>
+                                            <div class="col-sm-6 text-bold">
+                                                : {{user.obtainedmarks}}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 text-bold">
+                                                Max Marks
+                                            </div>
+                                            <div class="col-sm-6 text-bold">
+                                                : {{user.totalmaxmarks}}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 text-bold">
+                                                Percentage
+                                            </div>
+                                            <div class="col-sm-6 text-bold">
+                                                : {{user.percentage}}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-if="user.estmP_PublishToStudentFlg==1">
+                                            <i class="fa fa-check" style="color:green" title="Published"></i>
+                                        </span>
+                                        <span ng-if="user.estmP_PublishToStudentFlg!=1">
+                                            <i class="fa fa-times" style="color:red" title="Not Published"></i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr />
+
+                <div class="row text-center well">
+                    <label class="radio-inline">
+                        <input name="Cumulative1"  type="checkbox" ng-model="obj.SMSFLAG">
+                        <span class="lbl padding-8">SMS</span>
+                    </label>
+                    <label class="radio-inline">
+                        <input name="Cumulative" type="checkbox" ng-model="obj.EMAILFLAG" />
+                        <span class="lbl padding-8">EMAIL</span>
+                    </label>
+                </div>
+
+                <div class="row text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-click="SaveStudentStatus(qualification_type)">
+                        <i class="fa fa-save" aria-hidden="true"></i> Update
+                    </md-button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

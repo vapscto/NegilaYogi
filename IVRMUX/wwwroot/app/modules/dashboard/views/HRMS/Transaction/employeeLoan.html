@@ -1,0 +1,244 @@
+﻿<style>
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+</style>
+<section class="content">
+    <div class="box box-primary" data-ng-init="onLoadGetData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Loan</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <form class="form-horizontal" role="form" name="myForm" data-ng-submit="saveData()" novalidate>
+                    <div class="box-body">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee :<span style="color:red;">*</span></label>
+                                <div class="col-sm-6 border border-primary" ng-if="editflg == true">
+                                    <label class="control-label col-sm-12" >{{lablenamme}}</label>
+                                </div>                              
+                                    <div class="col-sm-6" ng-if="editflg != true">
+                                        <ui-select id="sel1" ng-model="loan.hrmE_Id" name="hrmE_Id" ng-keyup="searchfilter($select,filterdata);" required ng-change="GetDetailsByEmployee()">
+                                            <ui-select-match placeholder="Select or search Employee in the list">
+                                                {{$select.selected.hrmE_EmployeeFirstName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="employee in employeedropdown| propsFilter: {hrmE_EmployeeFirstName: $select.search}" value="{{employee.hrmE_Id}}" ng-selected="{{employee.Selected===true}}">
+                                                {{employee.hrmE_EmployeeFirstName}} {{employee.hrmE_EmployeeMiddleName}} {{employee.hrmE_EmployeeLastName}}
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interacted(myForm.hrmE_Id)" ng-messages="myForm.hrmE_Id.$error">
+                                            <div ng-message="required">Select Employee</div>
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Applied Date :<span style="color:red;">*</span></label>
+                                    <div class="col-sm-6">
+                                        <md-datepicker name="AppliedDate" ng-model="loan.hreL_AppliedDate" onkeydown="return false" md-min-date="minDatedoi" md-max-date="maxDatedoi" md-placeholder="Select Date" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.AppliedDate)" ng-messages="myForm.AppliedDate.$error">
+                                            <div ng-message="required">Select Applied Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Loan Type :<span style="color:red;">*</span></label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" id="sel1" data-ng-model="loan.hrmlN_Id" name="EmployeeLoan" required>
+                                            <option value="">Select</option>
+                                            <option ng-repeat="loan in masterloandropdown" value="{{loan.hrmlN_Id}}" ng-selected="{{loan.Selected===true}}">
+                                                {{loan.hrmL_LoanType}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.EmployeeLoan)" ng-messages="myForm.EmployeeLoan.$error">
+                                            <div ng-message="required">Select Loan Type</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Mode Of Payment:<span style="color:red;">*</span></label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" name="ModeOfPayment" id="sel12" data-ng-model="loan.hreL_ModeOfPayment" required>
+                                            <option value="">--Select--</option>
+                                            <option ng-repeat="modeOfPayment in modeOfPaymentdropdown" value="{{modeOfPayment.ivrmmoD_ModeOfPayment}}" ng-selected="{{modeOfPayment.Selected===true}}">
+                                                {{modeOfPayment.ivrmmoD_ModeOfPayment}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.ModeOfPayment)" ng-messages="myForm.ModeOfPayment.$error">
+                                            <div ng-message="required">Select Mode Of Payment</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Reference No. :<!--<span style="color:red;">*</span>--></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" name="ReferenceNo" class="form-control active" allow-pattern="([0-9])" ng-paste="$event.preventDefault()" data-ng-model="loan.hreL_ReferenceNo" id="ReferenceNo" maxlength="15">
+                                        <div class="error-messages" ng-if="interacted(myForm.ReferenceNo)" ng-messages="myForm.ReferenceNo.$error">
+                                            <div ng-message="required"> Enter Reference No</div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Loan Amount :<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="LoanAmount" class="form-control active" allow-pattern="([0-9.])" ng-paste="$event.preventDefault()" ng-disabled="LoanDetailsDis" data-ng-model="loan.hreL_LoanAmount" id="LoanAmount" maxlength="20" required ng-blur="CalculateEMI()">
+                                    <div class="error-messages" ng-if="interacted(myForm.LoanAmount)" ng-messages="myForm.LoanAmount.$error">
+                                        <div ng-message="required">Enter Loan Amount</div>
+                                        <div ng-message="minlength">Field must contain atleast 1 character</div>
+                                        <div ng-message="maxlength">Field cannot take more than 20 characters</div>
+                                        <div ng-message="pattern">Pattern does not match</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Loan Interest :<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="LoanInterest" class="form-control active" allow-pattern="([0-9|.])" ng-pattern="/^\d{0,2}(\.\d{1,2})?$/" step="0.01" ng-paste="$event.preventDefault()" ng-disabled="LoanDetailsDis" data-ng-model="loan.hreL_LoanInterest" id="LoanInterest" minlength="1" maxlength="5" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.LoanInterest)" ng-messages="myForm.LoanInterest.$error">
+                                        <div ng-message="required">Enter Loan Interest</div>
+                                        <div ng-message="minlength">Field must contain atleast 1 character</div>
+                                        <div ng-message="maxlength">Field cannot take more than 2 characters</div>
+                                        <div ng-message="pattern">Pattern does not match</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Loan Installments (IN MONTHS) :<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="LoanInstallments" class="form-control active" allow-pattern="([0-9])" ng-paste="$event.preventDefault()" ng-disabled="LoanDetailsDis" data-ng-model="loan.hreL_LoanInsallments" id="LoanInstallments" minlength="1" maxlength="3" required ng-blur="CalculateEMI()">
+                                    <div class="error-messages" ng-if="interacted(myForm.LoanInstallments)" ng-messages="myForm.LoanInstallments.$error">
+                                        <div ng-message="required">Enter Loan Installments</div>
+                                        <div ng-message="minlength">Field must contain atleast 1 character</div>
+                                        <div ng-message="maxlength">Field cannot take more than 3 characters</div>
+                                        <div ng-message="pattern">Pattern does not match</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Loan EMI :<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="Loanemi" class="form-control active" allow-pattern="(\s|[0-9.])" ng-paste="$event.preventDefault()" ng-disabled="LoanEMIDis" data-ng-model="loan.hreL_LaonEMI" id="Loanemi" minlength="1" maxlength="18" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.Loanemi)" ng-messages="myForm.Loanemi.$error">
+                                        <div ng-message="required">Enter Loan EMI</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Installment/Month :<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="Loaninstall" class="form-control active" allow-pattern="(\s|[0-9])" data-ng-model="loan.hreL_NoofInstallment" id="Loaninstall" minlength="1" maxlength="18" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.Loaninstall)" ng-messages="myForm.Loaninstall.$error">
+                                        <div ng-message="required">Enter Loan Installment</div>
+                                    </div>
+                                </div>
+                            </div>-->
+                        </div>
+                        <div class="col-sm-12" style="margin-top:10px;">
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <input type="hidden" ng-model="loan.hreL_Id" />
+                                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                        Save
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        </form>
+    </div>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Employee Loan List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!--<div ui-grid="gridOptions" ui-grid-pagination class="grid"></div>-->
+
+
+            <div class="box-body">
+                <div class="from-group">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="from-group">
+                                <input class="form-control" ng-model="search.masterEmployee.hrmE_EmployeeFirstName" type="text" placeholder="Search EmployeeFirstName" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="from-group">
+                                <input class="form-control" ng-model="search.hrMasterLoan.hrmL_LoanType" type="text" placeholder="Search LoanType" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="from-group">
+                                <input class="form-control" ng-model="search.hreL_LoanAmount" type="text" placeholder="Search LoanAmount" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th><a href="" ng-click="order('sno')">SNO</a></th>
+                        <th><a href="" ng-click="sort('masterEmployee.hrmE_EmployeeFirstName')">Employee Name</a></th>
+                        <th><a href="" ng-click="sort('hrMasterLoan.hrmL_LoanType')">Loan Type </a></th>
+                        <th><a href="" ng-click="sort('hreL_LoanAmount')">Loan Amount</a></th>
+                        <th><a href="" ng-click="sort('hreL_LoanInsallments')">Loan Insallments</a></th>
+                        <th><a href="" ng-click="sort('hreL_LaonEMI')">Loan EMI</a></th>
+                        <th><a href="" ng-click="sort('hreL_AppliedDate')">Applied Date</a></th>
+                        <th><a href="" ng-click="sort('hreL_TotalPending')">Total Pending</a></th>
+                        <th>Actions</></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue=(gridOptions | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td>{{$index+1}}</td>
+                        <td>{{user.masterEmployee.hrmE_EmployeeFirstName}}</td>
+                        <td>{{user.hrMasterLoan.hrmL_LoanType}}</td>
+                        <td>{{user.hreL_LoanAmount}}</td>
+                        <td>{{user.hreL_LoanInsallments}}</td>
+                        <td>{{user.hreL_LaonEMI}}</td>
+                        <td>{{user.hreL_AppliedDate |date:'dd/MM/yyyy'}}</td>                     
+                        <td>{{user.hreL_TotalPending}}</td>
+                        <td class="text-center">
+                            <span  ng-if="user.HREL_LoanStatus==='Applied'">
+                                <a href="javascript:void(0)" ng-click="EditData(user);"
+                                   data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-square-o" style="color:blue;" aria-hidden="true"></i></a>
+                            </span>
+                            <span ng-if="user.HREL_LoanStatus==='Applied' && user.hreL_ActiveFlag === true">
+                                <a href="javascript:void(0)" style="color:red;" ng-click="DeletRecord(user)" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                            <span ng-if="user.hreL_ActiveFlag === false && user.HREL_LoanStatus=='Applied'">
+                                <a href="javascript:void(0)" style="color:green;" ng-click="DeletRecord(user)" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+
+
+
+        </div>
+    </div>
+</section>

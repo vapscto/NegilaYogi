@@ -1,0 +1,234 @@
+﻿<style>
+    div.scrollTable {
+        overflow: auto;
+        /*white-space: nowrap;*/
+    }
+
+        div.scrollTable a {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px;
+            text-decoration: none;
+        }
+
+            div.scrollTable a:hover {
+                background-color: #777;
+            }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Book Register Data Import</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body import">
+                <div class="col-sm-6 col-sm-offset-3">
+                    <div class="text-center" ng-init="impall='import'">
+                        <label class="radio-inline">
+                            <input name="optradio" type="radio" value="import" ng-model="impall">
+                            <span class="lbl padding-8">Import data from Excel</span>
+                        </label>
+                        <label class="radio-inline" ng-hide="vm.gridOptions.data.length>0">
+                            <input name="optradio" type="radio" value="sample" ng-model="impall">
+                            <span class="lbl padding-8">Download Sample Excel</span>
+                        </label>
+                       
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+        <div class="box box-primary">
+
+            <div class="box-header with-border" ng-if="impall=='import'">
+                <h3 class="box-title">Import Data From Excel</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-12" ng-if="impall=='import'">
+                    <div class="col-sm-2 pull-left padding-left-none">
+                        <label class="custom-file-input file-blue1" style="width:100%;margin:auto;">
+                            <input type="file" name="impfile" class="btn btn-success" value="Import" ng-model="imp.file" accept=".xlsx"
+                                   onchange="angular.element(this).scope().selectFileforUploadzd(this, angular.element(this).scope().vm.gridOptions)"
+                                   style="padding-top: 1px;padding-bottom: 2px;" fileread1="" opts="vm.gridOptions" />
+                        </label>
+                    </div>
+                </div>
+                <div class="" ng-if="vm.gridOptions.data.length>0">
+                    <div class="col-sm-12">
+                        <div class="col-sm-2 pull-left">
+                            <h4>Imported Data</h4>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="scrollTable">
+                            <div class="margin-top-20 margin-bottom-10">
+
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr ng-repeat="item in vm.gridOptions.data  | limitTo:1">
+                                            <th>
+                                                <a href="" ng-click="order('sno')">SLNO</a>
+                                            </th>
+
+                                            <th ng-repeat="key in item | keys">
+                                                <a href="" ng-click="order(key)">{{key}}</a>
+
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in vm.gridOptions.data |orderBy:sortKey:reverse| filter:search ">
+                                            <td>{{ $index + 1}}</td>
+                                            <td ng-repeat="key in item | keys " ng-init="value = item[key]">{{value}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <pagination total-items="totalItems" ng-model="currentPage"
+                                            max-size="5" boundary-links="true"
+                                            items-per-page="numPerPage" class="pagination-sm">
+                                </pagination>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="text-center">
+
+                    <md-button type="submit" class="md-raised md-warn" ng-click="emp_reg();">
+                        <i class="fa fa-chevron-circle-left ng-scope" aria-hidden="true"></i>  Book Registration Page
+                    </md-button>
+
+
+                    <md-button type="submit" class="md-raised md-primary" ng-if="vm.gridOptions.data.length>0" id="save-btn"
+                               ng-click="savedata(vm.gridOptions.data,'#failedtable')">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-if="impall=='sample'"
+                               ng-click="download_excelfile()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Download Sample Excel File
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-if="failedlist.length>0"
+                               ng-click="export('#failedtable')">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Export Failed Records
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <!--show failed records-->
+
+                    <div class="col-sm-12 clearfix" style="overflow:scroll;" ng-show="hide1">
+
+                        <table class="table table-hover table-responsive table-bordered text-center" id="failedtable">
+                            <thead>
+                                <tr>
+                                    <th ng-repeat="header in headerdlist">
+                                        {{header.value}}
+
+                                    </th>
+                                </tr>
+                               
+                            </thead>
+                            <tbody>
+
+                                <tr ng-repeat="fail in failedlist">
+                                    <td>{{fail.LMB_BookTitle}}</td>
+                                    <td>{{fail.LMC_CategoryName}}</td>
+                                    <td>{{fail.LMB_BookType}}</td>
+                                    <td>{{fail.LMS_SubjectName}}</td>
+                                    <td>{{fail.LMD_DepartmentName}}</td>
+                                    <td>{{fail.LMB_Edition}}</td>
+                                    <td>{{fail.LMB_PublishedYear}}</td>
+                                    <td>{{fail.LMB_ISBNNo}}</td>
+                                    <td>{{fail.LML_LanguageName}}</td>
+                                    <td>{{fail.LMB_BillNo}}</td>
+                                    <td>{{fail.LMB_NetPrice}}</td>
+                                    <td>{{fail.donor_Name}}</td>
+                                    <td>{{fail.LMV_VendorName}}</td>
+                                    <td>{{fail.forTheClass}}</td>
+                                    <td>{{fail.LMP_PublisherName}}</td>
+                                    <td>{{fail.LMBA_AuthorFirstName}}</td>
+                                    <td>{{fail.LMBA_AuthorMiddleName}}</td>
+                                    <td>{{fail.LMBA_AuthorLastName}}</td>
+                                    <td>{{fail.LMB_NoOfCopies}}</td>
+                                    <td>{{fail.LMBANO_AccessionNo}}</td>
+                                    <td>{{fail.rack_Name}}</td>
+                                </tr>
+                              
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <div class="col-sm-12 clearfix" style="overflow:scroll;" ng-show="hide">
+                        <table class="table table-hover table-responsive table-bordered text-center" id="table_Id">
+                            <thead>
+
+                                <tr>
+                                    <th>LMB_BookTitle</th>
+                                    <th>LMC_CategoryName</th>
+                                    <th>LMB_BookType</th>
+                                    <th>LMS_SubjectName</th>
+                                    <th>LMD_DepartmentName</th>
+                                    <th>LMB_Edition</th>
+                                    <th>LMB_PublishedYear</th>
+                                    <th>LMB_ISBNNo</th>
+                                    <th>LML_LanguageName</th>
+                                    <th>LMB_BillNo</th>
+                                    <th>LMB_NetPrice</th>
+                                    <th>Donor_Name</th>
+                                    <th>LMV_VendorName</th>
+                                    <th>ForTheClass</th>
+                                    <th>LMP_PublisherName</th>
+                                    <th>LMBA_AuthorFirstName</th>
+                                    <th>LMBA_AuthorMiddleName</th>
+                                    <th>LMBA_AuthorLastName</th>
+                                    <th>LMB_NoOfCopies</th>
+                                    <th>LMBANO_AccessionNo</th>
+                                    <th>Rack_Name</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </form>
+</section>

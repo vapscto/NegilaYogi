@@ -1,0 +1,404 @@
+﻿<style>
+    .multiselect {
+        width: 24.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 0;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Master Items</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> Group :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="invmG_Id" name="grps" ng-change="groupChange();" required>
+                                        <option value="">Select Group </option>
+                                        <option ng-repeat="option in get_itemgroup" value="{{option.invmG_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.invmG_GroupName}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.grps)" ng-messages="myForm.grps.$error">
+                                        <div ng-message="required">Please Select Group</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Item Name:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control active" name="itemName" placeholder="Enter Item Name" ng-model="invmI_ItemName" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.itemName)" ng-messages="myForm.itemName.$error">
+                                        <div ng-message="required">Please Enter Item Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Max Stock:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control active" name="maxstock" placeholder="Enter Max Stock" ng-model="invmI_MaxStock" >
+                                    <div class="error-messages" ng-if="interacted(myForm.maxstock)" ng-messages="myForm.maxstock.$error">
+                                        <div ng-message="required">Please Enter Max Stock</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="1" name="tax" data-ng-model="invmI_TaxAplFlg">
+                                        <span class="lbl padding-4">Tax </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="1" name="rawitem" data-ng-model="invmI_RawMatFlg">
+                                        <span class="lbl padding-4">Raw Material</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="1" name="forsale" data-ng-model="invmI_ForSaleFlg">
+                                        <span class="lbl padding-4">For Sale</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="1" name="maintenance" data-ng-model="invmI_MaintenanceAplFlg">
+                                        <span class="lbl padding-4">Maintenance</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <label class="checkbox-inline col-sm-4">
+                                    <input type="checkbox" value="1" name="rawitem" data-ng-model="invmI_TaxAplFlg">
+                                    <span class="lbl padding-4">Tax Applied</span>
+                                </label>
+
+                                <div class="col-sm-8" ng-show="invmI_TaxAplFlg==1">
+                                    <div class="multiselect col-sm-8">
+                                        <label>
+                                            <input name="alltax" value="1" ng-model="usercheckC" type="checkbox" ng-click="all_checkC(usercheckC)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-model="asmcl" ng-repeat="tx in get_tax">
+                                            <input name="tax" ng-model="tx.clsck" type="checkbox" ng-click="togchkbxC();" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                {{tx.invmT_TaxName}} ({{tx.invmT_TaxAliasName}})
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interactedSale(myForm.tax)" ng-messages="myForm.tax.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>-->
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">UOM :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="invmuoM_Id" name="uom">
+                                        <option value="">Select UOM </option>
+                                        <option ng-repeat="option in get_UOM" value="{{option.invmuoM_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.invmuoM_UOMName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.uom)" ng-messages="myForm.uom.$error">
+                                        <div ng-message="required">Please Select UOM</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Item Code:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control active" name="itemcode" placeholder="Enter Item Code" ng-model="invmI_ItemCode" >
+                                    <div class="error-messages" ng-if="interacted(myForm.itemcode)" ng-messages="myForm.itemcode.$error">
+                                        <div ng-message="required">Please Enter Item Code</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Re-Order Stock:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control active" name="restock" maxlength="10" allow-pattern="[0-9]" placeholder="Enter Re-Oder Stock" ng-model="invmI_ReorderStock">
+                                    <div class="error-messages" ng-if="interacted(myForm.restock)" ng-messages="myForm.restock.$error">
+                                        <div ng-message="required">Please Enter Re-Order Stock</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">HSN Code:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control active" name="hsncode" placeholder="Enter HSN Code" ng-model="invmI_HSNCode">
+                                    <div class="error-messages" ng-if="interacted(myForm.hsncode)" ng-messages="myForm.hsncode.$error">
+                                        <div ng-message="required">Please Enter HSN Code</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12" ng-show="invmI_TaxAplFlg=='1'">
+                        <div class="well">
+                            <div class="">
+                                <div class="col-sm-4 pull-right">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-search"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>SL NO</th>
+                                            <th>
+                                                <label><input type="checkbox" value="" ng-click="toggleAll()" ng-model="all"><span class="lbl padding-8"></span></label>
+                                            </th>
+                                            <th><a href="" ng-click="sort('invmT_TaxName')">Tax</a></th>
+                                            <th><a href="" ng-click="sort('invmT_TaxAliasName')">Tax Alias</a></th>
+                                            <th><a href="" ng-click="sort('invmiT_TaxValue')">Percentage</a></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr ng-repeat="user in get_tax | orderBy:sortKey:reverse |filter:search">
+                                            <td>{{$index+1}}</td>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox" name="adcheckt" value="{{user.xyz}}" ng-change="optionToggled()" ng-model="user.xyz"><span class="lbl padding-8"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                {{user.invmT_TaxName}}
+                                            </td>
+                                            <td>
+                                                {{user.invmT_TaxAliasName}}
+                                            </td>
+                                            <td style="width:400px;">
+                                                <input type="text" name="Percent_{{user.invmiT_TaxValue}}" class="form-control active" ng-disabled="!user.xyz" ng-model="user.invmiT_TaxValue" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" placeholder="Enter Tax Percentage" ng-required="user.xyz" />
+                                                <div class="error-messages" ng-if="interacted(myForm['Percent_'+user.invmiT_TaxValue])" ng-messages="myForm['Percent_'+user.invmiT_TaxValue].$error">
+                                                    <div ng-message="required">Please Enter Tax Percentage </div>
+                                                </div>
+                                            </td>
+                                            <td hidden="hidden">{{user.invmiT_Id}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="text-center">
+                        <input type="hidden" ng-model="invmI_Id" value="{{invmI_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid">
+                            <i class="fa fa-save" aria-hidden="true"></i> Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()" ng-disabled="form.$invalid">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+        <div class="box box-primary" ng-show="get_item.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Item</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('invmG_Id')">Group Name</a></th>
+                            <th><a href="" ng-click="sortBy('invmuoM_Id')">UOM</a> </th>
+                            <th><a href="" ng-click="sortBy('invmI_ItemName')">Item Name</a></th>
+                            <th><a href="" ng-click="sortBy('invmI_GroupItemNo')">Group Item No</a></th>
+                            <th><a href="" ng-click="sortBy('invmI_ItemCode')">Item Code</a> </th>
+                            <th><a href="" ng-click="sortBy('invmI_ReorderStock')">Re-Order Stock</a></th>
+                            <th><a href="" ng-click="sortBy('invmI_HSNCode')">HSN Code</a> </th>
+
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_item | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.invmG_GroupName}}</td>
+                            <td>{{user.invmuoM_UOMName}}</td>
+                            <td>{{user.invmI_ItemName}}</td>
+                            <td>{{user.invmI_GroupItemNo}}</td>
+                            <td>{{user.invmI_ItemCode}}</td>
+                            <td>{{user.invmI_ReorderStock}}</td>
+                            <td>{{user.invmI_HSNCode}}</td>
+
+                            <td class="text-center">
+                                <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                &nbsp;
+                                <span ng-if="user.invmI_ActiveFlg === false">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.invmI_ActiveFlg === true">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.invmI_TaxAplFlg === true">
+                                    <span ng-if="user.invmI_ActiveFlg === true">
+                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Tax" data-ng-model="taxOption" data-target="#myModal" data-ng-click="onformclick(user.invmI_Id)">
+                                            <i class="fa fa-eye fa-1x" aria-hidden="true">Tax</i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="user.invmI_ActiveFlg === false">
+                                        <i class="fa fa-ban fa-1x" aria-hidden="true">Tax</i>
+                                    </span>
+
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+
+
+        <div id="myModal" class="modal fade" role="dialog" data-backdrop="static">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                        <div class="box-body">
+                            <div class="text-center">
+                                <table class="table">
+                                    <tr>
+                                        <td style="font-size:15px;">{{item}}</td>
+                                    </tr>
+                                </table>
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>SL NO</th>
+                                            <th><a href="" ng-click="sort('INVMIT_TaxValue')">Tax Name</a></th>
+                                            <th><a href="" ng-click="sort('imT_Alias')">Tax Alias </a></th>
+                                            <th><a href="" ng-click="sort('itT_Per')">Tax Percentage </a></th>
+
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr ng-repeat="user in griditemTax | orderBy:sortKey:reverse |filter:search">
+                                            <td>{{$index+1}}</td>
+                                            <td style="overflow-wrap:break-word">{{ user.invmT_TaxName}}</td>
+                                            <td style="overflow-wrap:break-word">{{ user.invmT_TaxAliasName}}</td>
+                                            <td style="overflow-wrap:break-word">{{ user.invmiT_TaxValue | number : 2}}</td>
+                                            <td class="text-center">
+
+                                                <span ng-if="user.invmiT_ActiveFlg === false">
+                                                    <a href="" ng-click="deactiveitax(user)"
+                                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                        <i> Activate </i>
+                                                    </a>
+                                                </span>
+                                                <span ng-if="user.invmiT_ActiveFlg === true">
+                                                    <a href="" ng-click="deactiveitax(user)"
+                                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                        <i> Deactivate</i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</section>

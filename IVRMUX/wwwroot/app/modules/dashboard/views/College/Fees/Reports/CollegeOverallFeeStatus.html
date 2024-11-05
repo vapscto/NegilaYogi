@@ -1,0 +1,370 @@
+﻿<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="saveYearlyGroupdata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Overall Fee Status Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel11" ng-model="asmaY_Id" ng-change="get_courses()" name="yrs" required>
+                                    <option value="" label="">--Select--</option>
+                                    <option ng-repeat="option in yearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.yrs)" ng-messages="myForm.yrs.$error">
+                                <div ng-message="required">Select Year</div>
+                            </div>
+                        </div>
+
+                        <label class="control-label col-sm-4">Fee Group:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <div class="multiselect col-sm-10" style="height:190px;">
+                                    <input type="checkbox" style="float:left;" name="allchbx" data-ng-model="allcheck" ng-click="allgroupcheck();">
+                                    <span class="lbl padding-8">ALL GROUP</span>
+                                    <hr />
+                                    <label><span style="color:red;">{{msg}}</span></label>
+                                    <ul class="padding-left-none">
+                                        <li ng-repeat="usr in grouplst | filter:query | orderBy: 'usr'">
+                                            <div class="col-sm-12">
+
+                                                <div style="float:left;margin-right:8px;font-size:18px;" ng-click="collapsed=!collapsed"><span ng-if="!collapsed">+</span><span ng-if="collapsed">-</span></div>
+                                                <input type="checkbox" style="float:left;" name="selcolchbx" data-ng-model="usr.checkedgrplst" ng-click="firstfnc(usr);" ng-disabled="allcheck"><!--ng-required="isOptionsRequired1()"-->
+                                                <!--<input hidden="hidden" data-ng-model="usr.fmG_Id" />-->
+                                                <span class="lbl padding-8">{{ usr.fmG_GroupName }}</span>
+                                            </div>
+
+                                            <ul ng-show="collapsed">
+                                                <li ng-repeat="usr1 in headlst" ng-if="usr.fmG_Id==usr1.fmG_Id">
+                                                    <div class="col-sm-12">
+                                                        <!--<div style="float:left;margin-right:8px;font-size:18px;" ng-click="collapsed1=!collapsed1"><span ng-if="!collapsed1">+</span><span ng-if="collapsed1">-</span></div>-->
+                                                        <input style="float:left;" type="checkbox" data-ng-model="usr1.checkedheadlst" ng-click="secfnc(usr1);" ng-disabled="allcheck">
+                                                        <!--<input hidden="hidden" data-ng-model="usr.fmH_Id" />-->
+                                                        <span class="lbl padding-8">{{ usr1.fmH_FeeName }}</span>
+                                                    </div>
+
+                                                    <!--<ul ng-show="collapsed1">
+
+                                                    <li ng-repeat="usr2 in installlst" ng-if="usr.fmG_Id==usr2.fmG_Id && usr1.fmH_Id==usr2.fmH_Id">
+                                                        <div class="col-sm-12">
+                                                            <input type="checkbox" data-ng-model="usr2.checkedinstallmentlst" ng-click="trdfnc(usr2,usr1);">
+                                                            <span class="lbl padding-8">{{ usr2.ftI_Name }}</span>
+                                                        </div>
+                                                    </li>
+                                                </ul>-->
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="error-messages" ng-if="interacted(myForm.selcolchbx)" ng-messages="myForm.selcolchbx.$error">
+                            <div ng-message="required">Select At Least One Checkbox</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Course :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="amcO_Id" ng-change="get_branches()" name="crse" required>
+                                    <option value="" label="">--Select--</option>
+                                    <option ng-repeat="cr in courselist" value="{{cr.amcO_Id}}" ng-selected="{{cr.Selected == true}}">
+                                        {{cr.amcO_CourseName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.crse)" ng-messages="myForm.crse.$error">
+                                <div ng-message="required">Select Course</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Branch :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="amB_Id" ng-change="get_semisters()" name="brnch" required>
+                                    <option value="" label="">--Select--</option>
+                                    <option ng-repeat="br in branchlist" value="{{br.amB_Id}}" ng-selected="{{br.Selected == true}}">
+                                        {{br.amB_BranchName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.brnch)" ng-messages="myForm.brnch.$error">
+                                <div ng-message="required">Select Branch</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Semester :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="amsE_Id" name="sems" required>
+                                    <option value="" label="">--Select--</option>
+                                    <option ng-repeat="sms in semesterlist" value="{{sms.amsE_Id}}" ng-selected="{{sms.Selected == true}}">
+                                        {{sms.amsE_SEMName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.sems)" ng-messages="myForm.sems.$error">
+                                <div ng-message="required">Select Semester</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="acmS_Id" name="sect" required>
+                                    <option value="ALL" label="">ALL</option>
+                                    <option ng-repeat="sec in sectionlist" value="{{sec.acmS_Id}}" ng-selected="{{sec.Selected == true}}">
+                                        {{sec.acmS_SectionName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.sect)" ng-messages="myForm.sect.$error">
+                                <div ng-message="required">Select Section</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Quota :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="acQ_Id" name="quat" required>
+                                    <option value="" label="">--Select--</option>
+                                    <option ng-repeat="qc in quotalist" value="{{qc.acQ_Id}}" ng-selected="{{qc.Selected == true}}">
+                                        {{qc.acQ_QuotaName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.quat)" ng-messages="myForm.quat.$error">
+                                <div ng-message="required">Select Quota</div>
+                            </div>
+                        </div>
+
+                        <div class="well text-center" ng-init="filterdata='regular'">
+                            <label class="radio-inline">
+                                <input type="radio" name="Regular" data-ng-model="filterdata" value="S">
+                                <span class="lbl padding-8">     Regular    </span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="Chal_no" value="D" data-ng-model="filterdata">
+                                <span class="lbl padding-8"> Deactive   </span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="Chal_no" value="L" data-ng-model="filterdata">
+                                <span class="lbl padding-8"> Left  </span>
+                            </label>
+
+                            <!--<label class="radio-inline">
+        <input type="radio" name="Chal_no" value="both" data-ng-model="filterdata">
+        <span class="lbl padding-8"> Both   </span>
+    </label>-->
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="savedata(grouplst,headlst)">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Report
+                </md-button>
+
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+                <md-button type="button" class="md-raised md-primary" ng-if="showbutton==true" id="print-btn" ng-click="printData();">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel()" target="_blank" ng-if="showbutton==true">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export to Excel
+                </md-button>
+
+
+            </div>
+        </div>
+
+        <div class="" ng-show="show_grid">
+
+            <div class="box box-primary">
+                <!--ng-show="StudentReport.length>0"-->
+            
+                <div class="box-header with-border">
+                    <h3 class="box-title">Overall Fee Status Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+
+                    <!--<div class="row">-->
+
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{feedetails.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue1!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group searchbox pull-right">
+                            <div class="input-group pull-right">
+                                <input class="form-control pull-right" ng-model="searchValue1" type="text" placeholder="search here...">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover table-responsive table-bordered text-center" >
+                        <thead>
+                            <tr>
+                                <th class="hdTH">
+                                    <label>
+                                        <input type="checkbox" value="" ng-model="grpall" ng-click="toggleAllgrp()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th>SLNO</th>
+                                <th><a href="" ng-click="sort1('StudentName')">Student Name</a></th>
+                                <th><a href="" ng-click="sort1('AMCST_AdmNo')">Adm No</a> </th>
+                                <th><a href="" ng-click="sort1('CategoryName')">Category</a> </th>
+                                <th><a href="" ng-click="sort1('StudentDue')">Last year Bal</a> </th>
+                                <th><a href="" ng-click="sort1('BFCSS_CurrentYrCharges')">Current Year Charges</a> </th>
+                                <th><a href="" ng-click="sort1('Receivable')"> Receivable</a> </th>
+                                <th><a href="" ng-click="sort1('Collection')">Paid Amount </a></th>
+                                <th><a href="" ng-click="sort1('CollectionAnyTime')">Fine</a> </th>
+                                <th><a href="" ng-click="sort1('BFCSS_ConcessionAmount')">Concession</a> </th>
+
+
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1=(feedetails | filter : searchValue1)| orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage2" ng-class-odd="'odd'" pagination-id="page2">
+                                <td>
+                                    <label>
+                                        <input type="checkbox" ng-model="user.grpselected" value="{{user.Id}}" ng-change="optionToggledgrp(user,$index)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td>{{itemsPerPage *(currentPage2-1)+$index+1}}</td>
+
+                                <td> {{ user.StudentName}}  </td>
+                                <td>{{ user.AMCST_AdmNo}}</td>
+                                <td>{{ user.CategoryName}}</td>
+                                <td>{{ user.StudentDue}}</td>
+                                <td>{{ user.BFCSS_CurrentYrCharges}}</td>
+                                <td>{{ user.Receivable}}</td>
+                                <td>{{user.Collection}}</td>
+                                <td>{{ user.CollectionAnyTime}}</td>
+                                <td>{{ user.BFCSS_ConcessionAmount}}</td>
+
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><b>TOTAL</b></td>
+                                <td><b>{{lastyrtotal}}</b></td>
+                                <td><b>{{curryrtotal}}</b></td>
+                                <td><b>{{rectotal}}</b></td>
+                                <td><b>{{paidtotal}}</b></td>
+                                <td><b>{{finertotal}}</b></td>
+                                <td><b>{{constotal}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <dir-pagination-controls max-size="5" pagination-id="page2"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+
+                    <!--</div>-->
+                </div>
+            </div>
+        </div>
+
+        <div class="" ng-show="printgrid">
+
+            <div class="box box-primary">
+                <div id="printgrdgrp">
+                    <!--<div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>-->
+                    <center><h4>OverAll Fee Status</h4></center>
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tablegrp">
+                        <thead>
+                            <tr>
+                                <th>SLNO</th>
+                                <th>Student Name</th>
+                                <th>Adm No</th>
+                                <th>Category</th>
+                                <th>Last year Bal </th>
+                                <th>Current Year Charges </th>
+                                <th>Receivable</th>
+                                <th>Paid Amount</th>
+                                <th>Fine</th>
+                                <th>Concession</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="pr in printdatatablegrp">
+
+                                <td>{{$index+1}}</td>
+                                <td> {{ pr.StudentName}}  </td>
+                                <td>{{ pr.AMCST_AdmNo}}</td>
+                                <td>{{ pr.CategoryName}}</td>
+                                <td>{{ pr.StudentDue}}</td>
+                                <td>{{ pr.BFCSS_CurrentYrCharges}}</td>
+                                <td>{{ pr.Receivable}}</td>
+                                <td>{{pr.Collection}}</td>
+                                <td>{{ pr.CollectionAnyTime}}</td>
+                                <td>{{ pr.BFCSS_ConcessionAmount}}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><b>TOTAL</b></td>
+                                <td><b>{{lastyrtotal1}}</b></td>
+                                <td><b>{{curryrtotal1}}</b></td>
+                                <td><b>{{rectotal1}}</b></td>
+                                <td><b>{{paidtotal1}}</b></td>
+                                <td><b>{{finertotal1}}</b></td>
+                                <td><b>{{constotal1}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

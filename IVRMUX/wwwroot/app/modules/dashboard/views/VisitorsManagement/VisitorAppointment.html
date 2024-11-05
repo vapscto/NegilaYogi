@@ -1,0 +1,698 @@
+﻿<style>
+    .file-blue:before {
+        content: 'Upload File';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+</style>
+
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Appointment Entry Form</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Visitor Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="visname" ng-model="VMAP_VisitorName" allow-pattern="(\s|[a-zA-Z])" placeholder="Enter Visitor Name." required ng-maxlength="200">
+                                <div class="error-messages" ng-if="interacted(myForm.visname)" ng-messages="myForm.visname.$error">
+                                    <div ng-message="required">Enter Visitor Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Contact No:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" name="mb2" id="catgr1y" type="text" ng-model="VMAP_VisitorContactNo" placeholder="Enter Phone No" maxlength="10" minlength="10" allow-pattern="\d" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" required><!--onpaste="return false;"-->
+                                <div class="error-messages" ng-if="interacted(myForm.mb2)" ng-messages="myForm.mb2.$error">
+                                    <div ng-message="required">Enter Conatct No</div>
+                                    <div ng-message="minlength">Contact number must contain 10 digits</div>
+                                    <div ng-message="maxlength">Contact number must contain 10 digits</div>
+                                    <div ng-message="pattern"> Contact number will accept only numerics </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Email:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="email" class="form-control" name="emal" ng-model="VMAP_VisitorEmailid" pattern="[^ @]*@[^ @]*" placeholder="Enter your email" required>
+
+                                <div class="text-left error-messages" ng-if="interacted(myForm.emal)" ng-messages="myForm.emal.$error">
+                                    <div ng-message="required">Enter Email ID</div>
+                                    <div ng-message="pattern">Please enter valid email which contains '@' and '.'</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="mail" ng-model="VMAP_FromPlace" required placeholder="Enter From Place.">
+                                <div class="error-messages" ng-if="interacted(myForm.mail)" ng-messages="myForm.mail.$error">
+                                    <div ng-message="required">Enter From Place.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Meeting Duration:</label>
+                            <div class="col-sm-8">
+                                <!--<input class="form-control" type="text" name="mitting" ng-model="VMAP_MeetingDuration" placeholder="Enter your Meeting Duration">
+                                <div class="text-left error-messages" ng-if="interacted(myForm.mitting)" ng-messages="myForm.mitting.$error">
+                                    <div ng-message="required">Enter Meeting Duration</div>
+                                </div>-->
+
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <input type="number" class="form-control active" name="t1_effort_{{$index}}" min="0" ng-model="effhrs" style="width:75px">
+                                        </td>
+
+                                        <td style="padding-left:5px">
+                                            <input type="number" class="form-control active" name="t1_effortm_{{$index}}" min="0" ng-model="effmin" style="width:75px">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">
+                                            HH
+                                        </td>
+                                        <td class="text-center">
+                                            MM
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">To Meet:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="meetab" ng-model="VMAP_ToMeet" placeholder="To Meet">
+                                <div class="text-left error-messages" ng-if="interacted(myForm.meetab)" ng-messages="myForm.meetab.$error">
+                                    <div ng-message="required">Enter To Meet</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">To Meet(Staff):</label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="staff1" ng-model="$parent.HRME_Id" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                           title="Select emp" >
+                                    <ui-select-match ng-trim="false" placeholder="Select or search employee in the list...">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in emplist | filter: $select.search " value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.hrmE_EmployeeFirstName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+
+                                <div class="error-messages" ng-if="interacted(myForm.staff1)" ng-messages="myForm.staff1.$error">
+                                    <div ng-message="required">Select Staff Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Visit Type:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="visittyp" ng-model="VMAP_VisitTypeFlg" required>
+                                    <option value="">--Select--</option>
+                                    <option value="Personal">Personal </option>
+                                    <option value="Official">Official</option>
+                                    <option value="Recruitment">Recruitment</option>
+                                    <option value="Meeting">Meeting</option>
+                                </select>
+                                <div class="text-left error-messages" ng-if="interacted(myForm.visittyp)" ng-messages="myForm.visittyp.$error">
+                                    <div ng-message="required">Select Visit Type</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Authorization By:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="authby" ng-model="VMAP_AuthorisationBy" placeholder="Enter Authorization By">
+                                <div class="text-left error-messages" ng-if="interacted(myForm.authby)" ng-messages="myForm.authby.$error">
+                                    <div ng-message="required">Enter Authorization By</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>-->
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Purpose:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+
+                                <textarea type="text" class="form-control" name="Purpos" ng-model="VMAP_MeetingPurpose" required placeholder="Enter Purpose" rows="3"></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.Purpos)" ng-messages="myForm.Purpos.$error">
+                                    <div ng-message="required">Enter Purpose</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">No Of People Accompanying:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="Perso" ng-model="VMAP_PersonsAccompanying" placeholder="Enter Persons Accompanying">
+                                <div class="error-messages" ng-if="interacted(myForm.Perso)" ng-messages="myForm.Perso.$error">
+                                    <div ng-message="required">Enter Persons Accompanying</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Entry/Request Date:<span style="color:red;">*</span></label>
+                            <md-datepicker name="entdate" ng-model="VMAP_EntryDateTime" onkeydown="return false" md-min-date="VMAP_EntryDateTime" md-placeholder="Select date" required></md-datepicker>
+                            <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm.entdate)" ng-messages="myForm.entdate.$error">
+                                <div ng-message="required">Select Date</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5" style="padding-top:7%;"> From Time : <strong style="color:red;">*</strong></label>
+                            <div class="col-sm-7">
+
+                                <div uib-timepicker name="sch_time1" ng-model="FOMST_IHalfLoginTime" ng-change="validateTomintime(FOMST_IHalfLoginTime)" hour-step="hstep" minute-step="mstep" ng-disabled="timedis" show-meridian="true" required></div>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_time1)" ng-messages="myForm.sch_time1.$error">
+                                    <div ng-message="required">Select  From Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5" style="padding-top:7%;">To Time :</label>
+                            <div class="col-sm-7">
+
+                                <div uib-timepicker name="sch_time2" ng-model="FOMST_IIHalfLogoutTime" min="min" ng-change="validatemax(FOMST_IIHalfLogoutTime)" hour-step="hstep" minute-step="mstep" ng-disabled="timedis" show-meridian="true" ></div>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_time2)" ng-messages="myForm.sch_time2.$error">
+                                    <div ng-message="required">Select To Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Location:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="loca" ng-model="VMAP_MeetingLocation"  placeholder="Enter Location">
+
+                                <div class="error-messages" ng-if="interacted(myForm.loca)" ng-messages="myForm.loca.$error">
+                                    <div ng-message="required">Enter Location</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Remarks:</label>
+                            <div class="col-sm-8">
+                                <!--<input type="text" class="form-control" name="Remarks" ng-model="VMAP_Remarks" placeholder="Enter Remarks">-->
+                                <textarea class="form-control" data-ng-model="VMAP_Remarks" placeholder="Enter Remarks" name="Remarks" rows="3"></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.Remarks)" ng-messages="myForm.Remarks.$error">
+                                    <div ng-message="required">Enter Remarks</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> Address:</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" data-ng-model="VMAP_FromAddress" placeholder="Full Address" name="adsss" rows="3"></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.adsss)" ng-messages="myForm.adsss.$error">
+                                    <div ng-message="required">Enter Address</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"> Documents Upload </h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body margin-top-10">
+                                <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>SL.NO.</th>
+                                            <th>UPLOAD</th>
+                                            <!--<th>DOCUMENT NAME</th>-->
+                                            <th>DESCRIPTION</th>
+                                            <th>VIEW</th>
+                                            <th>ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="materal in materaldocuupload" ng-class-odd="'odd'">
+                                            <td class="text-center">{{ $index + 1 }}</td>
+
+                                            <td class="text-center lessonplanner">
+                                                <input class="custom-file-input file-blue text-center" style="width:80px" id="{{materal.cfilepath}}"
+                                                       data-ng-model="materal.cfilepath" type="file"
+                                                       accept="image/*, application/pdf,application/msword,video/mp4,application/vnd.ms-powerpoint,
+                                                               application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                                               application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                                               application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                               application/vnd.ms-excel"
+                                                       name="filetypematerial{{$index}}"
+                                                       onchange="angular.element(this).scope().uploadmateraldocuments(this, angular.element(this).scope().materal)" ng-required="VMAP_VisitTypeFlg=='Recruitment' || VMAP_VisitTypeFlg=='Meeting'">
+                                                <div class="error-messages" ng-if="interacted(myForm['filetypematerial'+$index])"
+                                                     ng-messages="myForm['filetypematerial'+$index].$error">
+                                                    <div ng-message="required">Upload File</div>
+                                                </div>
+                                            </td>
+                                            <!--<td>
+
+                                                <input class="form-control" data-ng-model="materal.name" />
+                                            </td>-->
+                                            <td>
+<textarea class="form-control" data-ng-model="materal.cfiledesc">
+
+</textarea>
+                                            </td>
+                                            <td>
+                                                <span ng-if="materal.cfilepath !=null && materal.cfilepath !=''">
+                                                    <a ng-if="materal.filetype=='jpg' || materal.filetype=='png' ||
+                                                               materal.filetype=='svg'|| materal.filetype=='jpeg'
+                                                               || materal.filetype=='gif'"
+                                                       style="color:red;display:inline; font-weight: bolder;"
+                                                       data-ng-click="showmothersign(materal.cfilepath,materal.cfilename)">
+                                                        Image
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='mp4' || materal.filetype=='mp4'"
+                                                       style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                                       ng-click="showGuardianPhotonew(materal)">
+                                                        Video
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='pdf'" style="color:blue;display:inline;" ng-click="onview(materal.cfilepath,materal.cfilename)">
+                                                        <!--ng-click="downloadview(materal.cfilepath,materal.cfilename)">-->
+
+                                                        <b style="color:orangered;display:inline; ">Pdf</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='doc'|| materal.filetype=='docx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;">Document</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='ppt'|| materal.filetype=='pptx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;">PPT</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='xls'|| materal.filetype=='xlsx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;">Excel</b>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="" ng-hide="materaldocuupload.length > 9">
+                                                    <a href="" ng-show="$last" ng-click="addmateral()">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                                    <a href="" ng-click="removemateral($index)">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"> ADD MULTIPLE VISITOR </h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body margin-top-10">
+                                <div ng-repeat="vis in morevisitor">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Visitor Name:</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" name="visname{{$index}}" ng-model="vis.vmapvI_VisitorName" allow-pattern="(\s|[a-zA-Z])" placeholder="Enter Visitor Name." ng-maxlength="200">
+                                            <!--<div class="error-messages" ng-if="interacted(myForm.visname)" ng-messages="myForm.visname.$error">
+                                                <div ng-message="required">Enter Visitor Name</div>
+                                            </div>-->
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Contact No:</label>
+                                        <div class="col-sm-8">
+                                            <input class="form-control" name="mb2{{$index}}" id="catgr1y" type="text{{$index}}" ng-model="vis.vmapvI_VisitorContactNo" placeholder="Enter Phone No" maxlength="10" allow-pattern="\d">
+                                            <!--<div class="error-messages" ng-if="interacted(myForm.mb2)" ng-messages="myForm.mb2.$error">
+                                                <div ng-message="required">Enter Conatct No</div>
+                                                <div ng-message="minlength">Contact number must contain 10 digits</div>
+                                                <div ng-message="maxlength">Contact number must contain 10 digits</div>
+                                                <div ng-message="pattern"> Contact number will accept only numerics </div>
+                                            </div>-->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Email:</label>
+                                        <div class="col-sm-8">
+                                            <input type="email" class="form-control" name="emal{{$index}}" ng-model="vis.vmapvI_VisitorEmailId" pattern="[^ @]*@[^ @]*" placeholder="Enter your email">
+
+                                            <!--<div class="text-left error-messages" ng-if="interacted(myForm.emal)" ng-messages="myForm.emal.$error">
+                                                <div ng-message="required">Enter Email ID</div>
+                                                <div ng-message="pattern">Please enter valid email which contains '@' and '.'</div>
+                                            </div>-->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4"> Address:</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control" ng-model="vis.vmapvI_VisitorAddress" placeholder="Full Address" name="adsss{{$index}}" rows="3"></textarea>
+                                            <div class="error-messages" ng-if="interacted(myForm.adsss)" ng-messages="myForm.adsss.$error">
+                                                <div ng-message="required">Enter Address</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="float:right">
+
+                                        <span class="" ng-hide="morevisitor.length > 9">
+                                            <a href="" ng-show="$last" ng-click="addvisitor()">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="" id="remove" ng-hide="morevisitor.length ==1">
+                                            <a href="" ng-click="removeaddvisitor($index)">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="VMAP_Id" value="{{vmaP_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="getdata.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">APPOINTMENT ENTRY LIST</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body" style="overflow-x:scroll">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{getdata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>SL.NO.</th>
+                        <th><a href="" ng-click="sort('vmaP_VisitorName')">Name </a></th>
+                        <th><a href="" ng-click="sort('vmaP_VisitorContactNo')">Contact No</a></th>
+                        <th><a href="" ng-click="sort('vmaP_VisitorEmailid')">Email</a></th>
+                        <th><a href="" ng-click="sort('EMPNAME')">To Meet</a></th>
+                        <th><a href="" ng-click="sort('vmaP_FromPlace')">From</a></th>
+                        <th><a href="" ng-click="sort('vmaP_VisitTypeFlg')">Visit Type</a></th>
+                        <th><a href="" ng-click="sort('vmaP_EntryDateTime')">Entry Date</a></th>
+                        <th><a href="" ng-click="sort('vmaP_MeetingPurpose')">Purpose</a></th>
+                        <th><a href="" ng-click="sort('vmaP_MeetingLocation')">Location</a></th>
+                        <th><a href="" ng-click="sort('vmaP_MeetingLocation')">View Document</a></th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="obj in filterValue1 = (getdata | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td style="overflow-wrap:break-word">{{obj.vmaP_VisitorName}}</td>
+                        <td>{{obj.vmaP_VisitorContactNo}}</td>
+                        <td style="overflow-wrap:break-word"> {{obj.vmaP_VisitorEmailid}}</td>
+                        <td>{{obj.EMPNAME}}</td>
+                        <td>{{obj.vmaP_FromPlace }}</td>
+                        <td>{{obj.vmaP_VisitTypeFlg}}</td>
+                        <td>{{obj.vmaP_EntryDateTime | date:'dd/MM/yyyy'}}</td>
+                        <td style="overflow-wrap:break-word">{{obj.vmaP_MeetingPurpose}}</td>
+                        <td>{{obj.vmaP_MeetingLocation}}</td>
+                        <td class="text-center">
+                            <span ng-show="obj.RCNT!=0">
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#popup11" data-backdrop="static" ng-click="viewdocument(obj);"> <i class="fa fa-eye text-blue"></i></a>
+                            </span>
+
+                        </td>
+                        <td class="text-center">
+                            <span ng-show="obj.vmaP_Status=='Waiting'">
+                                <a href="javascript:void(0)" ng-click="edit(obj)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                |
+                                <span ng-if="obj.vmaP_ActiveFlag">
+                                    <a href="" ng-click="deactive(obj)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        Deactivate
+                                    </a>
+                                </span>
+                                <span ng-if="!obj.vmaP_ActiveFlag">
+                                    <a href="" ng-click="deactive(obj)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        Activate
+                                    </a>
+                                </span>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">VIEW UPLOADED FILE</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>SL.NO</th>
+                                <th>FILE NAME</th>
+                                <th>DESCRIPTION</th>
+                                <th>VIEW</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="documents in uploaddocfiles">
+                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td class="text-left">{{documents.cfilename}}</td>
+                                <td class="text-left">{{documents.cfiledesc}}</td>
+                                <td class="text-center">
+                                    <span ng-if="documents.cfilepath !=null && documents.cfilepath !=''">
+                                        <a ng-if="documents.filetype=='jpg' || documents.filetype=='png' || documents.filetype=='svg'||                                                 documents.filetype=='jpeg' || documents.filetype=='gif'"
+                                           style="color:red;display:inline; font-weight: bolder;"
+                                           data-ng-click="showmothersign(documents.cfilepath,documents.cfilename)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pictures.png" title="Image" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='mp4' || documents.filetype=='mp4'"
+                                           style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                           ng-click="showGuardianPhotonew(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/play-button.png" title="Video" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='pdf'" style="color:blue;display:inline;"
+                                           ng-click="onview(documents.cfilepath,documents.cfilename)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pdf.png" title="View Pdf" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='doc'|| documents.filetype=='docx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/filedoc.png" title="View Document" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='ppt'|| documents.filetype=='pptx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/ppt.png" title="View PPT" style="width:40px" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='xls'|| documents.filetype=='xlsx'"
+                                           style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/excel.png" title="View Excel" style="width:40px" />
+                                        </a>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span>
+                                        <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal"
+                                           ng-click="deleteuploadfile(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/delete.png" title="Delete" style="width:40px" />
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalimg" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="preview1" class="img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-small" id="popup15" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+        </div>
+
+        <div class="modal-content">
+            <div class="modal-body">
+                <div ng-repeat="vi1 in view_videos" style="padding-bottom:20px">
+                    <video width="320" height="240" controls="controls" crossorigin="anonymous" controlsList="nodownload" oncontextmenu="return false;">
+                        <source ng-src="{{vi1.coeeV_Videos | trustUrl}}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="clearpopupgrid15()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+
+            <!--<embed ng-src="{{content}}" style="width: 100%;" height="1000" />
+            <div class="modal-body" oncontextmenu="return false"></div>-->
+            <div id="pdfIdzz">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

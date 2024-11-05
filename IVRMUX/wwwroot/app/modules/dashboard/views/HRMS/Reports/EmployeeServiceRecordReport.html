@@ -1,0 +1,579 @@
+﻿
+
+<style>
+	#MyTable {
+		white-space: nowrap;
+		overflow-x: visible;
+		overflow-y: hidden;
+		width: 1230px;
+	}
+</style>
+
+<section class="content">
+	<form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Employee Service Record Report</h3>
+				<div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+				</div>
+			</div>
+			<div class="box-body">
+				<div class="col-sm-12">
+					<div class="text-center">
+						<div class="col-sm-6 col-sm-offset-3">
+							<!--Format -->
+							<div class="form-group well">
+								<div class="text-center">
+
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.FormatType" value="Format1" name="Format" ng-click="onClickFormatOne()">
+										<span class="lbl padding-8">Format 1</span>
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.FormatType" value="Format2" name="Format" ng-click="onClickFormatTwo()">
+										<span class="lbl padding-8">Format 2</span>
+									</label>
+								</div>
+							</div>
+							<!-- Working , Left flag -->
+							<div class="form-group well" ng-if="Employee.FormatType =='Format1'">
+								<div class="text-center">
+									<label class="radio-inline">
+										<input type="checkbox" ng-model="Employee.Working" value="{{Employee.Working}}" name="WorkingLeft" ng-change="FilterEmployeeData()">
+										<span class="lbl padding-8">Working</span>
+									</label>
+									<label class="radio-inline">
+										<input type="checkbox" ng-model="Employee.Left" value="{{Employee.Left}}" name="WorkingLeft" ng-change="FilterEmployeeData()">
+										<span class="lbl padding-8">Left</span>
+									</label>
+								</div>
+							</div>
+
+							<div class="form-group well" ng-if="Employee.FormatType =='Format1'">
+								<div class="text-center">
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.FIAL" value="FullDetails" name="FullDetails">
+										<span class="lbl padding-8">Full Details</span>
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.FIAL" value="Increment" name="FullDetails">
+										<span class="lbl padding-8">Increment</span>
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.FIAL" value="Achievement" name="Achievement">
+										<span class="lbl padding-8">Achievement</span>
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.FIAL" value="Leave" name="Leave">
+										<span class="lbl padding-8">Leave</span>
+									</label>
+								</div>
+							</div>
+
+
+							<!--Employee List-->
+
+							<div class="form-group well" ng-if="Employee.FormatType =='Format1'">
+								<div class="text-center">
+									<label class="radio-inline">
+										<span class="lbl padding-3">
+											Employee :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+										</span>
+									</label>
+									<label class="radio-inline">
+										<span class="lbl padding-3">
+											<select class="form-control" id="sel1" data-ng-model="Employee.HRME_Id" name="hrmE_IdF1" ng-required="Employee.FormatType =='Format1'" ng-change="onchageDropdownValue()">
+												<option value="" label="Select Employee">Select Employee</option>
+												<option ng-repeat="employee in employeedropdownF1" value="{{employee.hrmE_Id}}" ng-selected="{{employee.Selected===true}}">
+													{{employee.hrmE_EmployeeFirstName}} {{employee.hrmE_EmployeeMiddleName}} {{employee.hrmE_EmployeeLastName}}
+												</option>
+											</select>
+										</span>
+									</label>
+								</div>
+								<span class="error-messages" ng-if="interacted(myForm.hrmE_IdF1)" ng-messages="myForm.hrmE_IdF1.$error">
+									<span ng-message="required">Select Employee</span>
+								</span>
+							</div>
+
+
+							<!--All or Individual-->
+							<div class="form-group well" ng-if="Employee.FormatType =='Format2'">
+								<div class="text-center">
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.AllOrIndividual" value="All" name="AllOrIndividual" ng-change="GetAllOrIndividualEmployee()">
+										<span class="lbl padding-8">All</span>
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.AllOrIndividual" value="Individual" name="AllOrIndividual" ng-change="GetAllOrIndividualEmployee()">
+										<span class="lbl padding-8">Individual</span>
+									</label>
+								</div>
+							</div>
+
+							<div class="form-group well" ng-if="Employee.FormatType =='Format2'">
+								<div class="text-center">
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.AWL" value="AllF2" name="AllF2" ng-change="FilterEmployeeDataF2()">
+										<span class="lbl padding-8">All</span>
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.AWL" value="WorkingF2" name="WorkingF2" ng-change="FilterEmployeeDataF2()">
+										<span class="lbl padding-8">Working</span>
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.AWL" value="LeftF2" name="LeftF2" ng-change="FilterEmployeeDataF2()">
+										<span class="lbl padding-8">Left</span>
+									</label>
+								</div>
+							</div>
+
+
+							<!--Individual-->
+							<div class="form-group well" ng-if="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format2'">
+
+
+								<div class="text-center">
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.TypeOrEmployee" value="Type" name="TypeOrEmployee" ng-required="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format2'" ng-change="FilterEmployeeDataF2()">
+										<span class="lbl padding-8">Type <strong style="color:red;display:inline; font-weight: bolder;" ng-if="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format2'">*</strong></span>
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="Employee.TypeOrEmployee" value="Employee" name="TypeOrEmployee" ng-required="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format2'" ng-change="FilterEmployeeDataF2()">
+										<span class="lbl padding-8">Employee <strong style="color:red;display:inline; font-weight: bolder;" ng-if="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format2'">*</strong></span>
+									</label>
+
+
+
+									<div class="radio-inline" ng-if="Employee.TypeOrEmployee =='Type'">
+										<label class="radio-inline">
+											<span class="lbl padding-3">
+												Type : <strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+											</span>
+										</label>
+										<label class="radio-inline">
+											<span class="lbl padding-3">
+												<select class="form-control" id="sel1" data-ng-model="Employee.HRMET_Id" name="hrmeT_Id" ng-required="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format2' && Employee.TypeOrEmployee =='Type'" ng-change="onchageDropdownValue()">
+													<option value="" label="Select Employee Type">Select Employee Type</option>
+													<option ng-repeat="employeeType in employeeTypedropdown" value="{{employeeType.hrmeT_Id}}" ng-selected="{{employeeType.Selected===true}}">
+														{{employeeType.hrmeT_EmployeeType}}
+													</option>
+												</select>
+											</span>
+											<span class="error-messages" ng-if="interacted(myForm.hrmeT_Id)" ng-messages="myForm.hrmeT_Id.$error">
+												<span ng-message="required">Select Employee Type</span>
+											</span>
+										</label>
+									</div>
+									<div class="radio-inline" ng-if="Employee.TypeOrEmployee =='Employee'">
+										<label class="radio-inline">
+											<span class="lbl padding-3">
+												Employee :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+											</span>
+										</label>
+										<label class="radio-inline">
+											<span class="lbl padding-3">
+												<select class="form-control" id="sel1" data-ng-model="Employee.HRME_Id" name="hrmE_Id" ng-required="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format2' && Employee.TypeOrEmployee =='Employee'" ng-change="onchageDropdownValue()">
+													<option value="" label="Select Employee">Select Employee</option>
+													<option ng-repeat="employee in employeedropdownF2" value="{{employee.hrmE_Id}}" ng-selected="{{employee.Selected===true}}">
+														{{employee.hrmE_EmployeeFirstName}} {{employee.hrmE_EmployeeMiddleName}} {{employee.hrmE_EmployeeLastName}}
+													</option>
+												</select>
+											</span>
+											<span class="error-messages" ng-if="interacted(myForm.hrmE_Id)" ng-messages="myForm.hrmE_Id.$error">
+												<span ng-message="required">Select Employee</span>
+											</span>
+										</label>
+
+									</div>
+
+								</div>
+								<span class="error-messages" ng-if="interacted(myForm.TypeOrEmployee)" ng-messages="myForm.TypeOrEmployee.$error">
+									<span ng-message="required">Select Type / Employee</span>
+								</span>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+				<div class="col-sm-12">
+					<div class="text-center">
+						<md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()" aria-disabled="false">
+							<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+							Search
+						</md-button>
+						<md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+							<i class="fa fa-times" aria-hidden="true"></i>
+							Cancel
+						</md-button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="box box-primary" ng-show="EmployeeDis">
+			<div class="box-header with-border">
+				<h3 class="box-title">Employee Service Record Report</h3>
+				<div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+				</div>
+			</div>
+			<!-- /.box-header -->
+			<div class="box-body">
+				<div class="PFChallan" id="Baldwin">
+                    <div id="PFChallan">
+
+                        <table class=""  border="1">
+                            <tr>
+                                <td>
+                                    <div class="text-center">
+                                        <h4>{{institutionDetails.mI_Name}}</h4>
+                                        <h6> {{CurrentInstuteAddress}},</h6>
+                                        <h6> {{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                                        <h5>Employee Service Record</h5>
+                                    </div>
+                                   
+                                    <div class="" ng-if="Employee.FormatType=='Format1'">
+                                        <hr />
+                                        <div class="text-center margin-top-20 margin-bottom-10">
+                                            <table class="">
+                                                <tr>
+                                                    <td>
+                                                        <div class="col-sm-10 col-sm-offset-1">
+                                                            <div class="col-sm-6">
+                                                                <table class="table">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>  Employee Code </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmE_EmployeeCode}}
+                                                                            </td>
+
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>  Name of Employee </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmE_EmployeeFirstName}} {{EmployeeData.hrmE_EmployeeMiddleName}} {{EmployeeData.hrmE_EmployeeLastName}}
+                                                                            </td>
+
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Permanent Address </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmE_PerStreet}} ,<br />
+                                                                                {{EmployeeData.hrmE_PerArea}},<br />
+                                                                                {{EmployeeData.hrmE_PerCity}},<br />
+                                                                                {{EmployeeData.hrmE_PerPincode}}<br />
+                                                                                <!--{{EmployeeData.hrmE_PerStateId}},<br />
+                                                                                 {{EmployeeData.hrmE_PerCountryId}}-->
+                                                                            </td>
+
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Father's Name </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmE_FatherName}}
+                                                                            </td>
+
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Date of Birth </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmE_DOB  | date:"dd-MM-yyyy"}}
+                                                                            </td>
+
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Designation </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmdeS_DesignationName}}
+                                                                            </td>
+
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Date of Joining </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmE_DOJ | date:"dd-MM-yyyy"}}
+                                                                            </td>
+
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <table class="table">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>  Religion </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.ivrmmR_Name}}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Caste</td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.imC_CasteName}}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Local Address </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmE_LocStreet}} ,<br />
+                                                                                {{EmployeeData.hrmE_LocArea}},<br />
+                                                                                {{EmployeeData.hrmE_LocCity}},<br />
+                                                                                {{EmployeeData.hrmE_LocPincode}}<br />
+                                                                                <!--{{EmployeeData.hrmE_LocStateId}},<br />
+                                                                                    {{EmployeeData.hrmE_LocCountryId}}-->
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Contact No.  </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.employeeContactNo}}
+                                                                              
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Email-Id.  </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.employeeEmailId}}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Sex </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.ivrmmG_GenderName}}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> Department </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmD_DepartmentName}}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr ng-if="EmployeeData.hrmE_LeftFlag==true">
+                                                                            <td> Date of Leaving </td>
+                                                                            <td>  : </td>
+                                                                            <td class="">
+                                                                                {{EmployeeData.hrmE_DOL | date:"dd-MM-yyyy"}}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+
+                                                            </div>
+                                                        </div>
+
+                                                        </td>
+                                                    </tr>
+                                                </table>
+
+                                        </div>
+                                        <hr />
+
+                                        <div class="text-center margin-top-10 margin-bottom-10" ng-if="Employee.FIAL=='FullDetails' || Employee.FIAL=='Increment'">
+                                           
+                                             <div class="col-sm-10 col-sm-offset-1">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td> <h6> Employee Increment Details :</h6> </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <!-- <table class="table-bordered text-center margin-bottom-10"> -->
+                                                <!-- <thead> -->
+                                                <!-- <tr> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Serial No. -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Leave Name -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Total Leaves -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Availed Leaves -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Balance Leaves -->
+                                                <!-- </th> -->
+                                                <!-- </tr> -->
+                                                <!-- </thead> -->
+                                                <!-- <tbody> -->
+                                                <!-- <tr ng-repeat="employeeLeave in employeeLeaveDetails"> -->
+                                                <!-- <td>{{$index+1}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrmL_LeaveName}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_TotalLeaves}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_TransLeaves}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_CBLeaves}}</td> -->
+                                                <!-- </tr> -->
+                                                <!-- </tbody> -->
+                                                <!-- </table> -->
+                                            </div>
+                                        </div>
+
+                                        <div class="text-center margin-top-10 margin-bottom-10" ng-if="Employee.FIAL=='FullDetails' || Employee.FIAL=='Achievement'">
+                                            <div class="col-sm-10 col-sm-offset-1">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td> <h6> Employee Achievement Details :</h6> </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <!-- <table class="table-bordered text-center margin-bottom-10"> -->
+                                                <!-- <thead> -->
+                                                <!-- <tr> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Serial No. -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Leave Name -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Total Leaves -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Availed Leaves -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Balance Leaves -->
+                                                <!-- </th> -->
+                                                <!-- </tr> -->
+                                                <!-- </thead> -->
+                                                <!-- <tbody> -->
+                                                <!-- <tr ng-repeat="employeeLeave in employeeLeaveDetails"> -->
+                                                <!-- <td>{{$index+1}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrmL_LeaveName}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_TotalLeaves}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_TransLeaves}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_CBLeaves}}</td> -->
+                                                <!-- </tr> -->
+                                                <!-- </tbody> -->
+                                                <!-- </table> -->
+                                            </div>
+                                        </div>
+                                        <div class="text-center margin-top-10 margin-bottom-10" ng-if="Employee.FIAL=='FullDetails' || Employee.FIAL=='Leave'">
+                                            <div class="col-sm-10 col-sm-offset-1">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td> <h6> Employee Leave Details :</h6> </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <!-- <table class="table-bordered text-center margin-bottom-10"> -->
+                                                <!-- <thead> -->
+                                                <!-- <tr> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Serial No. -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Leave Name -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Total Leaves -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Availed Leaves -->
+                                                <!-- </th> -->
+                                                <!-- <th class="text-center"> -->
+                                                <!-- Balance Leaves -->
+                                                <!-- </th> -->
+                                                <!-- </tr> -->
+                                                <!-- </thead> -->
+                                                <!-- <tbody> -->
+                                                <!-- <tr ng-repeat="employeeLeave in employeeLeaveDetails"> -->
+                                                <!-- <td>{{$index+1}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrmL_LeaveName}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_TotalLeaves}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_TransLeaves}}</td> -->
+                                                <!-- <td>{{employeeLeave.hrelS_CBLeaves}}</td> -->
+                                                <!-- </tr> -->
+                                                <!-- </tbody> -->
+                                                <!-- </table> -->
+                                            </div>
+                                        </div>
+                                      
+                                    </div>
+                                    <div class="" ng-if="Employee.FormatType=='Format2'">
+                                        <table class="table-bordered text-center margin-bottom-10">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sl.No</th>
+                                                    <th>Name</th>
+                                                    <th>Religion & Cast</th>
+                                                    <th>Date of Joining</th>
+                                                    <th>Department</th>
+                                                    <th>Designation</th>
+                                                    <!--<th>B.Pay</th>-->
+                                                    <th>Total Emoluments</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="employee in employeeDetails">
+                                                    <td style="text-align:right">{{$index +1}}</td>
+                                                    <td class="text-left">{{employee.hrmE_EmployeeFirstName}} {{employee.hrmE_EmployeeMiddleName}} {{employee.hrmE_EmployeeLastName}}</td>
+                                                    <td class="text-left">{{employee.ivrmmR_Name}} {{employee.imC_CasteName}}</td>
+                                                    <td class="text-center">{{employee.hrmE_DOJ | date:"dd-MM-yyyy"}}</td>
+                                                    <td class="text-left">{{employee.hrmD_DepartmentName}}</td>
+                                                    <td class="text-left">{{employee.hrmdeS_DesignationName}}</td>
+                                                    <!--<td class="text-right">{{employee.basicPay | number : 2}}</td>-->
+                                                    <td class="text-center">{{employee.hrmE_ExpectedRetirementDate | date:"dd-MM-yyyy"}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+
+
+
+                                </td>
+                            </tr>
+
+                        </table>
+
+
+
+                    </div>
+				</div>
+				<hr />
+
+				<div class="text-center">
+					<md-button type="button" ng-click="printToCart('Baldwin')" class="md-raised md-primary">
+						<i class="fa fa-print" aria-hidden="true"></i>
+						print
+					</md-button>
+					<md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+						<i class="fa fa-times" aria-hidden="true"></i>
+						Cancel
+					</md-button>
+				</div>
+
+			</div>
+
+
+		</div>
+
+	</form>
+</section>

@@ -1,0 +1,291 @@
+﻿<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Elective Subjects Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="well" ng-init="Type='All'">
+                                    <div class="text-center">
+                                        <label class="radio-inline">
+                                            <input value="All" type="radio" ng-model="Type" ng-change="clear1()">
+                                            <span class="lbl padding-8">All</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input value="Indi" type="radio" ng-model="Type" ng-change="clear1()">
+                                            <span class="lbl padding-8">Category Wise</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input value="subj" type="radio" ng-model="Type" ng-change="clear1()">
+                                            <span class="lbl padding-8">Subject Wise</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input value="csw" type="radio" ng-model="Type" ng-change="clear1()">
+                                            <span class="lbl padding-8">Class-Section Wise</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="well text-center">
+                                    <label>
+                                        <input type="checkbox" name="fhcbx" data-ng-model="mob_flg">
+                                        <span class="lbl padding-8">Mobile No</span>
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="fghbx" data-ng-model="mail_flg">
+                                        <span class="lbl padding-8">Email-Id</span>
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="left" data-ng-model="Left_Flag">
+                                        <span class="lbl padding-8">Include Left Students</span>
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="deactive" data-ng-model="Deactive_Flag">
+                                        <span class="lbl padding-8">Include Deactive Students</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="yeardd" ng-model="ASMAY_Id" ng-change="get_categories()" required>
+                                        <option value="">Select Academic Year</option>
+                                        <option ng-repeat="year in year_list" value="{{year.asmaY_Id}}" ng-selected="year.Selected == true">{{year.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yeardd)" ng-messages="myForm.yeardd.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="Type=='Indi' || Type=='subj' || Type=='csw'">
+                                <label class="control-label col-sm-4">Category :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="categ" id="sel1" ng-model="EMCA_Id" ng-required="Type=='Indi' || Type=='subj' || Type=='csw'" ng-change="get_groups()">
+                                        <option value="">Select Category</option>
+                                        <option ng-repeat="cat in category_list" value="{{cat.emcA_Id}}" ng-selected="{{cat.Selected == true}}">
+                                            {{cat.emcA_CategoryName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.categ)" ng-messages="myForm.categ.$error">
+                                    <div ng-message="required">Select Category</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="Type=='subj'">
+                                <label class="control-label col-sm-4">Subject Group :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="grpp" ng-model="EMG_Id" ng-change="get_subjects()" ng-required="Type=='subj'">
+                                        <option value="">Select Subject Group</option>
+                                        <option ng-repeat="grp_dp in group_list_drp" value="{{grp_dp.emG_Id}}" ng-selected="grp_dp.Selected == true">{{grp_dp.emG_GroupName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.grpp)" ng-messages="myForm.grpp.$error">
+                                        <div ng-message="required">Select Subject Group</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="Type=='subj'">
+                                <label class="control-label col-sm-4">Subject :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="subjjj" id="sel1" ng-model="ISMS_Id" ng-change="student_subjs_list=[]" ng-required="Type=='subj'">
+                                        <option value="">Select Subject</option>
+                                        <option ng-repeat="subject in subject_list" value="{{subject.ismS_Id}}" ng-selected="{{subject.Selected == true}}">
+                                            {{subject.ismS_SubjectName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.subjjj)" ng-messages="myForm.subjjj.$error">
+                                    <div ng-message="required">Select Subject</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="Type=='csw'">
+                                <label class="control-label col-sm-4">Class :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="clsss" id="sel1" ng-model="ASMCL_Id" ng-change="get_sections()" ng-required="Type=='csw'">
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="cls in class_list" value="{{cls.asmcL_Id}}" ng-selected="{{cls.Selected == true}}">
+                                            {{cls.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.clsss)" ng-messages="myForm.clsss.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="Type=='csw'">
+                                <label class="control-label col-sm-4">Section :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="secc" ng-model="ASMS_Id" ng-change="student_subjs_list=[]" ng-required="Type=='csw'">
+                                        <option value="">Select Section</option>
+                                        <option ng-repeat="sec in section_list" value="{{sec.asmS_Id}}" ng-selected="sec.Selected == true">{{sec.asmC_SectionName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.secc)" ng-messages="myForm.secc.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="">
+                        <div class="">
+                            <div class="text-center">
+                                <md-button type="button" class="md-raised md-primary" ng-click="get_report()" id="save-btn">
+                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="clear()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="Print()" ng-show="group_list.length>0 && student_subjs_list.length>0">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="exportToExcel('#printSectionIdexcel')" 
+                                           ng-show="group_list.length>0 && student_subjs_list.length>0 && (Type == 'Indi' || Type == 'subj' || Type=='csw')">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Export
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="group_list.length>0 && student_subjs_list.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Elective Subjects Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" id="Final_Report" style="overflow:scroll;">
+                <div class="" id="Baldwin">
+                    <table class="table table-bordered" id="table786">
+                        <thead>
+                            <tr>
+                                <th>SL.No</th>
+                                <th ng-click="order('amsT_FirstName')">Student Name</th>
+                                <th ng-click="order('amsT_AdmNo')">Adm. No</th>
+                                <th ng-click="order('amsT_MobileNo')" ng-if="mob_flg">Mobile No</th>
+                                <th ng-click="order('amsT_emailId')" ng-if="mail_flg" style="width:150px;">Email-Id</th>
+                                <th ng-click="order('asmcL_ClassName')">Class</th>
+                                <th ng-click="order('asmC_SectionName')">Section</th>
+                                <th ng-click="order('grp.emG_GroupName')" ng-repeat="grp in group_list">{{grp.emG_GroupName}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="stud in student_list |orderBy:sortKey:reverse | filter : searchValue">
+                                <td>{{$index+1}}</td>
+                                <td style="text-align:left">{{stud.amsT_FirstName}}</td>
+                                <td style="text-align:left">{{stud.amsT_AdmNo}}</td>
+                                <td ng-if="mob_flg">{{stud.amsT_MobileNo}}</td>
+                                <td ng-if="mail_flg">{{stud.amsT_emailId}}</td>
+                                <td style="text-align:left">{{stud.asmcL_ClassName}}</td>
+                                <td style="text-align:left">{{stud.asmC_SectionName}}</td>
+                                <td style="text-align:left" ng-repeat="stu_sub in stud.sub_list track by $index">
+                                    <span ng-bind-html="stu_sub.ismS_SubjectName"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+
+<div id="printSectionId" ng-show="table_flag">
+    <div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>
+    <center><h4> Student Elective Subject Report</h4></center>   
+    <br />
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>SL.No</th>
+                <th>Student Name</th>
+                <th>Adm. No</th>
+                <th ng-if="mob_flg">Mobile No</th>
+                <th ng-if="mail_flg" style="width:150px;">Email-Id</th>
+                <th>Class</th>
+                <th>Section</th>
+                <th ng-repeat="grp in group_list">{{grp.emG_GroupName}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="stud in student_list |orderBy:sortKey:reverse | filter : searchValue">
+                <td>{{$index+1}}</td>
+                <td style="text-align:left">{{stud.amsT_FirstName}}</td>
+                <td style="text-align:left">{{stud.amsT_AdmNo}}</td>
+                <td ng-if="mob_flg">{{stud.amsT_MobileNo}}</td>
+                <td ng-if="mail_flg">{{stud.amsT_emailId}}</td>
+                <td style="text-align:left">{{stud.asmcL_ClassName}}</td>
+                <td style="text-align:left">{{stud.asmC_SectionName}}</td>
+                <td style="text-align:left" ng-repeat="stu_sub in stud.sub_list track by $index">
+                    <span ng-bind-html="stu_sub.ismS_SubjectName"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="printSectionIdexcel" ng-show="table_flag">
+    <table class="table-bordered">
+        <tr style="border : solid 0.5px black;">
+            <td colspan="{{colspan}}" style="text-align:center;">
+                <b> {{institutename}}</b>
+            </td>
+        </tr>
+        <tr style="border:0.5px solid black">
+            <td colspan="{{colspan}}" style="text-align :center">
+                <b>Student Elective Subject Report</b>
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered">
+        <thead>
+            <tr style="border:0.5px solid black">
+                <th>SL.No</th>
+                <th>Student Name</th>
+                <th>Adm. No</th>
+                <th ng-if="mob_flg">Mobile No</th>
+                <th ng-if="mail_flg" style="width:150px;">Email-Id</th>
+                <th>Class</th>
+                <th>Section</th>
+                <th ng-repeat="grp in group_list">{{grp.emG_GroupName}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border:0.5px solid black" ng-repeat="stud in student_list |orderBy:sortKey:reverse | filter : searchValue">
+                <td>{{$index+1}}</td>
+                <td style="text-align:left">{{stud.amsT_FirstName}}</td>
+                <td style="text-align:left">{{stud.amsT_AdmNo}}</td>
+                <td ng-if="mob_flg">{{stud.amsT_MobileNo}}</td>
+                <td ng-if="mail_flg">{{stud.amsT_emailId}}</td>
+                <td style="text-align:left">{{stud.asmcL_ClassName}}</td>
+                <td style="text-align:left">{{stud.asmC_SectionName}}</td>
+                <td style="text-align:left" ng-repeat="stu_sub in stud.sub_list track by $index">
+                    <span ng-bind-html="stu_sub.ismS_SubjectName"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

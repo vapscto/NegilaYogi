@@ -1,0 +1,315 @@
+<style>
+    /*.alert {
+        position: relative;
+         top: 50px;
+        left: 25%;
+        width: 50%;
+        z-index: 999999;
+    }*/
+    /*.alert {
+        position: relative;
+        top: 35px;
+        left: -7%;
+        width: 99%;
+        z-index: 999891;
+    }*/
+    .alert {
+        padding-bottom: 5px;
+        position: initial;
+        top: 0px;
+        left: 0%;
+        width: 80%;
+        z-index: 999891;
+        padding-top: 2px;
+        margin: 10px;
+    }
+
+    .bg-aqua, .callout.callout-info, .alert-info, .label-info, .modal-info .modal-body {
+        background-color: rgb(63, 81, 181) !important;
+    }
+</style>
+<section class="content">
+    <div data-ng-init="academicDet()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Yearly Course Branch Semester Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" ng-click="ShowHide()" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHidden">
+                <form class="form-horizontal" role="form" method="post" name="myForm" novalidate>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="yeardd" ng-model="ASMAY_Id" ng-change="get_courses()" required>
+                                        <option value="">Select Academic Year</option>
+                                        <option ng-repeat="year in accyearlist" value="{{year.asmaY_Id}}" ng-selected="year.Selected == true">{{year.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yeardd)" ng-messages="myForm.yeardd.$error">
+                                        <div ng-message="required">Please Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Course Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <md-datepicker name="fromdate" ng-model="ACAYC_From_Date" md-placeholder="Enter date" ng-change='checkErr(ACAYC_From_Date,ACAYC_To_Date)' md-min-date="ACAYC_From_Date1" md-max-date="ACAYC_To_Date1" ng-disabled="disable_flag" required onkeydown="return false"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.fromdate)" ng-messages="myForm.fromdate.$error">
+                                        <div ng-message="required">Please Fill Course Start Date </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Branch :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="brnh" ng-model="AMB_Id" ng-change="getsemisters()" required>
+                                        <option value="">Select Branch</option>
+                                        <option ng-repeat="branch in branchlist" value="{{branch.amB_Id}}" ng-selected="branch.amB_Id == AMB_Id">{{branch.amB_BranchName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.brnh)" ng-messages="myForm.brnh.$error">
+                                        <div ng-message="required">Please Select Branch</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Branch PreAdmission Start Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <md-datepicker name="branchstdate" ng-model="ACAYCB_PreAdm_FDate" md-placeholder="Enter date" ng-change="ACAYCB_PreAdm_TDate=null;ACAYB_ReferenceDate=null;" md-min-date="ACAYC_From_Date" md-max-date="ACAYC_To_Date" required onkeydown="return false"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.branchstdate)" ng-messages="myForm.branchstdate.$error">
+                                        <div ng-message="required">Please Fill Start Date </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Branch PreAdmission Cutoff Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <md-datepicker name="branchrefdate" ng-model="ACAYB_ReferenceDate" md-placeholder="Enter date" ng-change='checkErr(ASMAY_From_Date,ASMAY_To_Date)' md-min-date="ACAYC_From_Date" md-max-date="ACAYCB_PreAdm_FDate" required onkeydown="return false"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.branchrefdate)" ng-messages="myForm.branchrefdate.$error">
+                                        <div ng-message="required">Please Fill Cutoff Date </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Course :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="crse" ng-model="AMCO_Id" ng-change="getbranches()" required>
+                                        <option value="">Select Course</option>
+                                        <option ng-repeat="course in courselist" value="{{course.amcO_Id}}" ng-selected="course.amcO_Id == AMCO_Id">{{course.amcO_CourseName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.crse)" ng-messages="myForm.crse.$error">
+                                        <div ng-message="required">Please Select Course</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Course End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <md-datepicker name="todate" ng-model="ACAYC_To_Date" md-placeholder="Enter date"
+                                                   ng-change='checkErr1(ACAYC_From_Date,ACAYC_To_Date)' md-min-date="ACAYC_From_Date1" md-max-date="ACAYC_To_Date1" ng-disabled="disable_flag" required onkeydown="return false"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.todate)" ng-messages="myForm.todate.$error">
+                                        <div ng-message="required">Please Fill Course End Date </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">No.of Semester :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+
+                                    <input type="text" name="nosem" class="form-control active" ng-model="ACAYC_NoOfSEM" maxlength="2" allow-pattern="[0-9]" required ng-disabled="disable_flag" />
+                                    <div class="error-messages" ng-if="interacted(myForm.nosem)" ng-messages="myForm.nosem.$error">
+                                        <div ng-message="required">Enter No.Of Semester</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Branch PreAdmission End Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <md-datepicker name="btcenddate" ng-model="ACAYCB_PreAdm_TDate" md-placeholder="Enter date" ng-change='checkErr(ACAYCB_PreAdm_FDate,ACAYCB_PreAdm_TDate)' md-min-date="ACAYCB_PreAdm_FDate" md-max-date="ACAYC_To_Date" required onkeydown="return false"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.btcenddate)" ng-messages="myForm.btcenddate.$error">
+                                        <div ng-message="required">Please Fill End Date </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" ng-show="semester_list.length>0">
+                            <div class="well">
+                                <div class="">
+                                    <div class="col-sm-4 pull-right">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                                <span class="input-group-addon">
+                                                    <i class="fa fa-search"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <table class="table table-hover table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    SL NO
+                                                </th>
+                                                <th>
+                                                    <label>
+                                                        <label>
+                                                            <input type="checkbox" value="" ng-click="toggleAll()" ng-model="all" ng-disabled="ACAYC_NoOfSEM<(semester_list.length)">
+                                                            <span class="lbl padding-8"></span>
+                                                        </label>
+
+                                                    </label>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('amsE_SEMName')">Semester Name</a>
+                                                </th>
+                                                <th style="text-align:center"><a href="">From Date</a></th>
+                                                <th style="text-align:center"><a href="">To Date</a></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in semester_list | orderBy:sortKey:sortReverse |filter:search">
+                                                <td class="text-left">{{$index+1}}</td>
+                                                <td class="text-left">
+                                                    <label>
+                                                        <input type="checkbox" name="adcheckt" value="{{user.xyz}}" ng-change="optionToggled(user)" ng-model="user.xyz"><span class="lbl padding-8"></span>
+                                                    </label>
+                                                </td>
+                                                <td class="text-left">{{user.amsE_SEMName}}</td>
+                                                <td class="text-left">
+                                                    <md-datepicker name="semfromdte_{{user.amsE_Id}}" ng-model="user.acaycbS_SemStartDate" md-placeholder="Enter date" ng-change='validate_from_date(user.acaycbS_SemStartDate,user)' md-min-date="ACAYC_From_Date" md-max-date="ACAYC_To_Date" ng-required="user.xyz" ng-disabled="!user.xyz" onkeydown="return false"></md-datepicker>
+                                                    <div class="error-messages" ng-if="interacted(myForm['semfromdte_'+user.amsE_Id])" ng-messages="myForm['semfromdte_'+user.amsE_Id].$error">
+                                                        <div ng-message="required">Please Fill From Date </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-left">
+                                                    <md-datepicker name="semtodte_{{user.amsE_Id}}" ng-model="user.acaycbS_SemEndDate" md-placeholder="Enter date" ng-change='validate_to_date(user.acaycbS_SemEndDate,user)' md-min-date="ACAYC_From_Date" md-max-date="ACAYC_To_Date" ng-required="user.xyz" ng-disabled="!user.xyz" onkeydown="return false"></md-datepicker>
+                                                    <div class="error-messages" ng-if="interacted(myForm['semtodte_'+user.amsE_Id])" ng-messages="myForm['semtodte_'+user.amsE_Id].$error">
+                                                        <div ng-message="required">Please Fill To Date </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <input type="hidden" ng-model="ACABS_Id" value="{{ACABS_Id}}" />
+                        <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="savedata()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="detailslist">
+        <div class="box-header with-border">
+            <h3 class="box-title">Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="" ng-click="sort('asmaY_Year')">Academic Year</a></th>
+                        <th><a href="" ng-click="sort('amcO_CourseName')">Course</a> </th>
+                        <th><a href="" ng-click="sort('amB_BranchName')">Branch</a> </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (getsaveddata | filter : searchValue) |orderBy:sortKey:reverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">{{user.asmaY_Year}}</td>
+                        <td class="text-left">{{user.amcO_CourseName}}</td>
+                        <td class="text-left">{{user.amB_BranchName}}</td>
+                        <td>
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal" data-backdrop="static" ng-click="viewrecordspopup(user);">
+                                <i class="fa fa-eye text-purple"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+<div class="modal fade modal-medium" id="myModal" role="dialog">
+    <div class="modal-dialog modal-md">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title  text-white">YEARLY COURSE BRANCH SEMESTER MAPPING </h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                SLNO
+                            </th>
+                            <th>
+                                Semester Name
+                            </th>
+                            <th>
+                                Semester Start Date
+                            </th>
+                            <th>
+                                Semester End Date
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-sortable="configA">
+                        <tr ng-repeat="user in getviewdetails">
+                            <td class="text-left">{{$index+1}}</td>
+                            <td class="text-center">{{ user.amsE_SEMName}}</td>
+                            <td class="text-center">{{ user.acaycbS_SemStartDate | date :'dd/MM/yyyy'}}</td>
+                            <td class="text-center">{{ user.acaycbS_SemEndDate | date :'dd/MM/yyyy'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button><!--ng-click="get_subjects(EYC_Id)"-->
+            </div>
+        </div>
+
+    </div>
+</div>

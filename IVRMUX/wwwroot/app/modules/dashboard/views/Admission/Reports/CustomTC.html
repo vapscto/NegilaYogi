@@ -1,0 +1,466 @@
+﻿<!--<link type="text/css" media="print" rel="stylesheet" href="css/print/BBKV/BBKVTC/BBKVTCPdf.css" />-->
+
+<div data-ng-init="loaddata()" class="challan">
+    <section class="content">
+        <form class="form-horizontal" role="form" method="post" name="myform">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TC Custom Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Left Year:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel12" ng-model="asmaY_Id" name="stcrclstyr" ng-change="onchangeyear()" required>
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}" ng-selected="{{academic.Selected == true}}">{{academic.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                        <div ng-message="required">Select Left Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="well text-center" ng-init="admname='regno'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="regno" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Admno</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="stdname" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Name</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="well text-center" ng-init="tctempper='per'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="temp" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Temp Student</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="per" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Permanent Student</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Student :</label>
+                                <div class="col-sm-8">
+                                    <!--<select class="form-control" name="stdname" id="sel1" data-ng-model="amsT_Id" ng-change="stdnamechange()" required>
+                                        <option value="" label="Select Student"> </option>
+                                        <option ng-repeat="student in studentDropdown" value="{{student.amsT_Id}}" ng-selected="{{student.Selected == true}}">
+                                            {{student.studentname}}
+                                        </option>
+                                    </select>-->
+
+                                    <ui-select id="sel1" name="stdname" ng-model="$parent.amsT_Id" theme="bootstrap" ng-change="stdnamechange()"
+                                               ng-keyup="searchfilter()" title="Select Student" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or Search Student">{{$select.selected.studentname}}</ui-select-match>
+                                        <ui-select-choices repeat="student in studentDropdown | filter: $select.search" value="{{student.amsT_Id}}"
+                                                           ng-selected="{{student.Selected == true}}">
+                                            <div ng-bind-html="student.studentname | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myform.stdname)" ng-messages="myform.stdname.$error">
+                                        <div ng-message="required">Select Student</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false"
+                                   ng-click="savetmpldata()">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-primary" ng-click="printToCart()" ng-show="Print_flag">
+                            <!--ng-show="Print_flag"-->
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <link href="css/print/JSHS/JSHSTC.css" rel="stylesheet" />
+
+            <section class="content" ng-show="Print_flag">
+                <div class="box box-primary">
+                    <div class="box-body">
+                        <div class="JSHSTC" id="JSHSTC">
+                            <div style="page-break-after:always;margin-top:245px">
+                                <!--<div style="page-break-after:always;margin-bottom:50px">-->
+                                <h4 class="text-center">TRANSFER CERTIFICATE</h4>
+
+                                <div class="row">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="width-10 text-left">Certificate No.{{tcno}} </td>
+
+                                                <td class="width-10  text-right">Date of Issue : {{lbldol |date:'dd-MM-yyyy'}}  </td>
+
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <hr />
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="36"></td>
+                                                <td width="22">1</td>
+                                                <td width="300">Name of Student</td>
+
+                                                <td class=""> :&nbsp;&nbsp;&nbsp;&nbsp;{{lblstdname}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="36"></td>
+                                                <td width="22">2</td>
+                                                <td width="300">Admission Number</td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{admno}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="36"></td>
+                                                <td width="22">3</td>
+                                                <td width="300">Sex</td>
+
+                                                <td class=""> :&nbsp;&nbsp;&nbsp;&nbsp;{{amsT_Sex}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="36"></td>
+                                                <td width="22">4</td>
+                                                <td width="300">Mother's Name</td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{lblmothername}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="36"></td>
+                                                <td width="22">5</td>
+                                                <td width="300">Father's / Guardian's Name</td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{lblfathername}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tr>
+                                            <td width="36"></td>
+                                            <td width="22">6</td>
+                                            <td width="300">Nationality</td>
+
+                                            <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{lblnationality}} </td>
+
+                                        </tr>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="36"></td>
+                                                <td width="22">7</td>
+                                                <td width="300">Religion</td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{lblreligioncaste}}  </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="36"></td>
+                                                <td width="22">8</td>
+                                                <td width="300">Caste</td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{studcaste}}  </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="36"></td>
+                                                <td width="22">9</td>
+                                                <td width="300">Mother Tongue</td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{Mothertounge}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">10</td>
+                                                <td width="302">
+                                                    Whether the candidate belongs to Scheduled
+                                                    Caste / Scheduled Tribe
+                                                </td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{schedulecaste}} </td>
+                                                <td class="width-480  text-left">
+                                                    <p style="width:auto" contenteditable="true"></p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">11</td>
+                                                <td width="302">
+                                                    Date of birth according to the admission
+                                                    register
+                                                </td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{lbldob |date:'dd-MM-yyyy'}} (in figures) {{lbldobwords}} (in words)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">12</td>
+                                                <td width="302">Class in which last studied</td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{laststudied}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">13</td>
+                                                <td width="300">School / Board Annual examination last taken</td>
+
+                                                <td class=""> :&nbsp;&nbsp;&nbsp;&nbsp;{{lastexamdetails}}  {{ASTC_Result}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">14</td>
+                                                <td width="300">
+                                                    Whether failed. If so, once/twice in the same
+                                                    class
+                                                </td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{ASTC_ResultDetails}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">15</td>
+                                                <td width="300">Subjects Studied</td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{subjectsstudied}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">16</td>
+                                                <td width="300">
+                                                    Whether qualified for promotion to the higher
+                                                    class
+                                                </td>
+
+                                                <td class=""> :&nbsp;&nbsp;&nbsp;&nbsp;{{promotionflag}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">17</td>
+                                                <td width="300">
+                                                    Any fee concession availed of, if so, the nature
+                                                    of concession
+                                                </td>
+
+                                                <td class=""> :&nbsp;&nbsp;&nbsp;&nbsp;{{feeconcession}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">18</td>
+                                                <td width="300">
+                                                    Total number of days attended / working
+                                                </td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{noworkingdays}} / {{totalworkingdays}} days </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">19</td>
+                                                <td width="300">
+                                                    General conduct
+                                                </td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{lblconduct}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">20</td>
+                                                <td width="300">
+                                                    Date of application for certificate
+                                                </td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{applicationdate |date:'dd/MM/yyyy'}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">21</td>
+                                                <td width="300">
+                                                    Reason for leaving the school
+                                                </td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{lblreasonleaving}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="27"></td>
+                                                <td width="30">22</td>
+                                                <td width="300">
+                                                    Student's Personal Identification Number
+
+                                                </td>
+
+                                                <td class="">:&nbsp;&nbsp;&nbsp;&nbsp;{{tctemporper}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <div style="page-break-after:!important;margin-top:300px">
+                                        <!--<div style="page-break-after:always;margin-top:250px">-->
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+
+                                                        <td>
+                                                            I certify the entries in this T.C have been made with reference to the Admission Register maintained in our office
+                                                            and that they are true and correct. The School Dise Code number is 29160505606
+
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <br />
+                                            <br />
+                                            <br />
+
+                                            <div class="col-sm-2">
+                                                <table align="center">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Checked by </td>
+                                                            <!--<td contenteditable='true'> </td>-->
+
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <div class="col-sm-offset-9">
+                                                <table align="center">
+                                                    <tbody>
+                                                        <tr>
+
+                                                            <td class="text-left"> Institution Seal </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        <!--</div>-->
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </form>
+
+
+    </section>
+</div>
+

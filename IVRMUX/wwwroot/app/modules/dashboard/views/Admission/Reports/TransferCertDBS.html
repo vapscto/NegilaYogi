@@ -1,0 +1,324 @@
+﻿<link href="css/print/baldwin/BGHS/StudentTcBBHS/BGHSStudentTc.css" rel="stylesheet" />
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform" data-ng-init="StuAttRptDropdownList();" novalidate>
+        <link href="css/print/StJames/Stjamestcpdf.css" rel="stylesheet" />
+        <div data-ng-init="loaddata()">
+            <div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Student TC Custom Report</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box box-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class=" well text-center" ng-init="reporttype='All'">
+                                            <label class="radio-inline">
+                                                <input type="radio" value="All" name="cdreport" ng-model="reporttype" required>
+                                                <span class="lbl padding-8"><b> All </b></span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="indi" name="cdreport" ng-model="reporttype" required>
+                                                <span class="lbl padding-8"><b>Individual</b></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class=" well text-center" ng-init="temporper='Per'">
+                                            <label class="radio-inline">
+                                                <input type="radio" value="Temp" name="cdreportd" ng-model="temporper" required>
+                                                <span class="lbl padding-8"><b> Temporary TC  </b></span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" value="Per" name="cdreportd" ng-model="temporper" required>
+                                                <span class="lbl padding-8"><b>Permanent TC</b></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4"> Year:<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="stcrclstyr" ng-change="changeyear()" required>
+                                            <option value="">Select Year</option>
+                                            <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                            <div ng-message="required">Select Left Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Student Name:</label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel1" name="studentname" ng-model="$parent.AMST_Id" ng-change="onstudentnamechange()" theme="bootstrap"
+                                                   ng-keyup="searchfilter($select,user.status);" title="Select Student" required>
+                                            <ui-select-match ng-trim="false" placeholder="Select Or Search Student">
+                                                {{$select.selected.studentname}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="student in studentDropdown | filter: $select.search" value="{{student.amsT_Id}}"
+                                                               ng-selected="{{student.Selected == true}}">
+                                                <div ng-bind-html="student.studentname | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interacted(myform.studentname)" ng-messages="myform.studentname.$error">
+                                            <div ng-message="required">Select Student</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Class:<strong style="color:red;" ng-if="reporttype=='indi'">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="selsec" data-ng-model="ASMCL_Id" name="stcrccls" ng-change="changeclass()"
+                                                ng-required="reporttype=='indi'" ng-disabled="reporttype!='indi'">
+                                            <option value="">Select Class</option>
+                                            <option ng-repeat="options in classlist" value="{{options.asmcL_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmcL_ClassName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myform.stcrccls)" ng-messages="myform.stcrccls.$error">
+                                            <div ng-message="required">Select Class</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Section:<strong style="color:red;" ng-if="reporttype=='indi'">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="accsection" data-ng-model="ASMS_Id" name="stcrcsec" ng-change="changesection()"
+                                                ng-required="reporttype=='indi'" ng-disabled="reporttype!='indi'">
+                                            <option value="">Select Section</option>
+                                            <option ng-repeat="options in seclist" value="{{options.asmS_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmC_SectionName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myform.stcrcsec)" ng-messages="myform.stcrcsec.$error">
+                                            <div ng-message="required">Select Section </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="text-center">
+                                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false"
+                                               ng-click="savetmpldata();">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                        Report
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-primary" ng-click="printToCart()">
+                                        <!--ng-show="Print_flag"-->
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="BGHSStudentTc">
+                <div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">DON BOSCO SCHOOL, BANDEL</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body" id="BGHSStudentTc">
+                            <div style="padding:20px">
+                                <h2 class=" box-title text-center">DON BOSCO SCHOOL, BANDEL</h2>
+                                <p class="text-center"> P.O & DIST. HOOGHLY, WEST BENGAL – 712 103</p>
+                                <p class=" text-center">  (Affiliated to the Council for the Indian School Certificate Examination, New Delhi)</p>
+                            </div>
+                            <h2 class=" box-title text-center">TRANSFER CERTIFICATE</h2>
+
+                            <section style="margin-left:50px;margin-right:50px">
+
+
+                                <table align="center">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-left">
+                                                <p>TC Serial No : <B>{{tcno}}</B></p>
+                                            </td>
+                                            <td class="text-right">
+                                                <p>Reg. No : <b>{{admno}}</b></p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table text-center">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-150">This is to certify that</td>
+                                            <td class="border-bottom-dotted text-center"><b>{{amsT_FirstName}} {{amsT_MiddleName}} {{amsT_LastName}}</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class=" width-80  text-left ">son of</td>
+                                            <td class="border-bottom-dotted width-700"><B>{{lblfathername}}</B></td>
+                                            <td class="width-280  text-left">was admitted into this</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-150 text-left " width-20>school on the (date)</td>
+                                            <td class="border-bottom-dotted text-center"><B>{{lbldoa|date:"dd/MM/yyyy"}}</B></td>
+                                            <td class=" width-150  text-center " width-20>on a transfer from</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="border-bottom-dotted text-center"><b>&nbsp;{{classname}}</b></td>
+                                            <td class="width-140 ">and left on (date)</td>
+                                            <td class="border-bottom-dotted text-center"><b>{{last_date_attended|date:'dd-MM-yyyy'}} </b></td>
+                                            <td class="width-60  text-center">with a</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="border-bottom-dotted text-center"><b>{{lblconduct}}</b></td>
+                                            <td class="width-110  text-center">character.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class=" width-320  text-left ">He was then studying in the (@)</td>
+                                            <td class="border-bottom-dotted width-320"><B>{{laststudied}}</B></td>
+                                            <td class="width-150  text-right">class of the (+)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-100 border-bottom-dotted text-left"><B>{{}}</B></td>
+                                            <td class="width-270 ">stream, the school year being from (*)</td>
+                                            <td class=" width-130 border-bottom-dotted "><B>{{}}</B></td>
+                                            <td class=" width-60  text-right ">to (*)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <br />
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-100 border-bottom-dotted text-left"><B>{{}}</B></td>
+                                            <td class="width-270 "></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+
+                                            <td class=" width-110  text-left ">All sums due (#)</td>
+                                            <td class="border-bottom-dotted width-80"><B>{{}}</B></td>
+                                            <td class="width-320  text-right">to this school on his account have been remitted or</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="" width="450">satisfactorily arranged for.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="" width="490">His date of birth, according to the Admission Register is (in figures)</td>
+                                            <td class="border-bottom-dotted text-center"><B>{{lbldob |date:"dd/MM/yyyy"}}</B></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="" width="80">(in words</td>
+                                            <td class="border-bottom-dotted text-center"><B>{{lbldobwords}}</B></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="width-190 ">Promotion has been ($)</td>
+                                            <td class="border-bottom-dotted text-center width-300 "><B>{{lblPromotion}}</B></td>
+                                            <td class="width-100 "></td>
+
+
+                                        </tr>
+                                     
+
+                                    </tbody>
+                                </table>
+
+                                <div class="row margin-top-100">
+                                    <div class="col-sm-4 text-left"> Date :<B>{{todaydate|date:"dd/MM/yyyy"}}</B></div>
+                                    <div class="col-sm-8 text-right"> Signature :________________________</div>
+                                </div>
+
+                                <div class="text-center" style="margin-left: 62%;">
+                                    <p><b>Fr. Siby Joseph Vadakel, sdb</b></p>
+                                    <p><b>Principal</b></p>
+                                    <p>(Head of the School)</p>
+                                    <p>School Rubber Stamp</p>
+                                </div>
+
+
+
+                                <div class="col-sm-12 text-left">
+                                    <p><b>COUNTERSIGNED</b></p>
+                                    <p>@ to be given in words</p>
+                                    <p>+ mention whether ICSE/ISC stream)</p>
+                                    <p>* insert month and year</p>
+                                    <p># sums due to the school include payments for which provision is made in the rules supplied</p>
+                                    <p>to the parent/guardian when the scholar was admitted into the school</p>
+                                    <p>$ granted/refused/not applicable</p>
+                                </div>
+                            </section>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

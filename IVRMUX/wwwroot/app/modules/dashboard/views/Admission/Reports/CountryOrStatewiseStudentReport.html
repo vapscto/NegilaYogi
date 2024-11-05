@@ -1,0 +1,283 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Country Statewise Student List Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4 col-sm-offset-4 text-center">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div>
+                                    <select class="form-control" id="sel1year" data-ng-model="asmaY_Id" name="academic_year" required ng-change="OnChangeYear()">
+                                        <option value="">Select</option>
+                                        <option ng-repeat="options in academicList" value="{{options.asmaY_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmaY_Year}}</option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.academic_year)" ng-messages="myForm.academic_year.$error">
+                                    <div ng-message="required" style="color:red">{{errMessage_Year}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="well">
+                            <label class="radio-inline">
+                                <input type="radio" name="yorb" value="country" ng-model="enq" ng-click="onclickloaddata()" required>
+                                <span class="lbl padding-8">Country Wise <span style="color:Red">*</span></span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="yorb" value="state" ng-model="enq" ng-click="onclickloaddata()" required>
+                                <span class="lbl padding-8">State Wise <span style="color:Red">*</span></span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.yorb)" ng-messages="myForm.yorb.$error">
+                            <div ng-message="required">Select Country or State</div>
+                        </div>
+                        <div class="form-group" ng-if="enq=='country'">
+                            <label class="control-label col-sm-4">Country:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div>
+                                    <ui-select id="sel12" name="cntry" data-ng-model="obj.ivrmmC_Id" title="Select Country" ng-change="OnChangeCountry()">
+                                        <ui-select-match ng-trim="false" placeholder="select Country">{{$select.selected.ivrmmC_CountryName}}</ui-select-match>
+                                        <ui-select-choices repeat="options in countrylst | filter: $select.search" value="{{options.ivrmmC_Id}}" ng-selected="{{options.Selected == true}}">
+                                            <div ng-bind-html="options.ivrmmC_CountryName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.cntry)" ng-messages="myForm.cntry.$error">
+                                    <div ng-message="required" style="color:red">{{errMessage_Year}}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="enq=='state'">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">State: <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div>
+                                        <ui-select id="sel12" name="sta" data-ng-model="obj.ivrmmS_Id" title="Select State" ng-change="OnChangeState()">
+                                            <ui-select-match ng-trim="false" placeholder="select state">{{$select.selected.ivrmmS_Name}}</ui-select-match>
+                                            <ui-select-choices repeat="options in statelst | filter: $select.search" value="{{options.ivrmmS_Id}}" ng-selected="{{options.Selected == true}}">
+                                                <div ng-bind-html="options.ivrmmS_Name | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.sta)" ng-messages="myForm.sta.$error">
+                                        <div ng-message="required" style="color:red">{{errMessage_Year}}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <span>
+                        <md-button type="submit" class="md-raised md-primary" ng-click="ShowReport(enq)" id="submit">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                    </span>
+                    <md-button type="submit" class="md-raised md-warn" ng-click="cancel();">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="box box-primary" ng-show="reportdetails.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Country Statewise Student List Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <span>
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="overflow:scroll;width:100%;" id="style-4">
+                    <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" value="" ng-click="toggleAll();" ng-model="all">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sortBy('sno')">SL.NO.</a>
+                                </th>
+
+                                <th><a href="" ng-click="sortBy('User_Name')">Student Name</a> </th>
+
+                                <th><a href="" ng-click="sortBy('Email_Id')">Admission Number</a> </th>
+
+                                <th><a href="" ng-click="sortBy('Mob_No')">Registration Number</a> </th>
+
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1=(reportdetails  | filter : searchValue) | orderBy:propertyName:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page">
+                                <td class="text-center hdTD">
+                                    <label>
+                                        <input type="checkbox" data-ng-model="user.selected" ng-change="selected(user,itemsPerPage *(currentPage-1)+$index)">
+
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td>{{ itemsPerPage*(currentPage-1)+$index+1}}</td>
+                                <td style="text-align:left">{{ user.Amst_LastName}}</td>
+                                <td style="text-align:left">{{ user.AMST_AdmNo}}</td>
+                                <td style="text-align:left">{{ user.AMST_RegistrationNo}}</td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="page">
+                </dir-pagination-controls>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#tableexcell')" target="_blank" ng-show="IsHiddendown">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="printData()" ng-show="IsHiddendown">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        print
+                    </md-button>
+                </div>
+
+            </div>
+            <div id="printSectionId" ng-show="print_data" style="overflow:scroll">
+
+                <div class="">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                </div>
+                <center> <h4><u> Country Statewise Student List Report</u></h4></center>
+
+                <table class="table table-bordered text-center" id="Table">
+                    <thead>
+                        <tr>
+
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.NO.</a>
+                            </th>
+
+                            <th><a href="" ng-click="sortBy('User_Name')">Student Name</a> </th>
+
+                            <th><a href="" ng-click="sortBy('Email_Id')">Admission Number</a> </th>
+
+                            <th><a href="" ng-click="sortBy('Mob_No')">Registration Number</a> </th>
+
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in printdatatable">
+
+                            <td>{{$index+1}}</td>
+                            <td style="text-align:left">{{ user.Amst_LastName}}</td>
+                            <td style="text-align:left">{{ user.AMST_AdmNo}}</td>
+                            <td style="text-align:left">{{ user.AMST_RegistrationNo}}</td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div id="tableexcell" ng-show="print_data_exell" style="overflow:scroll">
+                <!--<center> <h4><u> REGISTRATION REPORT </u></h4></center>-->
+
+                <table class="table table-bordered text-center" id="Table">
+                    <thead>
+                        <tr>
+
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.NO.</a>
+                            </th>
+
+                            <th><a href="" ng-click="sortBy('User_Name')">Student Name</a> </th>
+
+                            <th><a href="" ng-click="sortBy('Email_Id')">Admission Number</a> </th>
+
+                            <th><a href="" ng-click="sortBy('Mob_No')">Registration Number</a> </th>
+
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in printdatatable | orderBy:propertyName:reverse">
+
+                            <td>{{ itemsPerPage*(currentPage-1)+$index+1}}</td>
+                            <td style="text-align:left">{{ user.Amst_LastName}}</td>
+                            <td style="text-align:left">{{ user.AMST_AdmNo}}</td>
+                            <td style="text-align:left">{{ user.AMST_RegistrationNo}}</td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+
+
+    </form>
+</section>

@@ -1,0 +1,495 @@
+﻿
+<section class="content" data-ng-init="loadData()">
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Concession Approval</h3>
+            <!--<div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>-->
+        </div>
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Concession Category: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="cacategory" data-ng-model="FMCC_Id" required data-ng-change="oncatchange()">
+                                    <option value="">Select Category</option>
+                                    <option ng-repeat="option in catdrp" value="{{option.fmcC_Id}}" ng-selected="option.Selected==true">
+                                        {{option.fmcC_ConcessionName}}
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cacategory)" ng-messages="myForm.cacategory.$error">
+                                    <div ng-message="required">Please Select Category</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Student Name: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="casname" id="sel1" data-ng-model="pasr_id" required data-ng-change="onstudchange()">
+                                    <option value="">Select Student</option>
+                                    <option ng-repeat="option in studentdrp" value="{{option.pasr_id}}" ng-selected="option.Selected==true">
+
+                                        {{option.pasR_FirstName}} <span ng-if="option.pasR_MiddleName !== null">
+                                            {{option.pasR_MiddleName}}
+                                        </span><span ng-if="option.pasR_LastName !== null">{{option.pasR_LastName}}</span>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.casname)" ng-messages="myForm.casname.$error">
+                                    <div ng-message="required">Student Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="text-center" style="margin-left: 50px;">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="searcgbtn" id="save-btn" aria-disabled="false" data-ng-click="searchdata()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                Search
+                            </md-button>
+                            <md-button type="submit" class="md-raised md-warn" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" data-ng-click="cleardata()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <div class="box box-primary" ng-show="displaysiblingdet.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">List Of Students</h3>
+
+        </div>
+        <!-- /.box-header -->
+
+        <div class="box-body">
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th width="100px">
+                            <a href="" ng-click="order('AdmNo')">Select</a>
+                        </th>
+                        <th width="100px"><a href="" ng-click="order('AdmNo')">SR.No</a> </th>
+                        <th><a href="" ng-click="order('pasrS_SiblingsName')">Student Name</a> </th>
+                        <th width="200px"><a href="" ng-click="order('pasrS_SiblingsClass')">Class</a> </th>
+                        <th width="200px"><a href="" ng-click="order('pasrS_SiblingsAdmissionNo')">Admission No</a> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in displaysiblingdet | orderBy:sortKey:reverse|filter:search1|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="user.isSelected" ng-disabled="checkbutton" ng-change="changecheck(user)" ng-checked="all2">
+                                <span class="lbl padding-8">{{user.pasR_FirstName}}</span>
+                            </label>
+                        </td>
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                        <td class="text-uppercase" style="text-align:left">{{user.pasrS_SiblingsName}}</td>
+                        <td>{{user.pasrS_SiblingsClass}}</td>
+                        <td>{{user.pasrS_SiblingsAdmissionNo}}</td>
+                        <td hidden="hidden">{{user.pasrS_Id}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr />
+            <div class="">
+                <div class="text-center">
+                    <md-button type="submit" ng-hide="rtestudent" class="md-raised md-primary" ng-disabled="checkbutton" id="checkbtn" aria-disabled="false" data-ng-click="checkdata(displaysiblingdet)">
+                        Check Sibling Match
+                    </md-button>
+                    <md-button ng-show="rtestudent" type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" data-ng-click="confirmdata(displaysiblingdet)">
+                        Confirm
+                    </md-button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="fillstaff.length>0 || secondgrid==true">
+        <div class="box-header with-border">
+            <div class="row">
+                <div class="col-sm-4">
+                    <h3 class="box-title  float-left" ng-show="secondgrid">Matched Students List</h3>
+                    <h3 class="box-title float-left" ng-show="fillstaff.length>0">Employee List</h3>
+                </div>
+                <div class="col-sm-4">
+
+                </div>
+                <div class="col-sm-4">
+                    <div class="">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="box-body" ng-show="secondgrid">
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th width="50px">
+                            <a href="" ng-click="order('AdmNo')">Select</a>
+                        </th>
+                        <th width="50px"><a href="" ng-click="order('AdmNo')">SR.No</a> </th>
+                        <th><a href="" ng-click="order('pasrS_SiblingsName')">Student Name</a> </th>
+                        <th width="150px"><a href="" ng-click="order('pasrS_SiblingsClass')">Class</a> </th>
+                        <th width="150px"><a href="" ng-click="order('pasrS_SiblingsAdmissionNo')">Admission No</a> </th>
+                        <th width="200px"><a href="" ng-click="order('fathername')">Father Name</a> </th>
+                        <th><a href="" ng-click="order('studentphtoto')">Student Photo</a> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in displayselectedlst | orderBy:sortKey:reverse|filter:search|itemsPerPage:itemsPerPage2" pagination-id="page2" current-page="currentPage2" ng-class-odd="'odd'">
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="user.isSelected" ng-change="changecheckmatch(user)" ng-checked="all2">
+                                <span class="lbl padding-8">{{user.pasR_FirstName}}</span>
+                            </label>
+                        </td>
+                        <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                        <td class="text-uppercase" style="text-align:left">{{user.pasrS_SiblingsName}}</td>
+                        <td>{{user.pasrS_SiblingsClass}}</td>
+                        <td>{{user.pasrS_SiblingsAdmissionNo}}</td>
+                        <td style="text-align:left">{{user.fathername}}</td>
+                        <td ng-if="user.studentphtoto!=null && user.studentphtoto!=''">
+                            <span>
+                                <img height="70" width="70" ng-src="{{user.studentphtoto}}" />
+                            </span><br />
+                            <span>
+                                <a style="color:blue;display:inline;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsimage(user.studentphtoto)">View Photo</a>
+                            </span>
+                        </td>
+                        <td ng-if="user.studentphtoto==null || user.studentphtoto==''"> Not Available</td>
+
+                        <td hidden="hidden">{{user.amsT_Id}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls pagination-id="page2"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+            <hr />
+        </div>
+        <div class="box-body" ng-show="fillstaff.length>0">
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="">Select</a>
+                        </th>
+                        <th><a href="">SR.No</a> </th>
+                        <th><a href="">Employee Name</a> </th>
+                        <th><a href="">Employee Code</a> </th>
+                        <th><a href="">Department</a> </th>
+                        <th><a href="">Designation</a> </th>
+                        <th><a href="">Employee Photo</a> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in fillstaff | orderBy:sortKey:reverse|filter:search2|itemsPerPage:itemsPerPage3" current-page="currentPage3" ng-class-odd="'odd'">
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="user.isSelected" ng-checked="all2">
+                                <span class="lbl padding-8">{{user.pasR_FirstName}}</span>
+                            </label>
+                        </td>
+                        <td>{{itemsPerPage3 *(currentPage3-1)+$index+1}}</td>
+                        <td class="text-uppercase" style="text-align:left">{{user.stafname}}</td>
+                        <td>{{user.hrmE_EmployeeCode}}</td>
+                        <td>{{user.department}}</td>
+                        <td>{{user.designation}}</td>
+                        <!--<td>{{user.hrmE_Photo}}</td>-->
+                        <td ng-if="user.hrmE_Photo!=null && user.hrmE_Photo!=''">
+                            <span>
+                                <img height="70" width="70" ng-src="{{user.hrmE_Photo}}" />
+                            </span><br />
+                            <span>
+                                <a style="color:blue;display:inline;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsimage(user.hrmE_Photo)">View Photo</a>
+                            </span>
+                        </td>
+                        <td ng-if="user.hrmE_Photo==null || user.hrmE_Photo==''">
+                            Not Available
+                        </td>
+                        <td hidden="hidden">{{user.hrmE_Id}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <div class="" ng-show="fillstaff.length>0 || secondgrid==true">
+            <div class="text-center">
+                <md-button ng-show="secondgrid" type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" data-ng-click="confirmdata(displayselectedlst)">
+                    Confirm
+                </md-button>
+                <md-button ng-show="fillstaff.length>0" type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" data-ng-click="confirmdata(fillstaff)">
+                    Confirm
+                </md-button>
+                <md-button type="submit" class="md-raised md-warn" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" data-ng-click="rejectdata(displayselectedlst)">
+                    Reject
+                </md-button>
+                <md-button type="submit" class="md-raised md-warn" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" data-ng-click="cleardata()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary">
+        <div class="box-header with-border" ng-show="concessionliststudent.length>0">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="box-title  float-left">SIBLINGS List</h3>
+                </div>
+                <div class="col-sm-2">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#tableexcell')" target="_blank" ng-show="concessionliststudent.length>0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                </div>
+                <div class="col-sm-4">
+                    <div class="">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+
+                                <input class="form-control" ng-model="search4" type="text" placeholder="search here...">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <table class="table table-hover table-responsive table-bordered text-center" ng-show="concessionliststudent.length>0">
+            <thead>
+                <tr>
+                    <th><a href="">SR.No</a> </th>
+                    <th><a href="">Student Name</a> </th>
+                    <th><a href="">Class</a> </th>
+                    <th><a href="">Sibling Name</a> </th>
+                    <th><a href="">Sibling Class</a> </th>
+                    <th><a href="">Concession Type</a> </th>
+                    <th><a href="">Concession Status</a> </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr dir-paginate="user in concessionliststudent | orderBy:sortKey:reverse|filter:search4|itemsPerPage:itemsPerPage4" pagination-id="pageid4" current-page="currentPage4" ng-class-odd="'odd'">
+                    <td>{{itemsPerPage4 *(currentPage4-1)+$index+1}}</td>
+                    <td style="text-align:left" class="text-uppercase">{{user.StudentName}}</td>
+                    <td style="text-align:left">{{user.SClass}}</td>
+                    <td class="text-uppercase" style="text-align:left" ng-if="user.ConcessionStatus=='Rejected'">{{user.PASRS_SiblingsName}}</td>
+                    <td class="text-uppercase" style="text-align:left" ng-if="user.ConcessionStatus=='Confirmed'">{{user.SiblingName}}</td>
+                    <td style="text-align:left" ng-if="user.ConcessionStatus=='Confirmed' && user.flag=='S'">{{user.SiblingClass}}</td>
+                    <td style="text-align:left" ng-if="user.ConcessionStatus=='Rejected' && user.flag=='S'">{{user.PASRS_SiblingsClass}}</td>
+                    <td ng-if="user.flag=='R'">-----</td>
+                    <td ng-if="user.flag=='R'">-----</td>
+                    <td>{{user.ConcessionName}}</td>
+                    <td ng-if="user.flag!='R'">
+                        {{user.ConcessionStatus}}
+                        <!--<span ng-if="user.ConcessionStatus=='C'">
+                            Confirmed
+                        </span>
+                        <span ng-if="user.ConcessionStatus=='R'">
+                            Rejected
+                        </span>-->
+                    </td>
+                    <td ng-if="user.flag=='R'">
+                        {{user.PASS_ActiveFlag}}
+                        <!--<span ng-if="user.PASS_ActiveFlag=='1'">
+                            Confirmed
+                        </span>
+                        <span ng-if="user.PASS_ActiveFlag==''">
+                            Rejected
+                        </span>-->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <dir-pagination-controls max-size="5" pagination-id="pageid4"
+                                 direction-links="true"
+                                 boundary-links="true">
+        </dir-pagination-controls>
+
+    </div>
+    <div class="box box-primary" ng-if="concessionliststaff.length>0">
+        <div class="box-header with-border">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="box-title  float-left">Employee Concession List</h3>
+                </div>
+                <div class="col-sm-2">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcelE('#tableexcellE')" target="_blank" ng-show="concessionliststaff.length>0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                </div>
+                <div class="col-sm-4" ng-show="concessionliststudent.length>0">
+                    <div class="">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="search5" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-hover table-responsive table-bordered text-center">
+            <thead>
+                <tr>
+                    <th><a href="">SR.No</a> </th>
+                    <th><a href="">Student Name</a> </th>
+                    <th><a href="">Class</a> </th>
+                    <th><a href="">Employee Name</a> </th>
+                    <th><a href="">Employee Code</a> </th>
+                    <th><a href="">Concession Type</a> </th>
+                    <th><a href="">Concession Status</a> </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr dir-paginate="user in concessionliststaff | orderBy:sortKey:reverse|filter:search5|itemsPerPage:itemsPerPage5" pagination-id="pageid5" current-page="currentPage5" ng-class-odd="'odd'">
+                    <td>{{itemsPerPage5 *(currentPage5-1)+$index+1}}</td>
+                    <td class="text-uppercase" style="text-align:left">{{user.StudentName}}</td>
+                    <td style="text-align:left">{{user.SClass}}</td>
+                    <td class="text-uppercase" style="text-align:left">{{user.EmployeeName}}</td>
+                    <td>{{user.EmployeeCode}}</td>
+                    <td>Employee</td>
+                    <td>
+                        {{user.ConcessionStatus}}
+                        <!--<span ng-if="user.ConcessionStatus==1">
+                            Confirmed
+                        </span>
+                        <span ng-if="user.ConcessionStatus==0">
+                            Rejected
+                        </span>-->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <dir-pagination-controls max-size="5" pagination-id="pageid5"
+                                 direction-links="true"
+                                 boundary-links="true">
+        </dir-pagination-controls>
+    </div>
+    <div id="tableexcell" ng-show="false" style="overflow:scroll">
+        <table class="table table-hover table-responsive table-bordered text-center">
+            <thead>
+                <tr style="border:0.5px solid black;font-size:large;font-weight:bold;">
+                    <td style="text-align:center;color:darkblue;" colspan="7">
+                        SIBLINGS CONCESSION REPORT
+                    </td>
+                </tr>
+                <tr style="border:0.5px solid black;font-size:medium;font-weight:bold">
+                    <td style="text-align:center;">SL.NO.</td>
+                    <td style="text-align:center;">STUDENT NAME</td>
+                    <td style="text-align:center;">CLASS</td>
+                    <td style="text-align:center;">SIBLING NAME</td>
+                    <td style="text-align:center;">SIBLING CLASS </td>
+                    <td style="text-align:center;">CONCESSION TYPE</td>
+                    <td style="text-align:center;">CONCESSION STATUS</td>
+                </tr>
+            </thead>
+            <tr style="border:0.5px solid black" ng-repeat="user in concessionliststudent | orderBy:propertyName:reverse">
+                <td style="text-align:center;">{{ $index+1}}</td>
+                <td style="text-align:left" class="text-uppercase">{{user.StudentName}}</td>
+                <td style="text-align:left">{{user.SClass}}</td>
+                <td class="text-uppercase" style="text-align:left" ng-if="user.ConcessionStatus=='Rejected'">{{user.PASRS_SiblingsName}}</td>
+                <td class="text-uppercase" style="text-align:left" ng-if="user.ConcessionStatus=='Confirmed'">{{user.SiblingName}}</td>
+                <td style="text-align:left" ng-if="user.ConcessionStatus=='Confirmed' && user.flag=='S'">{{user.SiblingClass}}</td>
+                <td style="text-align:left" ng-if="user.ConcessionStatus=='Rejected' && user.flag=='S'">{{user.PASRS_SiblingsClass}}</td>
+                <td ng-if="user.flag=='R'">-----</td>
+                <td ng-if="user.flag=='R'">-----</td>
+                <td>{{user.ConcessionName}}</td>
+                <td ng-if="user.flag!='R'">
+                    {{user.ConcessionStatus}}
+                </td>
+                <td ng-if="user.flag=='R'"></td>
+            </tr>
+            <!--<tr>
+                <td colspan="16" class="col-sm-12 text-center margin-top-2">
+                    <label>
+                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  © {{current_date|date:'yyyy'}} Copyright All rights reserved,Report generated by Vaps Technosoft Pvt. Ltd.
+                    </label>
+                </td>
+            </tr>-->
+        </table>
+    </div>
+    <div id="tableexcellE" ng-show="false" style="overflow:scroll">
+        <table class="table table-hover table-responsive table-bordered text-center">
+            <thead>
+                <tr style="border:0.5px solid black;font-size:large;font-weight:bold;">
+                    <td style="text-align:center;color:darkblue;" colspan="7">
+                        EMPLOYEE CONCESSION REPORT
+                    </td>
+                </tr>
+                <tr style="border:0.5px solid black;font-size:medium;font-weight:bold">
+                    <td style="text-align:center;">SL.NO.</td>
+                    <td style="text-align:center;">STUDENT NAME</td>
+                    <td style="text-align:center;">CLASS</td>
+                    <td style="text-align:center;">EMPLOYEE NAME</td>
+                    <td style="text-align:center;">EMPLOYEE CODE </td>
+                    <td style="text-align:center;">CONCESSION TYPE</td>
+                    <td style="text-align:center;">CONCESSION STATUS</td>
+                </tr>
+            </thead>
+            <tr style="border:0.5px solid black" ng-repeat="user in concessionliststaff | orderBy:propertyName:reverse">
+                <td style="text-align:center;">{{ $index+1}}</td>
+                <td class="text-uppercase" style="text-align:left">{{user.StudentName}}</td>
+                <td style="text-align:left">{{user.SClass}}</td>
+                <td class="text-uppercase" style="text-align:left">{{user.EmployeeName}}</td>
+                <td style="text-align:center;">{{user.EmployeeCode}}</td>
+                <td>Employee</td>
+                <td style="text-align:left">
+                    {{user.ConcessionStatus}}
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <!--<a href="{{imagedownload}}" target="_blank" class="btn btn-default">Download</a>-->
+                    <!--<button type="button" class="btn btn-default" ng-click="download()" data-dismiss="modal">Download</button>-->
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</section>

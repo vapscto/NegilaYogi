@@ -1,0 +1,367 @@
+﻿<style>
+    .classborder {
+        border: 1px solid black !important;
+        border-radius: 10px !important;
+        padding-left: 20px;
+    }
+
+    .classtextarea {
+        resize: none;
+    }
+
+    .file-blue:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .wordwrap {
+        word-break: break-word !important;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">STAFF COMPLIANTS</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Employee Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-7">
+                                <ui-select id="sel1" name="studentname" ng-model="$parent.HRME_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Student" required ng-change="OnChangeEmployee($parent.HRME_Id)" ng-disabled="editflag==true">
+                                    <ui-select-match ng-trim="false" placeholder="Select or search Student">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in getemployeelist | filter: $select.search " value="{{option.hrmE_Id}}"
+                                                       ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.hrmE_EmployeeFirstName)| highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.studentname)" ng-messages="myForm.studentname.$error">
+                                    <div ng-message="required">Select Employee </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-6 input-group">
+                                <md-datepicker name="sch_date" onkeypress="return false" data-ng-model="HREREM_Date" placeholder="Enter date" required
+                                               md-max-date="maxdate" md-min-date="middate" ng-disabled="editflag==true">
+                                </md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Subject : <span class="text-red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" ng-model="HREREM_Subject" name="subj" id="sub1" ng-maxlength="100" required />
+                                <div class="text-left error-messages" ng-if="interacted(myForm.subj)" ng-messages="myForm.subj.$error">
+                                    <div ng-message="required">Enter Subject</div>
+                                    <div ng-message="maxlength">Field Cannot Take More Than 100 Characters</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Remarks  :<span style="color:red">*</span> </label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control classtextarea" rows="5" ng-model="HREREM_Remarks" ng-trim="false" ng-maxlength="500" name="address" required></textarea>
+                                <div class="text-left error-messages" ng-if="interacted(myForm.address)" ng-messages="myForm.address.$error">
+                                    <div ng-message="required">Please Enter Remarks</div>
+                                    <div ng-message="maxlength">Field Cannot Take More Than 500 Characters</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Upload</th>
+                                        <th>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center">1</td>
+                                        <td class="text-center">
+                                            <input class="custom-file-input file-blue text-center" id="filename"
+                                                   data-ng-model="HREREM_FilePath" type="file"
+                                                   accept="image/*, application/pdf,application/msword,application/vnd.ms-powerpoint,
+                                                               application/vnd.openxmlformats-officedocument.presentationml.presentation,
+                                                               application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                                               application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                               application/vnd.ms-excel" name="filetypeteacher"
+                                                   onchange="angular.element(this).scope().uploadtecherdocuments(this)">
+                                        </td>
+                                        <td class="text-center">
+                                            <span ng-if="HREREM_FilePath !=null && HREREM_FilePath !=''">
+                                                <a ng-if="filetype=='jpg' || filetype=='png' || filetype=='svg'|| filetype=='jpeg' || filetype=='gif'"
+                                                   style="color:red;display:inline; font-weight: bolder;"
+                                                   data-ng-click="showmothersign(HREREM_FilePath,HREREM_FileName)">
+                                                    Image
+                                                </a>
+                                                <a ng-if="filetype=='pdf'" style="color:blue;display:inline;"
+                                                   ng-click="onview(HREREM_FilePath,HREREM_FileName)">
+                                                    <b style="color:orangered;display:inline; ">Pdf</b>
+                                                </a>
+                                                <a ng-if="filetype=='doc'|| filetype=='docx'"
+                                                   style="color:blue;display:inline;"
+                                                   href="{{document_Pathnew}}" target="_blank">
+                                                    <b style="color:orangered;display:inline;">Document</b>
+                                                </a>
+                                                <a ng-if="filetype=='ppt'|| filetype=='pptx'"
+                                                   style="color:blue;display:inline;"
+                                                   href="{{document_Pathnew}}" target="_blank">
+                                                    <b style="color:orangered;display:inline;">PPT</b>
+                                                </a>
+                                                <a ng-if="filetype=='xls'|| filetype=='xlsx'"
+                                                   style="color:blue;display:inline;"
+                                                   href="{{document_Pathnew}}" target="_blank">
+                                                    <b style="color:orangered;display:inline;">Excel</b>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="classborder">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Employee Name</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label"><b>:  {{studentname}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Emp Code</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label"><b>:  {{empcode}} </b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Department / Designation</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label"><b>:  {{dept}} / {{desg}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <input type="hidden" ng-model="HREREM_Id" value="{{HREREM_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="SaveDetails()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>                 
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-if="getsavedetails.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Satff Compliants Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box box-body">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th>Employee Details</th>
+                        <th>Subject</th>
+                        <th>Remarks</th>
+                        <th>Date</th>
+                        <th>File</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (getsavedetails | filter : search)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">
+                            Name : {{user.hrmE_EmployeeFirstName}}
+                            <br />
+                            Code :  {{user.hrmE_EmployeeCode}}
+                        </td>
+                        <td class="text-left">{{user.hrereM_Subject}}</td>
+                        <td class="text-left">{{user.hrereM_Remarks}}</td>
+                        <td class="text-center">{{user.hrereM_Date | date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">
+                            <div ng-if="user.hrereM_FilePath !==null && user.hrereM_FilePath !=''">
+                                <span ng-if="user.hrereM_FilePath !=null && user.hrereM_FilePath !=''">
+
+                                    <a>
+                                        {{user.hrereM_FileName}}
+                                    </a>
+                                    |
+                                    <a ng-if="user.filetype=='jpg' || user.filetype=='png' || user.filetype=='svg'|| user.filetype=='jpeg'
+                                                       || user.filetype=='gif'"
+                                       style="color:red;display:inline; font-weight: bolder;"
+                                       data-ng-click="showmothersign(user.hrereM_FilePath,user.hrereM_FileName)">
+                                        Image
+                                    </a>
+                                    <a ng-if="user.filetype=='pdf'" style="color:blue;display:inline;"
+                                       ng-click="onview(user.hrereM_FilePath,user.hrereM_FileName)">
+                                        <b style="color:orangered;display:inline; ">Pdf</b>
+                                    </a>
+                                    <a ng-if="user.filetype=='doc'|| user.filetype=='docx'"
+                                       style="color:blue;display:inline;"
+                                       href="{{user.document_Pathnew}}" target="_blank">
+                                        <b style="color:orangered;display:inline;">Document</b>
+                                    </a>
+                                    <a ng-if="user.filetype=='ppt'|| user.filetype=='pptx'"
+                                       style="color:blue;display:inline;"
+                                       href="{{user.document_Pathnew}}" target="_blank">
+                                        <b style="color:orangered;display:inline;">PPT</b>
+                                    </a>
+                                    <a ng-if="user.filetype=='xls'|| user.filetype=='xlsx'"
+                                       style="color:blue;display:inline;"
+                                       href="{{user.document_Pathnew}}" target="_blank">
+                                        <b style="color:orangered;display:inline;">Excel</b>
+                                    </a>
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <a class="text-aqua" href="" ng-click="EditDetails(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            |
+                            <span ng-if="user.hrereM_ActiveFlg === true">
+                                <a href="" ng-click="ActiveDeativeEmployeeCompliantsDetails(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                </a>
+                            </span>
+                            <span ng-if="user.hrereM_ActiveFlg === false">
+                                <a href="" ng-click="ActiveDeativeEmployeeCompliantsDetails(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section> 
+
+<div id="myModalimg" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="preview" class="img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-small" id="popup15" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+        </div>
+        <div class="modal-content">
+            <div class="modal-body">
+                <div ng-repeat="vi1 in view_videos" style="padding-bottom:20px">
+                    <video width="320" height="240" controls="controls" crossorigin="anonymous" controlsList="nodownload" oncontextmenu="return false;">
+                        <source ng-src="{{vi1.coeeV_Videos | trustUrl}}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="pauseOrPlay()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div id="pdfviewdd"></div>
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>
+    </div>
+</div>
+
+<div id="showppt" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <iframe ng-src="{{contantppt}}" width='100%' height='1000' frameborder='0'></iframe>
+        </div>
+    </div>
+</div>

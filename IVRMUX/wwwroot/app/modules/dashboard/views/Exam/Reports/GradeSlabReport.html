@@ -1,0 +1,210 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="StuAttRptDropdownList();" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Grade Slab Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="text-center well" ng-init="type=1">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type" ng-value="1" name="all" ng-change="getDataByType(type);">
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type" ng-value="2" name="all" ng-change="getDataByType(type);">
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Grade:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel12" data-ng-model="emgR_Id" name="class" ng-required="type==2" ng-disabled="type==1" ng-change="onchangegrade()">
+                                    <option value="">Select Grade</option>
+                                    <option ng-repeat="class in classDropdown" value="{{class.emgR_Id}}">{{class.emgR_GradeName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                    <div ng-message="required">Select Grade</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="savetmpldata();">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()" ng-model="clr" value="cl">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" 
+                                   ng-click="exportToExcel('#printSectionIdecel')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Excel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-disabled="print_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="gridflag">
+            <div class="box-header with-border">
+                <h3 class="box-title">GRADE SLAB REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Grade Type Here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center" id="tabel1">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sortBy('$index+1')">SL.No.</a></th>
+                            <th> GRADE TYPE </th>
+                            <th>SLAB IN(marks or %)</th>
+                            <th>GRADE SLAB</th>
+                            <th>GRADE</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="rt in final_details_list | filter:searchValue ">
+                        <tr>                            
+                            <td rowspan="{{rt.grd_details.length+1}}">{{$index+1}}</td>
+                            <td rowspan="{{rt.grd_details.length+1}}">{{rt.emgR_GradeName}}</td>
+                            <td rowspan="{{rt.grd_details.length+1}}">{{rt.emgR_MarksPerFlag}}</td>
+                        </tr>
+                        <tr ng-repeat="rt1 in rt.grd_details">
+                            <td>{{rt1.emgD_From}} - {{rt1.emgD_To}}</td>
+                            <td>{{rt1.emgD_Name}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+            <div id="printSectionId" ng-show="table_flag">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>GRADE SLAB REPORT</h4></center>
+                <br />
+                <table class="table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>GRADE TYPE </th>
+                            <th>SLAB IN(marks or %)</th>
+                            <th>GRADE SLAB</th>
+                            <th>GRADE</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="rt in final_details_list">
+                        <tr>
+                            <td rowspan="{{rt.grd_details.length+1}}">{{$index+1}}</td>
+                            <td rowspan="{{rt.grd_details.length+1}}">{{rt.emgR_GradeName}}</td>
+                            <td rowspan="{{rt.grd_details.length+1}}">{{rt.emgR_MarksPerFlag}}</td>
+                        </tr>
+                        <tr ng-repeat="rt1 in rt.grd_details">
+                            <td>{{rt1.emgD_From}} - {{rt1.emgD_To}}</td>
+                            <td>{{rt1.emgD_Name}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="printSectionIdecel" ng-show="table_flag">
+                <table class="table-bordered">
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="5" style="text-align:center;">
+                            <b> {{institutename}}</b>
+                        </td>
+                    </tr>
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="5" style="text-align:center;">
+                            <b> {{instituteaddress}}</b>
+                        </td>
+                    </tr>
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="5">
+                            &nbsp;
+                        </td>
+                    </tr>
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="5" style="text-align:center;">
+                            <b> Grade Slab Report </b>
+                        </td>
+                    </tr>
+                    <tr style="border : solid 0.5px black;">
+                        <td colspan="5" style="text-align:center;">
+                            <b> {{reportdetails}} </b>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="table-bordered" id="table">
+                    <thead>
+                        <tr style="border : solid 0.5px black;">
+                            <th>SL.No.</th>
+                            <th>GRADE TYPE </th>
+                            <th>SLAB IN(marks or %)</th>
+                            <th>
+                                <table>
+                                    <tr style="border : solid 0.5px black;">
+                                        <th>GRADE SLAB</th>
+                                        <th>GRADE</th>
+                                    </tr>
+                                </table>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="rt in final_details_list">
+                        <tr style="border : solid 0.5px black;">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left padding-left-15">{{rt.emgR_GradeName}}</td>
+                            <td class="text-left padding-left-15">{{rt.emgR_MarksPerFlag}}</td>
+                            <td>
+                                <table>
+                                    <tbody ng-repeat="rt1 in rt.grd_details">
+                                        <tr style="border : solid 0.5px black;">
+                                            <td>{{rt1.emgD_From}} - {{rt1.emgD_To}}</td>
+                                            <td>{{rt1.emgD_Name}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </form>
+</section>

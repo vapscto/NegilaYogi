@@ -1,0 +1,375 @@
+﻿
+<section class="content" data-ng-init="onLoadGetData()">
+ 
+        <form class="form-horizontal" role="form" name="myForm">
+            <div class="box box-primary" ng-show="!Editable">
+                <div class="box-header with-border">
+                    <h3 class="box-title">MRF Requisition List</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <!--<div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label col-sm-3">Job List :</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <input class="form-control ng-pristine ng-untouched ng-valid" ng-model="search" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+
+                        <div class="col-sm-12 text-right">
+                            <button type="button" class="btn btn-primary" data-toggle="tooltip" title="Download" ng-click="exportCsv()">
+                                <i class="fa fa-download"></i>
+                            </button>
+                            <button type="button" class="btn btn-info" data-toggle="tooltip" title="Refresh" ng-click="onLoadGetData()">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                            <button type="button" class="btn btn-primary" ng-click="addjob()">
+                                Add job  <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid margin-top-20" ui-grid="gridOptions" ui-grid-selection ui-grid-exporter ui-grid-pagination>
+                        <!--<div class="margin-top-20">
+                <div ui-grid="gridOptions" ui-grid-pagination class="grid"></div>
+            </div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary" ng-show="Editable">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Edit MRF Requisition</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Position :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="sel1" name="PosId" data-ng-model="mrfReq.hrmP_Id" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="job in masterPositionList" value="{{job.hrmP_Id}}" ng-selected="{{job.hrmP_Id == mrfReq.hrmP_Id}}">
+                                            {{job.hrmP_Position}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.PosId)" ng-messages="myForm1.PosId.$error">
+                                        <div ng-message="required">Select Position</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--<div class="col-sm-6">
+        <div class="form-group">
+            <label class="control-label col-sm-3">Location :</label>
+            <div class="col-sm-9">
+                <input class="form-control" name="location" ng-model="mrfReq.hrmrfR_JobLocation" type="text" required>
+                <div class="error-messages" ng-if="interacted1(myForm1.location)" ng-messages="myForm1.location.$error">
+                    <div ng-message="required">Enter Location</div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Location :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <label class="control-label">
+                                        <input type="radio" name="vf31" value="HO" ng-model="mrfReq.hrmrfR_JobLocation">
+                                        <span class="lbl padding-8">HO</span>
+                                    </label>
+                                    <label class="control-label">
+                                        <input type="radio" name="vf32" value="Client" ng-model="mrfReq.hrmrfR_JobLocation">
+                                        <span class="lbl padding-8">Client</span>
+                                    </label>
+                                    <div class="col-sm-9" ng-if="mrfReq.hrmrfR_JobLocation == 'Client'">
+                                        <select class="form-control" id="selcli" name="ClientLOC" ng-model="mrfReq.clientlocation" required>
+                                            <option value="">--Select--</option>
+                                            <option ng-repeat="cli in clientlist" value="{{cli.ismmclT_ClientName}}" ng-selected="{{cli.ismmclT_ClientName == mrfReq.clientlocation}}">
+                                                {{cli.ismmclT_ClientName}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.ClientLOC)" ng-messages="myForm.ClientLOC.$error">
+                                            <div ng-message="required">Select Client Location</div>
+                                        </div>
+                                    </div>
+                                    <label class="control-label">
+                                        <input type="radio" name="vf32" value="Location" ng-model="mrfReq.hrmrfR_JobLocation">
+                                        <span class="lbl padding-8">Location</span>
+                                    </label>
+                                    <div class="col-sm-9" ng-if="mrfReq.hrmrfR_JobLocation == 'Location'">
+                                        <input class="form-control" ng-model="mrfReq.dynamicloc" type="text" allow-pattern="[A-Za-z 0-9]" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Department :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="sel3" name="depId" data-ng-model="mrfReq.hrmD_Id" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="job in masterDepartmentList" value="{{job.hrmD_Id}}" ng-selected="{{job.hrmD_Id == mrfReq.hrmD_Id}}">
+                                            {{job.hrmD_DepartmentName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.depId)" ng-messages="myForm1.depId.$error">
+                                        <div ng-message="required">Select Department</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Priority :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="sel4" name="priority" data-ng-model="mrfReq.hrmpR_Id" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="job in masterPriorityList" value="{{job.hrmpR_Id}}" ng-selected="{{job.hrmpR_Id == mrfReq.hrmpR_Id}}">
+                                            {{job.hrmP_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.priority)" ng-messages="myForm1.priority.$error">
+                                        <div ng-message="required">Select Priority</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Position Type :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="sel5" name="PosType" data-ng-model="mrfReq.hrmpT_Id" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="job in masterPosTypeList" value="{{job.hrmpT_Id}}" ng-selected="{{job.hrmpT_Id == mrfReq.hrmpT_Id}}">
+                                            {{job.hrmpT_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.PosType)" ng-messages="myForm1.PosType.$error">
+                                        <div ng-message="required">Select Position Type</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Qualification :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="sel2" name="qualify" ng-model="mrfReq.hrmC_Id" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="qual in masterQualification" value="{{qual.hrmC_Id}}" ng-selected="{{qual.hrmC_Id == mrfReq.hrmC_Id}}">
+                                            {{qual.hrmC_QulaificationName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.qualify)" ng-messages="myForm1.qualify.$error">
+                                        <div ng-message="required">Select Qualification</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">MRF No. :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="mrf" ng-model="mrfReq.hrmrfR_MRFNO" type="text" required>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.mrf)" ng-messages="myForm1.mrf.$error">
+                                        <div ng-message="required">Enter MRF No</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">No. of Postion :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="noofpos" ng-model="mrfReq.hrmrfR_NoofPosition" type="text" required>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.noofpos)" ng-messages="myForm1.noofpos.$error">
+                                        <div ng-message="required">Enter No. of Postion</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Skill :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="skill" ng-model="mrfReq.hrmrfR_Skills" type="text" required>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.skill)" ng-messages="myForm1.skill.$error">
+                                        <div ng-message="required">Enter Skill</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Job Description :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="description" ng-model="mrfReq.hrmrfR_JobDesc" type="text" required>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.description)" ng-messages="myForm1.description.$error">
+                                        <div ng-message="required">Enter Description</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Experience (Year) :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-4">
+                                    <input class="form-control" name="exefrom" ng-model="mrfReq.hrmrfR_ExpFrom" type="text" required>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.exefrom)" ng-messages="myForm1.exefrom.$error">
+                                        <div ng-message="required">Enter Experience</div>
+                                    </div>
+                                </div>
+                                <label class="control-label col-sm-2">to :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-3">
+                                    <input class="form-control" name="expto" ng-model="mrfReq.hrmrfR_ExpTo" type="text" required>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.expto)" ng-messages="myForm1.expto.$error">
+                                        <div ng-message="required">Enter Experience</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Age :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="age" ng-model="mrfReq.hrmrfR_Age" type="text" required>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.age)" ng-messages="myForm1.age.$error">
+                                        <div ng-message="required">Enter Age</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Gender :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="sel33" name="genId" data-ng-model="mrfReq.ivrmmG_Id" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="gen in masterGender" value="{{gen.ivrmmG_Id}}" ng-selected="{{gen.ivrmmG_Id == mrfReq.ivrmmG_Id}}">
+                                            {{gen.ivrmmG_GenderName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.genId)" ng-messages="myForm1.genId.$error">
+                                        <div ng-message="required">Select Gender</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Reason :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="reason" ng-model="mrfReq.hrmrfR_Reason" type="text" required>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.reason)" ng-messages="myForm1.reason.$error">
+                                        <div ng-message="required">Enter Reason</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Remark :</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="remark" ng-model="mrfReq.hrmrfR_Remark" type="text">
+                                    <div class="error-messages" ng-if="interacted1(myForm1.remark)" ng-messages="myForm1.remark.$error">
+                                        <div ng-message="required">Enter Remark</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Job Attachment :</label>
+                                <div class="col-sm-9">
+                                    <textarea class="form-control" rows="2" id="comment" ng-model="mrfReq.hrmrfR_Attachment"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3"></label>
+                                <div class="col-sm-9">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="optradio" ng-model="mrfReq.hrmrfR_WrittenTestFlg">
+                                        <span class="lbl padding-8">Written Test</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3"></label>
+                                <div class="col-sm-9">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="optradio" ng-model="mrfReq.hrmrfR_OnlineTestFlg">
+                                        <span class="lbl padding-8">Online Test</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3"></label>
+                                <div class="col-sm-9">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="optradio" ng-model="mrfReq.hrmrfR_TechnicalInterviewFlg">
+                                        <span class="lbl padding-8">Technical Interview</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-footer text-right">
+                        <button type="button" class="btn btn-warning" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" ng-click="savejob(mrfReq)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save & Publish
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+   
+
+</section>

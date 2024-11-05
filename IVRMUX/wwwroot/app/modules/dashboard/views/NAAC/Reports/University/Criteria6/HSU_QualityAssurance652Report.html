@@ -1,0 +1,288 @@
+﻿
+<style>
+    .file-blue:before {
+        content: 'Upload File';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+    .multiselectCheck {
+        width: 19.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">6.5.2. Quality Assurance Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Cycle:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="cycleid" name="acdYear" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="val in getinstitutioncycle" value="{{val.cycleid}}" ng-selected="val.cycleid==cycleid">
+                                        {{val.cyclename}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdYear)" ng-messages="myForm.acdYear.$error">
+                                    <div ng-message="required">Select Cycle</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Institution Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="multiselectCheck col-sm-8">
+                                <label ng-model="MI_Id" ng-repeat="year in getparentidzero |filter:filterchkbx" value="{{year.mI_Id}}">
+                                    <input name="year" value="1" data-ng-model="year.select" type="checkbox" ng-click="togchkbx();" ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8">
+                                        {{year.mI_Name}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                <div ng-message="required" style="color:red">Select Institution Name</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" id="save-btn" aria-disabled="false" data-ng-click="Report()">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#printareaId1')" ng-show="printflag">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="printData()" ng-show="printflag">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="govtsclist.length > 0">
+            <div class="box-header with-border">
+                <h3 class="box-title">6.5.2. Quality Assurance Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <table>
+                    <tr>
+                        <td>5.Participation in NIRF process</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">
+                            6.Any other quality audit by recognized State, National or International agencies ( ISO, NABH, NABL Certification, NBA, any other)
+                        </td>
+                    </tr>
+                </table>
+
+
+                <table class="table table-bordered table-responsive">
+                    <tbody ng-repeat="user in finalarray1">
+                        <tr style="background-color:yellow;border:solid">
+                            <th colspan="12" class="text-center"> {{user.YEAR}} </th>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                            <th style="width:80px" rowspan="2"><b>Year</b></th>
+                            <th colspan="2"><b>AQARs prepared/ submitted.</b></th>
+                            <th colspan="2"><b>Academic Administrative Audit (AAA) and initiation of follow-up action</b></th>
+                            <th colspan="2"><b>Participation in NIRF process</b></th>
+                            <th colspan="2"><b>ISO Certification.</b></th>
+                            <th colspan="2"><b>NABH, NABL, NBA or any other certification</b></th>
+                            <th rowspan="2">Link Of The Relevent Documents</th>
+                        </tr>
+                        <tr>
+                            <th>Yes</th>
+                            <th>No</th>
+                            <th>Yes</th>
+                            <th>No</th>
+                            <th>Yes</th>
+                            <th>No</th>
+                            <th>Yes</th>
+                            <th>No</th>
+                            <th>Yes</th>
+                            <th>No</th>
+                        </tr>
+                   
+
+                        <tr ng-repeat="aaa in user.dlist">
+                            <td>{{aaa.YEAR}}</td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_AQARFlg=='Yes'">Yes</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_AQARFlg=='No'">No</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_AAAFlg=='Yes'">Yes</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_AAAFlg=='No'">No</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_NIRFFlg=='Yes'">Yes</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_NIRFFlg=='No'">No</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_ISOFlg=='Yes'">Yes</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_ISOFlg=='No'">No</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_NBAFlg=='Yes'">Yes</span> </td>
+                            <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_NBAFlg=='No'">No</span> </td>
+
+                            
+
+                            <td style="padding:0px">
+                                <div>
+                                    <table style="width:100%">
+                                        <tr ng-if="aaa.FILES.length==1" ng-repeat="ff in aaa.FILES" style="width:100%;height:100%">
+                                            <td style="width:100%;height:100%;padding:8px">
+                                                <a style="color: blue; text-decoration:underline;" href="{{ff.filepath}}">
+                                                    {{ff.filename}}
+                                                </a>
+                                            </td>
+
+                                        </tr>
+
+                                        <tr ng-if="aaa.FILES.length>1" ng-repeat="ff in aaa.FILES" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%">
+                                            <td style="width:100%;height:100%;padding:8px">
+                                                <a style="color: blue; text-decoration:underline;" href="{{ff.filepath}}">
+                                                    {{ff.filename}}
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="false">
+        <div class="box-body" id="printareaId1">
+            <div class="row">
+                <div class="col-sm-12">
+                    <table>
+                        <tr>
+                            <td style=" text-align :left; font-size:20px;text-align:center" colspan="6">
+                                <b>Financial Support Report</b>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <br />
+            <table>
+                <tr>
+                    <td>5.Participation in NIRF process</td>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        6.Any other quality audit by recognized State, National or International agencies ( ISO, NABH, NABL Certification, NBA, any other)
+                    </td>
+                </tr>
+
+            </table>
+
+
+
+
+
+
+            <table class="table table-bordered table-responsive" id="printareaId">
+
+                <tbody ng-repeat="user in finalarray1">
+
+                    <tr style="background-color:yellow;border:solid">
+                        <th colspan="12" class="text-center"> {{user.YEAR}} </th>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <th style="width:80px" rowspan="2"><b>Year</b></th>
+                        <th colspan="2"><b>AQARs prepared/ submitted.</b></th>
+                        <th colspan="2"><b>Academic Administrative Audit (AAA) and initiation of follow-up action</b></th>
+                        <th colspan="2"><b>Participation in NIRF process</b></th>
+                        <th colspan="2"><b>ISO Certification.</b></th>
+                        <th colspan="2"><b>NABH, NABL, NBA or any other certification</b></th>
+                        <th rowspan="2"><b>Link Of The Relevent Documents</b></th>
+                    </tr>
+                    <tr>
+                        <th>Yes</th>
+                        <th>No</th>
+                        <th>Yes</th>
+                        <th>No</th>
+                        <th>Yes</th>
+                        <th>No</th>
+                        <th>Yes</th>
+                        <th>No</th>
+                        <th>Yes</th>
+                        <th>No</th>
+                    </tr>
+                    <tr ng-repeat="aaa in user.dlist">
+                        <td>{{aaa.YEAR}}</td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_AQARFlg=='Yes'">Yes</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_AQARFlg=='No'">No</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_AAAFlg=='Yes'">Yes</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_AAAFlg=='No'">No</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_NIRFFlg=='Yes'">Yes</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_NIRFFlg=='No'">No</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_ISOFlg=='Yes'">Yes</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_ISOFlg=='No'">No</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_NBAFlg=='Yes'">Yes</span> </td>
+                        <td class="wordwrap"><span ng-if="aaa.NCAC654QUAS_NBAFlg=='No'">No</span> </td>
+
+                        <td style="padding:0px">
+                            <div>
+                                <table style="width:100%">
+                                    <tr ng-if="aaa.FILES.length==1" ng-repeat="ff in aaa.FILES" style="width:100%;height:100%">
+                                        <td style="width:100%;height:100%;padding:8px">
+                                            <a style="color: blue; text-decoration:underline;" href="{{ff.filepath}}">
+                                                {{ff.filename}}
+                                            </a>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr ng-if="aaa.FILES.length>1" ng-repeat="ff in aaa.FILES" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%">
+                                        <td style="width:100%;height:100%;padding:8px">
+                                            <a style="color: blue; text-decoration:underline;" href="{{ff.filepath}}">
+                                                {{ff.filename}}
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                </table>
+
+                            </div>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+

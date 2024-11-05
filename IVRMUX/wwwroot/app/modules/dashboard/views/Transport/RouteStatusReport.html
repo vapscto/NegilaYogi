@@ -1,0 +1,414 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary" data-ng-init="BindData()">
+            <div class="box-header with-border">
+                <h3 class="box-title">Route Status Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="">
+                    <div class="row">
+
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="text-center well" data-ng-init="regorname_map ='both'">
+
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="regorname_map" name="sclregname_map" ng-change="validreport()" value="new">
+                                    <span class="lbl padding-8">NEW</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="regorname_map" name="sclregname_map" ng-change="validreport()" value="regular">
+                                    <span class="lbl padding-8">REGULAR</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="regorname_map" name="sclregname_map" ng-change="validreport()" value="both">
+                                    <span class="lbl padding-8">BOTH</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="asmaY_Id" name="acd_year" required>
+                                        <option value="">Select</option>
+                                        <option ng-repeat="year in YearList" value="{{year.asmaY_Id}}"> {{year.asmaY_Year}} </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                        <div ng-message="required">Please Select the Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Route: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="ayr" ng-model="trmR_Id" required ng-disabled="asmaY_Id_flag">
+                                        <option value="">--Select--</option>
+                                        <option value="0">ALL</option>
+                                        <option ng-repeat="optlst1 in routedetails" value="{{optlst1.trmR_Id}}" ng-selected="{{optlst1.Selected == true}}">
+                                            {{optlst1.trmR_RouteNo}} : {{optlst1.trmR_RouteName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.ayr)" ng-messages="myForm.ayr.$error">
+                                        <div ng-message="required">Please Select Route</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" data-ng-init="sts1 ='ALL'">Status: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel12" ng-model="sts1" name="sts">
+                                        <option value="ALL">ALL</option>
+                                        <option value="APPROVED">APPROVED</option>
+                                        <option value="WAITING">WAITING</option>
+                                        <option value="REJECTED">REJECTED</option>
+
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.sts)" ng-messages="myForm.sts.$error">
+                                        <div ng-message="required" style="margin-left:185px;">Please Select the Status</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="text-center well" data-ng-init="Paidnotpaid ='Both'">
+
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Paidnotpaid" name="Paidnotpaidflag" value="Paid">
+                                    <span class="lbl padding-8">Paid</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Paidnotpaid" name="Paidnotpaidflag" value="NotPaid">
+                                    <span class="lbl padding-8">NotPaid</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Paidnotpaid" name="Paidnotpaidflag" value="Both">
+                                    <span class="lbl padding-8">BOTH</span>
+                                </label>
+                            </div>
+                        </div>
+
+
+
+                        <br />
+                        <hr />
+                        <div class="col-sm-12">
+                            <div class="text-center">
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="getreport(obj)">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                                </md-button>
+                                <md-button type="button" ng-click="printData()" class="md-raised md-primary" ng-if="printstudents.length > 0">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    print
+                                </md-button>
+                                <md-button type="button" ng-click="exportToExcel('#table1')" target="_blank" class="md-raised md-primary" ng-if="printstudents.length > 0">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Export to Excel
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<GRID VIEW>-->
+            <!--< Table>-->
+            <div class="box box-primary" ng-show="allandfalse">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Route Status Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body" style="overflow:scroll">
+
+                    <div class="col-sm-12">
+
+                        <!--<div class="form-group">
+                            <label class="control-label">
+                                <b> Schedule-wise Count :</b>  &nbsp;&nbsp;
+                                <span ng-repeat="sc in scheduledata">
+                                    &nbsp;&nbsp;
+                                    <label class="badge">
+                                        &nbsp;&nbsp;
+                                        {{sc.TRRSC_ScheduleName}}  &nbsp;&nbsp; -  &nbsp;&nbsp; {{sc.Stu_PKCount}}   &nbsp;&nbsp;
+                                    </label>
+                                </span>
+                                &nbsp;&nbsp;
+                            </label>
+                        </div>-->
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+
+                                <th><a href="" ng-click="order('sno')">SNO</a></th>
+                                <th><a href="" ng-click="sort('amsT_Photoname')">Photo</a></th>
+                                <th><a href="" ng-click="sort('amsT_FirstName')">NAME</a></th>
+                                <th><a href="" ng-click="sort('amsT_AdmNo')">ADM NO.</a></th>
+                                <th><a href="" ng-click="sort('astA_ApplicationNo')">APP NO.</a></th>
+                                <th><a href="" ng-click="sort('asmcL_Id')">CLASS</a></th>
+                                <th><a href="" ng-click="sort('asmC_SectionName')">SECTION</a></th>
+                                <th><a href="" ng-click="sort('amsT_BloodGroup')">BLOOD GROUP</a></th>
+
+                                <!--<th><a href="" ng-click="sort('trmR_RouteName')">ROUTE</a></th>-->
+                                <th><a href="" ng-click="sort('trmR_PickRouteName')">PICK UP ROUTE</a></th>
+                                <th><a href="" ng-click="sort('trmL_PickLocationName')">PICK UP LOCATION</a></th>
+                                <th><a href="" ng-click="sort('trmR_DropRouteName')">DROP ROUTE</a></th>
+                                <th><a href="" ng-click="sort('trmL_DropLocationName')">DROP LOCATION</a></th>
+                                <th><a href="" ng-click="sort('astA_ApplStatus')">STATUS</a></th>
+                                <th><a href="" ng-click="sort('astA_Regnew')">TRN.ADMISSION</a></th>
+                                <th><a href="" ng-click="sort('onetwoway')">TRN.TYPE</a></th>
+                                <th><a href="" ng-click="sort('paidornotpaid')">REG PAYMENT</a></th>
+                                <th><a href="" ng-click="sort('astA_FatherMobileNo')">MOBILE NUMBER</a></th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1 = (students| filter : searchValue) |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td class="text-center  hdTD">
+                                    <label>
+                                        <input type="checkbox" ng-model="user.selected" value="{{user.astA_Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+
+                                <td>{{itemsPerPage*(currentPage-1)+$index+1}}</td>
+                                <td>
+                                    <img src="{{user.amsT_Photoname}}" class="img-responsive" height="30" width="30" />
+                                </td>
+                                <td>{{user.amsT_FirstName}}</td>
+                                <td>{{user.amsT_AdmNo}}</td>
+                                <td>{{user.astA_ApplicationNo}}</td>
+                                <td>{{user.asmcL_ClassName}}</td>
+                                <td>{{user.asmC_SectionName}}</td>
+                                <td>{{user.amsT_BloodGroup}}</td>
+
+                                <!--<td>{{user.trmR_RouteName}}</td>-->
+                                <td>{{user.trmR_PickRouteName}}</td>
+                                <td><span ng-if="trmR_Id==user.trmR_Idp || trmR_Id==0">{{user.trmL_PickLocationName}}</span><span ng-if="trmR_Id!=user.trmR_Idp && || trmR_Id!=0">--</span></td>
+                                <td>{{user.trmR_DropRouteName}}</td>
+                                <td><span ng-if="trmR_Id==user.trmR_Idd || trmR_Id==0">{{user.trmL_DropLocationName}}</span><span ng-if="trmR_Id!=user.trmR_Idd && || trmR_Id!=0">--</span></td>
+                                <td>{{user.astA_ApplStatus}}</td>
+                                <td>{{user.astA_Regnew}}</td>
+                                <td>{{user.onetwoway}}</td>
+                                <td>{{user.paidornotpaid}}</td>
+                                <td>{{user.astA_FatherMobileNo}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                </div>
+
+
+                <div id="printareaId" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" style="height:100px;width:50%" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center>
+                        <h4>Route Status  Report</h4>
+                        <h3>  Route Name:{{routename}}</h3>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                        <thead style="font-weight: bold;">
+
+                            <tr style="font-size:12px !important">
+                                <th style="width:15px">SL. No.</th>
+                                <th >Photo</th>
+                                <th  style="width:110px !important">NAME</th>
+                                <th>ADM NO</th>
+                                <th>APP NO.</th>
+                                <th>CLASS</th>
+                                <th>SECTION</th>
+                                <th>BLOOD GROUP</th>
+
+                                <!--<th>ROUTE</th>-->
+                                <!--<th>PICK UP ROUTE</th>-->
+                                <th style="width:120px">PICK UP LOCATION</th>
+                                <!--<th>DROP ROUTE</th>-->
+                                <th style="width:120px">DROP LOCATION</th>
+                                <th>STATUS</th>
+                                <th>TRN.ADM</th>
+                                <th>TRN.TYPE</th>
+                                <th>REG PAYMENT</th>
+                                <th style="width:80px">MOBILE NUMBER</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr ng-repeat="user in printstudents |filter:searchValue" style="font-size:12px !important">
+                                <td style="text-align:center">{{$index+1}}</td>
+                                <td><img src="{{user.amsT_Photoname}}" class="img-responsive" height="35" width="35" />
+                                <td style="word-break:break-all">{{user.amsT_FirstName}}</td>
+                                <td>{{user.amsT_AdmNo}}</td>
+                                <td>{{user.astA_ApplicationNo}}</td>
+                                <td>{{user.asmcL_ClassName}}</td>
+                                <td>{{user.asmC_SectionName}}</td>
+                                <td>{{user.amsT_BloodGroup}}</td>
+                                <!--<td>{{user.trmR_RouteName}}</td>-->
+                                <!--<td>{{user.trmR_PickRouteName}}</td>-->
+                                <td><span ng-if="trmR_Id==user.trmR_Idp || trmR_Id==0">{{user.trmL_PickLocationName}}</span><span ng-if="trmR_Id!=user.trmR_Idp && || trmR_Id!=0">--</span></td>
+                                <!--<td>{{user.trmR_DropRouteName}}</td>-->
+                                <td><span ng-if="trmR_Id==user.trmR_Idd || trmR_Id==0">{{user.trmL_DropLocationName}}</span><span ng-if="trmR_Id!=user.trmR_Idd && || trmR_Id!=0">--</span></td>
+                                <td>{{user.astA_ApplStatus}}</td>
+                                <td>{{user.astA_Regnew}}</td>
+                                <td>{{user.onetwoway}}</td>
+                                <td>{{user.paidornotpaid}}</td>
+                                <td>{{user.astA_FatherMobileNo}}</td>
+                            </tr>
+                        </tbody>
+                        <!--<tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>-->
+                    </table>
+                </div>
+                <div id="printareaId" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center> <h4>Route Status  Report</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="table12">
+                        <thead style="font-weight: bold;">
+                            <tr style="border:0 solid white">
+                                <th>
+
+                                </th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+
+                                <th></th>
+                                <th></th>
+                                <th style="border:0 solid white"><h3> ROUTE NAME:&nbsp;{{routename}}</h3></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th>SL. No.</th>
+                                <th>Photo</th>
+                                <th>NAME</th>
+                                <th>ADM NO</th>
+                                <th>APP NO.</th>
+                                <th>CLASS</th>
+                                <th>SECTION</th>
+                                <th>BLOOD GROUP</th>
+
+                                <!--<th>ROUTE</th>-->
+                                <!--<th>PICK UP ROUTE</th>-->
+                                <th>PICK UP LOCATION</th>
+                                <!--<th>DROP ROUTE</th>-->
+                                <th>DROP LOCATION</th>
+                                <th>STATUS</th>
+                                <th>TRN.ADMISSION</th>
+                                <th>TRN.TYPE</th>
+                                <th>REG PAYMENT</th>
+                                <th>MOBILE NUMBER</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printstudents |filter:searchValue">
+                                <td style="text-align:center">{{$index+1}}</td>
+                                <td style="height:60px !important;padding:2px !important"><img height="40" width="40" src="{{user.amsT_Photoname}}" class="img-responsive" /></td>
+                                <td>{{user.amsT_FirstName}}</td>
+                                <td>{{user.amsT_AdmNo}}</td>
+                                <td>{{user.astA_ApplicationNo}}</td>
+                                <td>{{user.asmcL_ClassName}}</td>
+                                <td>{{user.asmC_SectionName}}</td>
+                                <td>{{user.amsT_BloodGroup}}</td>
+                                <!--<td>{{user.trmR_RouteName}}</td>-->
+                                <!--<td>{{user.trmR_PickRouteName}}</td>-->
+                                <td><span ng-if="trmR_Id==user.trmR_Idp || trmR_Id==0">{{user.trmL_PickLocationName}}</span><span ng-if="trmR_Id!=user.trmR_Idp && || trmR_Id!=0">--</span></td>
+                                <!--<td>{{user.trmR_DropRouteName}}</td>-->
+                                <td><span ng-if="trmR_Id==user.trmR_Idd || trmR_Id==0">{{user.trmL_DropLocationName}}</span><span ng-if="trmR_Id!=user.trmR_Idd && || trmR_Id!=0">--</span></td>
+                                <td>{{user.astA_ApplStatus}}</td>
+                                <td>{{user.astA_Regnew}}</td>
+                                <td>{{user.onetwoway}}</td>
+                                <td>{{user.paidornotpaid}}</td>
+                                <td>{{user.astA_FatherMobileNo}}</td>
+                            </tr>
+                        </tbody>
+                        <!--<tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>-->
+                    </table>
+                </div>
+            </div>
+
+
+        </div>
+    </form>
+</section>

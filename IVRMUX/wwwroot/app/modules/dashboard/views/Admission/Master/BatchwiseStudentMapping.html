@@ -1,0 +1,285 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" data-ng-init="LoadData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Batch Wise Student Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHiddenup">
+                <div class="">
+                    <div class="well" ng-init="type12='1'">
+                        <div class="text-center">
+                            <label class="radio-inline">
+                                <input name="optradio" type="radio" data-ng-model="type12" value="1" ng-click="getDataByType(1);" required>
+                                <span class="lbl padding-8">Create New Branch</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="optradio" type="radio" data-ng-model="type12" value="2" ng-click="getDataByType(2);" required>
+                                <span class="lbl padding-8">Update Branch</span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                            <div ng-message="required">Select any one of the radio button</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="acdyear" id="sel1" ng-model="AMAY_Id" required ng-disabled="ASASB_Id > 0">
+                                    <option value="">-Select-</option>
+                                    <option ng-repeat="option in yearList" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdyear)" ng-messages="myForm.acdyear.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="cls" id="sel1" ng-model="AMCL_Id" required ng-disabled="ASASB_Id > 0 || AMAY_Id=='' || AMAY_Id==null">
+                                    <option value="">-Select-</option>
+                                    <option ng-repeat="option in classList" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmcL_ClassName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="sec" id="sel1" ng-model="AMS_Id" required ng-change="GetStudentListByYearAndCLassSection()" ng-disabled="ASASB_Id > 0 || AMCL_Id=='' || AMCL_Id==null" >
+                                    <option value="">-Select-</option>
+                                    <option ng-repeat="option in sectionList" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmC_SectionName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Subject:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="subject" ng-model="ISMS_Id" required ng-disabled="ASASB_Id > 0  || AMS_Id=='' || AMS_Id==null" ng-change="getbatchname()">
+                                    <option value="">-Select-</option>
+                                    <option ng-repeat="option in subjectList" value="{{option.ismS_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.ismS_SubjectName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.subject)" ng-messages="myForm.subject.$error">
+                                    <div ng-message="required">Select Subject</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="type12=='1'">
+                            <label class="control-label col-sm-4">Batch Name:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" name="batch" class="form-control" ng-paste="$event.preventDefault()" allow-pattern="(\s|[a-zA-Z0-9])" maxlength="20" minlength="2" ng-disabled="ISMS_Id=='' || ISMS_Id==null" ng-required="type12=='1'" ng-model="ASASB_BatchName" >
+                                <div class="error-messages" ng-if="interacted(myForm.batch)" ng-messages="myForm.batch.$error">
+                                    <div ng-message="required">Enter Batch</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="type12=='2'">
+                            <label class="control-label col-sm-4">Batch Name:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel123" name="batch123" ng-model="ASASB_Id1" ng-required="type12=='2'" ng-disabled="ISMS_Id=='' || ISMS_Id==null " ng-change="getbatchwisestdlist()">
+                                    <option value="">-Select-</option>
+                                    <option ng-repeat="optionb in batchList" value="{{optionb.asasB_Id}}" ng-selected="{{optionb.Selected == true}}">
+                                        {{optionb.asasB_BatchName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.batch123)" ng-messages="myForm.batch123.$error">
+                                    <div ng-message="required">Select Batch</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="Studlist">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible" ng-click="ShowHidemiddle()"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+
+                            <input class="form-control" ng-model="search_upper_grid" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.NO.</th>
+                        <th>
+                            <label>
+                                <input type="checkbox" ng-model="selectedAll" ng-click="checkAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th><a href="" ng-click="sortBy_up('amsT_FirstName')">Student Name</a></th>
+                        <th><a href="" ng-click="sortBy_up('amsT_AdmNo')">ADMISSION NO.</a> </th>
+                        <th><a href="" ng-click="sortBy_up('amsT_RegistrationNo')">Registration NO.</a> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in studentList|orderBy:propertyName_up:reverse_up|itemsPerPage:itemsPerPage_up|filter:search_upper_grid" pagination-id="page_up" current-page="currentPage_up" ng-class-odd="'odd'">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" value="{{user.amsT_Id}}" ng-model="user.Selected" ng-change="test(user)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td class="text-left">{{ user.studentname}}</td>
+                        <td class="text-left">{{ user.amsT_AdmNo}}</td>
+                        <td class="text-left">{{ user.amsT_RegistrationNo}}</td>
+                        <td hidden="hidden">{{user.amsT_Id}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="page_up">
+            </dir-pagination-controls>
+            <hr />
+            <div class="text-center">
+                <input type="hidden" ng-model="ASASB_Id" />
+                <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="saveDetails()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Save
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" id="save-btn" ng-click="Clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Clear
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="adtableBwsl">
+        <div class="box-header with-border">
+            <h3 class="box-title">BATCH WISE STUDENT MAPPED List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible" ng-click="ShowHidedown()"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" ng-show="IsHiddendown">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.NO.</th>
+                        <th><a href="" ng-click="sortBy_down('amsT_FirstName')">Student Name</a></th>
+                        <th><a href="" ng-click="sortBy_down('asmaY_Year')">Year</a> </th>
+                        <th><a href="" ng-click="sortBy_down('asmcL_ClassName')">Class</a> </th>
+                        <th><a href="" ng-click="sortBy_down('asmC_SectionName')">Section</a> </th>
+                        <th><a href="" ng-click="sortBy_down('amsU_Name')">Subject</a> </th>
+                        <th><a href="" ng-click="sortBy_down('asasB_BatchName')">Batch Name</a> </th>
+                        <th><a href="" ng-click="sortBy_down('asasB_StudentStrenth')">Student Strength</a> </th>
+                        <!--<th style="text-align:center;visibility:hidden">Action</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in  filterValue1 = (subjectBatchList | filter : filterValue) |orderBy:sortKey:reverse_down|itemsPerPage:itemsPerPage_down" current-page="currentPage_down" pagination-id="page_down" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage_down*(currentPage_down-1)+$index+1}}</td>
+                        <td class="text-left">{{ user.namme}}</td>
+                        <td class="text-center">{{ user.asmaY_Year}}</td>
+                        <td class="text-left">{{ user.asmcL_ClassName}}</td>
+                        <td class="text-left">{{ user.asmC_SectionName}}</td>
+                        <td class="text-left">{{ user.amsU_Name}}</td>
+                        <td class="text-left">{{ user.asasB_BatchName}}</td>
+                        <td class="text-left">{{ user.asasB_StudentStrenth}}</td>                        
+                    </tr>
+                </tbody>
+            </table>           
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" pagination-id="page_down">
+            </dir-pagination-controls>
+
+            <div class="text-center" ng-show="edit_button_flag">
+                <input type="hidden" ng-model="ASASB_Id" />
+                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="saveDetails()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Save
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" id="save-btn" ng-click="Clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Clear
+                </md-button>
+            </div>
+        </div>
+    </div>
+</section>

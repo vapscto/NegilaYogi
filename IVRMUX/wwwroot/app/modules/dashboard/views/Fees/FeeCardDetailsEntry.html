@@ -1,0 +1,210 @@
+﻿
+<style>
+    .btn-default {
+        background-color: white;
+        color: black;
+        /*border-color: #0463c2;*/
+    }
+</style>
+
+<div data-ng-init="loaddata()">
+    <section class="content">
+        <form class="form-horizontal" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fee Card Details Entry</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="academicyear" id="sel1" data-ng-model="cfg.ASMAY_Id" ng-disabled="cfg.ASMAY_Id" ng-change="onselectacademic(yearlst)" required>
+
+                                        <option ng-repeat="option in yearlst" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.academicyear)" ng-messages="myForm.academicyear.$error">
+                                        <div ng-message="required">Please Select Academic Year </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Student Name :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="studentname" ng-model="$parent.Amst_Id1" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="onselectstudent($parent.Amst_Id1)" title="Select Student" ng-show="showstudentname" ng-required="showstudentname">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.amsT_FirstName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in studentlst | filter: $select.search " value="{{option.amst_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.amsT_FirstName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+                                    <div class="error-messages" ng-if="interacted(myForm.studentname)" ng-messages="myForm.studentname.$error">
+                                        <div ng-message="required">Please Select Student </div>
+                                    </div>
+                                </div>                                
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Fee Group :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="feegrp1" ng-model="FMG_Id" ng-change="onselectgroup(grouplst)" required>
+                                        <option value="" label="Select Group "></option>
+                                        <option ng-repeat="option in grouplst" value="{{option.fmG_Id}}" ng-selected="{{option.fmG_Id == fmG_Idedit}}">
+                                            {{option.fmG_GroupName}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.feegrp1)" ng-messages="myForm.feegrp1.$error">
+                                        <div ng-message="required">Please Select Group </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Fee Head:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="FMH_Id" name="FMH_Id" required>
+                                        <option value="" label="Select Head"> </option>
+                                        <option ng-repeat="option in headcount" value="{{option.fmH_Id}}" ng-selected="{{option.fmH_Id == fmH_Idedit}}">
+                                            {{option.fmH_FeeName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.FMH_Id)" ng-messages="myForm.FMH_Id.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Head</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Amount:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="amount1" ng-model="amount" name="Amount"   allow-pattern="([0-9.])"  ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/"    required />
+                                </div>
+                                <span ng-show="myForm.Amount.$error.pattern">Not a valid number!</span>
+                                <div class="error-messages" ng-if="interacted(myForm.Amount)" ng-messages="myForm.Amount.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Enter  Amount</div>
+                                    <div ng-message="pattern">Amount is invalid</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="Savedata()">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" id="clear-btn" ng-click="ClearAll()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>                      
+                    </div>
+                </div>               
+            </div>
+            <div> <!--ng-show="tablegrid"-->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Fee Card Details Entry Grid</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                            <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label">
+                    <b> Total  Records :</b>
+                    <label class="badge">
+                        {{totcountfirst}}
+                    </label>
+                </label>
+            </div>
+        </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group" ng-if="search!=''">
+                                        <label class="control-label">
+                                            <b>Total Records Searched : </b>
+                                            <label class="badge">
+                                              {{filterValue1.length}}
+                                            </label>
+                                        </label>
+                                    </div>
+                                </div>
+                        <div class="clearfix">
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                       
+                        
+                            <table class="table table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="" ng-click="order('FeeHead')">Sno</a>
+                                        </th>
+                                        <!--<th>
+                        <label>
+                            <input name="option[]" value="1" type="checkbox" ng-click="toggleAll(all)" ng-model="all" ng-disabled="allcheck">
+                            <span class="lbl padding-8"></span>
+                        </label>
+                    </th>-->
+                                        <th style="width:100px;">
+                                            <a href="" ng-click="order('asmaY_Year')">Academic Year</a>
+                                        </th>
+                                        <th style="width:200px;">
+                                            <a href="" ng-click="order('amsT_FirstName')">Student Name</a>
+                                        </th>
+
+                                        <th>
+                                            <a href="" ng-click="order('fmG_GroupName')">Group Name</a>
+                                        </th>
+
+                                        <th><a href="" ng-click="order('fmH_FeeName')">Fee Head</a> </th>
+                                        <th>
+                                            <a href="" ng-click="order('fsfM_Amount')"> Amount</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="order('fsfM_PaidAmount')"> Paid Amount</a>
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in filterValue1=(grid | filter:search) |orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{user.asmaY_Year}}</td>
+                                        <td> {{ user.amsT_FirstName}} <span ng-if="user.amsT_MiddleName !== null" class="lbl padding-8">  {{ user.amsT_MiddleName}} </span> <span ng-if="user.amsT_LastName !== null" class="lbl padding-8">{{ user.amsT_LastName}}</span><!--{{ user.amsT_FirstName + ' ' + user.amsT_MiddleName + ' ' + user.amsT_LastName}}--></td>
+                                        <td>{{user.fmG_GroupName}}</td>
+                                        <td>{{user.fmH_FeeName}}</td>
+                                        <td>{{user.fsfM_Amount}}</td>
+                                        <td>{{user.fsfM_PaidAmount}}</td>
+                                        <td hidden="hidden">{{user.fsfM_Id}}</td>
+                                        <td class="text-center">
+                                            <a href="javascript:void(0)" ng-click="EditData(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                            <a href="javascript:void(0)" ng-click="deletedata(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+
+</div>

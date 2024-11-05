@@ -1,0 +1,2384 @@
+
+<style>
+
+    .error-messages.ng-active {
+        color: red;
+    }
+
+    .k-grid-toolbar {
+        text-align: center;
+    }
+
+    .gridTitle {
+        text-align: center;
+    }
+
+    .titlecolor {
+        color: white !important;
+    }
+
+    .k-filter-row th, .k-title, .k-grid-header th.k-header {
+        font-weight: bold !important;
+    }
+
+    .k-grid-header .k-link, .k-grid-header .k-link:link, .k-pager-info, .k-scheduler-agendaview .k-scheduler-datecolumn, .k-scheduler-header {
+        color: black !important;
+    }
+
+    .k-pdf-export .k-grid-excel, .k-pdf-export .k-grid-pdf, .k-pdf-export .k-pager-wrap {
+        display: none;
+        width: 20%;
+        margin: auto;
+    }
+
+    .k-filter-row > th:first-child, .k-grid tbody td:first-child, .k-grid tfoot td:first-child, .k-grid-header th.k-header:first-child {
+        color: black;
+    }
+</style>
+
+<div data-ng-init="loaddata()">
+
+    <section class="content">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Yearly Fee Collection Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="well text-center" ng-init="rpttyp='year'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="year" ng-model="rpttyp" name="yearly" data-ng-click="onclickloaddata()">
+
+                                    <span class="lbl padding-8">Yearly Wise</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="date" ng-model="rpttyp" name="yearly" data-ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">Date Wise</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-sm-8 text-center">
+                            <div class="well" ng-init="result='FGW'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="FGW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Fee Group Wise</span>
+                                </label>
+
+                                <label class="radio-inline">
+                                    <input type="radio" value="FHW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Fee Head Wise</span>
+                                </label>
+
+                                <label class="radio-inline">
+                                    <input type="radio" value="FCW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Class Wise</span>
+                                </label>
+
+                                <label class="radio-inline">
+                                    <input type="radio" value="FSW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Student Wise</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="TRMW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Term Wise</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="INMW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Installment Wise</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="STRMW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Student Term Wise</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="CW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Category Wise</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="CTW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Class-Section-Installmentwise Consolidated</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="CTC" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Class-Installmentwise Consolidated</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="SWTPC" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Student Wise Total Paid Count</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="CWTPC" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Class-Section Wise Total Paid Count</span>
+                                </label>
+
+                                <label class="radio-inline">
+                                    <input type="radio" value="FPW" ng-model="result" name="Fee" ng-change="student_install_wise()">
+                                    <span class="lbl padding-8">Parent wise</span>
+                                </label>
+
+                            </div>
+
+                        </div><!--ng-show="adyr"-->
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Academic Year:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <select class="form-control" id="sel1" ng-model="asmaY_Id" ng-change="onselectyear(obj)" name="acd_year" required>
+                                        <!--ng-required="adyr"  ng-change="get_dates(asmaY_Id)" -->
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="options in arrlist6" value="{{options.asmaY_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                        <div ng-message="required">Please Enter the Academic Year</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row" ng-show="groupterm">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <!--<input type="checkbox" value="act" ng-model="custom_check" name="Allcustgrp"  data-ng-click="load_custom_check()"/>-->
+                                            <span class="lbl padding-8">Custom Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong><!--ng-hide="custom_check_flag"-->
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in custom" ng-model="fmgG_Id" value="{{role.fmgG_Id}}" ng-click="get_groups()">
+                                            <input type="checkbox" data-ng-model="role.fmgG_Id_chk1" name="fee_ct1" ng-selected="{{option.Selected == true}}" ng-required="groupterm && is_optionrequired_groupterm_cg()"><!--ng-disabled="custom_check_flag"-->
+                                            <span class="lbl padding-8">
+                                                {{role.fmg_groupname}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_ct1)" ng-messages="myForm.fee_ct1.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <!--<input type="checkbox" value="act" ng-model="group_check" name="Allfeegrp"  data-ng-click="load_group_check()" />-->
+                                            <span class="lbl padding-8">Fee Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong><!--ng-hide="group_check_flag"-->
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in group" ng-model="fmG_Id" value="{{role.fmG_Id}}" ng-click="binddatagrp3(group)">
+                                            <input type="checkbox" data-ng-model="role.fmG_Id_chk1" name="fee_gp1" ng-selected="{{option.Selected == true}}" ng-required="groupterm && is_optionrequired_groupterm_grp()"><!--ng-disabled="group_check_flag"-->
+                                            <span class="lbl padding-8">
+                                                {{role.fmG_GroupName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_gp1)" ng-messages="myForm.fee_gp1.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" name="All" ng-model="group_check" ng-true-value="1" ng-false-value="0" data-ng-click="load_group_check()" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="term">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <!--<input type="checkbox" value="act" ng-model="custom_check" name="All" ng-required="term == true">-->
+                                            <span class="lbl padding-8">Custom Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong>
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in custom" ng-model="fmgG_Id" value="{{role.fmgG_Id}}" ng-click="get_groups()">
+                                            <!--ng-click="binddatagrp1(custom)"-->
+                                            <input type="checkbox" data-ng-model="role.fmgG_Id_chk" name="fee_ct" ng-required="term && is_optionrequired_trm_cg()">
+                                            <span class="lbl padding-8">
+                                                {{role.fmg_groupname}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_ct)" ng-messages="myForm.fee_ct.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <!--<input type="checkbox" name="All" ng-model="group_check" ng-true-value="1" ng-false-value="0" data-ng-click="load_group_check()" />-->
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <span class="lbl padding-8">Fee Group:</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong>
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <input class="form-control" ng-model="checkallhrd1" type="checkbox" ng-click="hrdallcheck1()" />
+                                        <span class="lbl padding-8"> ALL </span>
+                                        <label ng-repeat="role in group" ng-model="fmG_Id" value="{{role.fmG_Id}}" ng-click="binddatagrp3(role.fmG_Id_chk)">
+                                            <input type="checkbox" data-ng-model="role.fmG_Id_chk" name="fee_gp" ng-required="term && is_optionrequired_trm_grp()">
+                                            <span class="lbl padding-8">
+                                                {{role.fmG_GroupName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_gp)" ng-messages="myForm.fee_gp.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" name="All" ng-model="group_check" ng-true-value="1" ng-false-value="0" data-ng-click="load_group_check()" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <!--ng-required="( term && is_optionrequired_trm_trm()) && !install"-->
+                                <div class="col-sm-12" ng-hide="result=='INMW'">
+                                    <label class="control-label">Term Name<strong style="color:red;display:inline; font-weight : bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="multiselect col-sm-12">
+                                        <input class="form-control" ng-model="checkallterm1" type="checkbox" ng-change="termallcheck1()" />
+                                        <span class="lbl padding-8"> ALL </span>
+                                        <label ng-repeat="role in groupcount" ng-model="fmT_Id" value="{{role.fmT_Id}}" ng-click="binddatagrp2(role.fmT_Id_chk)">
+                                            <input type="checkbox" data-ng-model="role.fmT_Id_chk" name="fee_tr">
+                                            <span class="lbl padding-8">
+                                                {{role.fmT_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_tr)" ng-messages="myForm.fee_tr.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-12" ng-show="result=='INMW'">
+                                    <label class="control-label">Installment Name<strong style="color:red;display:inline; font-weight : bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="multiselect col-sm-12">
+                                        <input class="form-control" ng-model="checkallinst" type="checkbox" ng-change="installcheck()" />
+                                        <span class="lbl padding-8"> ALL </span>
+                                        <label ng-repeat="role in installmentname" ng-model="ftI_Id" value="{{role.ftI_Id}}" ng-click="get_installment(installmentname)">
+                                            <input type="checkbox" data-ng-model="role.fti_Id_chk" name="fee_installment" ng-required="install && is_optionrequired_install()">                                      
+                                            <span class="lbl padding-8">
+                                                {{role.ftI_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_installment)" ng-messages="myForm.fee_installment.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-sm-2" ng-show="frmdt" ng-init="chequedate='1'">
+                            <label class="checkbox-inline">
+                                <input type="radio" value="1" ng-model="chequedate" />
+                                <span class="lbl padding-8">Transaction Date</span>
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="radio" value="2" ng-model="chequedate" />
+                                <span class="lbl padding-8">Cheque Date</span>
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="radio" value="4" ng-model="chequedate" />
+                                <span class="lbl padding-8">Transaction & Cheque</span>
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="radio" value="3" ng-model="chequedate" />
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="text-center">
+                                    <div class="well">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="act" ng-model="active" name="All" ng-true-value="1" ng-false-value="0" ng-checked="false">
+                                            <span class="lbl padding-4">Active</span>
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="dact" ng-model="deactive" name="All" ng-true-value="1" ng-false-value="0" ng-checked="false">
+                                            <span class="lbl padding-4">Deactive</span>
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="lft" ng-model="left" name="All" ng-true-value="1" ng-false-value="0" ng-checked="false">
+                                            <span class="lbl padding-4">Left</span>
+                                            <!--<span>Left</span>-->
+                                        </label>
+                                        <div class="error-messages" ng-if="interacted(myForm.All)" ng-messages="myForm.All.$error">
+                                            <div ng-message="required" style="margin-left:20px;">Please Select Status</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4" ng-show="result=='STRMW' || result=='FSW' || result=='SWTPC' || result=='CWTPC'">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">
+                                        <span class="lbl padding-8">Class :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></span>
+                                    </label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" id="class" ng-model="fmG_Class" name="student_Class" ng-required="result=='STRMW' || result == 'FSW'">
+                                            <option value="" label="Select Class"> </option>
+                                            <option ng-repeat="option in classcount" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                                {{option.asmcL_ClassName}}
+                                            </option>
+                                            <option value="0">--All--</option>
+                                        </select>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.student_Class)" ng-messages="myForm.student_Class.$error">
+                                        <div ng-message="required">Please Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4" ng-show="result=='STRMW' || result=='FSW'  || result=='SWTPC' || result=='CWTPC'">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Section :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" ng-model="asmC_Id" name="section" ng-required="result=='STRMW' || result == 'FSW'">
+                                            <option value="">Select Section</option>
+                                            <option ng-repeat="option in sectioncount" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                                {{option.asmC_SectionName}}
+                                            </option>
+                                            <option value="0">All</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.section)" ng-messages="myForm.section.$error">
+                                            <div ng-message="required">Please Select Section</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-3" ng-show="frmdt">
+                            <div class="form-group" id="frmdt">
+                                <label class="control-label col-sm-3">From Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-3 input-group text-right" style="">
+                                    <md-datepicker ng-model="fromDate" md-min-date="minDatemf" md-max-date="maxDatemf" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" ng-required="frmdt"></md-datepicker><!--ng-change='setTodate(fromDate)'-->
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3" ng-show="frmdt">
+                            <div class="form-group" id="frmdt">
+                                <label class="control-label col-sm-3">To Date:<span style="color:red;">*</span></label>
+
+                                <div class="col-sm-3 input-group text-right">
+                                    <md-datepicker ng-model="todate" onkeydown="return false"
+                                                   md-min-date="minDatemf" md-max-date="maxDatemf" name="To_Date" id="date2" md-placeholder="Enter  date" ng-required="frmdt"></md-datepicker><!--ng-change='checkErr(fromDate,todate)'-->
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="ShowReport(fmG_Id, asmaY_Id, fromDate, todate, result, status, rpttyp)">
+                            <i class="fa fa-edit" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" id="clear-btn" ng-click="Cancel()">Clear</md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel()" target="_blank" ng-if="showbutton == true">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-primary" ng-if="showbutton == true" id="print-btn" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <!--<md-button type="button" class="md-raised md-primary" data-toggle="modal" data-target="#myModal3" data-backdrop="static">Display</md-button>-->
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <div class="box-body" ng-show="termflg == true">
+                <div id="grid123">
+
+                </div>
+
+
+            </div>
+
+            <div class="box-body" ng-show="stdtermflg == true">
+                <div id="grid1234">
+
+                </div>
+
+
+            </div>
+
+            <div class="box-body" ng-show="fpw == true">
+                <div id="fpw1234">
+
+                </div>
+
+
+            </div>
+
+        </form>
+
+
+
+        <div class="box box-primary" ng-show="Grid_view">
+            <div class="box-header with-border">
+                <h3 class="box-title">Yearly Fee Collection Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" ng-show="std==true">
+                <div id="gridall"></div>
+            </div>
+            <div class="box-body">
+
+
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="grp">
+                    <!--ng-show="grp"-->
+                    <thead>
+
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="grpall" ng-click="toggleAllgrp()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+
+                            <th>Sl No </th>
+
+                            <th><a href="" ng-click="order2('FMG_GroupName')">Group Name</a> </th>
+
+                            <th ng-if="PaidAmount != true">
+                                <a href="" ng-click="order2('FSS_PaidAmount')">Paid Amount</a>
+                            </th>
+                            <th ng-if="Balance != true">
+                                <a href="" ng-click="order2('balance')">Balance</a>
+                            </th>
+                            <th ng-if="Concession != true">
+                                <a href="" ng-click="order2('concession')">Concession</a>
+                            </th>
+                            <th ng-if="Fine != true">
+                                <a href="" ng-click="order2('fine')">Fine</a>
+                            </th>
+                            <th ng-if="Rebate != true">
+                                <a href="" ng-click="order2('rebate')">Rebate</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order2('waived')">Waived Off</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order2('waived')">Adjusted</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order2('waived')">Excess Paid</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order2('waived')">Running Excess</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in groups | orderBy:sortKey2:reverse2 | filter:search" ng-class-odd="'odd'">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.grpselected" value="{{user.Id}}" ng-change="optionToggledgrp(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.FMG_GroupName }}</td>
+                            <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                            <td ng-if="Balance != true">{{ user.balance }}</td>
+                            <td ng-if="Concession != true">{{ user.concession }}</td>
+                            <td ng-if="Fine != true">{{ user.fine}}</td>
+                            <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                            <td ng-if="Waived != true">{{ user.waived}}</td>
+                            <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                            <td>{{ user.Excess}}</td>
+                            <td>{{ user.RunningExcess}}</td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="3">Total</td>
+                            <td ng-if="PaidAmount != true">{{g_total_FSS_PaidAmount}}</td>
+                            <td ng-if="Balance != true">{{g_total_balance}}</td>
+                            <td ng-if="Concession != true">{{g_total_concession}}</td>
+                            <td ng-if="Fine != true">{{g_total_fine}}</td>
+                            <td ng-if="Rebate != true">{{g_total_rebate}}</td>
+                            <td ng-if="Waived != true">{{g_total_waived}}</td>
+                            <td>{{g_total_adjusted}}</td>
+                            <td>{{g_total_excess}}</td>
+                            <td>{{g_total_runningexcess}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <div id="printSectionIdgrp" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>GroupWise Collection Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tablegrp">
+                        <thead>
+                            <tr>
+
+                                <th>Sl No </th>
+
+                                <th>Group Name </th>
+
+                                <th ng-if="PaidAmount != true">
+                                    Paid Amount
+                                </th>
+                                <th ng-if="Balance != true">
+                                    Balance
+                                </th>
+                                <th ng-if="Concession != true">
+                                    Concession
+                                </th>
+                                <th ng-if="Fine != true">
+                                    Fine
+                                </th>
+                                <th ng-if="Rebate != true">
+                                    Rebate
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Waived Off
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Adjusted
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Excess Paid
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Running Excess
+                                </th>
+
+
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatablegrp | orderBy:sortKey2:reverse2 ">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.FMG_GroupName }}</td>
+                                <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                                <td ng-if="Balance != true">{{ user.balance }}</td>
+                                <td ng-if="Concession != true">{{ user.concession }}</td>
+                                <td ng-if="Fine != true">{{ user.fine}}</td>
+                                <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                                <td ng-if="Waived != true">{{ user.waived}}</td>
+                                <td>{{ user.adjusted}}</td>
+                                <td>{{ user.Excess}}</td>
+                                <td>{{ user.RunningExcess}}</td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="2">Total</td>
+                                <td ng-if="PaidAmount != true">{{g_total_FSS_PaidAmount_p}}</td>
+                                <td ng-if="PaidAmount != true">{{g_total_balance_p}}</td>
+                                <td ng-if="Concession != true">{{g_total_concession_p}}</td>
+                                <td ng-if="Fine != true">{{g_total_fine_p}}</td>
+                                <td ng-if="Rebate != true">{{g_total_rebate_p}}</td>
+                                <td ng-if="Waived != true">{{g_total_waived_p}}</td>
+                                <td>{{g_total_adjusted_p}}</td>
+                                <td>{{g_total_excess_p}}</td>
+                                <td>{{g_total_runningexcess_p}}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="had">
+                    <!--ng-show="had"-->
+                    <thead>
+
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="hadall" ng-click="toggleAllhad()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+
+                            <th>Sl No </th>
+
+                            <th><a href="" ng-click="order3('FMH_FeeName')">Head Name</a> </th>
+
+                            <th ng-if="PaidAmount != true">
+                                <a href="" ng-click="order3('FSS_PaidAmount')">Paid Amount</a>
+                            </th>
+                            <th ng-if="Balance != true">
+                                <a href="" ng-click="order3('balance')">Balance</a>
+                            </th>
+                            <th ng-if="Concession != true">
+                                <a href="" ng-click="order3('concession')">Concession</a>
+                            </th>
+
+                            <th ng-if="Fine != true">
+                                <a href="" ng-click="order3('fine')">Fine</a>
+                            </th>
+                            <th ng-if="Rebate != true">
+                                <a href="" ng-click="order3('rebate')">Rebate</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order3('waived')">Waived Off</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order3('waived')">Adjustment</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order3('waived')">Excess Paid</a>
+                            </th>
+                            <th>
+                                <a href="">Running Excess</a>
+                            </th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in heads | orderBy:sortKey3:reverse3 | filter:search" ng-class-odd="'odd'">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.hadselected" value="{{user.Id}}" ng-change="optionToggledhad(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.FMH_FeeName }}</td>
+                            <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                            <td ng-if="Balance != true">{{ user.balance }}</td>
+                            <td ng-if="Concession != true">{{ user.concession }}</td>
+                            <td ng-if="Fine != true">{{ user.fine}}</td>
+                            <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                            <td ng-if="Waived != true">{{ user.waived}}</td>
+                            <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                            <td ng-if="Waived != true">{{ user.Excess}}</td>
+                            <td ng-if="Waived != true">{{ user.RunningExcess}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">Total</td>
+                            <td ng-if="PaidAmount != true">{{h_total_FSS_PaidAmount}}</td>
+                            <td ng-if="Balance != true">{{h_total_balance}}</td>
+                            <td ng-if="Concession != true">{{h_total_concession}}</td>
+                            <td ng-if="Fine != true">{{h_total_fine}}</td>
+                            <td ng-if="Rebate != true">{{h_total_rebate}}</td>
+                            <td ng-if="Waived != true">{{h_total_waived}}</td>
+                            <td ng-if="Waived != true">{{h_total_adjusted}}</td>
+                            <td ng-if="Waived != true">{{h_total_excess}}</td>
+                            <td ng-if="Waived != true">{{h_total_runningexcess}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <div id="printSectionIdhad" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>HeadWise Collection Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tablehad">
+                        <thead>
+                            <tr>
+
+                                <th>Sl No </th>
+
+                                <th>Head Name </th>
+
+                                <th ng-if="PaidAmount != true">
+                                    Paid Amount
+                                </th>
+                                <th ng-if="Balance != true">
+                                    Balance
+                                </th>
+                                <th ng-if="Concession != true">
+                                    Concession
+                                </th>
+                                <th ng-if="Fine != true">
+                                    Fine
+                                </th>
+                                <th ng-if="Rebate != true">
+                                    Rebate
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Waived Off
+                                </th>
+                                <th>
+                                    <a href="" ng-click="order3('waived')">Adjustment</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="order3('waived')">Excess Paid</a>
+                                </th>
+                                <th>
+                                    <a href="">Running Excess</a>
+                                </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatablehad | orderBy:sortKey3:reverse3 ">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.FMH_FeeName }}</td>
+                                <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                                <td ng-if="Balance != true">{{ user.balance }}</td>
+                                <td ng-if="Concession != true">{{ user.concession }}</td>
+                                <td ng-if="Fine != true">{{ user.fine}}</td>
+                                <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                                <td ng-if="Waived != true">{{ user.waived}}</td>
+                                <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                                <td ng-if="Waived != true">{{ user.Excess}}</td>
+                                <td ng-if="Waived != true">{{ user.RunningExcess}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Total</td>
+                                <td ng-if="PaidAmount != true">{{h_total_FSS_PaidAmount_p}}</td>
+                                <td ng-if="Balance != true">{{h_total_balance_p}}</td>
+                                <td ng-if="Concession != true">{{h_total_concession_p}}</td>
+                                <td ng-if="Fine != true">{{h_total_fine_p}}</td>
+                                <td ng-if="Rebate != true">{{h_total_rebate_p}}</td>
+                                <td ng-if="Waived != true">{{h_total_waived_p}}</td>
+                                <td ng-if="Waived != true">{{h_total_adjusted_p}}</td>
+                                <td ng-if="Waived != true">{{h_total_excess_p}}</td>
+                                <td ng-if="Waived != true">{{h_total_runningexcess_p}}</td>
+
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+
+                    </table>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="cls">
+                    <!--ng-show="cls"-->
+                    <thead>
+
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="clsall" ng-click="toggleAllcls()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+
+
+                            <th>Sl No </th>
+
+                            <th><a href="" ng-click="order4('ASMCL_ClassName')">Class Name</a> </th>
+                            <th><a href="">Total Charges</a> </th>
+
+                            <th ng-if="PaidAmount != true">
+                                <a href="" ng-click="order4('FSS_PaidAmount')">Paid Amount</a>
+                            </th>
+                            <th ng-if="Balance != true">
+                                <a href="" ng-click="order4('balance')">Balance</a>
+                            </th>
+                            <th ng-if="Concession != true">
+                                <a href="" ng-click="order4('concession')">Concession</a>
+                            </th>
+                            <th ng-if="Fine != true">
+                                <a href="" ng-click="order4('fine')">Fine</a>
+                            </th>
+                            <th ng-if="Rebate != true">
+                                <a href="" ng-click="order4('rebate')">Rebate</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order4('waived')">Waived Off</a>
+                            </th>
+                            <th ng-if="Excess != true">
+                                <a href="" ng-click="order4('Excess')">Excess</a>
+                            </th>
+                            <th ng-if="Excess != true">
+                                <a href="" ng-click="order4('openingbalance')">Opening Balance</a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in classes | orderBy:sortKey4:reverse4 | filter:search" ng-class-odd="'odd'">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.clsselected" value="{{user.Id}}" ng-change="optionToggledcls(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.ASMCL_ClassName }}</td>
+                            <td>{{ user.totalpayable}}</td>
+                            <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount}}</td>
+                            <td ng-if="Balance != true">{{ user.balance}}</td>
+                            <td ng-if="Concession != true">{{ user.concession }}</td>
+                            <td ng-if="Fine != true">{{ user.fine}}</td>
+                            <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                            <td ng-if="Waived != true">{{ user.waived}}</td>
+                            <td ng-if="ExcessPaidAmount != true">{{ user.Excess}}</td>
+                            <td ng-if="ExcessPaidAmount != true">{{ user.openingbalance}}</td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="3">Total</td>
+                            <td>{{c_total_totalpayable}}</td>
+                            <td ng-if="PaidAmount != true">{{c_total_FSS_PaidAmount}}</td>
+                            <td ng-if="Balance != true">{{c_total_balance}}</td>
+                            <td ng-if="Concession != true">{{c_total_concession}}</td>
+                            <td ng-if="Fine != true">{{c_total_fine}}</td>
+                            <td ng-if="Rebate != true">{{c_total_rebate}}</td>
+                            <td ng-if="Waived != true">{{c_total_waived}}</td>
+                            <td ng-if="excess != true">{{c_total_Excess}}</td>
+                            <td ng-if="excess != true">{{c_total_openingbalance}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <div id="printSectionIdcls" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>ClassWise Collection Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tablecls">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+
+                                <th>Class Name </th>
+                                <th>Total Payable </th>
+                                <th ng-if="PaidAmount != true">
+                                    Paid Amount
+                                </th>
+                                <th ng-if="Balance != true">
+                                    Balance
+                                </th>
+                                <th ng-if="Concession != true">
+                                    Concession
+                                </th>
+                                <th ng-if="Fine != true">
+                                    Fine
+                                </th>
+                                <th ng-if="Rebate != true">
+                                    Rebate
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Waived Off
+                                </th>
+                                <th ng-if="Excess != true">
+                                    <a href="" ng-click="order4('Excess')">Excess</a>
+                                </th>
+                                <th ng-if="Excess != true">
+                                    <a href="" ng-click="order4('openingbalance')">Opening Balance</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatablecls | orderBy:sortKey4:reverse4 ">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.ASMCL_ClassName }}</td>
+                                <td>{{ user.totalpayable }}</td>
+                                <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                                <td ng-if="Balance != true">{{ user.balance }}</td>
+                                <td ng-if="Concession != true">{{ user.concession }}</td>
+                                <td ng-if="Fine != true">{{ user.fine}}</td>
+                                <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                                <td ng-if="Waived != true">{{ user.waived}}</td>
+                                <td ng-if="ExcessPaidAmount != true">{{ user.Excess}}</td>
+                                <td ng-if="ExcessPaidAmount != true">{{ user.openingbalance}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Total</td>
+                                <td>{{c_total_totalpayable}}</td>
+                                <td ng-if="PaidAmount != true">{{c_total_FSS_PaidAmount_p}}</td>
+                                <td ng-if="Balance != true">{{c_total_balance_p}}</td>
+                                <td ng-if="Concession != true">{{c_total_concession_p}}</td>
+                                <td ng-if="Fine != true">{{c_total_fine_p}}</td>
+                                <td ng-if="Rebate != true">{{c_total_rebate_p}}</td>
+                                <td ng-if="Waived != true">{{c_total_waived_p}}</td>
+                                <td ng-if="excess != true">{{c_total_excess}}</td>
+                                <td ng-if="excess != true">{{c_total_openingbalance}}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="catg">
+                    <!--ng-show="cls"-->
+                    <thead>
+
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="catall" ng-click="toggleAllcat()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+
+
+                            <th>Sl No </th>
+
+                            <th><a href="" ng-click="order4('FMCC_ClassCategoryName')">Fee Class Category</a> </th>
+
+                            <th><a href="" ng-click="order4('fmh_feename')">Fee Head</a> </th>
+                            <th>
+                                <a href="" ng-click="order4('ByBank')">By Bank</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('ByCash')">By Cash</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('ByCard')">By Online</a>
+                            </th>
+
+                            <th>
+                                <a href="" ng-click="order4('waived')">By Card</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('ByECS')">By ECS</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('ByRTGS')">By RTGS</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in category | orderBy:sortKey4:reverse4 | filter:search" ng-class-odd="'odd'">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.catselected" value="{{user.Id}}" ng-change="optionToggledcat(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.FMCC_ClassCategoryName }}</td>
+                            <td>{{ user.fmh_feename}}</td>
+                            <td>{{ user.ByBank }}</td>
+                            <td>{{ user.ByCash}}</td>
+                            <td>{{ user.ByOnline}}</td>
+                            <td>{{ user.ByCard}}</td>
+                            <td>{{ user.ByECS}}</td>
+                            <td>{{ user.ByRTGS}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">Total</td>
+                            <td>{{cw_total_FSS_PaidAmount}}</td>
+                            <td>{{cw_total_fine}}</td>
+                            <td>{{cw_total_rebate}}</td>
+                            <td>{{cw_total_concession}}</td>
+                            <td>{{cw_total_waived}}</td>
+                            <td>{{ cw_total_balance}}</td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+                <div id="printSectionIdcat" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>CategoryWise Collection Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tablecat">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+
+                                <th>Fee Class Category </th>
+                                <th>
+                                    Fee Head
+                                </th>
+                                <th>
+                                    By Bank
+                                </th>
+                                <th>
+                                    By Cash
+                                </th>
+                                <th>
+                                    By Online
+                                </th>
+                                <th>
+                                    By Card
+                                </th>
+                                <th>
+                                    By ECS
+                                </th>
+                                <th>
+                                    By RTGS
+                                </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatablecat | orderBy:sortKey4:reverse4 ">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.FMCC_ClassCategoryName }}</td>
+                                <td>{{ user.fmh_feename}}</td>
+                                <td>{{ user.ByBank }}</td>
+                                <td>{{ user.ByCash}}</td>
+                                <td>{{ user.ByOnline}}</td>
+                                <td>{{ user.ByCard}}</td>
+                                <td>{{ user.ByECS}}</td>
+                                <td>{{ user.ByRTGS}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">Total</td>
+                                <td>{{cw_total_FSS_PaidAmount}}</td>
+                                <td>{{cw_total_fine}}</td>
+                                <td>{{cw_total_rebate}}</td>
+                                <td>{{cw_total_concession}}</td>
+                                <td>{{cw_total_waived}}</td>
+                                <td>{{ cw_total_balance}}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="clsinscon">
+                    <!--ng-show="cls"-->
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="clsallclscon" ng-click="toggleAllclsinscon()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No </th>
+                            <th><a href="" ng-click="order4('ASMCL_ClassName')">Class Name</a> </th>
+                            <th><a href="" ng-click="order4('ASMC_SectionName')">Section</a> </th>
+                            <th><a href="" ng-click="order4('FMT_Name')">Term</a> </th>
+                            <th><a href="" ng-click="order4('TotalCharges')">Total Charges</a> </th>
+                            <th><a href="" ng-click="order4('balance')">Balance Amount</a></th>
+                            <th><a href="" ng-click="order4('FSS_PaidAmount')">Paid Amount</a></th>
+                            <th><a href="" ng-click="order4('concession')">Concession</a> </th>
+                            <th><a href="" ng-click="order4('concession')">Waived Off</a> </th>
+                            <th><a href="" ng-click="order4('concession')">Adjusted</a> </th>
+                            <th><a href="" ng-click="order4('concession')">Excess Paid</a> </th>
+                            <th><a href="" ng-click="order4('concession')">Refund Amount</a> </th>
+                            <th><a href="" ng-click="order4('concession')">Running Excess </a> </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in classesinscon | orderBy:sortKey9:reverse9 | filter:search" ng-class-odd="'odd'">
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.clsselectedclscon" value="{{user.Id}}" ng-change="optionToggledclsinscon(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.ASMCL_ClassName }}</td>
+                            <td>{{ user.ASMC_SectionName }}</td>
+                            <td>{{ user.FMT_Name}}</td>
+                            <td>{{ user.TotalCharges }}</td>
+                            <td>{{ user.TotalBalance}}</td>
+                            <td>{{ user.TotalPaid}}</td>
+                            <td>{{ user.TotalConcession}}</td>
+                            <td>{{ user.TotalWaivedOff}}</td>
+                            <td>{{ user.Adjustment}}</td>
+                            <td>{{ user.Excess}}</td>
+                            <td>{{ user.TotalRefund}}</td>
+                            <td>{{ user.RunningExcess}}</td>
+
+                        </tr>
+                        <tr ng-if="clsallclscon==true">
+                            <td colspan="5">Total</td>
+                            <td>{{c_TotalCharges}}</td>
+                            <td>{{c_TotalBalance}}</td>
+                            <td>{{c_TotalPaid}}</td>
+                            <td>{{c_TotalConcession}}</td>
+                            <td>{{c_TotalWaivedOff}}</td>
+                            <td>{{c_Adjustment}}</td>
+                            <td>{{c_Excess}}</td>
+                            <td>{{c_TotalRefund}}</td>
+                            <td>{{c_RunningExcess}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="printSectionIdclsinscon" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>ClassInstallment Wise Consolidated Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tableclsclscon">
+                        <thead>
+                            <tr>
+                                <th>Sl No </th>
+                                <th><a href="">Class Name</a> </th>
+                                <th><a href="">Section Name</a> </th>
+                                <th><a href="">Term</a> </th>
+                                <th><a href="">Total Charges</a> </th>
+                                <th><a href="">Balance Amount</a></th>
+                                <th><a href="">Paid Amount</a></th>
+                                <th><a href="">Concession Amount</a></th>
+                                <th><a href="">Waived Off</a> </th>
+                                <th><a href="">Adjusted</a> </th>
+                                <th><a href="">Excess Paid</a> </th>
+                                <th><a href="">Refund Amount</a> </th>
+                                <th><a href="">Running Excess </a> </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatableclsinscon">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.ASMCL_ClassName }}</td>
+                                <td>{{ user.ASMC_SectionName }}</td>
+                                <td>{{ user.FMT_Name}}</td>
+                                <td>{{ user.TotalCharges }}</td>
+                                <td>{{ user.TotalBalance}}</td>
+                                <td>{{ user.TotalPaid}}</td>
+                                <td>{{ user.TotalConcession }}</td>
+                                <td>{{ user.TotalWaivedOff}}</td>
+                                <td>{{ user.Adjustment}}</td>
+                                <td>{{ user.Excess}}</td>
+                                <td>{{ user.TotalRefund}}</td>
+                                <td>{{ user.RunningExcess}}</td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="4">Total</td>
+                                <td>{{c_TotalCharges}}</td>
+                                <td>{{c_TotalBalance}}</td>
+                                <td>{{c_TotalPaid}}</td>
+                                <td>{{c_TotalConcession}}</td>
+                                <td>{{c_TotalWaivedOff}}</td>
+                                <td>{{c_Adjustment}}</td>
+                                <td>{{c_Excess}}</td>
+                                <td>{{c_TotalRefund}}</td>
+                                <td>{{c_RunningExcess}}</td>
+
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+
+                <div id="printSectionIdclsinscon" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>Installment Wise Consolidated Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tableclsclscon">
+                        <thead>
+                            <tr>
+                                <th>Sl No </th>
+                                <th><a href="">Class Name</a> </th>
+                                <th><a href="">Section Name</a> </th>
+                                <th><a href="">Term</a> </th>
+                                <th><a href="">Total Charges</a> </th>
+                                <th><a href="">Balance Amount</a></th>
+                                <th><a href="">Paid Amount</a></th>
+                                <th><a href="">Concession Amount</a></th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatableclsinscon">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.ASMCL_ClassName }}</td>
+                                <td>{{ user.ASMC_SectionName }}</td>
+                                <td>{{ user.FMT_Name}}</td>
+                                <td>{{ user.TotalCharges }}</td>
+                                <td>{{ user.TotalBalance}}</td>
+                                <td>{{ user.TotalPaid}}</td>
+                                <td>{{ user.TotalConcession }}</td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="4">Total</td>
+                                <td>{{c_TotalCharges}}</td>
+                                <td>{{c_TotalBalance}}</td>
+                                <td>{{c_TotalPaid}}</td>
+                                <td>{{c_TotalConcession}}</td>
+
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="clsinsconN">
+                    <!--ng-show="cls"-->
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="clsallclsconN" ng-click="toggleAllclsinsconN()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No </th>
+                            <th><a href="" ng-click="order4('ASMCL_ClassName')">Class Name</a> </th>
+                            <th><a href="" ng-click="order4('FMT_Name')">Term</a> </th>
+                            <th><a href="" ng-click="order4('TotalCharges')">Total Charges</a> </th>
+                            <th><a href="" ng-click="order4('balance')">Balance Amount</a></th>
+                            <th><a href="" ng-click="order4('FSS_PaidAmount')">Paid Amount</a></th>
+                            <th><a href="" ng-click="order4('concession')">Concession</a> </th>
+                            <th><a href="">Waived Off</a> </th>
+                            <th><a href="">Adjustment</a> </th>
+                            <th><a href="">Refund</a> </th>
+                            <th><a href="">Excess Paid</a> </th>
+                            <th><a href="">Running Excess</a> </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="userr in classesinsconN | orderBy:sortKey10:reverse10 | filter:search" ng-class-odd="'odd'">
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="userr.clsselectedclsconN" value="{{userr.Id}}" ng-change="optionToggledclsinsconN(userr,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ userr.ASMCL_ClassName }}</td>
+                            <td>{{ userr.FMT_Name}}</td>
+                            <td>{{ userr.TotalCharges }}</td>
+                            <td>{{ userr.TotalBalance}}</td>
+                            <td>{{ userr.TotalPaid}}</td>
+                            <td>{{ userr.TotalConcession}}</td>
+                            <td>{{ userr.TotalWaivedOff}}</td>
+                            <td>{{ userr.Adjustment}}</td>
+                            <td>{{ userr.TotalRefund}}</td>
+                            <td>{{ userr.Excess}}</td>
+                            <td>{{ userr.RunningExcess}}</td>
+
+                        </tr>
+                        <tr ng-if="clsallclsconN==true">
+                            <td colspan="4">Total</td>
+                            <td>{{c_TotalCharges}}</td>
+                            <td>{{c_TotalBalance}}</td>
+                            <td>{{c_TotalPaid}}</td>
+                            <td>{{c_TotalConcession}}</td>
+                            <td>{{c_TotalWaivedOff}}</td>
+                            <td>{{c_Adjustment}}</td>
+                            <td>{{c_TotalRefund}}</td>
+                            <td>{{c_Excess}}</td>
+                            <td>{{c_RunningExcess}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="printSectionIdclsinsconN" style="overflow:scroll" ng-show="tadprintN">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>ClassInstallment Wise Consolidated Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tableclsclsconN">
+                        <thead>
+                            <tr>
+                                <th>Sl No </th>
+                                <th><a href="">Class Name</a> </th>
+                                <th><a href="">Term</a> </th>
+                                <th><a href="">Total Charges</a> </th>
+                                <th><a href="">Balance Amount</a></th>
+                                <th><a href="">Paid Amount</a></th>
+                                <th><a href="">Concession Amount</a></th>
+                                <th><a href="">Waived Off</a> </th>
+                                <th><a href="">Adjustment</a> </th>
+                                <th><a href="">Refund</a> </th>
+                                <th><a href="">Excess Paid</a> </th>
+                                <th><a href="">Running Excess</a> </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="userr in printdatatableclsinsconN ">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ userr.ASMCL_ClassName }}</td>
+                                <td>{{ userr.FMT_Name}}</td>
+                                <td>{{ userr.TotalCharges }}</td>
+                                <td>{{ userr.TotalBalance}}</td>
+                                <td>{{ userr.TotalPaid}}</td>
+                                <td>{{ userr.TotalConcession }}</td>
+                                <td>{{ userr.TotalWaivedOff}}</td>
+                                <td>{{ userr.Adjustment}}</td>
+                                <td>{{ userr.TotalRefund}}</td>
+                                <td>{{ userr.Excess}}</td>
+                                <td>{{ userr.RunningExcess}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">Total</td>
+                                <td>{{c_TotalCharges}}</td>
+                                <td>{{c_TotalBalance}}</td>
+                                <td>{{c_TotalPaid}}</td>
+                                <td>{{c_TotalConcession}}</td>
+                                <td>{{c_TotalWaivedOff}}</td>
+                                <td>{{c_Adjustment}}</td>
+                                <td>{{c_TotalRefund}}</td>
+                                <td>{{c_Excess}}</td>
+                                <td>{{c_RunningExcess}}</td>
+
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+
+
+                <!--//added//-->
+                <!--<table class="table table-hover table-responsive table-bordered text-center" id="stdcounttbl" ng-if="stdwisetotalpaidcnt">
+        ng-show="cls"
+        <thead>
+            <tr>
+                <th class="hdTH">
+                    <label>
+                        <input type="checkbox" value="" ng-model="stdmodel" ng-click="toggleAllstd()">
+                        <span class="lbl padding-8"></span>
+                    </label>
+                </th>
+                <th>Sl No </th>
+                <th><a href="" ng-click="order4('ASMCL_ClassName')">Student Name</a> </th>
+                <th><a href="" ng-click="order4('ASMC_SectionName')">Admission No</a> </th>
+                <th><a href="" ng-click="order4('FMT_Name')">Class</a> </th>
+                <th><a href="" ng-click="order4('TotalCharges')">Section</a> </th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in stdcnt | orderBy:sortKey9:reverse9 | filter:search" ng-class-odd="'odd'">
+                <td class="text-center  hdTD">
+                    <label>
+                        <input type="checkbox" ng-model="user.stdcount" value="{{user.Id}}" ng-change="optionToggledclsinscon(user,$index)">
+                        <span class="lbl padding-8"></span>
+                    </label>
+                </td>
+                <td>{{ $index+1}}</td>
+                <td>{{ user.StudentName }}</td>
+                <td>{{ user.AMST_AdmNo }}</td>
+                <td>{{ user.ASMCL_ClassName}}</td>
+                <td>{{ user.ASMC_SectionName }}</td>
+
+
+            </tr>
+
+        </tbody>
+    </table>-->
+                <!--<div id="printSectionIdstdtotalpaidcnt" style="overflow:scroll" ng-show="tadprint">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <br />
+        <center>
+            <div>
+                <table>
+                    <tbody>
+                        <tr style="text-align:center;font-size:20px;margin-left:5px">
+                            <td><b>Student Wise Total Paid Count</b> </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </center>
+        <br />
+        <table class="table table-hover table-responsive table-bordered text-center" id="tableclsclscon">
+            <thead>
+                <tr>
+                    <th> SL No</th>
+                    <th><a href="" ng-click="order4('ASMCL_ClassName')">Student Name</a> </th>
+                    <th><a href="" ng-click="order4('ASMC_SectionName')">Admission No</a> </th>
+                    <th><a href="" ng-click="order4('FMT_Name')">Class</a> </th>
+                    <th><a href="" ng-click="order4('TotalCharges')">Section</a> </th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr ng-repeat="user in stdcntprint">
+                    <td>{{ $index+1}}</td>
+                    <td>{{ user.StudentName }}</td>
+                    <td>{{ user.AMST_AdmNo }}</td>
+                    <td>{{ user.ASMCL_ClassName}}</td>
+                    <td>{{ user.ASMC_SectionName }}</td>
+
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>-->
+                <!--Student Total Paid Count-->
+                <table class="table table-hover table-responsive table-bordered text-center" id="stdcounttbl" ng-show="stdinsconN">
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="stdmodel" ng-click="toggleAllstdcnt()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No </th>
+                            <th><a href="" ng-click="order9('StudentName')">Student Name</a> </th>
+                            <th><a href="" ng-click="order9('AMST_AdmNo')">Admission No</a> </th>
+                            <th ng-if="totalpayable != true">
+                                <a href="" ng-click="order9('totalpayable')">Total Payable</a>
+                            </th>
+                            <th ng-if="PaidAmount != true">
+                                <a href="" ng-click="order9('FSS_PaidAmount')">Paid Amount</a>
+                            </th>
+                            <th ng-if="Balance != true">
+                                <a href="" ng-click="order9('balance')">Balance</a>
+                            </th>
+                            <th ng-if="Concession != true">
+                                <a href="" ng-click="order9('concession')">Concession</a>
+                            </th>
+                            <th ng-if="Fine != true">
+                                <a href="" ng-click="order9('fine')">Fine</a>
+                            </th>
+                            <th ng-if="Rebate != true">
+                                <a href="" ng-click="order9('rebate')">Rebate</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order9('waived')">Waived Off</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order9('waived')">Adjustment</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order9('openingbalance')">Opening Balance</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in stdcnt | orderBy:sortKey9:reverse9 | filter:search" ng-class-odd="'odd'">
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.stdcount" value="{{user.Id}}" ng-change="optionToggledstdcnt(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.StudentName }}</td>
+                            <td>{{ user.AMST_AdmNo }}</td>
+                            <td ng-if="totalpayable != true">{{user.totalpayable}}</td>
+                            <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                            <td ng-if="Balance != true">{{ user.balance }}</td>
+                            <td ng-if="Concession != true">{{ user.concession }}</td>
+                            <td ng-if="Fine != true">{{ user.fine}}</td>
+                            <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                            <td ng-if="Waived != true">{{ user.waived}}</td>
+                            <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                            <td>{{ user.openingbalance}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">Total</td>
+                            <td ng-if="totalpayable != true">{{d_total_totalpayable}}</td>
+                            <td ng-if="PaidAmount != true">{{d_total_FSS_PaidAmount}}</td>
+                            <td ng-if="Balance != true">{{d_total_balance}}</td>
+                            <td ng-if="Concession != true">{{d_total_concession}}</td>
+                            <td ng-if="Fine != true">{{d_total_fine}}</td>
+                            <td ng-if="Rebate != true">{{d_total_rebate}}</td>
+                            <td ng-if="Waived != true">{{d_total_waived}}</td>
+                            <td ng-if="Waived != true">{{d_total_adjusted}}</td>
+                            <td>{{d_total_openingbalance}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--Added Print section-->
+                <div id="printSectionIdstdtotalpaidcount" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>Student Wise Total Paid Count</b> </td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tablestdcnt">
+                        <thead>
+                            <tr>
+                                <th> SL No</th>
+                                <th><a href="" ng-click="order4('StudentName')">Student Name</a> </th>
+                                <th><a href="" ng-click="order4('AMST_AdmNo')">Admission No</a> </th>
+                                <th ng-if="totalpayable != true">
+                                    Total Payable
+                                </th>
+                                <th ng-if="PaidAmount != true">
+                                    Paid Amount
+                                </th>
+                                <th ng-if="Balance != true">
+                                    Balance
+                                </th>
+                                <th ng-if="Concession != true">
+                                    Concession
+                                </th>
+                                <th ng-if="Fine != true">
+                                    Fine
+                                </th>
+                                <th ng-if="Rebate != true">
+                                    Rebate
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Waived Off
+                                </th>
+                                <th>
+                                    <a href="" ng-click="order4('waived')">Adjustment</a>
+                                </th>
+                                <th ng-if="Excess != true">
+                                    <a href="" ng-click="order4('openingbalance')">Opening Balance</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatablestd">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.StudentName }}</td>
+                                <td>{{ user.AMST_AdmNo }}</td>
+                                <td ng-if="totalpayable != true">{{user.totalpayable}}</td>
+                                <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                                <td ng-if="Balance != true">{{ user.balance }}</td>
+                                <td ng-if="Concession != true">{{ user.concession }}</td>
+                                <td ng-if="Fine != true">{{ user.fine}}</td>
+                                <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                                <td ng-if="Waived != true">{{ user.waived}}</td>
+                                <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                                <td ng-if="excess != true">{{ user.openingbalance}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">Total</td>
+                                <td ng-if="totalpayable != true">{{d_total_totalpayable}}</td>
+                                <td ng-if="PaidAmount != true">{{d_total_FSS_PaidAmount}}</td>
+                                <td ng-if="Balance != true">{{d_total_balance}}</td>
+                                <td ng-if="Concession != true">{{d_total_concession}}</td>
+                                <td ng-if="Fine != true">{{d_total_fine}}</td>
+                                <td ng-if="Rebate != true">{{d_total_rebate}}</td>
+                                <td ng-if="Waived != true">{{d_total_waived}}</td>
+                                <td ng-if="Waived != true">{{d_total_adjusted}}</td>
+                                <td ng-if="excess != true">{{d_total_openingbalance}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--//Ended Student Total Paid Count-->
+
+                <!--Class Section Wise total Paid count-->
+                <table class="table table-hover table-responsive table-bordered text-center" id="clscounttbl" ng-show="clscntinsconN">
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="clsmodel" ng-click="toggleAllclscnt()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No </th>
+                            <th><a href="" ng-click="order4('StudentName')">Student Name</a> </th>
+                            <th><a href="" ng-click="order4('ASMCL_ClassName')">Class/Section</a> </th>
+                            <th><a href="" ng-click="order4('AMST_AdmNo')">Admission No</a> </th>
+                            <th ng-if="totalpayable != true">
+                                <a href="" ng-click="order4('totalpayable')">Total Payable</a>
+                            </th>
+                            <th ng-if="PaidAmount != true">
+                                <a href="" ng-click="order4('FSS_PaidAmount')">Paid Amount</a>
+                            </th>
+                            <th ng-if="Balance != true">
+                                <a href="" ng-click="order4('balance')">Balance</a>
+                            </th>
+                            <th ng-if="Concession != true">
+                                <a href="" ng-click="order4('concession')">Concession</a>
+                            </th>
+                            <th ng-if="Fine != true">
+                                <a href="" ng-click="order4('fine')">Fine</a>
+                            </th>
+                            <th ng-if="Rebate != true">
+                                <a href="" ng-click="order4('rebate')">Rebate</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order4('waived')">Waived Off</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('waived')">Adjustment</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('Excess')">Excess</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('openingbalance')">Opening Balance</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in clscnt | orderBy:sortKey10:sortKey10 | filter:search" ng-class-odd="'odd'">
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.clscount" value="{{user.Id}}" ng-change="optionToggledclscnt(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.StudentName }}</td>
+                            <td>{{ user.ASMCL_ClassName }}</td>
+                            <td>{{ user.AMST_AdmNo }}</td>
+                            <td ng-if="totalpayable != true">{{user.totalpayable}}</td>
+                            <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                            <td ng-if="Balance != true">{{ user.balance }}</td>
+                            <td ng-if="Concession != true">{{ user.concession }}</td>
+                            <td ng-if="Fine != true">{{ user.fine}}</td>
+                            <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                            <td ng-if="Waived != true">{{ user.waived}}</td>
+                            <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                            <td ng-if="Excess != true">{{ user.Excess}}</td>
+                            <td>{{ user.openingbalance}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">Total</td>
+                            <td ng-if="totalpayable != true">{{d_total_totalpayable}}</td>
+                            <td ng-if="PaidAmount != true">{{d_total_FSS_PaidAmount}}</td>
+                            <td ng-if="Balance != true">{{d_total_balance}}</td>
+                            <td ng-if="Concession != true">{{d_total_concession}}</td>
+                            <td ng-if="Fine != true">{{d_total_fine}}</td>
+                            <td ng-if="Rebate != true">{{d_total_rebate}}</td>
+                            <td ng-if="Waived != true">{{d_total_waived}}</td>
+                            <td ng-if="Waived != true">{{d_total_adjusted}}</td>
+                            <td ng-if="Excess != true">{{d_total_Excess}}</td>
+                            <td>{{d_total_openingbalance}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--Class Wise Total Paid Count Added Print section-->
+                <div id="printSectionIdclasstotalpaidcount" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>Class Wise Total Paid Count</b> </td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tableclscnt">
+                        <thead>
+                            <tr>
+                                <th> SL No</th>
+                                <th><a href="" ng-click="order4('StudentName')">Student Name</a> </th>
+                                <th><a href="" ng-click="order4('ASMCL_ClassName')">Class/Section</a> </th>
+                                <th><a href="" ng-click="order4('AMST_AdmNo')">Admission No</a> </th>
+                                <th ng-if="totalpayable != true">
+                                    Total Payable
+                                </th>
+                                <th ng-if="PaidAmount != true">
+                                    Paid Amount
+                                </th>
+                                <th ng-if="Balance != true">
+                                    Balance
+                                </th>
+                                <th ng-if="Concession != true">
+                                    Concession
+                                </th>
+                                <th ng-if="Fine != true">
+                                    Fine
+                                </th>
+                                <th ng-if="Rebate != true">
+                                    Rebate
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Waived Off
+                                </th>
+                                <th>
+                                    <a href="" ng-click="order4('waived')">Adjustment</a>
+                                </th>
+                                <th ng-if="Excess != true">
+                                    <a href="" ng-click="order4('openingbalance')">Opening Balance</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatableclass">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.StudentName }}</td>
+                                <td>{{ user.AMST_AdmNo }}</td>
+                                <td ng-if="totalpayable != true">{{user.totalpayable}}</td>
+                                <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                                <td ng-if="Balance != true">{{ user.balance }}</td>
+                                <td ng-if="Concession != true">{{ user.concession }}</td>
+                                <td ng-if="Fine != true">{{ user.fine}}</td>
+                                <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                                <td ng-if="Waived != true">{{ user.waived}}</td>
+                                <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                                <td ng-if="Excess != true">{{ user.Excess}}</td>
+                                <td ng-if="excess != true">{{ user.openingbalance}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">Total</td>
+                                <td ng-if="totalpayable != true">{{d_total_totalpayable}}</td>
+                                <td ng-if="PaidAmount != true">{{d_total_FSS_PaidAmount}}</td>
+                                <td ng-if="Balance != true">{{d_total_balance}}</td>
+                                <td ng-if="Concession != true">{{d_total_concession}}</td>
+                                <td ng-if="Fine != true">{{d_total_fine}}</td>
+                                <td ng-if="Rebate != true">{{d_total_rebate}}</td>
+                                <td ng-if="Waived != true">{{d_total_waived}}</td>
+                                <td ng-if="Waived != true">{{d_total_adjusted}}</td>
+                                <td ng-if="Excess != true">{{d_total_Excess}}</td>
+                                <td ng-if="excess != true">{{d_total_openingbalance}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--Endded Class Section Wise total Paid count-->
+
+                <!--<table class="table table-hover table-responsive table-bordered text-center" id="clscnttbl" ng-show="clswisetotalpaidcnt">
+        ng-show="cls"
+        <thead>
+            <tr>
+                <th class="hdTH">
+        <label>
+            <input type="checkbox" value="" ng-model="clsmodel" ng-click="toggleAllclsinsconN()">
+            <span class="lbl padding-8"></span>
+        </label>
+    </th>
+                <th>Sl No </th>
+                <th><a href="" ng-click="order4('ASMCL_ClassName')">Class Name</a> </th>
+                <th><a href="" ng-click="order4('FMT_Name')">Section Name</a> </th>
+                <th><a href="" ng-click="order4('TotalCharges')">Total Paid</a> </th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="userr in clscnt | orderBy:sortKey10:reverse10 | filter:search" ng-class-odd="'odd'">
+                <td class="text-center  hdTD">
+        <label>
+            <input type="checkbox" ng-model="userr.clsmodelcnt" value="{{userr.Id}}" ng-change="optionToggledclscnt(userr,$index)">
+            <span class="lbl padding-8"></span>
+        </label>
+    </td>
+                <td>{{ $index+1}}</td>
+                <td>{{ userr.ASMCL_ClassName }}</td>
+                <td>{{ userr.ASMC_SectionName}}</td>
+                <td>{{ userr.Total }}</td>
+
+
+            </tr>
+
+        </tbody>
+    </table>-->
+                <!--<div id="printSectionIdclswisetotalpaidcnt" style="overflow:scroll" ng-show="tadprintN">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <br />
+        <center>
+            <div>
+                <table>
+                    <tbody>
+                        <tr style="text-align:center;font-size:20px;margin-left:5px">
+                            <td><b>Class Wise Total Paid Count</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </center>
+        <br />
+        <table class="table table-hover table-responsive table-bordered text-center" id="tableclsclsconN">
+            <thead>
+                <tr>
+                    <th>Sl No </th>
+                    <th><a href="">Class Name</a> </th>
+                    <th><a href="">Section </a> </th>
+                    <th><a href="">Total</a> </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="userr in clscntcount ">
+                    <td>{{ $index+1}}</td>
+                    <td>{{ userr.ASMCL_ClassName }}</td>
+                    <td>{{ userr.sectionname}}</td>
+                    <td>{{ userr.Total }}</td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>-->
+
+                <!-- added on 5/9/2022 -->
+                <!--<table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="installment">
+                    ng-show="cls"
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="clsinstallment" ng-click="toggleAllinstallment()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No </th>
+                            <th><a href="" ng-click="order4('StudentName')">Student Name</a> </th>
+                            <th><a href="" ng-click="order4('StudentName')">Class Name</a> </th>
+
+                            <th><a href="" ng-click="order4('FTI_Name')">Installment</a> </th>
+                            <th><a href="" ng-click="order4('TotalCharges')">Total Charges</a> </th>
+                            <th><a href="" ng-click="order4('balance')">Balance Amount</a></th>
+                            <th><a href="" ng-click="order4('FSS_PaidAmount')">Paid Amount</a></th>
+                            <th><a href="" ng-click="order4('concession')">Concession</a> </th>
+                            <th><a href="" ng-click="order4('concession')">Adjusted</a> </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in datainstallment | orderBy:sortKey9:reverse9 | filter:search" ng-class-odd="'odd'">
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.clsinstallmentdata" value="{{user.Id}}" ng-change="optionToggledinstallment(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.StudentName }}</td>
+                            <td>{{ user.ASMCL_ClassName }}</td>
+                            <td>{{ user.FTI_Name}}</td>
+                            <td>{{ user.Charge }}</td>
+                            <td>{{ user.Balance}}</td>
+                            <td>{{ user.Paid}}</td>
+                            <td>{{ user.Concession}}</td>
+                            <td>{{ user.adjusted}}</td>
+
+                        </tr>
+                        <tr ng-if="clsinstallment==true">
+                            <td colspan="5">Total</td>
+                            <td>{{c_TotalCharges}}</td>
+                            <td>{{c_TotalBalance}}</td>
+                            <td>{{c_TotalPaid}}</td>
+                            <td>{{c_TotalConcession}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>-->
+                <!--<div id="printSectionIdclsinscon" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>Installment Wise  Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tableinstallment">
+                        <thead>
+                            <tr>
+                                <th>Sl No </th>
+
+                                <th><a href="">Student Name</a> </th>
+                                <th><a href="">Class Name</a> </th>
+                                <th><a href="">Installment</a> </th>
+                                <th><a href="">Total Charges</a> </th>
+                                <th><a href="">Balance Amount</a></th>
+                                <th><a href="">Paid Amount</a></th>
+                                <th><a href="">Concession Amount</a></th>
+                                <th><a href="">Adjusted Amount</a></th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatableinstallment">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.StudentName }}</td>
+                                <td>{{ user.ASMCL_ClassName }}</td>
+
+                                <td>{{ user.FTI_Name}}</td>
+                                <td>{{ user.Charge }}</td>
+                                <td>{{ user.Balance}}</td>
+                                <td>{{ user.Paid}}</td>
+                                <td>{{ user.Concession}}</td>
+                                <td>{{ user.adjusted}}</td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="4">Total</td>
+                                <td>{{c_TotalCharges}}</td>
+                                <td>{{c_TotalBalance}}</td>
+                                <td>{{c_TotalPaid}}</td>
+                                <td>{{c_TotalConcession}}</td>
+
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>-->
+                <!--//added//-->
+
+                <!--Installment Wise count-->
+                <table class="table table-hover table-responsive table-bordered text-center" id="instcounttable" ng-show="instcntinsconN">
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="instmodel" ng-click="toggleAllinstcnt()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No </th>
+                            <th><a href="" ng-click="order4('StudentName')">Student Name</a> </th>
+                            <th><a href="" ng-click="order4('ASMCL_ClassName')">Class/Section</a> </th>
+                            <th><a href="" ng-click="order4('AMST_AdmNo')">Admission No</a> </th>
+                            <th><a href="" ng-click="order4('FTI_Name')">Installment name</a> </th>
+                            <th ng-if="totalpayable != true">
+                                <a href="" ng-click="order4('Payable')">Total Payable</a>
+                            </th>
+                            <th ng-if="PaidAmount != true">
+                                <a href="" ng-click="order4('Paid')">Paid Amount</a>
+                            </th>
+                            <th ng-if="Balance != true">
+                                <a href="" ng-click="order4('Balance')">Balance</a>
+                            </th>
+                            <th ng-if="Concession != true">
+                                <a href="" ng-click="order4('concession')">Concession</a>
+                            </th>
+                            <th ng-if="Fine != true">
+                                <a href="" ng-click="order4('Arrear')">Arrear</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('Excess')">Excess</a>
+                            </th>
+                            <th ng-if="Rebate != true">
+                                <a href="" ng-click="order4('Charge')">Charge</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order4('waived')">Adjustment</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in instcnt | orderBy:sortKey9:sortKey9 | filter:search" ng-class-odd="'odd'">
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.instcount" value="{{user.Id}}" ng-change="optionToggledinstcnt(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.StudentName }}</td>
+                            <td>{{ user.ASMCL_ClassName }}</td>
+                            <td>{{ user.AMST_AdmNo }}</td>
+                            <td>{{ user.FTI_Name }}</td>
+                            <td ng-if="Payable != true">{{user.Payable}}</td>
+                            <td ng-if="Paid != true">{{ user.Paid }}</td>
+                            <td ng-if="Balance != true">{{ user.Balance }}</td>
+                            <td ng-if="Concession != true">{{ user.Concession }}</td>
+                            <td ng-if="Arrear != true">{{ user.Arrear}}</td>
+                            <td ng-if="Excess != true">{{ user.Excess}}</td>
+                            <td ng-if="Charge != true">{{ user.Charge}}</td>
+                            <td ng-if="adjusted != true">{{ user.adjusted}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">Total</td>
+                            <td ng-if="Payable != true">{{d_total_Payable}}</td>
+                            <td ng-if="Paid != true">{{d_total_Paid}}</td>
+                            <td ng-if="Balance != true">{{d_total_Balance}}</td>
+                            <td ng-if="Concession != true">{{d_total_Concession}}</td>
+                            <td ng-if="Arrear != true">{{d_total_Arrear}}</td>
+                            <td ng-if="Excess != true">{{d_total_Excess}}</td>
+                            <td ng-if="Charge != true">{{d_total_Charge}}</td>
+                            <td ng-if="Waived != true">{{d_total_adjusted}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!--Installment Wise count-->
+                <div id="printSectionIdinsttotalpaidcount" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>Installment Wise Paid Count</b> </td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tableinstcnt">
+                        <thead>
+                            <tr>
+                                <th> SL No</th>
+                                <th><a href="" ng-click="order4('StudentName')">Student Name</a> </th>
+                                <th><a href="" ng-click="order4('ASMCL_ClassName')">Class/Section</a> </th>
+                                <th><a href="" ng-click="order4('AMST_AdmNo')">Admission No</a> </th>
+                                <th><a href="" ng-click="order4('FTI_Name')">Installment name</a> </th>
+                                <th ng-if="Payable != true">
+                                    Total Payable
+                                </th>
+                                <th ng-if="Paid != true">
+                                    Paid Amount
+                                </th>
+                                <th ng-if="Balance != true">
+                                    Balance
+                                </th>
+                                <th ng-if="Concession != true">
+                                    Concession
+                                </th>
+                                <th ng-if="Arrear != true">
+                                    Arrear
+                                </th>
+                                <th ng-if="Excess != true">
+                                    Excess
+                                </th>
+                                <th ng-if="Charge != true">
+                                    Charge
+                                </th>
+                                <th>
+                                    <a href="" ng-click="order4('adjusted')">Adjustment</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatableinst">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.StudentName }}</td>
+                                <td>{{ user.ASMCL_ClassName }}</td>
+                                <td>{{ user.AMST_AdmNo }}</td>
+                                <td>{{ user.FTI_Name }}</td>
+                                <td ng-if="Payable != true">{{user.Payable}}</td>
+                                <td ng-if="Paid != true">{{ user.Paid }}</td>
+                                <td ng-if="Balance != true">{{ user.Balance }}</td>
+                                <td ng-if="Concession != true">{{ user.Concession }}</td>
+                                <td ng-if="Arrear != true">{{ user.Arrear}}</td>
+                                <td ng-if="Excess != true">{{ user.Excess}}</td>
+                                <td ng-if="Charge != true">{{ user.Charge}}</td>
+                                <td ng-if="adjusted != true">{{ user.adjusted}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">Total</td>
+                                <td ng-if="Payable != true">{{d_total_Payable}}</td>
+                                <td ng-if="Paid != true">{{d_total_Paid}}</td>
+                                <td ng-if="Balance != true">{{d_total_Balance}}</td>
+                                <td ng-if="Concession != true">{{d_total_Concession}}</td>
+                                <td ng-if="Arrear != true">{{d_total_Arrear}}</td>
+                                <td ng-if="Excess != true">{{d_total_Excess}}</td>
+                                <td ng-if="Charge != true">{{d_total_Charge}}</td>
+                                <td ng-if="Waived != true">{{d_total_adjusted}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--Installment Wise count-->
+
+                <pagination total-items="totalItems" ng-model="currentPage"
+                            max-size="5" boundary-links="true"
+                            items-per-page="numPerPage" class="pagination-sm">
+                </pagination>
+            </div>
+        </div>
+    </section>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal3" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close text-white" data-dismiss="modal">×</button>
+                <h4 class="modal-title text-white">Details</h4>
+            </div>
+            <div class="modal-body">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="" ng-model="payable">
+                        <span class="lbl padding-8">Payable Amount</span>
+                    </label>
+                </div>
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="" ng-model="PaidAmount">
+                        <span class="lbl padding-8">Paid Amount</span>
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="" ng-model="Balance">
+                        <span class="lbl padding-8">Balance</span>
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="" ng-model="Concession">
+                        <span class="lbl padding-8">Concession</span>
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="" ng-model="Fine">
+                        <span class="lbl padding-8">Fine</span>
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="" ng-model="Rebate">
+                        <span class="lbl padding-8">Rebate</span>
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="" ng-model="Waived">
+                        <span class="lbl padding-8">Waived Off</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

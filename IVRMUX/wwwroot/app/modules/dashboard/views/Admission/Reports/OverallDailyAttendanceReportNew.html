@@ -1,0 +1,279 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="StuAttRptDropdownList();" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Overall Daily Attendance Report:</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="cat" required ng-change="getyeardetails()">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in yearDropdown" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected===true}}">{{option.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="fdate" onkeydown="return false" ng-model="fromdate" ng-change="fromdate()"
+                                               md-placeholder="Enter date" md-min-date="minDatedof"
+                                               md-max-date="maxDatedof" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="showReport()" id="save-btn" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="button" ng-disabled="catreport_btn" ng-click="exportToExcel('#printSectionId')" target="_blank" class="md-raised md-primary">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export
+                        </md-button>
+                        <!--<md-button type="button" ng-disabled="catreport_btn" ng-click="print()" target="_blank" class="md-raised md-primary">
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </md-button>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="catreport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Overall Daily Attendance Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <table class="table table-hover table-responsive table-bordered" id="table1">
+                <thead>
+                    <tr>
+                        <!--<th class="hdTH">
+                            <label>
+                                <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>-->
+                        <th class="text-center">
+                            <a href="" ng-click="order('sno')">SL. No.</a>
+                        </th>
+
+                        <th class="text-center">
+                            <a href="" ng-click="order('classname')">Class</a>
+                        </th>
+                        <th class="text-center">
+                            <a href="" ng-click="order('sectionname')">Section</a>
+                        </th>
+                        <th class="text-center">
+                            <a href="" ng-click="order('TOTAL')">Strength</a>
+                        </th>
+                        <th class="text-center">
+                            <a href="" ng-click="order('present')">Present</a>
+                        </th>
+                        <th class="text-center">
+                            <a href="" ng-click="order('absent')">Absent</a>
+                        </th>
+                        <th class="text-center">
+                            <a href="" ng-click="order('Employeename')">Class Teacher</a>
+                        </th>
+                        <th class="text-center">
+                            <a href="" ng-click="order('ABSENT')">Absent Student Name</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in students">
+                    <tr>
+                        <!--<td class="text-center  hdTD">
+                            <label>
+                                <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>-->
+                        <td rowspan="{{user.studentlist.length+1}}" style="text-align:center">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.studentlist.length+1}}">{{ user.classname }}</td>
+                        <td class="text-left" rowspan="{{user.studentlist.length+1}}">{{ user.sectionname }}</td>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}">{{ user.present + user.absent}}</td>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}">{{ user.present}}</td>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}">{{ user.absent}}</td>
+                        <td class="text-left" rowspan="{{user.studentlist.length+1}}">{{ user.Employeename}}</td>
+                    </tr>
+                    <tr ng-repeat="student1 in user.studentlist">
+                        <td class="text-left padding-left-5">
+                            <span ng-if="student1.studentname=='No Absents'">
+                                &nbsp;
+                            </span>
+                            <span ng-if="student1.studentname!='No Absents'">
+                                {{student1.studentname}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="4" direction-links="true" boundary-links="true"></dir-pagination-controls>
+        </div>
+
+        <!--  ---------------------PRINT DATA---------------------------->
+        <!--<div id="printSectionId" ng-show="table_flag">
+            <table class="table table-hover table-responsive table-bordered">
+                <tr>
+                    <td colspan="8" class="text-center">
+                        <center><h4>{{instname}}</h4></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8" class="text-center">
+                        <center><h4>{{instaddress}}</h4></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8" class="text-center">
+                        <center><h4>Over All Daily Attendance</h4></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8" class="text-center">
+                        <center><h4>Academic Year : {{yearname}}</h4></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8" class="text-center">
+                        <center><h4>Attendance Date : {{fromdate | date :'dd/MM/yyyy'}}</h4></center>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table class="table table-hover table-responsive table-bordered" id="main_gid_export" ng-show="main_gid_export_flag">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Strength</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Class Teacher</th>
+                        <th>Absent Student Name</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in students">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}" style="text-align:center">{{$index+1}}</td>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}">{{ user.classname}}</td>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}">{{ user.sectionname}}</td>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}">{{ user.present + user.absent}}</td>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}">{{ user.present}}</td>
+                        <td class="text-center" rowspan="{{user.studentlist.length+1}}">{{ user.absent}}</td>
+                        <td class="text-left padding-left-5" rowspan="{{user.studentlist.length+1}}">{{ user.Employeename}}</td>
+                    </tr>
+                    <tr ng-repeat="student1 in user.studentlist">
+                        <td class="text-left padding-left-5">
+                            <span ng-if="student1.studentname!='No Absents'">
+                                {{student1.studentname}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>-->
+
+
+
+
+        <div id="printSectionId" ng-show="table_flag">
+            <table class="table table-hover table-responsive table-bordered">
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" class="text-center">
+                        <center><h4>{{instname}}</h4></center>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" class="text-center">
+                        <center><h4>{{instaddress}}</h4></center>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" class="text-center">
+                        <center><h4>Over All Daily Attendance</h4></center>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" class="text-center">
+                        <center><h4>Academic Year : {{yearname}}</h4></center>
+                    </td>
+                </tr>
+                <tr style="border : solid 0.5px black;">
+                    <td colspan="8" class="text-center">
+                        <center><h4>Attendance Date : {{fromdate | date :'dd/MM/yyyy'}}</h4></center>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                <thead>
+                    <tr style="border : solid 0.5px black;">
+                        <th>SL.No.</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Strength</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Class Teacher</th>
+                        <th>
+                            <table>
+                                <tr style="border : solid 0.5px black;">
+                                    <th>Absent Student Name</th>
+                                </tr>
+                            </table>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody ng-repeat="user in students">
+                    <tr style="border : solid 0.5px black;">
+                        <td class="text-center" style="text-align:center">{{$index+1}}</td>
+                        <td class="text-center">{{ user.classname}}</td>
+                        <td class="text-center">{{ user.sectionname}}</td>
+                        <td class="text-center">{{ user.present + user.absent}}</td>
+                        <td class="text-center">{{ user.present}}</td>
+                        <td class="text-center">{{ user.absent}}</td>
+                        <td class="text-left padding-left-5">{{ user.Employeename}}</td>
+                        <td>
+                            <table>
+                                <tr style="border : solid 0.5px black;" ng-repeat="student1 in user.studentlist">
+                                    <td class="text-left padding-left-5">
+                                        <span ng-if="student1.studentname!='No Absents'">
+                                            {{student1.studentname}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

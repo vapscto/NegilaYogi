@@ -1,0 +1,715 @@
+﻿<STYLE>
+    .tableheader {
+        font-size: 16px !important;
+        table-layout: fixed;
+        border: 0px !important;
+        text-align: left !important;
+        line-height: 1.4;
+        /*line-height: 1;*/
+    }
+</STYLE>
+<div data-ng-init="loaddata()">
+    <section class="content twocoloumn">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">PDA Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" ng-click="ShowHideup()"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+
+
+                    <div class="row">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <div class="well">
+                                <div class="text-center" ng-init="type='Ind'">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" data-ng-model="type" value="Ind" data-ng-click="onclickloaddata()" required>
+                                        <span class="lbl padding-8">Individual</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" data-ng-model="type" value="All" data-ng-click="onclickloaddata()" required>
+                                        <span class="lbl padding-8">All</span>
+                                    </label>
+
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                                    <div ng-message="required">Select any one of the radio button</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Academic Year:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <select class="form-control" id="sel1" ng-model="asmaY_Id" name="acd_year" required>
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="options in acdyr" value="{{options.asmaY_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                        <div ng-message="required">Please Select the Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Class:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <select class="form-control" id="sel1" ng-model="asmcL_Id" name="acd_year" data-ng-change="onselectclass()" required>
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="options in classcount" value="{{options.asmcL_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                        <div ng-message="required">Please Select the Class</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Section :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-7">
+                                    <select class="form-control" ng-model="asmC_Id" name="section" data-ng-change="onselectsection()" ng-required="section">
+                                        <option value="">Select Section</option>
+                                        <option ng-repeat="option in sectioncount" value="{{option.amsC_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmc_sectionname}}
+                                        </option>
+                                        <!--<option value="0">All</option>-->
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.section)" ng-messages="myForm.section.$error">
+                                        <div ng-message="required">Please Select Student</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group" ng-show="type=='Ind'">
+                                <label class="control-label col-sm-5">Student Name:<span style="color:Red">*</span></label>
+                                <div class="col-sm-7">
+                                    <ui-select id="sel1" name="studentname" ng-model="$parent.AMST_Id" ng-disabled="BokStud" theme="bootstrap" ng-keyup="searchfilter1($select);" ng-change="get_Studentdetails($parent.AMST_Id)" title="Select book">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Student Name..."> {{$select.selected.amsT_AdmNo}}::{{$select.selected.amsT_FirstName}}</ui-select-match>
+                                        <ui-select-choices repeat="user in studlist | filter: $select.search" value="{{user.amsT_Id}}" ng-selected="{{user.Selected == true}}">
+                                            <div ng-bind-html="(user.amsT_AdmNo)+'::'+(user.amsT_FirstName) | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <label id="upnme11" ng-show="updateshowlabel1">{{updatename}}</label>
+                                    <div class="error-messages" ng-if="interacted(myForm.stud)" ng-messages="myForm.stud.$error">
+                                        <div ng-message="required">Please Select Student Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+
+                        <div class="col-sm-6">
+                            <div class="form-group" id="frmdt">
+                                <label class="control-label col-sm-5">From Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-5 input-group text-right" style="">
+                                    <md-datepicker ng-model="fromDate" md-min-date="minDatemf" md-max-date="maxDatemf" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" required></md-datepicker><!--ng-change='setTodate(fromDate)'-->
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group" id="frmdt">
+                                <label class="control-label col-sm-5">To Date:<span style="color:red;">*</span></label>
+
+                                <div class="col-sm-5 input-group text-right">
+                                    <md-datepicker ng-model="todate" onkeydown="return false"
+                                                   md-min-date="minDatemf" md-max-date="maxDatemf" name="To_Date" id="date2" md-placeholder="Enter  date" required></md-datepicker><!--ng-change='checkErr(fromDate,todate)'-->
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4 text-center">
+                            <div class="form-group">
+                                <label class="radio-inline">
+                                    <input type="checkbox" value="year" ng-model="detailed" ng-true-value="1" ng-false-value="0">
+                                    <span class="lbl padding-8">Detailed</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="checkbox" value="date" ng-model="stored" ng-true-value="1" ng-false-value="0">
+                                    <span class="lbl padding-8">Stored Transaction</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="checkbox" value="date" ng-model="format1" ng-true-value="1" ng-false-value="0">
+                                    <span class="lbl padding-8">Format-1</span>
+                                </label>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="ShowReport(fmG_Id, asmaY_Id, fromDate,rpttyp,result,status,due)">
+                            <i class="fa fa-edit" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" id="clear-btn" ng-click="clear_feedef()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-primary" ng-click="printToCart('printSectionId')" ng-show="reportlist.length>0">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box box-primary" ng-show="Grid_view">
+                <div class="box-header with-border">
+                    <h3 class="box-title">PDA Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div id="printrcp" ng-show="detail">
+                        <div>
+                            <div class="BArrearReport" ng-repeat="report in reportlist" style="" id="BArrearReport">
+
+                                <div class="" id="BArrearReport">
+
+                                    <section class="clearfix">
+                                        <div class="">
+                                            <div class="baldwin text-center">
+                                                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                            </div>
+                                            <h4 class="text-center">Fees and Deposit Details for <b>{{year}}</b></h4>
+                                            <h5 class="text-center"><b>GST No : 29AAATR3497G3Z1</b></h5>
+                                            <br />
+                                            <table class="tableheader">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>STUDENT NAME</td>
+                                                        <td>:  {{report.stu_rpt[0].AMST_FirstName}}</td>
+                                                        <td>CLASS & SECTION </td>
+                                                        <td>: {{report.stu_rpt[0].ASMCL_ClassName}} -  {{report.stu_rpt[0].ASMC_SectionName}}</td>
+
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <br />
+                                            <table class="tableheader" STYLE="WIDTH:50%;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Adm No</td>
+                                                        <td>: {{report.stu_rpt[0].AMST_AdmNo}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <br />
+
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th><b>Sl.No</b></th>
+                                                        <th><b>Receipt No</b></th>
+                                                        <th><b>Receipt Date</b></th>
+                                                        <th><b>Expenditure Head</b></th>
+                                                        <th><b>Amount</b></th>
+                                                        <th><b>Remarks</b></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="text-center" ng-repeat="value in report.stu_rpt | orderBy:predicate:default | filter:paginate| filter:search">
+                                                        <td>{{ $index+1}}</td>
+                                                        <td><label>{{value.PDAE_TransactionNo}}</label></td>
+                                                        <td><label>{{value.PDAE_Date | date: 'dd-MMM-yyyy'}}</label></td>
+                                                        <td>{{value.PDAMH_HeadName}}</td>
+                                                        <td>{{value.PDAEH_Amount}}</td>
+                                                        <td>{{value.PDAE_Remarks}}</td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                            <table class="table-bordered">
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td><b>TOTAL EXPENDITURE</b></td>
+                                                    <td>
+                                                        <b>{{report.tot}}</b>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                            </table>
+
+                                            <br />
+                                            <table class="tableheader">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="width-250">
+                                                            Total Fee and Deposit Collected :
+                                                        </td>
+                                                        <td>{{report.paid}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="width-250">
+                                                            Total Expenditure Amount :
+                                                        </td>
+                                                        <td>{{report.tot}}</td>
+                                                    </tr>
+
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="width-200" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBExcessPaid!=0">
+                                                            Opening Balance-School Dues :
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBExcessPaid!=0"><b>{{value.pdaS_OBExcessPaid}}</b></td>
+                                                    </tr>
+
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBStudentDue!=0">
+                                                            Opening Balance-Student Dues :
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBStudentDue!=0"><b>{{value.pdaS_OBStudentDue}}</b></td>
+                                                    </tr>
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_CYRefundAmt!=0">
+                                                            Refunded Amount :
+
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_CYRefundAmt!=0">{{value.pdaS_CYRefundAmt}}</td>
+                                                    </tr>
+
+
+                                                    <tr ng-repeat="value in admsudentslist">
+
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && report.conces!=0">
+                                                            Concession Amount :
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && report.conces!=0">{{report.conces}}</td>
+                                                    </tr>
+
+
+
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id">
+                                                            School Balance :
+                                                        </td>
+
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_CBStudentDue!=0">
+                                                            Student Balance :
+                                                        </td>
+
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces - report.tot -value.pdaS_CYRefundAmt>0)"><b>{{(report.paid  + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces ) - report.tot -value.pdaS_CYRefundAmt}}</b></td>
+
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id  && (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces - report.tot -value.pdaS_CYRefundAmt<0)">
+                                                            <b>
+                                                                {{report.tot - (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces)  -value.pdaS_CYRefundAmt}}
+                                                            </b>
+                                                        </td>
+
+
+                                                    </tr>
+
+
+
+
+                                                </tbody>
+
+                                            </table>
+                                            <table class="mt-100">
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            This is Computer Generated Statement does not require Signature.
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </section>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="printcons" ng-show="consol">
+                        <div>
+                            <div class="BArrearReport" ng-repeat="report in reportlist" style="" id="BArrearReport">
+
+                                <div class="margin-top-10" id="BArrearReport">
+
+                                    <section class="clearfix">
+                                        <div class="">
+                                            <div class="baldwin text-center">
+                                                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                            </div>
+                                            <h4 class="text-center">Fees and Deposit Details for <b>{{year}}</b></h4>
+                                            <h5 class="text-center"><b>GST No : 29AAATR3497G3Z1</b></h5>
+                                            <br />
+                                            <table class="tableheader">
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="2">STUDENT NAME</td>
+                                                        <td colspan="2">:  {{report.stu_rpt[0].AMST_FirstName}}</td>
+                                                        <td colspan="2">CLASS & SECTION </td>
+                                                        <td>: {{report.stu_rpt[0].ASMCL_ClassName}} -  {{report.stu_rpt[0].ASMC_SectionName}}</td>
+
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <br />
+                                            <table class="tableheader" STYLE="WIDTH:50%;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Adm No</td>
+                                                        <td>: {{report.stu_rpt[0].AMST_AdmNo}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <br />
+
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th><b>Sl.No</b></th>
+                                                        <th class="width-400"><b>Expenditure Head</b></th>
+                                                        <th><b>Amount</b></th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="text-center" ng-repeat="value in report.stu_rpt | orderBy:predicate:default | filter:paginate| filter:search">
+                                                        <td>{{ $index+1}}</td>
+                                                        <td>{{value.PDAMH_HeadName}}</td>
+                                                        <td class="text-right">{{value.PDAEH_Amount}}</td>
+                                                        <!--<td>{{value.PDAE_Remarks}}</td>-->
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="text-center"><b>TOTAL EXPENDITURE</b></td>
+                                                        <td class="text-right">
+                                                            <b>{{report.tot}}</b>
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                            <!--<table class="table-bordered">
+                                                <tr>
+                                                    <td colspan="2" class="text-center" ><b>TOTAL EXPENDITURE</b></td>
+                                                    <td class="text-center" >
+                                                        <b>{{report.tot}}</b>
+                                                    </td>
+                                                </tr>
+                                            </table>-->
+
+                                            <br />
+                                            <table class="tableheader">
+
+
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="width-250">
+                                                            Total Fee and Deposit Collected :
+                                                        </td>
+                                                        <td>{{report.paid}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="width-250">
+                                                            Total Expenditure Amount :
+                                                        </td>
+                                                        <td>{{report.tot}}</td>
+                                                    </tr>
+
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="width-200" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBExcessPaid!=0">
+                                                            Opening Balance-School Dues :
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBExcessPaid!=0"><b>{{value.pdaS_OBExcessPaid}}</b></td>
+                                                    </tr>
+
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBStudentDue!=0">
+                                                            Opening Balance-Student Dues :
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBStudentDue!=0"><b>{{value.pdaS_OBStudentDue}}</b></td>
+                                                    </tr>
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_CYRefundAmt!=0">
+                                                            Refunded Amount :
+
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_CYRefundAmt!=0">{{value.pdaS_CYRefundAmt}}</td>
+                                                    </tr>
+
+
+                                                    <tr ng-repeat="value in admsudentslist">
+
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && report.conces!=0">
+                                                            Concession Amount :
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && report.conces!=0">{{report.conces}}</td>
+                                                    </tr>
+
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id">
+                                                            School Balance :
+                                                        </td>
+
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces - report.tot -value.pdaS_CYRefundAmt>0)"><b>{{(report.paid  + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces ) - report.tot -value.pdaS_CYRefundAmt}}</b></td>
+                                                    </tr>
+
+
+                                                    <tr ng-repeat="value in admsudentslist">
+                                                        <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id ">
+                                                            <!--&& value.pdaS_CBStudentDue!=0-->
+                                                            Student Balance :
+                                                        </td>
+
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id  && value.pdaS_CYRefundAmt>0 ">
+                                                            <b>
+
+
+                                                                {{report.paid + value.pdaS_OBExcessPaid  - (report.tot - value.pdaS_OBStudentDue + report.conces)  -value.pdaS_CYRefundAmt}}
+                                                            </b>
+                                                        </td>
+                                                        <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id  && (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces - report.tot -value.pdaS_CYRefundAmt<0)">
+                                                            <b>
+                                                                {{report.tot - (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces)  -value.pdaS_CYRefundAmt}}
+                                                            </b>
+                                                        </td>
+                                                    </tr>
+
+
+                                                </tbody>
+
+                                            </table>
+                                            <table class="fxDiv">
+                                                <tr>
+                                                    <td colspan="2">
+                                                        This is Computer Generated Statement does not require Signature.
+                                                    </td>
+
+                                                </tr>
+                                            </table>
+
+
+                                        </div>
+                                    </section>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="printformat1" ng-show="format1">
+                        <div ng-repeat="report in reportlist" style="page-break-after:always" >
+
+                        
+                                <div class="baldwin text-center">
+                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                </div>
+                                <h5 class="text-center">Fees and Deposit Details for <b>{{year}}</b></h5>
+                                <h5 class="text-center"><b>GST No : 29AAATR3497G3Z1</b></h5>
+                         
+                                <table class="tableheader">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="2">STUDENT NAME</td>
+                                            <td colspan="2">:  {{report.stu_rpt[0].AMST_FirstName}}</td>
+                                            <td colspan="2">  CLASS & SECTION </td>
+                                            <td>: {{report.stu_rpt[0].ASMCL_ClassName}} -  {{report.stu_rpt[0].ASMC_SectionName}}</td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <table class="tableheader" STYLE="WIDTH:50%;">
+                                    <tbody>
+                                        <tr>
+                                            <td>Adm No</td>
+                                            <td>: {{report.stu_rpt[0].AMST_AdmNo}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                              
+
+                                <table class="table table-bordered table-condensed" style="width:90%">
+                                    <thead>
+                                        <tr>
+                                            <td width="5%"><b>Sl No </b></td>
+                                            <td width="60%"><b>Expenditure  Head</b></td>
+                                            <td width="15%"><b>Amount</b></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3" class="text-center">
+                                                <b> Fee Details</b>
+                                            </td>
+
+                                        </tr>
+                                        <tr ng-repeat="user in report.fees">
+                                            <td ng-if="user.PDAMH_HeadName=='EDN ESTABLISHMENT and ADMINISTRATION FEE' || user.PDAMH_HeadName=='BOARDING CHARGES'">{{$index+1}}</td>
+                                            <td ng-if="user.PDAMH_HeadName=='EDN ESTABLISHMENT and ADMINISTRATION FEE' || user.PDAMH_HeadName=='BOARDING CHARGES'">{{user.PDAMH_HeadName}}</td>
+                                            <td ng-if="user.PDAMH_HeadName=='EDN ESTABLISHMENT and ADMINISTRATION FEE' || user.PDAMH_HeadName=='BOARDING CHARGES'">{{user.PDAEH_Amount}}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" class="text-center"><b>Total</b></td>
+                                            <td>{{report.feestotal}}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="3" class="text-center">
+                                                <b> Donation Details</b>
+                                            </td>
+
+                                        </tr>
+                                        <tr ng-repeat="user in report.donation">
+                                            <td ng-if="user.PDAMH_HeadName=='STAFF SALARY FUND' || user.PDAMH_HeadName=='DEVELOPMENT FUND'">{{$index+1}}</td>
+                                            <td ng-if="user.PDAMH_HeadName=='STAFF SALARY FUND' || user.PDAMH_HeadName=='DEVELOPMENT FUND'">{{user.PDAMH_HeadName}}</td>
+                                            <td ng-if="user.PDAMH_HeadName=='STAFF SALARY FUND' || user.PDAMH_HeadName=='DEVELOPMENT FUND'">{{user.PDAEH_Amount}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" class="text-center"><b>Total</b></td>
+                                            <td><b>{{report.donationtotal}}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-center">
+                                                <b> Personal Expenditure Deposit Details</b>
+                                            </td>
+
+                                        </tr>
+                                        <tr ng-repeat="user in report.other">
+                                            <td ng-if="user.PDAMH_HeadName!='BOARDING CHARGES' && user.PDAMH_HeadName!='STAFF SALARY FUND' && user.PDAMH_HeadName!='DEVELOPMENT FUND' && user.PDAMH_HeadName!='EDN ESTABLISHMENT and ADMINISTRATION FEE'">
+                                                {{$index+1}}
+                                            </td>
+                                            <td ng-if="user.PDAMH_HeadName!='BOARDING CHARGES' && user.PDAMH_HeadName!='STAFF SALARY FUND' && user.PDAMH_HeadName!='DEVELOPMENT FUND' && user.PDAMH_HeadName!='EDN ESTABLISHMENT and ADMINISTRATION FEE'">
+                                                {{user.PDAMH_HeadName}}
+                                            </td>
+                                            <td ng-if="user.PDAMH_HeadName!='BOARDING CHARGES' && user.PDAMH_HeadName!='STAFF SALARY FUND' && user.PDAMH_HeadName!='DEVELOPMENT FUND' && user.PDAMH_HeadName!='EDN ESTABLISHMENT and ADMINISTRATION FEE'">
+                                                {{user.PDAEH_Amount}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" class="text-center"><b>Total</b></td>
+                                            <td><b>{{report.othertotal}}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" class="text-center"><b>Total Expenditure</b></td>
+                                            <td><b>{{report.tot}}</b></td>
+                                        </tr>
+
+                                        
+                                        <tr ng-repeat="value in admsudentslist">
+                                            <td class="width-200" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBExcessPaid!=0" colspan="2">
+                                                Opening Balance:School Due
+                                            </td>
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBExcessPaid!=0"><b>{{value.pdaS_OBExcessPaid}}</b></td>
+                                        </tr>
+
+                                        <tr ng-repeat="value in admsudentslist">
+                                            <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBStudentDue!=0" colspan="2">
+                                                Opening Balance:Student Due
+                                            </td>
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_OBStudentDue!=0"><b>{{value.pdaS_OBStudentDue}}</b></td>
+                                        </tr>
+                                        <tr ng-repeat="value in admsudentslist">
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id" class="text-center" colspan="2"><b>Total fee and deposit collected</b></td>
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id"><b>{{report.paid}} </b></td>
+                                        </tr>
+                                        <tr ng-repeat="value in admsudentslist">
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id" class="text-center" colspan="2"><b>Total expenditure amount :</b></td>
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id"><b>{{report.tot}}</b></td>
+                                        </tr>
+                                        <tr ng-repeat="value in admsudentslist" ng-if="report.conces>0">
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id" class="text-center" colspan="2"><b>Concession Amount:</b></td>
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id"><b>{{report.conces}}</b></td>
+
+                                        </tr>
+                                    
+                                        <tr ng-repeat="value in admsudentslist" ng-if="((report.paid  + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces ) - report.tot -value.pdaS_CYRefundAmt)>0">
+                                            <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id" colspan="2">
+                                                Due from School  to the student:
+                                            </td>
+
+
+
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces - report.tot -value.pdaS_CYRefundAmt>0)">
+                                                <b>{{(report.paid  + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces ) - report.tot -value.pdaS_CYRefundAmt}}</b>
+                                            </td>
+
+
+
+                                        </tr>
+                                        <tr ng-repeat="value in admsudentslist" ng-if="(report.tot - (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces)  -value.pdaS_CYRefundAmt)>0">
+                                            <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id" colspan="2">
+                                                Due from Student  to the School :
+                                            </td>
+
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id  && (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces - report.tot -value.pdaS_CYRefundAmt<0)">
+                                                <b>
+                                                    {{report.tot - (report.paid + value.pdaS_OBExcessPaid - value.pdaS_OBStudentDue + report.conces)  -value.pdaS_CYRefundAmt}}
+                                                </b>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="value in admsudentslist">
+                                            <td class="" ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_CYRefundAmt!=0" colspan="2">
+                                                Refunded Amount :
+
+                                            </td>
+                                            <td ng-if="value.amst_Id==report.stu_rpt[0].AMST_Id && value.pdaS_CYRefundAmt!=0">{{value.pdaS_CYRefundAmt}}</td>
+                                        </tr>
+
+
+                                    </tbody>
+
+                                </table>
+                                <p> This is Computer Generated Statement does not require Signature.</p>
+                           
+
+                        </div>
+
+
+
+                    </div>
+
+
+                </div>
+
+        </form>
+    </section>
+
+</div>

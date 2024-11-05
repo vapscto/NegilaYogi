@@ -1,0 +1,477 @@
+﻿<script type="text/javascript">
+    function refreshDialer() {
+        document.getElementById("idpdf").contentWindow.location.reload(true);
+    }
+</script>
+
+<style>
+    #wrapper {
+        overflow-x: scroll;
+        width: 1072px;
+    }
+
+    .file-blue:before {
+        content: 'Upload File';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+
+    .UploadEmpDoc .file-blue:before {
+        content: 'Upload Doc' !important;
+        font-size: 12px;
+    }
+</style>
+<section class="content" data-ng-init="onLoadGetDataEmployeeType()">
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <!--<h3 class="box-title">EMPLOYEE SELECTION</h3>-->
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class=" fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="groupType in groupTypedropdown">
+                                        <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType.selected)">
+                                        <span class="lbl padding-8">
+                                            {{groupType.hrmgT_EmployeeGroupType}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-right-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="department in departmentdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)">
+                                        <span class="lbl padding-8">
+                                            {{department.hrmD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="designation in designationdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                        <span class="lbl padding-8">
+                                            {{designation.hrmdeS_DesignationName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Employee :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="empname" ng-model="obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" ng-change="emp_Sel(obj.hrmE_Id)" title="Select Employee" required>
+                                    <ui-select-match placeholder="Select or search Employee in the list...">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in employee | propsFilter: {hrmE_EmployeeFirstName: $select.search}" value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm1.empname)" ng-messages="myForm1.empname.$error">
+                                <div ng-message="required" style="margin-left:270px;"> Select Employee First</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm7" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Roles and Responsibilities in BOS/BOE:</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class=" fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Subject:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="Subject" data-ng-model="bosboe.hreboS_Subject" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required ng-disabled="bosboe.hreboS_StatusFlg=='Approved'">
+                                <div class="error-messages" ng-if="interacted7(myForm7.Subject)" ng-messages="myForm7.Subject.$error">
+                                    <div ng-message="required">Please enter Subject Name</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                BOS/BOE: <span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <div class="text-center">
+                                    <label class="radio-inline">
+                                        <input type="radio" ng-model="bosboe.hreboS_BOSBOEFlg" value="BOS" name="BOSBOE{{$index+1}}" ng-disabled="bosboe.hreboS_StatusFlg=='Approved'" required>
+                                        <span class="lbl padding-8">BOS<strong style="color:red;display:inline; font-weight: bolder;">*</strong></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" ng-model="bosboe.hreboS_BOSBOEFlg" value="BOE" name="BOSBOE{{$index+1}}" ng-disabled="bosboe.hreboS_StatusFlg=='Approved'" required>
+                                        <span class="lbl padding-8">BOE<strong style="color:red;display:inline; font-weight: bolder;">*</strong></span>
+                                    </label>
+                                </div>
+                                <span class="error-messages col-sm-offset-5" ng-if="interacted7(myForm7.BOSBOE)" ng-messages="myForm7.BOSBOE.$error">
+                                    <span ng-message="required">Select BOS/BOE</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Role:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="Role" data-ng-model="bosboe.hreboS_Role" ng-disabled="bosboe.hreboS_StatusFlg=='Approved'" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted7(myForm7.Role)" ng-messages="myForm7.Role.$error">
+                                    <div ng-message="required">Please enter Role Name</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                University/College: <span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="UNICOL" ng-model="bosboe.hreboS_UnvCollegeFlg" ng-disabled="bosboe.hreboS_StatusFlg=='Approved'" required>
+                                    <option value="">--Select--</option>
+                                    <option value="University">University</option>
+                                    <option value="College">College</option>
+                                    <option value="Autonomous">Autonomous</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted7(myForm7.UNICOL)" ng-messages="myForm7.UNICOL.$error">
+                                    <div ng-message="required">Select University/College/Autonomous</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"> From Date:<span style="color:red">*</span></label>
+                            <div class="col-sm-6">
+                                <md-datepicker name="FromDate" style="width: 150px;" ng-model="bosboe.hreboS_FromToDate" ng-disabled="bosboe.hreboS_StatusFlg=='Approved'" onkeydown="return false" md-placeholder="Select date"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted7(myForm7.FromDate)" ng-messages="myForm7.FromDate.$error">
+                                    <div ng-message="required">Please Enter From Date</div>
+                                    <div ng-message="valid">The entered value is not a date!</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">To Date:<span style="color:red">*</span></label>
+                            <div class="col-sm-6">
+                                <md-datepicker name="ToDate" style="width: 150px;" ng-model="bosboe.hreboS_ToDate" ng-disabled="bosboe.hreboS_StatusFlg=='Approved'" onkeydown="return false" md-placeholder="Select date"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted7(myForm7.ToDate)" ng-messages="myForm7.ToDate.$error">
+                                    <div ng-message="required">Please Enter To Date</div>
+                                    <div ng-message="valid">The entered value is not a date!</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Academic Year:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <select class="form-control" style="width: 200px;" id="sel1" name="Year" data-ng-model="bosboe.hreboS_Year" ng-disabled="bosboe.hreboS_StatusFlg=='Approved'" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="acdyr in academicyearlist" value="{{acdyr.asmaY_Id}}" ng-selected="{{acdyr.Selected == true}}">
+                                        {{acdyr.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted7(myForm7.Year)" ng-messages="myForm7.Year.$error">
+                                    <div ng-message="required">Select Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="col-sm-6">
+                        <div class="form-group text-center">
+                            <label class="custom-file-input file-blue" style="width:100%;margin:auto;">
+                                <input id="document{{bosboe.hreboS_Id}}" type="file" name="doc" accept="image/*" data-ng-model="documentListBOSBOE[$index].hreboS_Document" onchange="angular.element(this).scope().selectFileforUploadzdBOSBOE(this, angular.element(this).scope().bosboe)">
+                            </label>
+                            <span ng-if="bosboe.hreboS_Document !=null && bosboe.hreboS_Document !=''">
+                                <a ng-if="bosboe.extention=='jpg' || bosboe.extention=='JPG' || bosboe.extention=='jpeg'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsBOSBOE(bosboe)"> view</a>
+                                <a ng-if="bosboe.extention=='pdf'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#showpdf" data-ng-click="showmodaldetailsBOSBOE(bosboe)"> view</a>
+                            </span>
+                            <div class="error-messages" ng-if="interacted7(myForm7.doc)" ng-messages="myForm7.doc.$error">
+                                <div ng-message="required">Please upload the file</div>
+                            </div>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"> Files Upload </h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body margin-top-10">
+                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>SL.NO.</th>
+                                        <th>FILE PATH</th>
+                                        <th>DESCRIPTION</th>
+                                        <th>FILE NAME</th>
+                                        <th>REMARK</th>
+                                        <th>VIEW</th>
+                                        <th>ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="materal in documentListBOSBOE" ng-class-odd="'odd'">
+                                        <td class="text-center">{{ $index + 1 }}</td>
+                                        <td class="text-center lessonplanner">
+                                            <input class="custom-file-input file-blue text-center" id="document{{materal.hreboS_Id}}" type="file" name="doc" accept="image/*" data-ng-model="documentListBOSBOE[$index].nchrebosF_FilePath" onchange="angular.element(this).scope().selectFileforUploadzdBOSBOE(this, angular.element(this).scope().materal)" ng-disabled="materal.nchrebosF_StatusFlg=='Approved'">
+                                            <div class="error-messages" ng-if="interacted7(myForm7['filetypematerial'+$index])"
+                                                 ng-messages="myForm7['filetypematerial'+$index].$error">
+                                                <div ng-message="required">Upload File</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control" data-ng-model="materal.nchrebosF_Filedesc" ng-disabled="materal.nchrebosF_StatusFlg=='Approved'"></textarea>
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control" data-ng-model="materal.nchrebosF_FileName" ng-disabled="materal.nchrebosF_StatusFlg=='Approved'"></textarea>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#popup22" title="View Remark" data-backdrop="static" ng-click="viewfilecomment(materal);"> <i class="fa fa-eye text-blue"></i></a>
+                                        </td>
+                                        <td>
+                                            <span ng-if="materal.nchrebosF_FilePath !=null && materal.nchrebosF_FilePath !=''">
+                                                <a ng-if="materal.extention=='jpg' || materal.extention=='JPG' || materal.extention=='jpeg' || materal.extention=='JPEG'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModal" data-ng-click="showmodaldetailsBOSBOE(materal)"> view</a>
+                                                <a ng-if="materal.extention=='pdf'" style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#showpdf" data-ng-click="showmodaldetailsBOSBOE(materal)"> view</a>
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="" ng-hide="documentListBOSBOE.length > 9">
+                                                <a href="" ng-show="$last" ng-click="addNewDocumentBOSBOE()" ng-disabled="materal.nchrebosF_StatusFlg=='Approved'">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="" id="remove" ng-hide="documentListBOSBOE.length ==1">
+                                                <a href="" ng-click="removeNewDocumentBOSBOE($index,materal)" ng-disabled="materal.nchrebosF_StatusFlg=='Approved'">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="well text-center">
+                <md-button type="button" class="md-raised md-primary" ng-click="validateBOSBOEDetails(obj)">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="clear_BOSBOE_tab();">
+                    <i class="fa fa-times" aria-hidden="true"></i> Clear
+                </md-button>
+            </div>
+
+        </div>
+    </form>
+    <div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <embed id="idpdf" ng-src="{{content}}" onload="refreshDialer();" style="width: 100%;" height="1000" />
+                <div class="modal-body" oncontextmenu="return false"></div>
+            </div>
+        </div>
+    </div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                            <!--ng-init="zoomWidth = 100;imgStyle = {width:'100px'}" ng-style="imgStyle"
+                            ng-mouse-wheel-up="zoomWidth = zoomWidth + 20; imgStyle.width = zoomWidth +'px'; "
+                            ng-mouse-wheel-down="zoomWidth = zoomWidth - 20;imgStyle.width = zoomWidth  +'px'; " />-->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-center">
+                        <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                        <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                    </div>
+                    <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Close
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">BOS/BOE List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div ui-grid="gridOptions" ui-grid-pagination class="grid"></div>
+        </div>
+    </div>
+    <div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">VIEW DOCUMENT REMARKS</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="box-body margin-top-10">
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO</th>
+                                    <th>REMARK</th>
+                                    <th>REMARK BY</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="comment in documentCommentlist">
+                                    <td class="text-center">{{ $index + 1 }}</td>
+                                    <td class="text-left">{{comment.nchrbosC_Remarks}}</td>
+                                    <td class="text-left">{{comment.remarkPersonname}}</td>
+                                    <td class="text-left">{{comment.nchrbosC_StatusFlg}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="popup22" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">VIEW FILE REMARKS</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="box-body margin-top-10">
+                        <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO</th>
+                                    <th>REMARK</th>
+                                    <th>REMARK BY</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="comment in documentsubCommentlist">
+                                    <td class="text-center">{{ $index + 1 }}</td>
+                                    <td class="text-left">{{comment.nchrbosfC_Remarks}}</td>
+                                    <td class="text-left">{{comment.remarkPersonname}}</td>
+                                    <td class="text-left">{{comment.nchrbosfC_StatusFlg}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,534 @@
+﻿<!--<link type="text/css" media="print" rel="stylesheet" href="css/print/BBKV/BBKVTC/BBKVTCPdf.css" />-->
+
+<div data-ng-init="loaddata()" class="challan">
+    <section class="content">
+        <form class="form-horizontal" role="form" method="post" name="myform">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TC Custom Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="well text-center" ng-init="admname='regno'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="regno" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Admno</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="stdname" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Name</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Last Year:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="stcrclstyr" required ng-change="onclickregnoname()">
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                        <div ng-message="required">Select Last Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Student Name: <strong style="color:red;">*</strong> </label>
+                                <div class="col-sm-8">
+                                    <!--<select class="form-control" id="sel1" data-ng-model="amsT_Id" ng-change="stdnamechange()" required>
+                                        <option value="" label="Select Student"> </option>
+                                        <option ng-repeat="student in studentDropdown" value="{{student.amsT_Id}}" ng-selected="{{student.Selected == true}}">
+                                            {{student.studentname}}
+                                        </option>
+                                    </select>-->
+                                    <ui-select id="sel1" name="studentnamed" ng-model="$parent.AMST_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,user.status);" title="Select Student" required ng-change="stdnamechange()">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Student in the list">
+                                            {{$select.selected.studentname}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="student in studentDropdown | filter: $select.search" value="{{student.amsT_Id}}"
+                                                           ng-selected="{{student.Selected == true}}">
+                                            <div ng-bind-html="student.studentname | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myform.studentnamed)" ng-messages="myform.studentnamed.$error">
+                                        <div ng-message="required">Selec Student</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="well text-center" ng-init="tctempper='per'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="temp" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Temp Student</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="per" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Permanent Student</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Promoted Class:</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmcL_Id" name="stcrclstyrd">
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="classs in class" value="{{classs.asmcL_Id}}">{{classs.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyrd)" ng-messages="myform.stcrclstyrd.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false"
+                                   ng-click="savetmpldata();">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-primary" ng-click="printToCart()" ng-show="Print_flag">
+                            <!--ng-show="Print_flag"-->
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <link href="css/print/BBKV/BBKVTC/BBKVTC.css" rel="stylesheet" />
+
+            <div class="box box-primary" ng-show="report">
+                <div class="box-body">
+                    <div class="BBKVTC" id="BBKVTC">
+                        <table class="table text-center">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <img src="images/BBKVTCLOGO.png" class="img-responsive">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="300" class="text-center">
+                                        <h2 class="text-center" style="margin-top:-5px;"> TRANSFER CERTIFICATE </h2>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                    <!--<td width="50">No :</td>
+                                                    <td class="border-bottom-dotted">{{tcno}}</td>-->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table class="table">
+                                            <tbody>
+                                                <tr style="float: right;">                                                    
+                                                    <td width="60">DATE :</td>
+                                                    <td class="border-bottom-dotted">{{todaydate | date :'dd/MM/yyyy'}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row  container" style="margin-top:-10px;">
+                            <div class="col-sm-4">
+                                <table class="table">
+                                    <tr>
+                                        <td width="100">Affiliation No:</td>
+                                        <td class="">830892</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <div class="col-sm-4">
+                                <table class="table">
+                                    <tr>
+                                        <td width="100">School Code:</td>
+                                        <td class="">41692</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <div class="col-sm-4">
+                                <table class="table">
+                                    <tr>
+                                        <td width="100">DISE Code: </td>
+                                        <td class="">29120910805</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <table class="table">
+                                    <tr>
+                                        <td width="100">TC.No:</td>
+                                        <td class="border-bottom-dotted">{{tcno}}</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <div class="col-sm-4">
+                                <table class="table">
+                                    <tr>
+                                        <td width="100">STS No.: </td>
+                                        <td class="border-bottom-dotted">{{stsno}}</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <div class="col-sm-4">
+                                <table class="table">
+                                    <tr>
+                                        <td width="120">Admission NO: </td>
+                                        <td class="border-bottom-dotted">{{admno}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <table class="table ">
+                            <tbody>
+                                <tr>
+                                    <td width="10">1.</td>
+                                    <td width="110">Name of Pupil</td>
+                                    <td class="border-bottom text-center">{{lblstdname}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">2.</td>
+                                    <td width="120">Mother's Name :</td>
+                                    <td class="border-bottom text-center">{{lblmothername}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">3.</td>
+                                    <td width="240">Name of Father's / Guardian's Name :</td>
+                                    <td class="border-bottom text-center">{{lblfathername}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tr>
+                                <td width="10">4.</td>
+                                <td width="510">Date of Birth(In christian)according to Admission & Withdrawal Register  In Figure :</td>
+                                <td class="border-bottom text-center">{{lbldob | date :'dd/MM/yyyy'}}</td>
+
+                            </tr>
+                        </table>
+                        <table class="table">
+                            <tr>
+                                <td width="30"></td>
+                                <td class="width-80 ">in words :</td>
+                                <td class="border-bottom text-center">{{lbldobwords | uppercase}}</td>
+                            </tr>
+                        </table>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">5.</td>
+                                    <td width="110">
+                                        Nationality :
+                                    </td>
+                                    <td class="border-bottom text-center">{{lblnationality}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">6.</td>
+                                    <td width="460">Whether the Candidate belongs to SC/ST/OBC/GM :</td>
+                                    <td class="border-bottom text-center">{{castecategory}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">7.</td>
+                                    <td width="310">Date of First admission in the school with class :</td>
+                                    <td class="border-bottom text-center">{{lbldoa |date:'dd/MM/yyyy'}} </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">8.</td>
+                                    <td width="310">Class in which the pupil last studied (in figures) :</td>
+                                    <td class="border-bottom text-center">{{laststudied}} </td>
+                                    <td width="80">in words :</td>
+                                    <td class="border-bottom text-center">{{laststudiedinwords}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">9.</td>
+                                    <td width="360">School/Board Annual Examination last taken with result :</td>
+                                    <td class="border-bottom text-center">{{ASTC_Result}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">10.</td>
+                                    <td width="330">Whether failed (Give Reason) :</td>
+                                    <td class="border-bottom text-center">No</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tr>
+                                <td width="10">11.</td>
+                                <td class="width-130">Subjects Studied :</td>
+
+                                <td width="5">1.</td>
+
+                                <td class="border-bottom text-center">{{subject1}}</td>
+                                <td width="5">2.</td>
+
+                                <td class="border-bottom text-center">{{subject2}}</td>
+                                <td width="5">3.</td>
+
+                                <td class="border-bottom text-center">{{subject3}}</td>
+                            </tr>
+                        </table>
+                        <table class="table">
+                            <tr>
+                                <td class="width-160"></td>
+                                <td width="5">4.</td>
+                                <td class="border-bottom text-center">{{subject4}}</td>
+                                <td width="5">5.</td>
+                                <td class="border-bottom text-center">{{subject5}}</td>
+                                <td width="5">6.</td>
+                                <td class="border-bottom text-center">{{subject6}}</td>
+                            </tr>
+                        </table>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">12.</td>
+                                    <td width="330">Whether qualified for promotion to the higher class :</td>
+                                    <td class="border-bottom text-center"><!--{{promotionflag}}--></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10"></td>
+                                    <td width="180">if so, to which class (in fig.)</td>
+                                    <td class="border-bottom text-center"><!--{{promotedclass}}--></td>
+                                    <td width="80">(in words)</td>
+                                    <td class="border-bottom text-center"><!--{{promotedclassinfig}}--></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tr>
+                                <td width="10">13.</td>
+                                <td class="width-320">
+                                    Month upto which the pupil has paid school dues :
+                                </td>
+
+                                <td class="border-bottom text-center">March</td>
+                            </tr>
+                        </table>
+                        <!--<table class="table">
+                            <tr>
+                                <td width="10">14.</td>
+                                <td width="420"> Any fee concession availed of, if so, the nature of such concession : </td>
+
+                                <td class="border-bottom text-center">{{feeconcession}}</td>
+                            </tr>
+                        </table>-->
+
+                        <table class="table">
+                            <tr>
+                                <td width="10">14.</td>
+                                <td width="320"> Total No.of working days in the academic session :</td>
+                                <td class="border-bottom text-center">{{totalworkingdays}}</td>
+                            </tr>
+                        </table>
+                        <table class="table">
+                            <tr>
+                                <td width="10">15.</td>
+                                <td width="340"> Total No.of working days pupil present in the school :</td>
+                                <td class="border-bottom text-center">{{noworkingdays}}</td>
+                            </tr>
+                        </table>
+                        <table class="table">
+                            <tr>
+                                <td width="10">16.</td>
+                                <td width="400"> whether NCC cadet/boy scout/girl guide(details may be given) :</td>
+                                <td class="border-bottom text-center">{{nccdetais}}</td>
+                            </tr>
+                        </table>
+
+                        <table class="table">
+                            <tr>
+                                <td width="10">17.</td>
+                                <td width="580">Games played or extra-curricular activities in which the pupils usually took part :</td>
+                            </tr>
+                        </table>
+                        <table class="table">
+                            <tr>
+                                <td width="210">(Mention achivement their in) :</td>
+                                <td class="border-bottom text-center">{{gamesplayed}}</td>
+                            </tr>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">18.</td>
+                                    <td width="130">General conduct :</td>
+                                    <td class="border-bottom text-center">{{lblconduct}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">20.</td>
+                                    <td width="220">Date of application for certificate :</td>
+                                    <td class="border-bottom text-center">{{lblapplicationdate | date :'dd/MM/yyyy'}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">19.</td>
+                                    <td width="190">Date of issue for certificate : </td>
+                                    <td class="border-bottom text-center">{{lbldate | date :'dd/MM/yyyy'}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!--<table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">22.</td>
+                                    <td width="200">Reason for leaving the school :</td>
+                                    <td class="border-bottom text-center">{{lblreasonleaving}}</td>
+                                </tr>
+                            </tbody>
+                        </table>-->
+                        <!--<table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">23.</td>
+                                    <td width="140">Any other remarks :</td>
+                                    <td class="border-bottom text-center">{{ASTC_Remarks}}</td>
+                                </tr>
+                            </tbody>
+                        </table>-->
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td width="10">20.</td>
+                                    <td width="200">Whether availed any govt aid :</td>
+                                    <td class="border-bottom text-center">{{feeconcession}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table" style="margin-top:50px;">
+                            <tr>
+                                <!--<td class="width-150">Signature of <br /> class Teacher</td>-->
+                                <td style="float:left">
+                                    <table class="table ">
+                                        <tr>
+                                            <td class="width-240 text-center">Checked By <br />(With full name and designation)</td>
+                                        </tr>
+
+                                    </table>
+                                </td>
+                                <td style="float:right">
+                                    <table class="table  float-right">
+                                        <tr>
+                                            <td class="width-260">Signature of the principal with date <br />&nbsp;&nbsp;&nbsp;&nbsp; school seal</td>
+                                        </tr>
+
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table" style="margin-top:10px;">
+                            <tr>
+                                <td style="font-size:8px;">
+                                    Transfer Certificate should be issued only under the signatures ofthe Regular Principal/Vice Principal and itshould be counter-signed by an officer not below the rank
+                                    of District Inspector ofSchools/Deputy Director of Education / Education Officer of the Education Deptt. of the State/Union Territory concerned. Incase ofa student
+                                    migratingfrom the CBSE affiliated school to another CBSE affiliated school the transfer certificate ofa previous school Ofsuch a student may be countersigned by the
+                                    Regional oncer ofthe Board or The Asst. Commissioner ofthe WS or The Deputy Director, Navodaya Vidyalaya Samiti in India or an officer of the Board at the Head
+                                    Quartersand by the FirstSecretary/Attache/CulturaIAttache oran equivalentofficerofthe Embassy/ High Commission oflndia in the concerned country in respectof
+                                    students studying in an affiliated school of the CBSE situated outside the country and the student shall not be admitted to a school without such a counter signature.
+                                    Assistant Commissioners, KVS have also been authorised to countersign thl Transfer Certificates issued by the schools run by Directorated General, Border Security force.
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+

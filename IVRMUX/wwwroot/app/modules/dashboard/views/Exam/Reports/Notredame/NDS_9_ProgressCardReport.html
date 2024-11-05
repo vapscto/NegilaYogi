@@ -1,0 +1,365 @@
+﻿<style>
+    thead {
+        color: black !important;
+        text-align: center;
+        background: white !important;
+    }
+
+    .trclasssubject {
+        height: 140px !important;
+        white-space: pre-wrap;
+    }
+
+    .pagelayout {
+        border: 1px solid black !important;
+        padding-left: 3px !important;
+        padding-right: 3px !important
+    }
+
+    .Ndsreport {
+        background-color: #c9eaf0 !important;
+    }
+
+    .Ndsreport1 {
+        background-color: #f7db99 !important;
+    }
+    
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">9 Progress Card Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Academic Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="acd1" ng-model="ASMAY_Id" ng-disabled="selected_temp.length>0"
+                                            ng-change="onyearchange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="acd in year_list" value="{{acd.asmaY_Id}}" ng-selected="{{acd.Selected==true}}">
+                                            {{acd.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd1)" ng-messages="myForm.acd1.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Class:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="class" ng-model="ASMCL_Id" ng-change="onclasschange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="clas in class_list" value="{{clas.asmcL_Id}}" ng-selected="{{clas.Selected==true}}">
+                                            {{clas.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Section:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="cat" ng-model="ASMS_Id" ng-disabled="selected_temp.length>0"
+                                            ng-change="onsectionchange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="section in section_list" value="{{section.asmS_Id}}" ng-selected="{{section.Selected==true}}">
+                                            {{section.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    <input name="allcheck" value="" ng-model="all" type="checkbox" ng-click="OnClickAll()">
+                                    <span class="lbl padding-8">
+                                        Student :
+                                    </span><span style="color:Red">*</span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                    <label ng-repeat="termdetails in getstudentlist | filter :filterchkbx">
+                                        <input name="option1" value="{{termdetails.amsT_Id}}" type="checkbox" ng-model="termdetails.AMST_Ids"
+                                               ng-required="isOptionsRequired1();" ng-click="individual()">
+                                        <span class="lbl padding-8">{{termdetails.studentname}}</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-8 error-messages" ng-if="interacted(myForm.option1)" ng-messages="myForm.option1.$error">
+                                    <div ng-message="required">Select Atleast One Student</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center row">
+                        <input type="hidden" ng-model="EME_ID" />
+                        <md-button type="button" class="md-raised md-primary" ng-click="saveddata(obj)" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-list-alt " aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-click="print_HHS02();">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="padding:3px !important"class="box box-primary" ng-if="studentdetails.length>0">
+            <div  style="padding:3px !important">
+                <div  id="HHS02" style="padding:3px !important">
+                    <div ng-repeat="report in studentdetails">
+                        <div class="pagelayout" style="page-break-before:always;">
+                            <div class="row margin-top-5">
+                                <div class="col-sm-12">
+                                    <!--<img src="/images/NDSLogoexam.jpg" class="img-responsive" style="width:100%;" />-->
+                                    <img src="{{imgname}}" class="img-responsive" style="width:100%;" />
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div style="font-size:13px !important">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3" style="width:20%"><b>Class/Section/Roll No. :</b></label>
+                                            <label class="control-label col-sm-2 border-bottom"><b>{{report.classname}}/{{report.sectionname}}/{{report.rollno}}</b></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4" style="width: 15%"><b>Student's Name :</b></label>
+                                            <label class="control-label col-sm-4 border-bottom"><b>{{report.studentname}}</b></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3" style="width:33%"><b>Father's/Mother's/Guardian's Name :</b></label>
+                                            <label class="control-label col-sm-3 border-bottom"><b>{{report.fathername}}</b></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2" style="width: 13%"><b>Date Of Birth :</b></label>
+                                            <label class="control-label col-sm-2 border-bottom" style="width: 10%;"><b>{{report.dob}}</b></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="row margin-top-10">
+                                    <div class="col-sm-12">
+                                        <table class="table  table-bordered table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <td width="100" class="text-left Ndsreport1" style="word-wrap :break-word!important"><b>Scholastic Areas(A)</b> </td>
+                                                    <td class="text-center Ndsreport1 " colspan="{{getgroupdetails.length}}"><b>Academic Year(100 Marks)</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <th   class="text-center Ndsreport  width-40"><b>Subject Name</b></th>
+                                                    <th class="Ndsreport" ng-repeat="grp in getgroupdetails" style="word-wrap :break-word!important">
+                                                       
+                                                        <b>{{grp.empG_DistplayName}} </b><br />
+                                                        <b ng-if="grp.empG_DistplayName!='Grade'">({{grp.empsG_MarksValue}})</b>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat="subj in report.studentsubjects" ng-if="subj.EMPS_AppToResultFlg">
+                                                <tr>
+                                                    <td class="text-left Ndsreport" ><b>{{subj.ISMS_SubjectName}}</b></td>
+                                                    <td class="text-center" ng-repeat="grpexam in getgroupdetails">
+                                                        <span ng-repeat="mrks in report.studentmarks"
+                                                              ng-if="subj.ISMS_Id==mrks.ISMS_Id && mrks.EMPSG_DisplayName==grpexam.empG_DistplayName">
+                                                            <label ng-if="mrks.PassFailFlag=='AB'||mrks.PassFailFlag=='M'||mrks.PassFailFlag=='L'">
+                                                                <b>  {{marks.PassFailFlag}}</b>
+                                                                <b ng-if="marks.ObtainedMarks>0 && grpexam.empG_DistplayName!='Grade'">
+                                                                    ({{marks.ObtainedMarks}})
+                                                                </b>
+                                                            </label>
+                                                            <label ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'
+                                                           && grpexam.empG_DistplayName!='Grade'">
+                                                                <b>  {{mrks.ObtainedMarks}}</b>
+                                                            </label>
+                                                            <label ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'
+                                                           && grpexam.empG_DistplayName=='Grade'">
+                                                                <b>  {{mrks.ObtainedGrade}}</b>
+                                                            </label>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tbody ng-repeat="subj in report.studentsubjects" ng-if="!subj.EMPS_AppToResultFlg">
+                                                <tr>
+                                                    <td class="text-left" style="word-wrap:break-word"><b>{{subj.ISMS_SubjectName}}</b></td>
+                                                    <td class="text-center" ng-repeat="grpexam in getgroupdetails">
+                                                        <span ng-repeat="mrks in report.studentmarks"
+                                                              ng-if="subj.ISMS_Id==mrks.ISMS_Id && mrks.EMPSG_DisplayName==grpexam.empG_DistplayName">
+
+                                                            <label ng-if="mrks.PassFailFlag=='AB'||mrks.PassFailFlag=='M'||mrks.PassFailFlag=='L'">
+                                                                <b>  {{marks.PassFailFlag}}</b>
+                                                                <b ng-if="marks.ObtainedMarks>0 && grpexam.empG_DistplayName!='Grade'">
+                                                                    ({{marks.ObtainedMarks}})
+                                                                </b>
+                                                            </label>
+                                                            <label ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'
+                                                           && grpexam.empG_DistplayName!='Grade'">
+                                                                <b>  {{mrks.ObtainedMarks}}</b>
+                                                            </label>
+                                                            <label ng-if="mrks.PassFailFlag!='AB' && mrks.PassFailFlag!='M' && mrks.PassFailFlag !='L'
+                                                           && grpexam.empG_DistplayName=='Grade'">
+                                                                <b>  {{mrks.ObtainedGrade}}</b>
+                                                            </label>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="row margin-top-10">
+                                    <div class="col-sm-12">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="{{gettermdetails.length+1}}" class="text-center Ndsreport1">Co-Scholastic Areas : {on 5- Point(A-C) grading scale}</th>
+                                                </tr>
+                                                <tr>
+                                                    <td width="100" class="text-center Ndsreport "></td>
+                                                    <td ng-repeat="cos in  gettermdetails" class="text-center Ndsreport">
+                                                        {{cos.ecT_TermName}}
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat="subjco in report.skill_main_list">
+                                                <tr>
+                                                    <td class="text-left Ndsreport" style="word-wrap:break-word">
+                                                        <b> {{subjco.ECS_SkillName}}</b>
+                                                    </td>
+                                                    <td class="text-center" ng-repeat="cos in gettermdetails">
+                                                        <span ng-repeat="sc in subjco.skill_score_details" ng-if="cos.ecT_Id==sc.ecT_Id">
+                                                            <b>{{sc.scoregrade}}</b>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="row margin-top-10">
+                                    <div class="col-sm-12">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="{{gettermdetails.length+1}}" class="text-center Ndsreport1 ">Discipline : {on 5- Point(A-C) grading scale}</th>
+                                                </tr>
+                                                <tr>
+                                                    <td width="100" class="text-center Ndsreport"></td>
+                                                    <td ng-repeat="cos in  gettermdetails" class="text-center Ndsreport">
+                                                        {{cos.ecT_TermName}}
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat="subjco in report.activity_main_list">
+                                                <tr>
+                                                    <td class="text-left Ndsreport  " style="word-wrap:break-word">
+                                                        <b>{{subjco.ECACTA_SkillArea}}</b>
+                                                    </td>
+                                                    <td ng-repeat="cos in  gettermdetails" class="text-center">
+                                                        <span ng-repeat="sc in subjco.activity_score_details" ng-if="cos.ecT_Id==sc.ecT_Id">
+                                                            <b>{{sc.EMGD_Name}}</b>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="margin-top-10">
+                                    <!--<div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-12 control-label">
+                        <b>Class Teacher's Remarks : </b> <b class="border-bottom">{{report.remarks}}</b>
+                    </label>
+                </div>
+            </div>-->
+                                    <br/>
+                                    
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-12 control-label">
+                                                <b>Promoted To Class : </b> <b class="border-bottom">{{report.promotedclass}}</b>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-12 control-label">
+                                                <b>Class Teacher's Remarks : </b> <b class="border-bottom">{{report.remarks}}</b>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
+                                <div class="row padding-top-40">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b>Place : Vasai</b></label>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label"><b>Date : {{generateddate | date:'dd/MM/yyyy'}}</b></label>
+                                            </div>
+
+                                        </div>
+                                        <br/>
+                                        <div class="col-sm-3 text-center">
+                                            <label class="control-label">  <b>Signature of Class Teacher</b></label>
+                                        </div>
+                                        <div class="col-sm-3 text-center">
+                                            <label class="control-label"> <b>Signature of Principal</b></label>
+                                        </div>
+                                        <div class="col-sm-3 text-center">
+                                            <label class="control-label"> <b>Signature of Parents</b></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

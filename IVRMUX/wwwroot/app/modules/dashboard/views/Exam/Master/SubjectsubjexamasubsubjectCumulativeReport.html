@@ -1,0 +1,321 @@
+﻿<style>
+    .k-grid-toolbar {
+        text-align: center;
+    }
+
+    .gridTitle {
+        text-align: center;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" data-ng-submit="saveddata()" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Cumulative Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="yeardd" ng-model="asmaY_Id" ng-change="get_classes(asmaY_Id)" required>
+                                        <option value="">Select Academic Year</option>
+                                        <option ng-repeat="year in yearlt" value="{{year.asmaY_Id}}" ng-selected="year.Selected == true">{{year.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yeardd)" ng-messages="myForm.yeardd.$error">
+                                        <div ng-message="required"> Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">class :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="cumcls" ng-model="asmcL_Id" data-ng-change="get_cls_sections(asmcL_Id)" required>
+                                        <option value="" label="Select class"> </option>
+                                        <option ng-repeat="option in clslist" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cumcls)" ng-messages="myForm.cumcls.$error">
+                                    <div ng-message="required"> Select Class</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="cumsec" ng-model="asmS_Id" data-ng-change="get_exams(asmS_Id,asmcL_Id,asmaY_Id)" required>
+                                        <option value="" label="Select Section"> </option>
+                                        <option ng-repeat="option in seclist" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cumsec)" ng-messages="myForm.cumsec.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Exam Name :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="cumexnm" ng-model="emE_Id" data-ng-change="onselectcategory(FMCC_Id,ASMCL_Id)" required>
+                                        <option value="" label="Select Exam Name"> </option>
+                                        <option ng-repeat="option in exsplt" value="{{option.emE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.emE_ExamName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cumexnm)" ng-messages="myForm.cumexnm.$error">
+                                    <div ng-message="required">Select Exam Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    <input name="allcheck" value="" ng-model="all" type="checkbox" ng-click="OnClickAll()">
+                                    <span class="lbl padding-8">
+                                        Student :
+                                    </span><span style="color:Red">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                        <label data-ng-model="AMST_Id" ng-repeat="sub in studentlistdetails | filter:filterchkbx" value="{{sub.amsT_Id}}">
+                                            <input name="Subjectoption" value="" ng-click="individual()" ng-model="sub.checkedsub" type="checkbox" ng-required="isOptionsRequired3()">
+                                            <span class="lbl padding-8">
+                                                {{sub.amsT_FirstName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.Subjectoption)" ng-messages="myForm.Subjectoption.$error">
+                                        <div ng-message="required">Select Student</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label>
+                                <input type="checkbox" name="left" data-ng-model="Left_Flag" ng-click="OnChangeLeftFlag()">
+                                <span class="lbl padding-8">Include Left Students</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="deactive" data-ng-model="Deactive_Flag" ng-click="OnChangeLeftFlag()">
+                                <span class="lbl padding-8">Include Deactive Students</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" data-ng-model="sectionrank">
+                                <span class="lbl padding-8"></span> Display Rank
+                            </label>
+                            <label>
+                                <input type="checkbox" data-ng-model="DisplayGrade">
+                                <span class="lbl padding-8"></span> Display Grade
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="row text-center">
+                        <input type="hidden" ng-model="EME_ID" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-list-alt " aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-click="printToCart()" ng-show="printbtn">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel('#Baldwin')" ng-show="printbtn">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Excel
+                        </md-button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="repoershow">
+        <div class="box-header with-border">
+            <h3 class="box-title">Cumulative Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" style="overflow:scroll">
+            <div  class="CumulativeReportBB" style="page-break-before:always;">
+                <div id="Baldwin">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered" style="font-size:{{size}} !important" id="table1">
+                            <thead>
+                                <tr style="border:0px white solid !important">
+                                    <th style="text-align :center; background :white ;color:black;font-size:medium;border:0px white solid" colspan="{{colnspan}}">
+                                        <div class="row">
+                                            <label><b style="font-size:x-large !important"> {{inst_name | uppercase}}</b> </label>
+                                        </div>
+                                        <div>
+                                            <label><b style="font-size: medium;">{{add}},{{city}}-{{pin}}</b></label>
+                                        </div>
+                                        <div style="border-bottom: 0.02px solid black;">
+                                            <label> <b style="font-size:large !important">CONSOLIDATED MARKS SHEET</b> </label>
+                                        </div>
+
+                                        <div class="row">
+                                            <label class="col-sm-4"><b style="font-size: medium;">ACADEMIC YEAR : {{yr}} </b></label>
+                                            <label class="col-sm-4"><b style="font-size: medium;">EXAM : {{exmmid}} </b></label>
+                                            <label class="col-sm-4"><b style="font-size: medium;">CLASS & SEC : {{cla}} - {{sec}}</b></label>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center" rowspan="4"><b><a href="">Sl No</a> </b></th>
+                                    <th class="text-center" rowspan="4"><b><a href="" ng-click="sort('amsT_RegistrationNo')">Reg.NO</a> </b></th>
+                                    <th class="text-center" rowspan="4"><b><a href="" ng-click="sort('amsT_FirstName')">Student Name</a></b> </th>
+                                    <th class="text-center" ng-repeat="col1 in submainlistnew" rowspan="{{col1.rowspancnt}}" colspan="{{col1.clmcnt}}">
+                                        <b> {{col1.subjectname}}</b>
+                                    </th>
+                                    <th class="text-center" rowspan="4"><b><a href="" ng-click="sort('estmP_TotalObtMarks')">Total</a></b></th>
+                                    <th class="text-center" rowspan="4"><b><a href="" ng-click="sort('estmP_TotalMaxMarks')">Max.Total</a></b></th>
+                                    <th class="text-center" rowspan="4"><b><a href="" ng-click="sort('estmP_Percentage')">Per.(%)</a></b></th>
+                                    <th class="text-center" rowspan="4" ng-if="sectionrank==true">
+                                        <b>
+                                            <a href="" ng-click="sort('estmP_SectionRank')">Rank</a>
+                                        </b>
+                                    </th>
+                                    <!--<th class="text-center" rowspan="5"><a href="" ng-click="sort('estmP_Result')">PASS/FAIL</a></th>-->
+                                </tr>
+                                <tr>
+                                    <th class="text-center" ng-repeat="col1 in abcd" colspan="{{col1.clspncnt}}" ng-if="col1.subsubjectname!=''"><b>{{col1.subsubjectname}}</b></th>
+                                    <!--<th class="text-center" colspan="1">&nbsp;</th>-->
+                                </tr>
+                                <tr><th class="text-center" ng-repeat="col1 in subjectlistwithdetails" colspan="1"><b>{{col1.EMSE_SubExamName}}</b></th></tr>
+                                <tr><th class="text-center" ng-repeat="col1 in tempmarksgrade"><b>{{col1.name}}  <span ng-if="DisplayGrade==true"> | G </span> </b></th></tr>
+                            </thead>
+                            <tbody style="font-size:{{size}} !important">
+                                <tr ng-repeat="user in studlist | orderBy:sortKey:reverse" style="font-size:{{size}} !important">
+                                    <td class="text-center" style="font-size:{{size}} !important">{{ $index+1}}</td>
+                                    <td class="text-center" style="font-size:{{size}} !important">{{ user.amsT_RegistrationNo }} </td>
+                                    <td class="text-left" style="font-size:{{size}} !important">{{ user.amsT_FirstName }} </td>
+                                    <td ng-repeat="mm in tempmarksgrade" class="text-center"
+                                        style="font-size:{{size}} !important;">
+                                        <span ng-repeat="ff in user.arraybind" ng-if="user.amsT_Id==ff.AMST_Id && mm.subjidnew==ff.ISMS_Id && mm.EMSE_SubExamName==ff.EMSE_SubExamName && mm.EMSS_SubSubjectName==ff.EMSS_SubSubjectName  && mm.name=='M'">
+                                            <b ng-if="ff.passfailflag!='AB'">{{ff.subsubjectmarks}}   </b>
+                                            <b ng-if="DisplayGrade==true && ff.passfailflag!='AB' && ff.subsubjectmarks > 0">  |  {{ff.subsubjectgrade}}   </b>
+                                            <b ng-if="ff.passfailflag=='AB'">{{ff.passfailflag}}</b>
+                                        </span>
+                                        <span ng-repeat="ff in user.arraybind" ng-if="user.amsT_Id==ff.AMST_Id && mm.subjidnew==ff.ISMS_Id && mm.EMSE_SubExamName==ff.EMSE_SubExamName && mm.EMSS_SubSubjectName==ff.EMSS_SubSubjectName  && mm.name=='G'">
+                                            <b ng-if="ff.passfailflag!='AB'">{{ff.subsubjectgrade}} </b>
+                                            <b ng-if="ff.passfailflag=='AB'">{{ff.passfailflag}}</b>
+                                        </span>
+                                    </td>
+                                    <td class="text-center" style="font-size:{{size}} !important">{{ user.total }} </td>
+                                    <td class="text-center" style="font-size:{{size}} !important">{{ user.maxtotal }} </td>
+                                    <td class="text-center" style="font-size:{{size}} !important">{{ user.percentage }} </td>
+                                    <td class="text-center" style="font-size:{{size}} !important" ng-if="sectionrank==true">{{ user.estmP_SectionRank}} </td>
+                                    <!--<td class="text-center" style="font-size:{{size}} !important">{{ user.estmP_Result}} </td>-->
+                                </tr>
+                            </tbody>
+                            </
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!--<div class="col-sm-12" style="display:none !important" ng-hide="true">
+        <div  id="Baldwin">
+            <table class="table table-bordered table-condensed" style="font-size:{{size}} !important" id="table1" border="1">
+                <thead>
+                    <tr style="border:0px white solid !important">
+                        <th style="text-align :center; background :white ;color:black;font-size:medium;border:0px white solid" colspan="{{colnspan}}">
+                            <div class="row">
+                                <label><b style="font-size:x-large !important"> {{inst_name | uppercase}}</b> </label>
+                            </div>
+                            <div>
+                                <label><b style="font-size: medium;">{{add}},{{city}}-{{pin}}</b></label>
+                            </div>
+                            <div style="border-bottom: 0.02px solid black;">
+                                <label> <b style="font-size:large !important">CONSOLIDATED MARKS SHEET</b> </label>
+                            </div>
+
+                            <div class="row">
+                                <label class="col-sm-4"><b style="font-size: medium;">ACADEMIC YEAR : {{yr}} </b></label>
+                                <label class="col-sm-4"><b style="font-size: medium;">EXAM : {{exmmid}} </b></label>
+                                <label class="col-sm-4"><b style="font-size: medium;">CLASS & SEC : {{cla}} - {{sec}}</b></label>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="text-center" rowspan="5"><b>Sl No </b></th>
+                        <th class="text-center" rowspan="5"><b>Reg.NO </b></th>
+                        <th class="text-center" rowspan="5"><b>Student Name</b> </th>
+                        <th class="text-center" ng-repeat="col1 in submainlistnew" rowspan="{{col1.rowspancnt}}" colspan="{{col1.clmcnt}}">
+                            <b> {{col1.subjectname}}</b>
+                        </th>
+                        <th class="text-center" rowspan="5"><b>Total</b></th>
+                        <th class="text-center" rowspan="5"><b>Max.Total</b></th>
+                        <th class="text-center" rowspan="5"><b>Per.(%)</b></th>
+                        <th class="text-center" rowspan="5" ng-if="sectionrank==true">
+                            <b>
+                                <a href="" ng-click="sort('estmP_SectionRank')">Rank</a>
+                            </b>
+                        </th>
+
+                    </tr>
+                    <tr>
+                        <th class="text-center" ng-repeat="col1 in abcd" colspan="{{col1.clspncnt}}" ng-if="col1.subsubjectname!=''"><b>{{col1.subsubjectname}}</b></th>
+                        <th class="text-center" colspan="1">&nbsp;</th>
+                    </tr>
+                    <tr><th class="text-center" ng-repeat="col1 in subjectlistwithdetails" colspan="1"><b>{{col1.EMSE_SubExamName}}</b></th></tr>
+                    <tr><th class="text-center" ng-repeat="col1 in tempmarksgrade"><b>{{col1.name}}  <span ng-if="DisplayGrade==true"> | G </span> </b></th></tr>
+                </thead>
+                <tbody style="font-size:{{size}} !important">
+                    <tr ng-repeat="user in studlist" style="font-size:{{size}} !important">
+                        <td class="text-center" style="font-size:{{size}} !important">{{$index+1}}</td>
+                        <td class="text-center" style="font-size:{{size}} !important">{{user.amsT_RegistrationNo }} </td>
+                        <td class="text-left" style="font-size:{{size}} !important">{{user.amsT_FirstName }} </td>
+                        <td ng-repeat="mm in tempmarksgrade" class="text-center"
+                            style="font-size:{{size}} !important;">
+                            <span ng-repeat="ff in user.arraybind" ng-if="user.amsT_Id==ff.AMST_Id && mm.subjidnew==ff.ISMS_Id && mm.EMSE_SubExamName==ff.EMSE_SubExamName && mm.EMSS_SubSubjectName==ff.EMSS_SubSubjectName  && mm.name=='M'">
+                                <b ng-if="ff.passfailflag!='AB'">{{ff.subsubjectmarks}}   </b>
+                                <b ng-if="DisplayGrade==true && ff.passfailflag!='AB' && ff.subsubjectmarks > 0">  |  {{ff.subsubjectgrade}}   </b>
+                                <b ng-if="ff.passfailflag=='AB'">{{ff.passfailflag}}</b>
+                            </span>
+                            <span ng-repeat="ff in user.arraybind" ng-if="user.amsT_Id==ff.AMST_Id && mm.subjidnew==ff.ISMS_Id && mm.EMSE_SubExamName==ff.EMSE_SubExamName && mm.EMSS_SubSubjectName==ff.EMSS_SubSubjectName  && mm.name=='G'">
+                                <b ng-if="ff.passfailflag!='AB'">{{ff.subsubjectgrade}} </b>
+                                <b ng-if="ff.passfailflag=='AB'">{{ff.passfailflag}}</b>
+                            </span>
+                        </td>
+                        <td class="text-center" style="font-size:{{size}} !important">{{user.total}} </td>
+                        <td class="text-center" style="font-size:{{size}} !important">{{user.maxtotal}} </td>
+                        <td class="text-center" style="font-size:{{size}} !important">{{user.percentage}} </td>
+                        <td class="text-center" style="font-size:{{size}} !important" ng-if="sectionrank==true">{{user.estmP_SectionRank}} </td>
+
+                    </tr>
+                </tbody>
+                </
+            </table>
+        </div>
+    </div>-->
+    
+</section>

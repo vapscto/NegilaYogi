@@ -1,0 +1,711 @@
+﻿<style>
+    .textwidth {
+        width: 100px
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">PF Transaction</h3>
+                <!--<div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>-->
+                <md-button type="submit" class="md-raised md-primary  pull-right" id="save-btn" ng-click="FinalVerifypopup()" aria-disabled="false">
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Final Verify
+                </md-button>
+            </div>
+            <div class="box-body">
+
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <div class="col-sm-6">
+                            <!--Month,year-->
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <span class="lbl padding-3">
+                                        Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <span class="lbl padding-3">
+                                        <select class="form-control" id="sel1" ng-model="IMFY_Id" name="hreS_Year" required>
+                                            <option value="" label="Select">Select Year</option>
+                                            <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.imfY_Id}}" ng-selected="{{leaveyear.Selected===true}}">
+                                                {{leaveyear.imfY_FinancialYear}}
+                                            </option>
+                                        </select>
+                                        <span class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                            <span ng-message="required">Select Year</span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <span class="lbl padding-3">
+                                        Month :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <span class="lbl padding-3">
+                                        <select class="form-control" id="sel1" ng-model="ivrM_Month_Id" name="hreS_Month" ng-change="datevalidation()" required>
+                                            <option value="" label="Select">Select</option>
+                                            <option ng-repeat="month in monthdropdown" value="{{month.ivrM_Month_Id}}" ng-selected="{{month.Selected===true}}">
+                                                {{month.ivrM_Month_Name}}
+                                            </option>
+                                        </select>
+                                        <span class="error-messages" ng-if="interacted(myForm.hreS_Month)" ng-messages="myForm.hreS_Month.$error">
+                                            <span ng-message="required">Select Month</span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <span class="lbl padding-3">
+                                        Employee Name :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="employeename" ng-model="$parent.HRME_Id" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Employee">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Employee in the list...">{{$select.selected.hrmE_EmployeeFirstName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in employeelist | filter: $select.search " value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <span class="error-messages" ng-if="interacted(myForm.employeename)" ng-messages="myForm.employeename.$error">
+                                        <span ng-message="required">Select Employee</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <span class="lbl padding-3">
+                                        Remark :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <textarea type="text" class="form-control" name="Remark" ng-model="Remark" placeholder="Enter Purpose" rows="3"></textarea>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="col-sm-10  col-sm-offset-2">
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">PF Date :<span style="color:red;">*</span></label>
+                                    <div class="col-sm-6">
+                                        <label class="radio-inline">
+                                            <span class="lbl padding-3">
+                                                <md-datepicker ng-model="HRME_PFDate" onkeydown="return false" name="FromDate" id="FromDate" md-max-date="maxDateFrom" md-min-date="minDateFrom" md-placeholder="Select  Date" required></md-datepicker>
+                                            </span>
+                                        </label>
+                                        <div class="error-messages" ng-if="interacted(myForm.FromDate)" ng-messages="myForm.FromDate.$error">
+                                            <div ng-message="required">Select Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="well" ng-init="PFVPFflag='PF'">
+                                        <label class="radio-inline col-sm-6">
+                                            <input type="radio" name="PF" value="PF" data-ng-model="PFVPFflag" ng-change="changepftypeui(PFVPFflag)">
+                                            <span class="lbl padding-8">PF</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="VPF" data-ng-model="PFVPFflag" ng-change="changepftypeui()">
+                                            <span class="lbl padding-8">VPF</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="well" ng-init="DepositWithdrow='Deposit'">
+                                        <label class="radio-inline col-sm-6">
+                                            <input type="radio" name="Deposit" value="Deposit" data-ng-model="DepositWithdrow" ng-change="DepositWithdra()">
+                                            <span class="lbl padding-8">Deposit</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Withdraw" data-ng-model="DepositWithdrow" ng-change="DepositWithdra()">
+                                            <span class="lbl padding-8">Withdraw</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <span class="lbl padding-3">
+                                            Type  :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" ng-model="HeadType" name="Type" required>
+                                                <option value="" label="Select">Select</option>
+                                                <option value="Opening Balance" label="Opening Balance" ng-if="DepositWithdrow=='Deposit'">Opening Balance</option>
+                                                <option value="PF Transefer" label="PF Transefer" ng-if="DepositWithdrow=='Deposit'">PF Transefer</option>
+                                                <option value="FPF To PF" label="FPF To PF" ng-if="DepositWithdrow=='Deposit'">FPF To PF</option>
+                                                <option value="Non Refundable Loan" label="Non Refundable Loan" ng-if="DepositWithdrow=='Withdraw'">Non Refundable Loan</option>
+                                                <option value="Settlement Of PF" label="Settlement Of PF" ng-if="DepositWithdrow=='Withdraw' && PFVPFflag=='PF'">Settlement Of PF</option>
+                                                <option value="Settlement Of VPF" label="Settlement Of VPF" ng-if="DepositWithdrow=='Withdraw' && PFVPFflag=='VPF'">Settlement Of VPF</option>
+                                                <option value="Interest Adjestment" label="Interest Adjustment">Interest Adjustment</option>
+
+                                            </select>
+                                            <span class="error-messages" ng-if="interacted(myForm.Type)" ng-messages="myForm.Type.$error">
+                                                <span ng-message="required">Select Type</span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-if="PFVPFflag=='VPF'">
+                                    <div class="col-sm-4">
+                                        <span class="lbl padding-3">
+                                            Amount :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </div>
+
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" name="Amount" type="text" ng-model="obj.Amount" allow-pattern="[0-9.]" required>
+                                    </div>
+                                    <span class="error-messages" ng-if="interacted(myForm.Amount)" ng-messages="myForm.Amount.$error">
+                                        <span ng-message="required">Enter Amount</span>
+                                    </span>
+                                </div>
+
+                                <div class="form-group" ng-if="PFVPFflag=='PF'">
+                                    <div class="col-sm-4">
+                                        <span class="lbl padding-3">
+                                            Own PF Amount :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" name="ownamount" type="text" ng-model="obj.ownamount" allow-pattern="[0-9.]" required>
+                                    </div>
+                                    <span class="error-messages" ng-if="interacted(myForm.ownamount)" ng-messages="myForm.ownamount.$error">
+                                        <span ng-message="required">Enter Amount</span>
+                                    </span>
+                                </div>
+
+                                <div class="form-group" ng-if="PFVPFflag=='PF'">
+                                    <div class="col-sm-4">
+                                        <span class="lbl padding-3">
+                                            School PF Amount :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" name="schoolamount" type="text" ng-model="obj.schoolamount" allow-pattern="[0-9.]" required>
+                                    </div>
+                                    <span class="error-messages" ng-if="interacted(myForm.schoolamount)" ng-messages="myForm.schoolamount.$error">
+                                        <span ng-message="required">Enter Amount</span>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-sm-12" ng-if="Editflag==false">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SavePFData()" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Save PF Data
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!--Edit Update Functionality-->
+            <div class="box box-primary" ng-if="Editflag==true">
+                <div class="box-header with-border">
+                    <h3 class="box-title">{{PFVPFflag}} Edit Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <span class="col-sm-6" style="font-weight:500;font-size:medium"><b>Name:</b> {{HRME_EmployeeFirstName}}</span>
+                            <span class="col-sm-6" style="font-weight:500;font-size:medium"><b>PF Type:</b> {{PFVPFflag}}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">PF Date :<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            <md-datepicker ng-model="HRME_PFDate" onkeydown="return false" name="FromDate" id="FromDate" md-max-date="maxDateFrom" md-min-date="minDateFrom" md-placeholder="Select  Date"></md-datepicker>
+                                        </span>
+                                    </label>
+                                    <div class="error-messages" ng-if="interacted(myForm.FromDate)" ng-messages="myForm.FromDate.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+
+                            <div class="table-wrapper-scroll-y my-custom-scrollbar" style="overflow:auto">
+
+                                <table class="table table-bordered table-striped mb-0" ng-if="PFVPFflag=='VPF'">
+                                    <thead>
+                                        <tr>
+                                            <th><a href="" ng-click="sort('IMFY_FinancialYear')">Year</a></th>
+                                            <th><a href="" ng-click="sort('IVRM_Month_Name')">Month</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_VOBAmount')">Opening Balance</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_Contribution')">Contribution</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_Intersest')">Interest</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_TransferAmount')">VPF Transfer</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_WithdrawnAmount')">Withdrawn Amount</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_SettledAmount')">Settled Amount</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_DepositAdjustmentAmount')">Deposit Adjustment Amount</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_WithsrawAdjustmentAmount')">Withdraw Adjustment Amount</a></th>
+                                            <th><a href="" ng-click="sort('HREVPFST_ClosingBalance')">Closing Balance</a></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!--  <tr dir-paginate="newuser in  filterValue1 = (vpfgriddata | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">-->
+                                        <tr ng-repeat="newuser in  payrollStandard">
+
+                                            <td class="text-center">{{ newuser.IMFY_FinancialYear }}</td>
+                                            <td class="text-left">{{ newuser.IVRM_Month_Name }}</td>
+                                            <td class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_VOBAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td class="text-left">
+                                                <input ng-disabled="true" class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_Contribution" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td class="text-left">
+                                                <input ng-disabled="true" class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_Intersest" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_TransferAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_WithdrawnAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_SettledAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_DepositAdjustmentAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_WithsrawAdjustmentAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td class="text-left">
+                                                <input ng-disabled="true" class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREVPFST_ClosingBalance" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered table-striped mb-0" ng-if="PFVPFflag=='PF'">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:5%"><a href="" ng-click="sort('IMFY_FinancialYear')">year</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('IVRM_Month_Name')">Month</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_OBOwnAmount')">OWN Opening Balance</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_OBInstituteAmount')">SCHOOL Opening Balance</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_OwnContribution')">OWN Contribution</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_IntstituteContribution')">SCHOOL Contribution</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_OwnInterest')">OWN Interest</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_InstituteInterest')">SCHOOL Interest</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_OwnSettlementAmount')">OWN Transfer Amount</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_InstituteLSettlementAmount')">SCHOOL Transfer Amount</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_OwnWithdrwanAmount')">OWN Withdrawn Amount</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_InstituteWithdrawnAmount')">SCHOOL Withdrawn Amount</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_OwnSettlementAmount')">OWN Settled Amount</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_InstituteLSettlementAmount')">SCHOOL Settled Amount</a></th>
+                                            <th style="width:10%"><a href="" ng-click="sort('HREPFST_OwnSettlementAmount')"> Deposit Adjustment Amount</a></th>
+                                            <th style="width:10%"><a href="" ng-click="sort('HREPFST_InstituteLSettlementAmount')"> Withdraw Adjustment Amount</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_OwnClosingBalance')">OWN Closing Balance</a></th>
+                                            <th style="width:5%"><a href="" ng-click="sort('HREPFST_InstituteClosingBalance')">SCHOOL Closing Balance</a></th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!--<tr dir-paginate="newuser in  filterValue1 = (pfgriddata | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">-->
+                                        <tr ng-repeat="newuser in  payrollStandard">
+
+                                            <td style="width:5%" class="text-left">{{ newuser.IVRM_Month_Name}}</td>
+                                            <td style="width:5%" class="text-left">{{ newuser.IMFY_FinancialYear}}</td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_OBOwnAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_OBInstituteAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" ng-disabled="true" name="Amount" type="text" ng-model="newuser.HREPFST_OwnContribution" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" ng-disabled="true" name="Amount" type="text" ng-model="newuser.HREPFST_IntstituteContribution" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" ng-disabled="true" name="Amount" type="text" ng-model="newuser.HREPFST_OwnInterest" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" ng-disabled="true" name="Amount" type="text" ng-model="newuser.HREPFST_InstituteInterest" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_OwnTransferAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_InstituteTransferAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_OwnWithdrwanAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_InstituteWithdrawnAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_OwnSettlementAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_InstituteLSettlementAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:10%" class="text-center">
+                                                Own Amount:  <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_OwnDepositAdjustmentAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+
+                                                School Amount  <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_InstituteDepositAdjustmentAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+
+                                            </td>
+                                            <td style="width:10%" class="text-center">
+                                                Own Amount:  <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_OwnWithdrawAdjustmentAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+
+                                                School Amount  <input class="form-control active textwidth" name="Amount" type="text" ng-model="newuser.HREPFST_InstituteWithdrawAdjustmentAmount" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" ng-disabled="true" name="Amount" type="text" ng-model="newuser.HREPFST_OwnClosingBalance" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+                                            <td style="width:5%" class="text-left">
+                                                <input class="form-control active textwidth" ng-disabled="true" name="Amount" type="text" ng-model="newuser.HREPFST_InstituteClosingBalance" allow-pattern="[0-9.]" ng-blur="PFBlurcalculation(newuser)">
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-if="Editflag==false" ng-click="SavePFData()" aria-disabled="false">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Save PF Data
+                            </md-button>
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-if="Editflag==true" ng-click="EditSave()" aria-disabled="false">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Update
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">PF Transaction Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue.$" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-wrapper-scroll-y my-custom-scrollbar" style="overflow:auto">
+
+                            <table class="table table-bordered table-striped mb-0" ng-if="PFVPFflag=='VPF'">
+                                <thead>
+                                    <tr>
+                                        <th><a href="" ng-click="sort('')">SL.No.</a></th>
+                                        <th><a href="" ng-click="sort('IVRM_Month_Name')">Month</a></th>
+                                        <th><a href="" ng-click="sort('IMFY_FinancialYear')">year</a></th>
+                                        <th><a href="" ng-click="sort('HRME_EmployeeFirstName')">Employee Name</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_VOBAmount')">Opening Balance</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_Contribution')">Contribution</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_Intersest')">Interest</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_Intersest')">VPF Transfer</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_WithdrawnAmount')">Withdrawn Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_SettledAmount')">Settled Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_DepositAdjustmentAmount')">Deposit Adjustment Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_WithsrawAdjustmentAmount')">Withdraw Adjustment Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREVPFST_ClosingBalance')">Closing Balance</a></th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="newuser in  filterValue1 = (vpfgriddata | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td class="text-left">{{ newuser.IVRM_Month_Name }}</td>
+                                        <td class="text-center">{{ newuser.IMFY_FinancialYear }}</td>
+                                        <td class="text-left">{{ newuser.HRME_EmployeeFirstName}}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_VOBAmount}}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_Contribution}}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_Intersest }}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_TransferAmount }}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_WithdrawnAmount }}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_SettledAmount }}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_DepositAdjustmentAmount }}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_WithsrawAdjustmentAmount }}</td>
+                                        <td class="text-left">{{ newuser.HREVPFST_ClosingBalance}}</td>
+                                        <td class="text-center">
+                                            <span ng-hide="newuser.HREVPFST_ManuallyCheckedFlg==true">
+                                                <a class="text-aqua" href="" ng-click="editdata(newuser)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                </a>
+                                                &nbsp;
+                                                <a href="" ng-click="deactive(newuser)"
+                                                   class="fa fa-trash" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                </a>
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table table-bordered table-striped mb-0" ng-if="PFVPFflag=='PF'">
+                                <thead>
+                                    <tr>
+                                        <th><a href="" ng-click="sort('')">SL.No.</a></th>
+                                        <th><a href="" ng-click="sort('IVRM_Month_Name')">Month</a></th>
+                                        <th><a href="" ng-click="sort('IMFY_FinancialYear')">year</a></th>
+                                        <th><a href="" ng-click="sort('HRME_EmployeeFirstName')">Employee Name</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OBOwnAmount')">OWN Opening Balance</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OBInstituteAmount')">SCHOOL Opening Balance</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OwnContribution')">OWN Contribution</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_IntstituteContribution')">SCHOOL Contribution</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OwnInterest')">OWN Interest</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_InstituteInterest')">SCHOOL Interest</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OwnSettlementAmount')">OWN Transfer Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_InstituteLSettlementAmount')">SCHOOL Transfer Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OwnWithdrwanAmount')">OWN Withdrawn Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_InstituteWithdrawnAmount')">SCHOOL Withdrawn Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OwnSettlementAmount')">OWN Settled Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_InstituteLSettlementAmount')">SCHOOL Settled Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OwnSettlementAmount')"> Deposit Adjustment Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_InstituteLSettlementAmount')"> Withdraw Adjustment Amount</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_OwnClosingBalance')">OWN Closing Balance</a></th>
+                                        <th><a href="" ng-click="sort('HREPFST_InstituteClosingBalance')">SCHOOL Closing Balance</a></th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="newuser in  filterValue1 = (pfgriddata | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td class="text-left">{{ newuser.IVRM_Month_Name}}</td>
+                                        <td class="text-left">{{ newuser.IMFY_FinancialYear}}</td>
+                                        <td class="text-left">{{ newuser.HRME_EmployeeFirstName}}</td>
+                                        <td class="text-left">{{ newuser.HREPFST_OBOwnAmount}}</td>
+                                        <td class="text-left">{{ newuser.HREPFST_OBInstituteAmount }}</td>
+                                        <td class="text-left">{{ newuser.HREPFST_OwnContribution }}</td>
+                                        <td class="text-left">{{ newuser.HREPFST_IntstituteContribution }}</td>
+                                        <td class="text-left">{{ newuser.HREPFST_OwnInterest }}</td>
+                                        <td class="text-center">{{ newuser.HREPFST_InstituteInterest }}</td>
+                                        <td class="text-left">{{ newuser.HREPFST_OwnTransferAmount }}</td>
+                                        <td class="text-center">{{ newuser.HREPFST_InstituteTransferAmount }}</td>
+                                        <td class="text-center">{{ newuser.HREPFST_OwnWithdrwanAmount }}</td>
+                                        <td class="text-center">{{ newuser.HREPFST_InstituteWithdrawnAmount }}</td>
+                                        <td class="text-center">{{ newuser.HREPFST_OwnSettlementAmount }}</td>
+                                        <td class="text-center">{{ newuser.HREPFST_InstituteLSettlementAmount }}</td>
+
+                                        <td class="text-center">
+                                            Own Amount: {{newuser.HREPFST_OwnDepositAdjustmentAmount}}
+                                            School Amount {{newuser.HREPFST_InstituteDepositAdjustmentAmount}}
+                                        </td>
+                                        <td class="text-center">
+                                            Own Amount: {{newuser.HREPFST_OwnWithdrawAdjustmentAmount}}
+                                            School Amount {{newuser.HREPFST_InstituteWithdrawAdjustmentAmount}}
+                                        </td>
+
+                                        <td class="text-center">{{ newuser.HREPFST_OwnClosingBalance }}</td>
+                                        <td class="text-center">{{ newuser.HREPFST_InstituteClosingBalance }}</td>
+                                        <td class="text-center">
+                                            <span ng-hide="newuser.HREPFST_ManuallyCheckedFlg==true">
+                                                <a class="text-aqua" href="" ng-click="editdata(newuser)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                </a>
+                                                &nbsp;
+                                                <a href="" ng-click="deactive(newuser)"
+                                                   class="fa fa-trash" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                </a>
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="10"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--<div ui-grid="gridAuth" ui-grid-pagination ui-grid-edit class="grid text-center" id="style-4" style="height: 270px;"></div>-->
+            </div>
+        </div>
+
+
+
+    </form>
+</section>
+
+
+
+<!--for view file comments -->
+<div class="modal fade modal-medium" id="finalrunpopup" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" ng-click="onclosedata()" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Final Verify</h4>
+            </div>
+            <div class="modal-body">
+                <div id="reports">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="form-group ">
+                                    <div class="well" ng-init="PFVPFflagfinal='PF'">
+                                        <label class="radio-inline col-sm-6">
+                                            <input type="radio" name="PF" value="PF" data-ng-model="PFVPFflagfinal" ng-change="changepftypeui(PFVPFflag)">
+                                            <span class="lbl padding-8">PF</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="VPF" data-ng-model="PFVPFflagfinal" ng-change="changepftypeui()">
+                                            <span class="lbl padding-8">VPF</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group ">
+                                    <div class="col-sm-4">
+                                        <span class="lbl padding-3">
+                                            Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" ng-model="IMFY_Id" name="hreS_Year" required>
+                                                <option value="" label="Select">Select Year</option>
+                                                <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.imfY_Id}}" ng-selected="{{leaveyear.Selected===true}}">
+                                                    {{leaveyear.imfY_FinancialYear}}
+                                                </option>
+                                            </select>
+                                            <span class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                                <span ng-message="required">Select Year</span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group ">
+
+                                    <div class="col-sm-4">
+                                        <span class="lbl padding-3">
+                                            Employee :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </div>                                    
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                        <label class="control-label">
+                                            <input type="checkbox" name="ckeckempl" ng-model="empl" ng-true-value="true" ng-false-value="false" data-ng-click="all_check_empl()">
+                                            <span class="lbl padding-8"> <b>All</b></span>
+                                        </label>
+                                        <label data-ng-model="PASR_Id" ng-repeat="emp in employeelist | filter:search" value="{{emp.hrmE_Id}}">
+                                            <input name="emp1" value="1" ng-model="emp.selected" type="checkbox" ng-required="isOptionsRequired3()" ng-true-value="true" ng-false-value="false" ng-change="addColumn4()">
+                                            <span class="lbl padding-8"> {{emp.hrmE_EmployeeFirstName}} </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.emp1)" ng-messages="myForm.emp1.$error">
+                                        <div ng-message="required" style="color:red">Select Employee</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <hr />
+
+                            <div class="col-sm-12">
+                                <div class="text-center">
+                                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="finalverify()" aria-disabled="false">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                        Final Run
+                                    </md-button>                                  
+                                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal" ng-click="onclosedata()"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>

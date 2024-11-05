@@ -1,0 +1,336 @@
+﻿
+
+<style>
+    #Table {
+        white-space: nowrap;
+        overflow-x: visible;
+        overflow-y: hidden;
+        width: 1230px;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Details Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+
+                    <div class="col-sm-5">
+                        <div class="form-group well">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Header:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="headerselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByheaderAll(headerselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="header in headerdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="header.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByheader(header)">
+                                        <span class="lbl padding-8">
+                                            {{header.value}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-7">
+                        <!--Format -->
+                        <div class="form-group well">
+                            <div class="text-center">
+
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.FormatType" value="Format1" name="Format" ng-click="onClickFormatOne()">
+                                    <span class="lbl padding-8">Format 1</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.FormatType" value="Format2" name="Format" ng-click="onClickFormatTwo()">
+                                    <span class="lbl padding-8">Format 2</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group well" ng-if="Employee.FormatType =='Format1'">
+                            <div class="text-center">
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.DOBJL" value="DOB" name="BJL" ng-change="getEmployeeByDOBJL()">
+                                    <span class="lbl padding-8">Date of Birth</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.DOBJL" value="DOJ" name="BJL" ng-change="getEmployeeByDOBJL()">
+                                    <span class="lbl padding-8">Date of Joining</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.DOBJL" value="DOL" name="BJL" ng-change="getEmployeeByDOBJL()">
+                                    <span class="lbl padding-8">Date of Leaving</span>
+                                </label>
+                            </div>
+                            <div class="text-center">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <span class="lbl padding-3">
+                                            <label class="inline">
+                                                <span class="lbl padding-3">
+                                                    From :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                                </span>
+                                                <span class="lbl padding-3">
+                                                    <md-datepicker ng-model="Employee.FromDate" onkeydown="return false" name="FromDate" id="FromDate" md-placeholder="Enter  date" md-max-date="maxDateFrom" md-min-date="minDateFrom" ng-change="setToDate(Employee.FromDate)" ng-required="Employee.FormatType =='Format1'"></md-datepicker>
+                                                </span>
+                                            </label>
+                                        </span>
+                                        <div class="error-messages" ng-if="interacted(myForm.FromDate)" ng-messages="myForm.FromDate.$error">
+                                            <span ng-message="required">Select From Date</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <span class="lbl padding-3">
+                                            <label class="inline">
+                                                <span class="lbl padding-3">
+                                                    To :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                                </span>
+                                                <span class="lbl padding-3">
+                                                    <md-datepicker ng-model="Employee.ToDate" onkeydown="return false" name="ToDate" id="ToDate" md-max-date="maxDateTo" md-min-date="minDateTo" md-placeholder="Enter  date" ng-required="Employee.FormatType =='Format1'" ng-change="OnchageToDate()"></md-datepicker>
+                                                </span>
+                                            </label>
+                                        </span>
+                                        <div class="error-messages" ng-if="interacted(myForm.ToDate)" ng-messages="myForm.ToDate.$error">
+                                            <span ng-message="required">Select To Date</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Working , Left flag -->
+                        <div class="form-group well">
+                            <div class="text-center">
+                                <label class="radio-inline">
+                                    <input type="checkbox" ng-model="Employee.Working" value="{{Employee.Working}}" name="WorkingLeft" ng-change="GetEmployeeListByWorkingSelection()">
+                                    <span class="lbl padding-8">Working</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="checkbox" ng-model="Employee.Left" value="{{Employee.Left}}" name="WorkingLeft" ng-change="GetEmployeeListByLeftSelection()">
+                                    <span class="lbl padding-8">Left</span>
+                                </label>
+                            </div>
+                        </div>
+
+
+
+                        <!--All or Individual-->
+                        <div class="form-group well" ng-if="Employee.FormatType =='Format1'">
+                            <div class="text-center">
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.AllOrIndividual" value="All" name="AllOrIndividual" ng-change="GetAllOrIndividualEmployee()">
+                                    <span class="lbl padding-8">All</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.AllOrIndividual" value="Individual" name="AllOrIndividual" ng-change="GetAllOrIndividualEmployee()">
+                                    <span class="lbl padding-8">Individual</span>
+                                </label>
+                            </div>
+                        </div>
+                        <!--Individual-->
+                        <div class="form-group well" ng-if="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format1'">
+                            <div class="text-center">
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.TypeOrEmployee" value="Type" name="TypeOrEmployee" ng-required="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format1'">
+                                    <span class="lbl padding-8">Type <strong style="color:red;display:inline; font-weight: bolder;" ng-if="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format1'">*</strong></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="Employee.TypeOrEmployee" value="Employee" name="TypeOrEmployee" ng-required="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format1'">
+                                    <span class="lbl padding-8">Employee <strong style="color:red;display:inline; font-weight: bolder;" ng-if="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format1'">*</strong></span>
+                                </label>
+                                <div class="radio-inline" ng-if="Employee.TypeOrEmployee =='Type'">
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            Type : <strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" data-ng-model="Employee.hrmeT_Id" name="hrmeT_Id" ng-required="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format1' && Employee.TypeOrEmployee =='Type'">
+                                                <option value="" label="Select Employee Type">Select Employee Type</option>
+                                                <option ng-repeat="employeeType in employeeTypedropdown" value="{{employeeType.hrmeT_Id}}" ng-selected="{{employeeType.Selected===true}}">
+                                                    {{employeeType.hrmeT_EmployeeType}}
+                                                </option>
+                                            </select>
+                                        </span>
+                                        <span class="error-messages" ng-if="interacted(myForm.hrmeT_Id)" ng-messages="myForm.hrmeT_Id.$error">
+                                            <span ng-message="required">Select Employee Type</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="radio-inline" ng-if="Employee.TypeOrEmployee =='Employee'">
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            Employee : <strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" data-ng-model="Employee.hrmE_Id" name="hrmE_Id" ng-required="Employee.AllOrIndividual =='Individual' && Employee.FormatType =='Format1' && Employee.TypeOrEmployee =='Employee'">
+                                                <option value="" label="Select Employee">Select Employee</option>
+                                                <option ng-repeat="emp in employeedropdown" value="{{emp.hrmE_Id}}" ng-selected="{{emp.Selected===true}}" style="text-transform: uppercase !important">
+                                                    {{emp.hrmE_EmployeeFirstName}} {{emp.hrmE_EmployeeMiddleName}} {{emp.hrmE_EmployeeLastName}}
+                                                </option>
+                                            </select>
+                                        </span>
+                                        <span class="error-messages" ng-if="interacted(myForm.hrmE_Id)" ng-messages="myForm.hrmE_Id.$error">
+                                            <span ng-message="required">Select Employee</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="Employee.FormatType =='Format2'">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="groupType in groupTypedropdown">
+                                        <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType)">
+                                        <span class="lbl padding-8">
+                                            {{groupType.hrmgT_EmployeeGroupType}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-right-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="department in departmentdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)">
+                                        <span class="lbl padding-8">
+                                            {{department.hrmD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="designation in designationdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                        <span class="lbl padding-8">
+                                            {{designation.hrmdeS_DesignationName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="EmployeeDis">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Details Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="PFChallan" id="Baldwin">
+                    <div id="PFChallan">
+                        <div class="text-center">
+                            <h4>{{institutionDetails.mI_Name}}</h4>
+                            <h6> {{CurrentInstuteAddress}}</h6>
+                            <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                            <h5>Employee Details Report</h5>
+                        </div>
+                        <div class="" id="Table" style="overflow:scroll;width:100%;">
+                            <table class="table-bordered text-center margin-bottom-10" style="width:1500px;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:center">Sl.No</th>
+                                        <th ng-repeat="column in columnsTest">{{column.columnName}}</th>
+                                    </tr>
+                                </thead>
+                                <tr ng-repeat="row in rows">
+                                    <td style="text-align:right">{{$index +1}}</td>
+                                    <td class="text-left" ng-repeat="column in columnsTest">{{row[column.columnID]}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <!--<md-button type="button" ng-click="printToCart('Baldwin')" class="md-raised md-primary">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        print
+                    </md-button>-->
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#Table')" >
+                        <i class="fa fa-file-excel-o" ></i>
+                        Export to Excel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</section>

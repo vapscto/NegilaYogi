@@ -1,0 +1,392 @@
+﻿
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">GRN (GOODS RECEIPT NOTE)</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="well">
+                                <div class="text-center" ng-init="typeflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="All" ng-model="typeflag" ng-change="typerdochange()">
+                                        <span class="lbl padding-8"> All </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Overall" name="Overall" ng-model="typeflag" ng-change="typerdochange()">
+                                        <span class="lbl padding-8"> Overall </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Detailed" name="Detailed" ng-model="typeflag" ng-change="typerdochange()">
+                                        <span class="lbl padding-8"> Detailed </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="typeflag=='Overall' || typeflag=='Detailed'">
+                            <div class="col-sm-6 col-lg-offset-3">
+                                <div class="well">
+                                    <div class="text-center">
+                                        <label class="radio-inline" ng-show="typeflag=='Detailed'">
+                                            <input type="radio" value="Individual_1" name="Individual" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                            <span class="lbl padding-8">Individual</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Item_1" name="item" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                            <span class="lbl padding-8">Item-wise</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Supplier" name="supplier" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                            <span class="lbl padding-8">Supplier</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 col-lg-offset-2" ng-if="typeflag !='All'">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" ng-true-value="true" ng-false-value="false" name="bwdates" data-ng-model="bw_dates">   <!--value="BD"-->
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-9" ng-if="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="obj.startdate" name="sdate" md-placeholder="Start Date"  ng-required="bw_dates" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="obj.enddate" name="ddate" md-placeholder="End Date"  ng-required="bw_dates" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ======================= GRN No. ============================ -->
+                            <div class="form-group" ng-if="optionflag=='Individual_1'">
+                                <label class="control-label col-sm-4">Select or Search GRN No:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_grn_item_supplier.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search GRN No. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="grnall" type="checkbox" ng-click="all_check(grnall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMGRN_Id" ng-repeat="grn in get_grn_item_supplier | filter : searchValue">
+                                            <input name="grnno" ng-model="grn.grnck" type="checkbox" ng-click="togchkbxG();" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                {{grn.INVMGRN_GRNNo}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.grnno)" ng-messages="myForm.grnno.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- ===========================ITEMS========================== -->
+                            <div class="form-group" ng-if="optionflag=='Item_1'">
+                                <label class="control-label col-sm-4">Select or Search Item :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_grn_item_supplier.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Item here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="itemall" type="checkbox" ng-click="all_checkI(itemall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMI_Id" ng-repeat="itm in get_grn_item_supplier | filter : searchValue">
+                                            <input name="item" ng-model="itm.itemck" type="checkbox" ng-click="togchkbxI();" ng-required="isOptionsRequiredI()">
+                                            <span class="lbl padding-8">
+                                                {{itm.INVMI_ItemName}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ===========================Supplier========================== -->
+                            <div class="form-group" ng-if="optionflag=='Supplier'">
+                                <label class="control-label col-sm-4">Select or Search Supplier :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_grn_item_supplier.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Supplier here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="suplierall" type="checkbox" ng-click="all_checkS(suplierall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMS_Id" ng-repeat="itm in get_grn_item_supplier | filter : searchValue">
+                                            <input name="supplier" ng-model="itm.suplierck" type="checkbox" ng-click="togchkbxS();" ng-required="isOptionsRequiredS()">
+                                            <span class="lbl padding-8">
+                                                {{itm.INVMS_SupplierName}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.supplier)" ng-messages="myForm.supplier.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="get_grnreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <!--<md-button ng-show="get_grnreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printgrn')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>-->
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+        <div class="box box-primary" ng-show="tablediv">
+            <div class="box-header with-border">
+                <h3 class="box-title">GRN Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div id="gridall"></div>
+
+            </div>
+        </div>
+
+        <div ng-if="typeflag=='All' || typeflag=='Detailed'">
+            <div ng-hide="true">
+                <div id="printgrn">
+                    <div class="text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="grn" width="100%">
+                    </div>
+                    <h4 class="text-center">GOODS RECEIPT NOTE (GRN) REPORT</h4>
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                </th>
+                                <th><a href="" ng-click="sortBy('INVMGRN_PurchaseDate')">Purchase Date</a></th>
+                                <th><a href="" ng-click="sortBy('INVTGRN_BatchNo')">Batch No.</a></th>
+                                <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier</a> </th>
+                                <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item</a> </th>
+                                <th><a href="" ng-click="sortBy('INVMUOM_UOMName')">UOM</a> </th>
+                                <th><a href="" ng-click="sortBy('INVTGRN_Qty')">Quantity</a> </th>
+                                <th><a href="" ng-click="sortBy('INVTGRN_PurchaseRate')">Purchase Rate</a> </th>
+                                <th><a href="" ng-click="sortBy('INVTGRN_MRP')">MRP</a> </th>
+                                <th><a href="" ng-click="sortBy('INVTGRN_SalesPrice')">Sale Price </a> </th>
+                                <th><a href="" ng-click="sortBy('INVTGRN_DiscountAmt')">Discount</a> </th>
+                                <th><a href="" ng-click="sortBy('INVTGRN_TaxAmt')">Tax</a> </th>
+                                <th><a href="" ng-click="sortBy('INVTGRN_Amount')">Amount</a> </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in get_grnreport">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td>{{user.INVMGRN_PurchaseDate | date:'dd-MM-yyyy'}}</td>
+                                <td>{{user.INVTGRN_BatchNo}}</td>
+                                <td>{{user.INVMS_SupplierName}}</td>
+                                <td>{{user.INVMI_ItemName}}</td>
+                                <td>{{user.INVMUOM_UOMName}}</td>
+                                <td>{{user.INVTGRN_Qty | number :2}}</td>
+                                <td>{{user.INVTGRN_PurchaseRate | number :2}}</td>
+                                <td>{{user.INVTGRN_MRP |number :2}}</td>
+                                <td>{{user.INVTGRN_SalesPrice |number :2}}</td>
+                                <td>{{user.INVTGRN_DiscountAmt | number :2}}</td>
+                                <td>{{user.INVTGRN_TaxAmt |number :2}}</td>
+                                <td>{{user.INVTGRN_Amount | number :2}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="10"><b>Total</b></td>
+                                <td><b>{{totaldiscount | number :2}}</b></td>
+                                <td><b>{{totaltax | number :2}}</b></td>
+                                <td><b>{{totalamt | number :2}}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="10"><b>Final Amount</b></td>
+                                <td colspan="3"><b>{{finalamt | number :2}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="typeflag=='Overall'">
+            <div ng-if="optionflag=='Item_1'">
+                <div ng-hide="true">
+                    <div id="printgrn">
+                        <div class="text-center">
+                            <img src="{{imgname}}" class="img-responsive" alt="grn" width="100%">
+                        </div>
+                        <h4 class="text-center">GOODS RECEIPT NOTE (GRN) REPORT</h4>
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item</a> </th>
+                                    <th><a href="" ng-click="sortBy('INVMI_ItemCode')">Item Code</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnQuantity')">Quantity</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnRate')">Purchase Rate</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnMRP')">MRP</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnSalePrice')">Sale Price </a> </th>
+                                    <th><a href="" ng-click="sortBy('grnDiscount')">Discount</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnTax')">Tax</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnAmount')">Amount</a> </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in get_grnreport">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td>{{user.INVMI_ItemName}}</td>
+                                    <td>{{user.INVMI_ItemCode}}</td>
+                                    <td>{{user.grnQuantity | number :2}}</td>
+                                    <td>{{user.grnRate | number :2}}</td>
+                                    <td>{{user.grnMRP |number :2}}</td>
+                                    <td>{{user.grnSalePrice |number :2}}</td>
+                                    <td>{{user.grnDiscount | number :2}}</td>
+                                    <td>{{user.grnTax |number :2}}</td>
+                                    <td>{{user.grnAmount | number :2}}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="7"><b>Total</b></td>
+                                    <td><b>{{totaldiscount | number :2}}</b></td>
+                                    <td><b>{{totaltax | number :2}}</b></td>
+                                    <td><b>{{totalamt | number :2}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="7"><b>Final Amount</b></td>
+                                    <td colspan="3"><b>{{finalamt | number :2}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div ng-if="optionflag=='Supplier'">
+                <div ng-hide="true">
+                    <div id="printgrn">
+                        <div class="text-center">
+                            <img src="{{imgname}}" class="img-responsive" alt="grn" width="100%">
+                        </div>
+                        <h4 class="text-center">GOODS RECEIPT NOTE (GRN) REPORT</h4>
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('INVMS_SupplierName')">Supplier Name</a> </th>
+                                    <th><a href="" ng-click="sortBy('INVMS_SupplierCode')">Code</a> </th>
+                                    <th><a href="" ng-click="sortBy('INVMS_SupplierConatctNo')">Contact No.</a> </th>
+                                    <th><a href="" ng-click="sortBy('INVMS_EmailId')">Email_ID</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnQuantity')">Quantity</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnRate')">Purchase Rate</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnMRP')">MRP</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnSalePrice')">Sale Price </a> </th>
+                                    <th><a href="" ng-click="sortBy('grnDiscount')">Discount</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnTax')">Tax</a> </th>
+                                    <th><a href="" ng-click="sortBy('grnAmount')">Amount</a> </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in get_grnreport">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td>{{user.INVMS_SupplierName}}</td>
+                                    <td>{{user.INVMS_SupplierCode}}</td>
+                                    <td>{{user.INVMS_SupplierConatctNo}}</td>
+                                    <td>{{user.INVMS_EmailId}}</td>
+                                    <td>{{user.grnQuantity | number :2}}</td>
+                                    <td>{{user.grnRate | number :2}}</td>
+                                    <td>{{user.grnMRP |number :2}}</td>
+                                    <td>{{user.grnSalePrice |number :2}}</td>
+                                    <td>{{user.grnDiscount | number :2}}</td>
+                                    <td>{{user.grnTax |number :2}}</td>
+                                    <td>{{user.grnAmount | number :2}}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="9"><b>Total</b></td>
+                                    <td><b>{{totaldiscount | number :2}}</b></td>
+                                    <td><b>{{totaltax | number :2}}</b></td>
+                                    <td><b>{{totalamt | number :2}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="9"><b>Final Amount</b></td>
+                                    <td colspan="3"><b>{{finalamt | number :2}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</section>

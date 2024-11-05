@@ -1,0 +1,348 @@
+﻿<section class="content">
+    <div data-ng-init="loaddata();">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savepages()" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fiancial Accounting Ledger</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6 form-horizontal">
+
+                            <div class="text-center well col-sm-8 col-sm-offset-3">
+                                <div ng-init="optionType1='Student'">
+                                    <span><b> Type </b></span>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Student" ng-model="optionType1">
+                                        <span class="lbl padding-4"><b> Student </b></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Sales" ng-model="optionType1">
+                                        <span class="lbl padding-4"><b> Sales </b></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Item" ng-model="optionType1">
+                                        <span class="lbl padding-4"><b> Item Wise </b></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="text-center well col-sm-5 col-sm-offset-3">
+                                <div ng-init="crdrflg='CR'">
+                                    <span><b> Flag </b></span>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="CR" ng-model="crdrflg">
+                                        <span class="lbl padding-4"><b> CR </b></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="DR" ng-model="crdrflg">
+                                        <span class="lbl padding-4"><b> DR </b></span>
+                                    </label>
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Company name:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel2" name="company" ng-model="$parent.FAMCOMP_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Company Name" required>
+                                        <ui-select-match placeholder="Select or Search Company Name">
+                                            {{$select.selected.famcomP_CompanyName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="chk in companyname | propsFilter: {famcomP_CompanyName: $select.search}"
+                                                           value="{{chk.famcomP_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="chk.famcomP_CompanyName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.company)" ng-messages="myForm.company.$error">
+                                        <div ng-message="required">Select Company Name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Financial Year:
+                                    <span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="year" ng-model="IMFY_Id" required>
+                                        <option value="">--Select   Year--</option>
+                                        <option ng-repeat="chk in fyear" value="{{chk.imfY_Id}}" ng-selected="{{chk.imfY_Id == IMFY_Id}}">
+                                            {{chk.imfY_FinancialYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.year)"
+                                         ng-messages="myForm.year.$error">
+                                        <div ng-message="required">Select Year  </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Master Group Name:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="usrnm" ng-model="$parent.FAMGRP_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select);" title="Select Group Name" ng-disabled="dis==true" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or Search Master Group Name">
+                                            {{$select.selected.FAMGRP_GroupName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="user in getgroupname | filter: $select.search" value="{{user.FAMGRP_Id}}" ng-selected="{{user.Selected == true}}">
+                                            <div ng-bind-html="user.FAMGRP_GroupName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.usrnm)" ng-messages="myForm.usrnm.$error">
+                                        <div ng-message="required">
+                                            Select Master Group
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="form-group" ng-show="optionType1=='Student'">
+                                <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="selus2e" data-ng-model="ASMCL_Id" name="stu_Class" ng-change="onselectclass()" ng-required="optionType1=='Student'">
+                                        <option value="" label="Select class"> </option>
+                                        <option ng-repeat="option11 in classarr" value="{{option11.asmcL_Id}}" ng-selected="{{option11.Selected == true}}">
+                                            {{option11.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.stu_Class)" ng-messages="myForm.stu_Class.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Class</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="optionType1=='Student'">
+                                <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="seluse1" data-ng-model="ASMS_Id" name="stu_Section" ng-change="onselectmodeof()" ng-required="optionType1=='Student'">
+                                        <option value="" label="Select Section"> </option>
+                                        <option ng-repeat="option1 in sectionarr" value="{{option1.asmS_Id}}" ng-selected="{{option1.Selected == true}}">
+                                            {{option1.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.stu_Section)" ng-messages="myForm.stu_Section.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Section</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="optionType1=='Student'">
+
+
+
+
+
+                                <div class="form-group">
+                                    <label for="sel2" class="control-label col-sm-4">
+                                        <input type="checkbox" ng-click="toggleAll()" ng-model="selectAll" ng-disabled="disablegroups">
+                                        <span class="lbl padding-8">Student Name:<span style="color:red;">*</span></span>
+                                    </label>
+
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                        <label data-ng-model="FMG_GroupName" ng-repeat="role in studentlst|filter:filterchkbx" value="{{role.fmG_Id}}">
+                                            <input type="checkbox" ng-model="role.selected" ng-change="optionToggled(role.amst_Id)" name="roleGroup" ng-required="isOptionsRequired();">
+
+                                            <span class="lbl padding-8">  {{role.amsT_FirstName + ' ' + role.amsT_MiddleName + ' ' + role.amsT_LastName}}</span>
+                                        </label>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.roleGroup)" ng-messages="myForm1.roleGroup.$error">
+                                        <div ng-message="required">Select atleast one checkbox</div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group" ng-show="optionType1=='Sales'">
+                                <div class="form-group">
+                                    <label for="sel2" class="control-label col-sm-4">
+                                        <input type="checkbox" ng-click="toggleAllSales()" ng-model="selectAllsales" ng-disabled="disablegroups">
+                                        <span class="lbl padding-8">Supplier Name:<span style="color:red;">*</span></span>
+                                    </label>
+
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                        <label data-ng-model="FMG_GroupName" ng-repeat="role in supplierdata|filter:filterchkbx" value="{{role.invmS_Id}}">
+                                            <input type="checkbox" ng-model="role.selected" ng-change="optionToggled(role.invmS_Id)" name="roleGroup" ng-required="isOptionsRequired();">
+
+                                            <span class="lbl padding-8">  {{role.invmS_SupplierName + ' ' + optionstu.invmS_SupplierCode}}</span>
+                                        </label>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.roleGroup)" ng-messages="myForm1.roleGroup.$error">
+                                        <div ng-message="required">Select atleast one checkbox</div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="optionType1=='Item'">
+                                <div class="form-group">
+                                    <label for="sel2" class="control-label col-sm-4">
+                                        <input type="checkbox" ng-click="toggleAllItem()" ng-model="selectAllitem" ng-disabled="disablegroups">
+                                        <span class="lbl padding-8">Item Name:<span style="color:red;">*</span></span>
+                                    </label>
+
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                        <label data-ng-model="FMG_GroupName" ng-repeat="role in itemdata|filter:filterchkbx" value="{{role.invmI_Id}}">
+                                            <input type="checkbox" ng-model="role.selected" ng-change="optionToggled(role.invmI_Id)" name="roleGroup" ng-required="isOptionsRequired();">
+
+                                            <span class="lbl padding-8">  {{role.invmI_ItemName}}</span>
+                                        </label>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.roleGroup)" ng-messages="myForm1.roleGroup.$error">
+                                        <div ng-message="required">Select atleast one checkbox</div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    
+                    </div>
+
+
+                    <br />
+
+                    <div class="">
+                        <div class="text-center">
+                            <input type="hidden" ng-model="FAMLED_Id" />
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+
+                     
+                            <md-button class="md-raised md-warn" data-ng-click="clear()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fiancial Accounting Ledger </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">
+                                SL.NO
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('FAMLED_LedgerName')">Ledger Name</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('FAMLED_LedgerAliasName')">Alias Name</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('FAMLED_LedgerCreatedDate')">Ledger Date</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('FAMCOMP_CompanyName')">Company Name</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('FAMGRP_GroupName')">Master Group Name</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('FAUGRP_UserGroupName')">User Group</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('IMFY_FinancialYear')"> Financial Year</a>
+                            </th>
+
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr dir-paginate="user in getreport |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                            <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td style="text-align:left">{{user.FAMLED_LedgerName}}</td>
+                            <td style="text-align:left">{{user.FAMLED_LedgerAliasName}}</td>
+                            <td>{{user.FAMLED_LedgerCreatedDate |date:'dd/MM/yyyy'}}</td>
+                            <td style="text-align:left">{{user.FAMCOMP_CompanyName}}</td>
+                            <td style="text-align:left">{{user.FAMGRP_GroupName}}</td>
+                            <td style="text-align:left">{{user.FAUGRP_UserGroupName}}</td>
+                            <td style="text-align:left">{{user.IMFY_FinancialYear}}</td>
+
+                            <td class="hidden">{{user.FAMLED_Id}}</td>
+                            <td class="text-center">
+                                <span ng-if="user.FAMLED_ActiveFlg == true">
+                                    <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                    <a href="" ng-click="Deletedata(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.FAMLED_ActiveFlg == false">
+                                    <a href="" ng-click="Deletedata(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+
+    </div>
+
+
+</section>

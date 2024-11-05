@@ -1,0 +1,372 @@
+﻿<link href="../css/print/hutchings/Bonafide_Cert/BonafideCert.css" rel="stylesheet" />
+<link href="../css/print/Portals/FeeReceipt.css" rel="stylesheet" />
+<form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+    <section class="content" data-ng-init="loaddata()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Exam Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="text-center well" ng-init="detailsrdo='EWAS'">
+                        <label class="radio-inline">
+                            <input name="Options" type="radio" value="EWAS" ng-model="detailsrdo" ng-change="radioChange()">
+                            <span class="lbl padding-8">
+                                Exam Wise
+                            </span>
+                        </label>
+                        <label class="radio-inline">
+                            <input name="Options" type="radio" value="SWAE" ng-model="detailsrdo" ng-change="radioChange()">
+                            <span class="lbl padding-8"> Subject Wise</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input name="Options" type="radio" value="ESW" ng-model="detailsrdo" ng-change="radioChange()">
+                            <span class="lbl padding-8">
+                                Exam-Subject Wise
+                            </span>
+                        </label>
+                        <label class="radio-inline">
+                            <input name="Options" type="radio" value="OVERALL" ng-model="detailsrdo" ng-change="radioChange()">
+                            <span class="lbl padding-8">
+                                Overall
+                            </span>
+                        </label>
+                        <label class="radio-inline">
+                            <input name="Options" type="radio" value="Halt_Ticket" ng-model="detailsrdo" ng-change="radioChange()">
+                            <span class="lbl padding-8">
+                                Hall Ticket
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div ng-show="(detailsrdo !='OVERALL')">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="asmaY_Id" data-ng-change="onyearchange()" name="acd_year" ng-required="detailsrdo!='OVERALL'">
+                                        <option value="">Select Year </option>
+                                        <option ng-repeat="option in acayearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                        <div ng-message="required">Select the Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div ng-show="(detailsrdo =='EWAS') || (detailsrdo=='ESW') || (detailsrdo=='Halt_Ticket')">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Exam :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="EME_Id" data-ng-change="onExamchange()" name="exm" ng-required="(detailsrdo =='EWAS') || (detailsrdo=='ESW')">
+                                        <option value="">Select Exam </option>
+                                        <option ng-repeat="option in examlist" value="{{option.emE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.emE_ExamName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.exm)" ng-messages="myForm.exm.$error">
+                                        <div ng-message="required">Select Exam</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div ng-show="(detailsrdo=='SWAE') || (detailsrdo=='ESW')">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Subject :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel2" ng-model="ismS_Id" name="sub" required>
+                                        <option value="">Select Subject </option>
+                                        <option ng-repeat="option in subjectlist" value="{{option.ismS_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.ismS_SubjectName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.sub)" ng-messages="myForm.sub.$error">
+                                        <div ng-message="required">Select Subject</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-show="detailsrdo !='Halt_Ticket'" ng-disabled="form.$invalid" id="save-btn" ng-click="getreport()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-show="detailsrdo=='Halt_Ticket'" ng-disabled="form.$invalid" id="save-btn" ng-click="report()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                      Generate  Hall Ticket
+                    </md-button>
+                    <md-button  class="md-raised md-primary" ng-click="printData()" ng-show="main_list.length > 0 && detailsrdo=='Halt_Ticket'">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+
+
+                <!--=====================  GRID=============-->
+                <div class="" ng-show="examReportList.length>0">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">EXAM REPORT DETAILS</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="" ng-show="(detailsrdo=='EWAS') || (detailsrdo=='SWAE') || (detailsrdo=='ESW')">
+                                <table class="table table-hover table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center"> Sl. no </th>
+                                            <th class="text-center" ng-if="detailsrdo=='EWAS'"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SUBJECTS</a> </th>
+                                            <th class="text-center" ng-if="detailsrdo=='SWAE'"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">EXAM</a> </th>
+                                            <th class="text-center" ng-if="detailsrdo=='ESW'"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">YEAR</a> </th>
+                                            <th class="text-center"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">MARKS OBTAINED</a> </th>
+                                            <th class="text-center"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">MAXIMUM MARK</a> </th>
+                                            <th class="text-center"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">GRADE OBTAINED</a> </th>
+                                            <!--<th class="text-center"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SEMESTER HIGHEST</a> </th>
+                                            <th class="text-center"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SEMESTER AVERAGE</a> </th>
+                                            <th class="text-center"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SECTION HIGHEST</a> </th>
+                                            <th class="text-center"><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SECTION AVERAGE</a> </th>-->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="user in examReportList | orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                            <td class="text-left" ng-if="detailsrdo=='EWAS'">{{user.ISMS_SubjectName}}</td>
+                                            <td class="text-left" ng-if="detailsrdo=='SWAE'">{{user.EME_ExamName}}</td>
+                                            <td class="text-left" ng-if="detailsrdo=='ESW'">{{user.ASMAY_Year}}</td>
+                                            <td>
+                                                <span>
+                                                    {{user.ECSTMPS_ObtainedMarks}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span>
+                                                    {{user.ECSTMPS_MaxMarks}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span>
+                                                    {{user.ECSTMPS_ObtainedGrade}}
+                                                </span>
+                                            </td>
+                                            <!--<td>
+                                                <span>
+                                                    {{user.ECSTMPS_SemHighest}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span>
+                                                    {{user.ECSTMPS_SemAverage}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span>
+                                                    {{user.ECSTMPS_SectionHighest}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span>
+                                                    {{user.ECSTMPS_SectionAverage}}
+                                                </span>
+                                            </td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="" ng-show="detailsrdo=='OVERALL'">
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th> Sl. no </th>
+                                            <th><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">YEAR</a> </th>
+                                            <th><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">EXAM NAME</a> </th>
+                                            <th><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SEMESTER NAME</a> </th>
+                                            <th><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SUBJECT NAME</a> </th>
+                                            <th><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">OBTAINED MARKS</a> </th>
+                                            <th><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">GRADE</a> </th>
+                                            <th><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SEMESTER RANK</a> </th>
+                                            <th><a href="" ng-click="sort('ecstmpS_ObtainedMarks')">SECTION RANK</a> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="user in examReportList | orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                            <td>{{user.ASMAY_Year}}</td>
+                                            <td>{{user.EME_ExamName}}</td>
+                                            <td>{{user.AMSE_SEMName}}</td>
+                                            <td>{{user.ISMS_SubjectName}}</td>
+                                            <td>{{user.ECSTMPS_ObtainedMarks}}</td>
+                                            <td>{{user.ECSTMPS_ObtainedGrade}}</td>
+                                            <td>{{user.ECSTMP_SemRank}}</td>
+                                            <td>{{user.ECSTMP_SectionRank}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <dir-pagination-controls max-size="10"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                    <!-- ========================================= GRAPH ========================================== -->
+                    <div class="box-body">
+                        <div class="" ng-show="examReportList.length>0">
+                            <div class="col-sm-12">
+                                <div class="box box-danger">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">AVERAGE EXAM BAR GRAPH</h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <div id="examchart" style="height: 350px;"></div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="" ng-show="(examReportList.length>0) && (detailsrdo !='OVERALL')">
+                            <div class="col-sm-12">
+                                <div class="box box-danger">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">HIGHEST EXAM BAR GRAPH</h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <div id="examchart2" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary" ng-show="main_list.length > 0 && detailsrdo=='Halt_Ticket'">
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Hallticket Report</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+
+                    <!--//added by sanjeev-->
+                    <div class="box-body">
+                        <div id="printformat1">
+                            <div ng-repeat="user in employeeid">
+                                <div class="col-sm-12 pagelayout" style="page-break-before:always !important;">
+
+                                    <div class="text-center">
+                                        <img src="https://vapsclg.blob.core.windows.net/files/Nagarjuna%20Degree%20(1).jpg" class="logo" style="width:auto !important;height:200px">
+                                    </div>
+                                    <div class="text-center"><h3>ADMISSION TICKET FOR  {{examname | uppercase}} {{exmyear}}</h3></div>
+                                    <div class="sect1">
+                                        <div class="row margin-bottom-10">
+                                            <!--<div class="col-sm-8">
+                                                <div class="form-group col-sm-4">
+                                                    <label class="control-label col-sm-4"><b>NAME OF THE STUDENT</b></label>
+                                                    <label class="control-label col-sm-8">
+                                                        : <b>{{user.AMCST_FirstName | uppercase}}</b>
+                                                    </label>
+                                                </div>
+                                                <div class="form-group colsm4">
+                                                    <label class="control-label col-sm-4"><b>REG NO</b></label>
+                                                    <label class="control-label col-sm-8">
+                                                        : <b>{{user.AMCST_AdmNo | uppercase}}</b>
+                                                    </label>
+                                                </div>
+                                            </div>-->
+
+                                            <div class="row">
+                                                <div class="col-sm-8">
+                                                    <b>NAME OF THE STUDENT&nbsp;:&nbsp;{{user.AMCST_FirstName | uppercase}}</b>
+                                                </div>
+                                                <div class="col-sm-4 text-right">
+                                                    <b>Reg.No&nbsp;:&nbsp;{{user.AMCST_AdmNo | uppercase}}</b>
+
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-4 text-left"><b>SEM&nbsp;:&nbsp;{{user.AMSE_SEMName}}</b></div>
+                                                <div class="col-sm-4 text-center"><b>COURSE&nbsp;:&nbsp;{{user.AMCO_CourseName}}</b></div>
+                                                <div class="col-sm-4 text-right"><b>SECTION&nbsp;:&nbsp;{{user.section}}</b></div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <table class="table table-hover table-responsive table-bordered" style="width:100%">
+                                            <thead>
+
+                                                <tr>
+                                                    <th><b>SL No</b></th>
+                                                    <th><b>SUBJECTS</b></th>
+                                                    <!--<th><b> REPORTING TIME</b></th>-->
+                                                    <th><b> EXAM DATE</b></th>
+                                                    <!--<th><b>TIME</b></th>-->
+                                                    <th><b>SIGNATURE</b></th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="planner in user.plannerdetails">
+                                                    <td class="text-center" rowspan="{{planner.length+1}}">{{$index+1}}</td>
+                                                    <td class="text-left" width="400">{{planner.ISMS_SubjectName}}<!--({{planner.ISMS_SubjectCode}})--></td>
+                                                    <!--<td>
+                                                        {{planner.EXTTC_ReportingTime}}
+                                                    </td>-->
+                                                    <td>
+
+                                                        {{planner.ExamStarDate |date:'dd/MM/yyyy'}} <!--&nbsp; ({{planner.ETTS_StartTime}} -- {{planner.ETTS_EndTime}})-->
+                                                    </td>
+
+                                                    <td></td>
+                                                </tr>
+
+
+                                            </tbody>
+                                        </table>
+                                        <table class="table" style="margin-top:100px !important;margin-bottom:120px">
+                                            <tr>
+                                                <td class="text-left">CLASS TEACHER</td>
+                                                <td class="text-left">HOD</td>
+                                                <td class="text-right">PRINCIPAL</td>
+                                            </tr>
+                                        </table>
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

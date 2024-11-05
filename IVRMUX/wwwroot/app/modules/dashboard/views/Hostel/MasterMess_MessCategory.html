@@ -1,0 +1,184 @@
+﻿<style>
+    .file-blue:before {
+        content: 'Upload File';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <dCanceliv class="box-header with-border">
+                <h3 class="box-title">MASTER MESS Category Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </dCanceliv>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-5 form-horizontal">                         
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Mess Name:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control" data-ng-model="HLMM_Id" name="mes" required>
+                                            <option value="" label="Mess Name"> </option>
+                                            <option ng-repeat="option in get_messlist" value="{{option.hlmM_Id}}" ng-selected="{{option.Selected == true}}">
+                                                {{option.hlmM_Name}}
+                                            </option>
+
+                                        </select>
+                                        <!--<select class="form-control" ng-model="HLMM_Id" name="mes" required>
+        <option value="">--Select--</option>
+        <option ng-repeat="val in get_messlist" value="{{val.hlmM_Id}}" ng-selected="val.hlmM_Id==true">
+            {{val.hlmM_Name}}
+        </option>
+    </select>-->
+                                        <div class="error-messages" ng-if="interacted(myForm.mes)" ng-messages="myForm.mes.$error">
+                                            <div ng-message="required">Select Mess Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                           
+                        </div>
+                        <div class="col-sm-7 form-horizontal">
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-3">Mess Category : <span style="color:red;">*</span></label>
+                                <div class="multiselect">
+                                    <input class="form-control" ng-model="searchsection" type="text" placeholder="search here...">
+                                    <label ng-disabled="HLMMMC_Id > 0">
+                                        <input value="all" data-ng-model="HLMMC_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkCCCC()" ng-disabled="HLMMMC_Id > 0">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="room in mess_category |filter:searchsection" value="{{room.hlmmC_Id}}">
+                                        <input type="checkbox" data-ng-model="room.selected" ng-click="togchkbxCCCC()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequiredtwo()" name="sections" ng-disabled="HLMMMC_Id > 0" />
+                                        <span class="lbl padding-8">{{room.hlmmC_Name}}</span>
+                                    </label>    
+                                </div>
+
+                                <div class="error-messages" ng-if="interacted(myForm.sections)" ng-messages="myForm.sections.$error">
+                                    <div ng-message="required">  Select Any One Category</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <hr />
+            <div class="text-center">
+                <input type="hidden" ng-model="HLMMMC_Id" value="{{hlmmmC_Id}}" />
+                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Save
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="get_messlistmapping.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">MASTER MESS Category Mapping</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{get_messlist.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="search!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="" ng-click="sort('hlmM_Name')">Mess Name</a></th>
+
+                        <th><a href="" ng-click="sort('HLMMC_Name')">Category Name</a></th>
+
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in filterValue=(get_messlistmapping | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.hlmM_Name}}</td>
+                        <td>{{user.hlmmC_Name}}</td>
+                        <td class="text-center">
+                            <span ng-if="user.hlmmC_ActiveFlag == true">
+                                <a class="text-aqua" href="" ng-click="EditData(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                <a href="" ng-click="deactiveY(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i> Deactivate</i>
+                                </a>
+                            </span>
+                            <span ng-if="user.hlmmC_ActiveFlag == false">
+                                <a href="" ng-click="deactiveY(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i> Activate </i>
+                                </a>
+                            </span>
+
+                        </td>
+                        <!--<td style="text-align:center">
+        <a href="javascript:void(0)" ng-click="EditData(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        </a>
+        |
+        <span ng-if="!user.hlmmC_ActiveFlag">
+            <a href="" ng-click="deactiveY(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                Activate
+            </a>
+        </span>
+        <span ng-if="user.hlmmC_ActiveFlag">
+            <a href="" ng-click="deactiveY(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                Deactivate
+            </a>
+        </span>
+    </td>-->
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>

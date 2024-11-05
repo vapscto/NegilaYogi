@@ -1,0 +1,500 @@
+﻿
+<style>
+    .multiselect {
+        width: 24.1em;
+        height: 14em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="LoadData();" novalidate name="myForm">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Attendance Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="well row text-center">
+                    <label class="radio-inline">
+                        <input type="radio" ng-model="obj.type" value="StudentAbsentPeriodWise" name="all" ng-change="OnChangeFlag();">
+                        <span class="lbl padding-8">Student Wise</span>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" ng-model="obj.type" value="SubjectWiseAttEntry" name="all" ng-change="OnChangeFlag();">
+                        <span class="lbl padding-8">Subject Wise Attendance Entry</span>
+                    </label>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMAY_Id" ng-change="OnChangeYear()" name="acd_year" required>
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="academic in yearDropdown" ng-selected="{{academic.asmaY_Id == ASMAY_Id}}" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required" style="color:red">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMCL_Id" name="cls" ng-change="OnChangeClass()" required>
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="class in classDropdown" value="{{class.asmcL_Id}}">{{class.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                    <div ng-message="required" style="color:red">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMS_Id" name="sec" required ng-change="OnChangeSection()">
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="section in sectionDropdown" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                    <div ng-message="required" style="color:red">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="obj.fromdate" onkeydown="return false" name="from_date" id="FromDate" ng-change='setTodate(obj)'
+                                               md-min-date="minDatef" md-max-date="maxDatef" md-placeholder="Enter date" ng-required="obj.type=='Date'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.from_date)" ng-messages="myForm.from_date.$error">
+                                    <div ng-message="required" style="color:red">Select From Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="obj.todate" onkeydown="return false" ng-change='setTodate1(obj)' name="to_date" id="todate"
+                                               md-min-date="minDatet" md-max-date="maxDatet" md-placeholder="Enter date" ng-disabled="obj.fromdate==null"
+                                               ng-required="obj.type=='Date'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.to_date)" ng-messages="myForm.to_date.$error">
+                                    <div ng-message="required" style="color:red">Select To Date</div>
+                                </div>
+                            </div>
+                            <span style="color:red;">{{errMessage}}</span>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-if="obj.type=='StudentAbsentPeriodWise'">
+                            <label class="control-label col-sm-3">
+                                <input name="allcheck" value="" ng-model="obj.all" type="checkbox" ng-click="OnClickAll()">
+                                <span class="lbl padding-8">
+                                    Student :
+                                </span><span style="color:Red">*</span>
+                            </label>
+                            <div class="col-sm-8">
+                                <div class="multiselect">
+                                    <input class="form-control" ng-model="obj.searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                    <label data-ng-model="AMST_Id" ng-repeat="sub in getstudentlist | filter:filterchkbx" value="{{sub.amsT_Id}}">
+                                        <input name="Subjectoption" value="" ng-click="individual()" ng-model="sub.checkedsub" type="checkbox"
+                                               ng-required="isOptionsRequired3() && obj.type=='StudentAbsentPeriodWise'">
+                                        <span class="lbl padding-8">
+                                            {{sub.amsT_FirstName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.Subjectoption)" ng-messages="myForm.Subjectoption.$error">
+                                    <div ng-message="required">Select Student</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="obj.type=='SubjectWiseAttEntry'">
+                            <label class="control-label col-sm-3">
+                                <input name="allcheck" value="" ng-model="obj.all1" type="checkbox" ng-click="OnClickAll1()">
+                                <span class="lbl padding-8">
+                                    Subject :
+                                </span><span style="color:Red">*</span>
+                            </label>
+                            <div class="col-sm-8">
+                                <div class="multiselect">
+                                    <input class="form-control" ng-model="obj.searchchkbx1" type="text" placeholder="search here..." style="margin:1%;">
+                                    <label data-ng-model="ISMS_Id" ng-repeat="sub in subjectDropdown | filter:filterchkbx1" value="{{sub.ismS_Id}}">
+                                        <input name="Subjectoption1" value="" ng-click="individual1()" ng-model="sub.checkedsubj" type="checkbox"
+                                               ng-required="isOptionsRequired4() && obj.type=='SubjectWiseAttEntry'">
+                                        <span class="lbl padding-8">
+                                            {{sub.ismS_SubjectName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.Subjectoption1)" ng-messages="myForm.Subjectoption1.$error">
+                                    <div ng-message="required">Select Subject</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="OnReport(obj);">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#table')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-warn" ng-disabled="excel_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="excel_flag==false">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Attendance Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body" ng-if="obj.type=='StudentAbsentPeriodWise'">
+            <div ng-repeat="dd in studentlist" class="margin-top-5">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Student Name : {{dd.STUDENTNAME}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Admno : {{dd.AMST_AdmNo}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Roll.No : {{dd.AMAY_RollNo}}</b></label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Year : {{dd.ASMAY_Year}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Class : {{dd.ASMCL_ClassName}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Section : {{dd.ASMC_SectionName}}</b></label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <label class="control-label col-sm-12">
+                                <b>From Date- o Date : {{obj.fromdate| date:'dd/MM/yyyy'}}-{{obj.todate| date:'dd/MM/yyyy'}}</b>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div style="overflow-x:scroll;width:100%;">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl.No</th>
+                                            <th>Attendance Date</th>
+                                            <th>Subject</th>
+                                            <th>Period</th>
+                                            <th>Staff Name</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tr ng-repeat="user1 in dd.attendancedetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-center">{{ user1.ASA_FROMDATE}}</td>
+                                        <td class="text-left">{{user1.ISMS_SUBJECTNAME}}</td>
+                                        <td class="text-left">{{ user1.TTMP_PeriodName}}</td>
+                                        <td class="text-left">{{ user1.EMPLOYEENAME}}</td>
+                                        <td class="text-left">{{user1.PresentCount}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-body" ng-if="obj.type=='SubjectWiseAttEntry'">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div style="overflow-x:auto">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Subject</th>
+                                    <th ng-repeat="dd in daysOfMonth">{{dd.columnname}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="sub in subjectlistdetails">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{sub.ISMS_SubjectName}}</td>
+                                    <td class="text-left" ng-repeat="dd in daysOfMonth">
+                                        <span ng-repeat="sub_att in sub.attendancedetails" ng-if="dd.columnname==sub_att.ASA_FROMDATE">
+                                            {{sub_att.Periods}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div ng-show="fdsfdfsdfd">
+        <div id="printidd">
+            <div ng-repeat="dd in studentlist" class="margin-top-5" style="page-break-after: always !important">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="baldwin text-center">
+                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row text-center">
+                    <h3> Student Subject Wise Attednace Report - From :  {{obj.fromdate| date:'dd/MM/yyyy'}} To : {{obj.todate| date:'dd/MM/yyyy'}}  </h3>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Student Name : {{dd.STUDENTNAME}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Admno : {{dd.AMST_AdmNo}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Roll.No : {{dd.AMAY_RollNo}}</b></label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Year : {{dd.ASMAY_Year}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Class : {{dd.ASMCL_ClassName}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="control-label col-sm-12"><b>Section : {{dd.ASMC_SectionName}}</b></label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div style="overflow-x:scroll;width:100%;">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl.No</th>
+                                            <th>Attendance Date</th>
+                                            <th>Subject</th>
+                                            <th>Period</th>
+                                            <th>Staff Name</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tr ng-repeat="user1 in dd.attendancedetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-center">{{ user1.ASA_FROMDATE}}</td>
+                                        <td class="text-left">{{user1.ISMS_SUBJECTNAME}}</td>
+                                        <td class="text-left">{{ user1.TTMP_PeriodName}}</td>
+                                        <td class="text-left">{{ user1.EMPLOYEENAME}}</td>
+                                        <td class="text-left">{{user1.PresentCount}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="exceldd">
+            <div ng-repeat="dd in studentlist">
+                <table>
+                    <tr style="border:0.5px solid black">
+                        <td colspan="6" style="text-align:center">
+                            <b>
+                                Student Subject Wise Attednace Report - From :
+                                {{obj.fromdate| date:'dd/MM/yyyy'}} To : {{obj.todate| date:'dd/MM/yyyy'}}
+                            </b>
+                        </td>
+                    </tr>
+                    <tr style="border:0.5px solid black">
+                        <td colspan="2" style="text-align:left"><b>Student Name : {{dd.STUDENTNAME}}</b></td>
+                        <td colspan="2" style="text-align:left"><b>Admno : {{dd.AMST_AdmNo}}</b></td>
+                        <td colspan="2" style="text-align:left"><b>Roll.No : {{dd.AMAY_RollNo}}</b></td>
+                    </tr>
+                    <tr style="border:0.5px solid black">
+                        <td colspan="2" style="text-align:left"><b>Year : {{dd.ASMAY_Year}}</b></td>
+                        <td colspan="2" style="text-align:left"><b>Class : {{dd.ASMCL_ClassName}}</b></td>
+                        <td colspan="2" style="text-align:left"><b>Section : {{dd.ASMC_SectionName}}</b></td>
+                    </tr>
+                    <tr style="border:0.5px solid black">
+                        <td colspan="6">
+                            &nbsp;
+                        </td>
+                    </tr>
+                </table>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr style="border:0.5px solid black">
+                            <th>Sl.No</th>
+                            <th>Attendance Date</th>
+                            <th>Subject</th>
+                            <th>Period</th>
+                            <th>Staff Name</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tr style="border:0.5px solid black" ng-repeat="user1 in dd.attendancedetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-center">{{ user1.ASA_FROMDATE}}</td>
+                        <td class="text-left">{{user1.ISMS_SUBJECTNAME}}</td>
+                        <td class="text-left">{{ user1.TTMP_PeriodName}}</td>
+                        <td class="text-left">{{ user1.EMPLOYEENAME}}</td>
+                        <td class="text-left">{{user1.PresentCount}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="printidd1">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row text-center">
+                <h3> Subject Staff Date Wise Attednace Entry Report - From :  {{obj.fromdate| date:'dd/MM/yyyy'}} To : {{obj.todate| date:'dd/MM/yyyy'}}  </h3>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3">
+                    <label class="control-label col-sm-12"><b>Year : {{yearname}}</b></label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="control-label col-sm-12"><b>Class : {{classname}}</b></label>
+                </div>
+                <div class="col-sm-3">
+                    <label class="control-label col-sm-12"><b>Section : {{sectionname}}</b></label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Subject</th>
+                                    <th ng-repeat="dd in daysOfMonth">{{dd.columnname}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="sub in subjectlistdetails">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{sub.ISMS_SubjectName}}</td>
+                                    <td class="text-left" ng-repeat="dd in daysOfMonth">
+                                        <span ng-repeat="sub_att in sub.attendancedetails" ng-if="dd.columnname==sub_att.ASA_FROMDATE">
+                                            {{sub_att.Periods}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="exceldd1">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="6" style="text-align:center">
+                        <b>
+                            Subject Staff Date Wise Attednace Entry Report - From
+                            {{obj.fromdate| date:'dd/MM/yyyy'}} To : {{obj.todate| date:'dd/MM/yyyy'}}
+                        </b>
+                    </td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="2" style="text-align:left"><b>Year : {{yearname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Class : {{classname}}</b></td>
+                    <td colspan="2" style="text-align:left"><b>Section : {{sectionname}}</b></td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="6">
+                        &nbsp;
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered">
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th>Sl.No</th>
+                        <th>Subject</th>
+                        <th ng-repeat="dd in daysOfMonth">{{dd.columnname}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border:0.5px solid black" ng-repeat="sub in subjectlistdetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{sub.ISMS_SubjectName}}</td>
+                        <td class="text-left" ng-repeat="dd in daysOfMonth">
+                            <span ng-repeat="sub_att in sub.attendancedetails" ng-if="dd.columnname==sub_att.ASA_FROMDATE">
+                                {{sub_att.Periods}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

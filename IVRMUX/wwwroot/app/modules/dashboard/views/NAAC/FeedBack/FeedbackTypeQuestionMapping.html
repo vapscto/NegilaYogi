@@ -1,0 +1,311 @@
+﻿<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" ng-init="BindData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Feedback Type And Question Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Feedback Type :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="typename" ng-disabled="typeadd==true" data-ng-model="FMTY_Id" required
+                                        ng-change="onchnagetype()">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="class in feedbacktype" value="{{class.fmtY_Id}}" ng-selected="{{class.Selected == true}}">
+                                        {{class.fmtY_FeedbackTypeName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.typename)" ng-messages="myForm.typename.$error">
+                                <div ng-message="required">Select The Feedback Type </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3" ng-if="questionflag==false">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Feedback Question:<strong style="color:red;">*</strong></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                <label ng-repeat="className in feedbackquestion | filter:search">
+                                    <input type="checkbox" ng-model="className.Selected" name="typeremarks"
+                                           ng-required="isOptionsRequired()">
+                                    <span class="lbl padding-8"> {{className.fmqE_FeedbackQuestions}}  </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.typeremarks)" ng-messages="myForm.typeremarks.$error">
+                                <div ng-message="required">Select Feedback Question</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="questionflag==true">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Feedback Question :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="typeques" data-ng-model="obj.FMQE_Id_New" ng-required="questionflag==true"
+                                            ng-change="onchangequestion(obj)">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="class in feedbackquestiond" value="{{class.fmqE_Id}}" ng-selected="{{class.Selected == true}}">
+                                            {{class.fmqE_FeedbackQuestions}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.typeques)" ng-messages="myForm.typeques.$error">
+                                    <div ng-message="required">Select The Feedback Question </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Feedback Option :<strong style="color:red;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                    <label ng-repeat="options in feedbackquestionoption | filter:search">
+                                        <input type="checkbox" ng-model="options.Selected" name="typeremarksoptions"
+                                               ng-required="isOptionsRequiredoptions() && questionflag==true && FMQE_ManualEntryFlg==false">
+                                        <span class="lbl padding-8"> {{options.fmoP_FeedbackOptions}}  </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.typeremarksoptions)"
+                                     ng-messages="myForm.typeremarksoptions.$error">
+                                    <div ng-message="required">Select Feedback Options</div>
+                                </div>
+                            </div>
+                            <div class="form-group text-center">
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="addtocart(obj)" ng-if="questionflag==true">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                    Add
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-if="questionflag==true && temparraydetails.length>0">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SLNO</th>
+                                    <th>Feedback Type</th>
+                                    <th>Feedback Question</th>
+                                    <th>Feedback Option</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="cls in temparraydetails ">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{cls.feedbacktypename}}</td>
+                                    <td class="text-left">{{cls.feedbackquestionname}}</td>
+                                    <td class="text-left">
+                                        <table>
+                                            <tr ng-repeat="sub in cls.optiondetails ">
+                                                <td class="text-left">{{sub.FMOP_FeedbackOptions}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="text-primary" ng-click="deletecart(cls,$index)">
+                                            <i class="fa fa-trash text-red" aria-hidden="true" title="Delete"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="save(obj)" ng-if="questionflag==false">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="savemultiple(obj)" ng-if="questionflag==true && temparraydetails.length>0">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button ng-hide="gridOptions.data.length>0" type="submit" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" data-toggle="modal" ng-show="catreport" data-target="#myModal">
+                                <i class="fa fa-sort" aria-hidden="true"></i>Set order
+                            </md-button>
+                            <input type="hidden" ng-model="FMTY_Id" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="catreport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Feedback Type And Question Mapping Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body" style="margin-top:9px;">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input class="form-control" ng-model="searchValue1" type="text" placeholder="search here...">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <table class="table table-hover table-responsive table-bordered" id="tabel1datweise" ng-show="catreport">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sort('$index+1')">SL.No.</a></th>
+                            <th><a href="" ng-click="sort('fmtY_FeedbackTypeName')">Feedback Type </a></th>
+                            <th><a href="" ng-click="sort('fmqE_FeedbackQuestions')">Feedback Questions</a></th>
+                            <th><a href="" ng-click="sort('fmtQ_TQOrder')">Order</a></th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user1 in filterValue2 = (getdetails | filter : searchValue1)| orderBy:sortKey:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td class="text-center">{{ itemsPerPage*(currentPage-1)+$index+1}}</td>
+                            <td class="text-left">{{ user1.fmtY_FeedbackTypeName}}</td>
+                            <td class="text-left">{{ user1.fmqE_FeedbackQuestions}}</td>
+                            <td class="text-center">{{user1.fmtQ_TQOrder}}</td>
+                            <td class="text-center">
+                                <span ng-if="user1.fmtY_QuestionwiseOptionFlg === true">
+                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal"
+                                       title="View Question Wise Options" ng-click="getquestionwiseoption(user1)" data-target="#myModal35">
+                                        <i class="fa fa-eye" aria-hidden="true" title="View Question Wise Options"></i>
+                                    </a>
+                                </span>
+                                &nbsp;&nbsp;
+                                <span ng-if="user1.fmtQ_ActiveFlag === false">
+                                    <a href="" ng-click="deactiveY(user1)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user1.fmtQ_ActiveFlag === true">
+                                    <a href="" ng-click="deactiveY(user1)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" on-page-change="pageChanged(newPageNumber)">
+            </dir-pagination-controls>
+        </div>
+
+    </div>
+
+</section>
+<div class="modal fade modal-medium" id="myModal" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="BindData()" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">Feedback Type And Question Mapping</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SLNO</th>
+                            <th>Feedback Type</th>
+                            <th>Feedback Questions</th>
+                            <th>Order</th>
+                        </tr>
+                    </thead>
+                    <tbody ui-sortable="sortableOptions" ng-model="grouptypeListOrder">
+                        <tr ng-repeat="user in grouptypeListOrder">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left padding-left-5">{{user.fmtY_FeedbackTypeName}}</td>
+                            <td class="text-left padding-left-5">{{user.fmqE_FeedbackQuestions}}</td>
+                            <td class="text-center">{{user.fmtQ_TQOrder}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="getOrder(grouptypeListOrder);">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="BindData()">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade modal-medium" id="myModal35" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="BindData()" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h5 class="modal-title text-white">Question Option Mapping Details</h5>
+                <h5 class="modal-title text-white">Feedback Type : {{feedbacktype}} Option Mapping</h5>
+                <h5 class="modal-title text-white">Question : {{question}} Option Mapping</h5>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL.No.</th>
+                            <th>Option</th>
+                            <th>Option Remarks</th>
+                            <th>Order</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody ui-sortable="sortableOptionsnew" ng-model="getquestionsoptions">
+                        <tr ng-repeat="user in getquestionsoptions">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left padding-left-5">{{user.fmoP_OptionName}}</td>
+                            <td class="text-left padding-left-5">{{user.fmoP_OptionName}}</td>
+                            <td class="text-center">{{user.fmtqO_TQOOrder}}</td>
+                            <td class="text-center">
+                                <span ng-if="user.fmtqO_ActiveFlag === false">
+                                    <a href="" ng-click="deactiveoption(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.fmtqO_ActiveFlag === true">
+                                    <a href="" ng-click="deactiveoption(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="getOrdernew(getquestionsoptions);">Save Order</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="BindData()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

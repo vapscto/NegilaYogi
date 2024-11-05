@@ -1,0 +1,1368 @@
+﻿<section class="content">
+    <style>
+
+        .k-grid td {
+            overflow: hidden;
+            border-style: solid;
+            border-width: 1px 1px 1px 1px;
+            padding: .5em .6em .4em .6em;
+            /*font-weight: 400;
+          white-space: nowrap;
+          text-overflow: ellipsis;*/
+            text-align: left
+        }
+        /*.k-grid tr td {
+            border-bottom-width: 1px !important;
+            border-style: solid !important;
+            border-top-style: solid !important;
+            border-right-style: solid !important;
+            border-bottom-style: solid !important;
+            border-left-style: solid !important;
+        }*/
+        .k-detail-cell .k-tabstrip .k-content {
+            padding: 0.2em;
+        }
+
+        .k-grid-header {
+            color: black !important;
+            font-size: 14px !important;
+        }
+
+            .k-filter-row th, .k-grid-header th.k-header {
+                overflow: hidden;
+                border-style: solid;
+                border-width: 0 0 1px 1px;
+                padding: .5em .6em .4em .6em;
+                font-weight: 500;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                text-align: left;
+                color: black
+            }
+    </style>
+    <form class="form-horizontal" role="form" name="myForm" novalidate>
+        <div class="box box-primary" data-ng-init="LoadData()">
+            <div class="box-header with-border">
+                <h3 class="box-title">TimeTable Consolidated Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" ng-click="ShowHide1()" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well">
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="ST" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">STAFF WISE DETAILS</span>
+                            </label>
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="STD" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">STAFF DAY WISE</span>
+                            </label>
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="CSUB" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">CLASS SUBJECT</span>
+                            </label>
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="STSUB" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">STAFF SUBJECT</span>
+                            </label>
+                            <!--<label class="radio-inline" style="padding-bottom:20px">
+                    <input type="radio" value="SSW" data-ng-model="TYPE" name="type" />
+                    <span class="lbl padding-8">STAFF SUBJECT WORKLOAD</span>
+                </label>-->
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="SPW" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">STAFF PERIOD WISE WORKLOAD</span>
+                            </label>
+                            <!--<label class="radio-inline" style="padding-bottom:20px">
+                    <input type="radio" value="SPWBG" data-ng-model="TYPE" name="type" />
+                    <span class="lbl padding-8">STAFF SUBJECT WORKLOAD BEFORE GENERATION</span>
+                </label>-->
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="STFP" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">STAFF FREE PERIOD</span>
+                            </label>
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="PSTF" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">PERIOD WISE  STAFF FREE </span>
+                            </label>
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="SPC" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">STAFF-PERIOD CONSOLIDATED</span>
+                            </label>
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="CSPC" data-ng-model="TYPE" name="type" ng-change="changeradio()" />
+                                <span class="lbl padding-8">CLASS-SECTION PERIOD  CONSOLIDATED</span>
+                            </label>
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="RMR" data-ng-model="TYPE" name="type" ng-change="typechange()" />
+                                <span class="lbl padding-8">ROOM-WISE REPORT</span>
+                            </label>
+                            <label class="radio-inline" style="padding-bottom:20px">
+                                <input type="radio" value="ATG" data-ng-model="TYPE" name="type" ng-change="typechange()" />
+                                <span class="lbl padding-8">STAFF WORKLOAD AFTER TIMETABLE GENERATION</span>
+                            </label>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-3" ng-show="TYPE=='ST'">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" data-ng-model="rpttypai" />
+                            <span class="lbl padding-8">Teacher Master</span>
+                        </label>
+                    </div>
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel" name="acd" ng-model="asmaY_Id" ng-change="get_category()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="year in year_list" value="{{year.asmaY_Id}}" ng-selected="{{year.Selected == true}}">
+                                        {{year.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd)" ng-messages="myForm.acd.$error">
+                                    <div ng-message="required">Please Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4" ng-show="TYPE=='ST'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Category Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="cat" ng-model="ttmC_Id" ng-change="get_class()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="optlst in cateoglst" value="{{optlst.ttmC_Id}}" ng-selected="{{optlst.Selected == true}}">
+                                        {{optlst.ttmC_CategoryName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.categ)" ng-messages="myForm.categ.$error">
+                                    <div ng-message="required">Please Select Category</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4" ng-show="TYPE=='ST'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class :<span style="color:Red">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchclasschkbx" type="text" placeholder="search here...">
+                                <label>
+                                    <input name="classes"  ng-model="userclasscheck" type="checkbox" data-ng-click="all_checkclass(userclasscheck)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label data-ng-model="classid" ng-repeat="option in claslist |filter:filterclasschkbx" value="{{option.asmcL_Id}}">
+                                    <input name="classes"  data-ng-model="option.claslis" type="checkbox" ng-required="isOptionsRequired4();" 
+                                           ng-click="togchkbx4();">
+                                    <span class="lbl padding-8">
+                                        {{option.asmcL_ClassName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.classes)" ng-messages="myForm.classes.$error" style="padding-left:188px">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4" ng-show="TYPE=='ST'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section :<span style="color:Red">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchsectionchkbx" type="text" placeholder="search here...">
+                                <label>
+                                    <input name="sectns" value="1" ng-model="usersectioncheck" type="checkbox" data-ng-click="all_checksection()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label data-ng-model="secid" ng-repeat="section in seclist |filter:filtersectionchkbx" value="{{section.asmS_Id}}" ng-click="loaddata(seclist)">
+
+                                    <input name="sectns" value="1" data-ng-model="section.secs" type="checkbox" ng-required="isOptionsRequired5();" ng-click="togchkbx5();">
+                                    <span class="lbl padding-8">
+                                        {{section.asmC_SectionName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.sectns)" ng-messages="myForm.sections.$error" style="padding-left:188px">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4" ng-show="TYPE=='CSUB' || TYPE=='SPW'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Staff Name :<span style="color:Red">*</span></label>
+
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                <label>
+                                    <input name="staf" value="1" ng-model="usercheck" type="checkbox" data-ng-click="all_check()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label data-ng-model="staf" ng-repeat="staff in ldstafflst |filter:filterchkbx" value="{{staff.hrmE_Id}}">
+
+                                    <input name="staf" value="1" data-ng-model="staff.stf" type="checkbox" ng-required="isOptionsRequired();" ng-click="togchkbx();">
+                                    <span class="lbl padding-8">
+                                        {{staff.empName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.staf)" ng-messages="myForm.staf.$error">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4" ng-show="TYPE=='CSUB' || TYPE=='STSUB' || TYPE=='SPW'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Day :<span style="color:Red">*</span></label>
+
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here...">
+                                <label>
+                                    <input name="sayy" value="1" ng-model="usercheck1" type="checkbox" data-ng-click="all_check1()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label data-ng-model="sayy" ng-repeat="day in dayslst_fix |filter:filterchkbx1" value="{{day.ttmD_Id}}">
+
+                                    <input name="sayy" value="1" data-ng-model="day.sayy" type="checkbox" ng-required="isOptionsRequired1();" ng-click="togchkbx1();">
+                                    <span class="lbl padding-8">
+                                        {{day.ttmD_DayName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.sayy)" ng-messages="myForm.sayy.$error">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4" ng-show="TYPE=='CSUB' || TYPE=='STSUB' || TYPE=='SPW'">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Period :<span style="color:Red">*</span></label>
+
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx2" type="text" placeholder="search here...">
+                                <label>
+                                    <input name="ppr" value="1" ng-model="usercheck2" type="checkbox" data-ng-click="all_check2()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label data-ng-model="ppr" ng-repeat="prd in ldperiodslst |filter:filterchkbx2" value="{{prd.ttmP_Id}}">
+
+                                    <input name="ppr" value="1" data-ng-model="prd.ppr" type="checkbox" ng-required="isOptionsRequired2();" ng-click="togchkbx2();">
+                                    <span class="lbl padding-8">
+                                        {{prd.ttmP_PeriodName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.ppr)" ng-messages="myForm.ppr.$error">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="TYPE=='STFP' ||  TYPE=='PSTF'">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Day:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel11" name="ddddy" ng-model="TTMD_Id" ng-required="TYPE=='STFP' ||  TYPE=='PSTF'">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="year in dayslst_fix" value="{{year.ttmD_Id}}" ng-selected="{{year.Selected == true}}">
+                                        {{year.ttmD_DayName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.ddddy)" ng-messages="myForm.ddddy.$error">
+                                    <div ng-message="required"> Select Day</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row" ng-show="TYPE=='PSTF'">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Period:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel11" name="pppy" ng-model="TTMP_Id" ng-required="TYPE=='PSTF'">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="year in ldperiodslst" value="{{year.ttmP_Id}}" ng-selected="{{year.Selected == true}}">
+                                        {{year.ttmP_PeriodName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.pppy)" ng-messages="myForm.pppy.$error">
+                                    <div ng-message="required"> Select Period</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row" ng-show="TYPE=='RMR'">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group" style="padding-left:10px;padding-top:20px">
+
+                            <label class="radio-inline">
+                                <input type="radio" value="SAWC" ng-model="rpttyp" name="sub_cls" ng-checked="true" data-ng-click="onclickloaddata()">
+                                <span class="lbl padding-8">Subject Along With Class Details</span>
+                            </label>
+                        </div>
+                        <div class="form-group" style="padding-left:10px">
+                            <label class="radio-inline">
+                                <input type="radio" value="SNWC" ng-model="rpttyp" name="sub_cls" data-ng-click="onclickloaddata()">
+                                <span class="lbl padding-8">Subject  Without Class Details</span>
+                            </label>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="submit" class="md-raised md-primary" data-ng-click="GetReport()">
+                    <i class="fa fa-file" aria-hidden="true"></i> Report
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                </md-button>
+                <md-button type="button" ng-click="printData()" class="md-raised md-primary" ng-show="timetablelist.length>0 &&  TYPE!='RMR' &&  TYPE!='ATG'">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    PRINT
+                </md-button>
+                <md-button type="button" ng-click="exportToExcel('#tabel11')" target="_blank" class="md-raised md-primary" ng-show="timetablelist.length>0 && TYPE!='CSUB' && TYPE!='RMR' &&  TYPE!='ATG'">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    EXCEL
+                </md-button>
+            </div>
+        </div>
+    </form>
+
+    <!-----tesing---------->
+    <!------------------------STAFF WISE DETAILS START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='ST' && timetablelist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STAFF WISE DETAILS Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div>
+
+
+                <div id="gridhhs">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!------------------------STAFF WISE DETAILS END------------------------------->
+    <!------------------------STAFF DAY WISE START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='STD' && timetablelist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STAFF DAY WISE Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{stdmainarray.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="stdsearchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="stdsearchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL. NO.</th>
+                            <th><a href="" ng-click="sortBy('NAME')">STAFF NAME</a></th>
+                            <th><a href="" ng-click="sortBy('ABR')">STAFF ABBREVIATION</a></th>
+                            <th ng-repeat="day in daysList">{{day.ttmD_DayName}}</th>
+                            <th><a href="" ng-click="sortBy('TOTAL')">TOTAL ALLOTTED PERIODS</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="tt in filterValue1=(stdmainarray | filter : stdsearchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="mno">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>
+                                {{tt.NAME}}
+                            </td>
+                            <td>
+                                {{tt.ABR}}
+                            </td>
+                            <td ng-repeat="day1 in daysList">
+                                <span ng-repeat="pp in tt.ttlist" ng-if="day1.ttmD_Id==pp.TTMD_Id">
+                                    {{pp.PCOUNT}}
+                                </span>
+                            </td>
+                            <td>
+                                {{tt.TOTAL}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="mno">
+                </dir-pagination-controls>
+
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+            <div id="STDPRNT" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <div id="STDEXCEL">
+                    <center> <h4 class="box-title">STAFF DAY WISE CONSOLIDATED REPORT</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL. NO</th>
+                                <th>STAFF NAME</th>
+                                <th>STAFF ABBREVIATION</th>
+                                <th ng-repeat="day in daysList">{{day.ttmD_DayName}}</th>
+                                <th>TOTAL ALLOTTED PERIODS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat=" tt in stdmainarray">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center">
+                                    {{tt.NAME}}
+                                </td>
+                                <td class="text-center">
+                                    {{tt.ABR}}
+                                </td>
+                                <td ng-repeat="day1 in daysList" class="text-center">
+                                    <span ng-repeat="pp in tt.ttlist" ng-if="day1.ttmD_Id==pp.TTMD_Id">
+                                        {{pp.PCOUNT}}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    {{tt.TOTAL}}
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="{{daysList.length+4}}" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+
+
+        </div>
+    </div>
+    <!------------------------STAFF DAY WISE END------------------------------->
+    <!------------------------CLASS SUBJECT WISE START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='CSUB' && timetablelist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">CLASS SUBJECT WISE Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{stdmainarray.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="csubsearchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue2.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="csubsearchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL. NO.</th>
+                            <th><a href="" ng-click="sortBy('SUBJECT')" style="width:100px">SUBJECT </a></th>
+                            <th ng-repeat="cls in class_sectons" style="width:30px">{{cls.asmcL_ClassName}}</th>
+                            <th><a href="" ng-click="sortBy('TOTAL')">TOTAL ALLOTTED PERIODS</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="tt in filterValue2 = (stdmainarray | filter : csubsearchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'" pagination-id="xyz">
+                            <!--dir-paginate="tt in filterValue2=(stdmainarray | filter : csubsearchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'" pagination-id="xyz"-->
+                            <!--<td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>-->
+                            <td style="text-align:center">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                            <td>
+                                {{tt.SUBJECT}}
+                            </td>
+
+                            <td ng-repeat="day1 in class_sectons" style="width:30px">
+                                <span ng-repeat="pp in tt.ttlist" ng-if="day1.asmcL_Id==pp.ASMCL_Id && day1.asmS_Id==pp.ASMS_Id">
+                                    {{pp.PCOUNT}}
+                                </span>
+                            </td>
+                            <td>
+                                {{tt.TOTAL}}
+                            </td>
+                        </tr>
+
+
+
+                    </tbody>
+                </table>
+                <!--<dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>-->
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="xyz">
+                </dir-pagination-controls>
+
+
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+            <div id="CSUBPRNT" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <div id="CSUBEXCEL">
+                    <center> <h4 class="box-title">CLASS SUBJECT WISE CONSOLIDATED REPORT</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL. NO</th>
+                                <th style="overflow-wrap:break-word;width:100px">SUBJECT </th>
+                                <th ng-repeat="cls in class_sectons">{{cls.asmcL_ClassName}}</th>
+                                <th style="overflow-wrap:break-word">TOTAL ALLOTTED PERIODS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat=" tt in stdmainarray">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center" style="overflow-wrap:break-word">
+                                    {{tt.SUBJECT}}
+                                </td>
+
+                                <td ng-repeat="day1 in class_sectons" class="text-center" style="width:2%">
+                                    <span ng-repeat="pp in tt.ttlist" ng-if="day1.asmcL_Id==pp.ASMCL_Id && day1.asmS_Id==pp.ASMS_Id">
+                                        {{pp.PCOUNT}}
+                                    </span>
+                                </td>
+                                <td class="text-center" style="overflow-wrap:break-word">
+                                    {{tt.TOTAL}}
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="{{class_sectons.length+3}}" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+
+
+        </div>
+    </div>
+    <!------------------------CLASS SUBJECT WISE END------------------------------->
+    <!------------------------STAFF SUBJECT WISE START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='STSUB' && timetablelist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STAFF SUBJECT WISE Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{stdmainarray.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="csubsearchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue2.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="csubsearchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL. NO.</th>
+                            <th><a href="" ng-click="sortBy('SUBJECT')" style="width:100px">SUBJECT </a></th>
+                            <th ng-repeat="cls in class_sectons" style="width:30px">{{cls.asmcL_ClassName}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="tt in filterValue2=(stdmainarray | filter : csubsearchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage2" current-page="currentPage2" pagination-id="pqr">
+                            <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                            <td>
+                                {{tt.SUBJECT}}
+                            </td>
+
+                            <td ng-repeat="day1 in class_sectons" style="width:30px">
+                                <span ng-repeat="pp in tt.ttlist" ng-if="day1.asmcL_Id==pp.ASMCL_Id && day1.asmS_Id==pp.ASMS_Id">
+                                    {{pp.ENAME}}
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+
+                    </tbody>
+                </table>
+                <!--<dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>-->
+
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" pagination-id="pqr">
+                </dir-pagination-controls>
+
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+            <div id="STSUBPRNT" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <div id="STSUBEXCEL">
+                    <center> <h4 class="box-title">STAFF SUBJECT WISE CONSOLIDATED REPORT</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL. NO</th>
+                                <th style="overflow-wrap:break-word;width:100px">SUBJECT </th>
+                                <th ng-repeat="cls in class_sectons">{{cls.asmcL_ClassName}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat=" tt in stdmainarray">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center" style="overflow-wrap:break-word">
+                                    {{tt.SUBJECT}}
+                                </td>
+
+                                <td ng-repeat="day1 in class_sectons" class="text-center" style="overflow-wrap:break-word">
+                                    <span ng-repeat="pp in tt.ttlist" ng-if="day1.asmcL_Id==pp.ASMCL_Id && day1.asmS_Id==pp.ASMS_Id">
+                                        {{pp.ENAME}}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="{{class_sectons.length+2}}" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+
+
+        </div>
+    </div>
+    <!------------------------CLASS SUBJECT WISE END------------------------------->
+    <!------------------------STAFF PERIOD WISE START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='SPW' && stdmainarray.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STAFF PERIOD WISE COUNT Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div>
+
+
+                <div id="SPWGRID">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!------------------------STAFF PERIOD WISE END------------------------------->
+    <!------------------------STAFF SUBJECT WISE START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='STFP' && stdmainarray.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STAFF FREE PERIOD Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{stdmainarray.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="sftpsearchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue3.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="sftpsearchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL. NO.</th>
+                            <th><a href="" ng-click="sortBy('ENAME')">STAFF NAME </a></th>
+                            <th ng-repeat="prd in period_list">{{prd.ttmP_PeriodName}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="tt in filterValue3=(stdmainarray | filter : sftpsearchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage3" current-page="currentPage3" pagination-id="abc">
+                            <td>{{itemsPerPage3 *(currentPage3-1)+$index+1}}</td>
+                            <td>
+                                {{tt.ENAME}}
+                            </td>
+
+                            <td ng-repeat="day1 in period_list">
+                                <span ng-repeat="pp in tt.VLIST" ng-if="day1.ttmP_Id==pp.TTMP_Id">
+                                    <label style="color:brown"> {{pp.PeriodFree}}</label>
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true" pagination-id="abc"> </dir-pagination-controls>
+
+
+
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+            <div id="STFPPRNT" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <div id="STFPEXCEL">
+                    <center> <h4 class="box-title">STAFF FREE PERIOD CONSOLIDATED REPORT</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL. NO</th>
+                                <th style="overflow-wrap:break-word;">STAFF NAME </th>
+                                <th ng-repeat="prd in period_list">{{prd.ttmP_PeriodName}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat=" tt in stdmainarray">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center" style="overflow-wrap:break-word">
+                                    {{tt.ENAME}}
+                                </td>
+
+                                <td ng-repeat="day1 in period_list">
+                                    <span ng-repeat="pp in tt.VLIST" ng-if="day1.ttmP_Id==pp.TTMP_Id">
+                                        <label style="color:brown"> {{pp.PeriodFree}}</label>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="{{period_list.length+1}}" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+
+
+        </div>
+    </div>
+    <!------------------------CLASS SUBJECT WISE END------------------------------->
+    <!------------------------PERIOD WISE FREE STAFF START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='PSTF' && stdmainarray.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">PERIOD WISE FREE STAFF Consolidated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{stdmainarray.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="freesearchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue4.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="freesearchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL. NO.</th>
+                            <th><a href="" ng-click="sortBy('ENAME')">STAFF NAME </a></th>
+                            <th><a href="" ng-click="sortBy('ABBR')">ABBREVIATION </a></th>
+                            <th><a href="" ng-click="sortBy('EMPCODE')">EMP. CODE </a></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="tt in filterValue4=(stdmainarray | filter : freesearchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage4" current-page="currentPage4">
+                            <td>{{itemsPerPage4 *(currentPage4-1)+$index+1}}</td>
+                            <td>
+                                {{tt.ENAME}}
+                            </td>
+                            <td>
+                                {{tt.ABBR}}
+                            </td>
+                            <td>
+                                {{tt.EMPCODE}}
+                            </td>
+
+
+
+                        </tr>
+
+
+
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>
+
+
+
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+            <div id="PSTFPRNT" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <div id="PSTFEXCEL">
+                    <center> <h4 class="box-title">PERIOD WISE FREE STAFF CONSOLIDATED REPORT</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL. NO</th>
+                                <th>STAFF NAME</th>
+                                <th>ABBREVIATION </th>
+                                <th>EMP. CODE </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat=" tt in stdmainarray">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td>
+                                    {{tt.ENAME}}
+                                </td>
+                                <td>
+                                    {{tt.ABBR}}
+                                </td>
+                                <td>
+                                    {{tt.EMPCODE}}
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+
+
+        </div>
+    </div>
+    <!------------------------PERIOD WISE FREE STAFF END------------------------------->
+    <!------------------------STAFF-PERIOD  CONSOLIDATED START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='SPC' && stdmainarray.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STAFF-PERIOD CONSOLIDATED Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{stdmainarray.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="spcsearchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValuespc.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="spcsearchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL. NO.</th>
+                            <th><a href="" ng-click="sortBy('ENAME')">STAFF NAME </a></th>
+                            <th><a href="" ng-click="sortBy('ABR')">ABBREVIATION </a></th>
+                            <th ng-repeat="prd in period_list">PERIOD &nbsp;{{prd.ttmP_PeriodName}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="tt in filterValuespc=(stdmainarray | filter : spcsearchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPagespc" current-page="currentPagespc" pagination-id="spc">
+                            <td>{{itemsPerPagespc *(currentPagespc-1)+$index+1}}</td>
+                            <td>
+                                {{tt.ENAME}}
+                            </td>
+                            <td>
+                                {{tt.ABR}}
+                            </td>
+
+                            <td ng-repeat="day1 in period_list">
+                                <span ng-repeat="pp in tt.plist" ng-if="day1.ttmP_Id==pp.TTMP_Id">
+                                    <label> {{pp.Details}}</label>
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true" pagination-id="spc"> </dir-pagination-controls>
+
+
+
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+            <div id="SPCPRNT" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <div id="SPCEXCEL">
+                    <center> <h4 class="box-title">STAFF-PERIOD  CONSOLIDATED</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL. NO</th>
+                                <th style="overflow-wrap:break-word;">STAFF NAME </th>
+                                <th style="overflow-wrap:break-word;">ABBREVIATION </th>
+                                <th ng-repeat="prd in period_list">PERIOD &nbsp;{{prd.ttmP_PeriodName}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat=" tt in stdmainarray">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center" style="overflow-wrap:break-word">
+                                    {{tt.ENAME}}
+                                </td>
+                                <td class="text-center" style="overflow-wrap:break-word">
+                                    {{tt.ABR}}
+                                </td>
+
+                                <td ng-repeat="day1 in period_list" style="overflow-wrap:break-word">
+                                    <span ng-repeat="pp in tt.plist" ng-if="day1.ttmP_Id==pp.TTMP_Id">
+                                        <label> {{pp.Details}}</label>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="{{period_list.length+1}}" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+
+
+        </div>
+    </div>
+    <!------------------------STAFF-PERIOD  CONSOLIDATED END------------------------------->
+    <!------------------------CLASS-SECTION PERIOD  CONSOLIDATED START------------------------------->
+    <div class="box box-primary" ng-show="TYPE=='CSPC' && stdmainarray.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">CLASS-SECTION PERIOD  CONSOLIDATED Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div style="overflow:scroll">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{stdmainarray.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="cspcsearchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValuecspc.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="cspcsearchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL. NO.</th>
+                            <th><a href="" ng-click="sortBy('ASMCL_ClassName')">CLASS/SECTION </a></th>
+                            <th ng-repeat="prd in period_list">PERIOD &nbsp;{{prd.ttmP_PeriodName}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="tt in filterValuecspc=(stdmainarray | filter : cspcsearchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPagecspc" current-page="currentPagecspc">
+                            <td>{{itemsPerPagecspc *(currentPagecspc-1)+$index+1}}</td>
+                            <td>
+                                {{tt.ASMCL_ClassName}}
+                            </td>
+                            <td ng-repeat="day1 in period_list">
+                                <span ng-repeat="pp in tt.plist" ng-if="day1.ttmP_Id==pp.TTMP_Id">
+                                    <label> {{pp.Details}}</label>
+                                </span>
+                            </td>
+
+                        </tr>
+
+
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>
+
+
+
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+            <div id="CSPCPRNT" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <div id="CSPCEXCEL">
+                    <center> <h4 class="box-title">CLASS-SECTION PERIOD  CONSOLIDATED REPORT</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL. NO</th>
+                                <th style="overflow-wrap:break-word;">CLASS/SECTION </th>
+                                <th ng-repeat="prd in period_list">PERIOD &nbsp;{{prd.ttmP_PeriodName}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat=" tt in stdmainarray">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center" style="overflow-wrap:break-word">
+                                    {{tt.ASMCL_ClassName}}
+                                </td>
+
+                                <td ng-repeat="day1 in period_list" style="overflow-wrap:break-word">
+                                    <span ng-repeat="pp in tt.plist" ng-if="day1.ttmP_Id==pp.TTMP_Id">
+                                        <label> {{pp.Details}}</label>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="{{period_list.length+1}}" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+
+
+        </div>
+    </div>
+    <!------------------------CLASS-SECTION PERIOD  CONSOLIDATED END------------------------------->
+
+    <div class="box box-primary" ng-show="TYPE=='RMR' && timetablelist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Class Room  Wise timetable report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div>
+
+
+                <div id="gridhhs1">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="box box-primary" ng-show="TYPE=='ATG' && stdtt.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STAFF WORKLOAD AFTER TIMETABLE GENERATION</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div>
+
+
+                <div id="gridhhs12">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

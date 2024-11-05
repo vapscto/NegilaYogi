@@ -1,0 +1,199 @@
+﻿<style>
+    html, body {
+        height: 100%;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Fee Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-6">
+
+                    <div class="well text-center" ng-init="feedetailsrdo='overall'">
+                        <label>Select Radio Button:<span style="color:red;">*</span></label>
+                        <label class="radio-inline">
+                            <input type="radio" value="overall" data-ng-model="feedetailsrdo" name="overall" data-ng-change="onclickradio()">
+                            <span class="lbl padding-8">Overall Fees Analysis</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" value="detailed" data-ng-model="feedetailsrdo" name="detailed" data-ng-change="onclickradio()">
+                            <span class="lbl padding-8">Detailed Fees Analysis</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="sel1" name="Year" data-ng-model="cfg.ASMAY_Id" data-ng-change="onclickradio()" required>
+                                <option value="" label="Select Academic Year"> </option>
+                                <option ng-repeat="option in yearlist"value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == cfg.ASMAY_Id}}">
+                                    {{option.asmaY_Year}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.Year)" ng-messages="myForm.Year.$error">
+                            <div ng-message="required">Please Select Academic Year</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!----====== Overall Fee grid ================-->
+    <div class="" ng-show="feedetialsGrid">
+        <div class="" ng-show="feedetailsrdo=='overall'">
+            <div class="box box-primary">
+                <div class="box-body">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>RECEIVABLE</th>
+                                <th>CONCESSION</th>
+                                <th>COLLECTION</th>
+                                <th>ADJUSTMENT</th>
+                                <th>BALANCE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="value in getfeedata">
+                                <td>{{value.Receivable}}</td>
+                                <td>{{value.Concession}}</td>
+                                <td>{{value.Collectionamount}}</td>
+                                <td>{{value.Adjusted}}</td>
+                                <td>{{value.Balance}}</td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!----====== Overall Fee Graphs ================-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="box box-danger">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">OVERALL FEES ANALYSIS</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div id="columnchart" style="height: 350px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"> OVERALL FEES ANALYSIS </h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div id="chartContainer" style="height: 350px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!--=================Detailed Fees Analysis========================-->
+        <div ng-show="feedetailsrdo=='detailed'">
+            <md-content>
+                <md-tabs md-dynamic-height md-border-bottom>
+                    <div ng-show="detailsfee">
+                        <md-tab label="Fee Details" class="fa fa-table">
+                            <md-content class="md-padding">
+                                <div class="row">
+                                    <div class="box box-primary">
+
+                                        <table class="table table-hover table-responsive table-bordered text-center">
+                                            <thead>
+                                                <tr>
+                                                    <th> <a href="" ng-click="sort('FEE_HEAD')">FEE HEAD</a> </th>
+                                                    <th> <a href="" ng-click="sort('DueDate')">Due Date</a> </th>
+                                                    <th><a href="" ng-click="sort('RECEIVABLE')">RECEIVABLE</a> </th>
+                                                    <th><a href="" ng-click="sort('CONCESSION')">CONCESSION</a> </th>
+                                                    <th><a href="" ng-click="sort('COLLECTION')">COLLECTION</a> </th>
+                                                    <th><a href="" ng-click="sort('ADJUSTMENT')">ADJUSTMENT</a> </th>
+                                                    <th><a href="" ng-click="sort('BALANCE')">BALANCE</a> </th>
+                                                    <th hidden="hidden"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr dir-paginate="user in getfeedata |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                                    <td>{{user.FEE_HEAD}}</td>
+                                                    <td>{{user.DueDate}}</td>
+                                                    <td>{{user.RECEIVABLE}}</td>
+                                                    <td>{{user.CONCESSION}}</td>
+                                                    <td>{{user.COLLECTION}}</td>
+                                                    <td>{{user.ADJUSTMENT}}</td>
+                                                    <td>{{user.BALANCE}}</td>
+                                                    <td hidden="hidden">{{user.FMH_Id}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <dir-pagination-controls max-size="10"
+                                                                 direction-links="true"
+                                                                 boundary-links="true">
+                                        </dir-pagination-controls>
+
+                                    </div>
+                                </div>
+                            </md-content>
+                        </md-tab>
+
+                        <md-tab label="Bar Graph" class="fa fa-bar-chart">
+                            <md-content class="md-padding">
+                                <div class="box box-danger">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">OVERALL FEES ANALYSIS</h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div id="columnchartFee" style="height: 350px; width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <!--<div id="columnchartdetailed" style="height: 400px; width: 1086px !important;"></div>-->
+                            </md-content>
+                        </md-tab>
+
+                        <md-tab label="Line Graph" class="fa fa-line-chart">
+                            <md-content class="md-padding">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title"> OVERALL FEES ANALYSIS </h3>
+                                        <div class="box-tools pull-right">
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div id="chartContainerFee" style="height: 350px; width: 100%;"></div>
+                                    </div>
+                                </div>
+                                <!--<div id="rangeBarChatdetailed" style="height: 400px; width: 1086px !important;"></div>-->
+                            </md-content>
+                        </md-tab>
+                    </div>
+
+                </md-tabs>
+            </md-content>
+        </div>
+    </div>
+
+
+</section>

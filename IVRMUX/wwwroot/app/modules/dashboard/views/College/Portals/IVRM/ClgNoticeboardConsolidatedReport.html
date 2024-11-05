@@ -1,0 +1,579 @@
+﻿
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata();" novalidate>
+        <div class="box box-primary">
+
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    Noticeboard Upload Report
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+
+            <div class="box-body">
+                <div class="well">
+                    <div class="text-center" >
+                        <label class="radio-inline" ng-init="typeflag='Staff'">
+                            <input type="radio" value="Staff" name="Staff" ng-model="typeflag"  ng-change="onrdochange()"><!--ng-change="onrdochange(optionflag)"-->
+                            <span class="lbl padding-8">Staff</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" value="Student" name="Student" ng-model="typeflag" ng-change="onrdochange()">
+                            <span class="lbl padding-8">Student</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="well">
+                    <div class="text-center" ng-init="optionflag='Detailed'">
+                        <label class="radio-inline">
+                            <input type="radio" value="Detailed" name="Detailed" ng-model="optionflag" ng-change="onrdochange()"><!--ng-change="onrdochange(optionflag)"-->
+                            <span class="lbl padding-8">Detailed Report</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" value="consolidated" name="consolidated" ng-model="optionflag" ng-change="onrdochange()">
+                            <span class="lbl padding-8">Consolidated Report</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top:15px;">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From Date: <span style="color:Red">*</span></label>
+                            <div class="col-sm-5">
+                                <div class="">
+                                    <md-datepicker id="FromDate" ng-model="fromdate" onkeydown="return false" name="fdate" md-placeholder="From Date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">To Date: <span style="color:Red">*</span></label>
+                            <div class="col-sm-5">
+                                <div class="">
+                                    <md-datepicker id="ToDate" name="tdate" ng-model="todate" onkeydown="return false" md-placeholder="To Date"
+                                                   md-min-date="fromdate" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+
+                <br />
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <!--ng-if="optionflag=='Detailed'"-->
+                            <label for="sel2" class="control-label col-sm-3">Course Name : </label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                <label ng-hide="searchchkbx1.length>0">
+                                    <input name="clsoption" value="all" ng-model="all" type="checkbox" ng-click="toggleAll()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="cls in courselist | filter:searchchkbx1" value="{{AMCO_Id}}">
+                                    <input type="checkbox" ng-model="cls.selected" ng-change="optionToggled(cls)" name="sec" ng-required="isOptionsRequired()" /> <!--ng-required="isOptionsRequired()"-->
+                                    <span class="lbl padding-8">{{cls.AMCO_CourseName}}</span>
+                                </label>
+
+                            </div>
+
+                        </div>
+                        <div class="error-messages col-sm-offset-2 " ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                            <div ng-message="required">Select Any One Course</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <span>
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="showreport()">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                        </span>
+                        <md-button type="submit" class="md-raised md-warn" data-ng-click="Clearid();">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                            <md-button type="submit" class="md-raised md-primary" ng-if="optionflag=='consolidated' && reportlist.length>0"  ng-click="exportToExcel1('#tableex1')" target="_blank">
+                                Export to Excel
+                            </md-button>
+                            <md-button type="submit" class="md-raised md-warn" ng-if="optionflag=='consolidated' && reportlist.length>0" ng-click="printData1();">
+                                Print
+                            </md-button>
+
+                            <md-button type="submit" class="md-raised md-primary" ng-if="reportlist.length>0 && optionflag=='Detailed'" ng-click="exportToExcel('#tableex')" target="_blank">
+                                Export to Excel
+                            </md-button>
+                            <md-button type="submit" class="md-raised md-warn" ng-if="reportlist.length>0 && optionflag=='Detailed'" ng-click="printData();">
+                                Print
+                            </md-button>
+
+                        </div>
+
+                        <!--<div ng-if="optionflag=='Detailed'">
+
+                           
+                               
+                       
+                        </div>-->
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-if="reportlist.length>0 && optionflag=='Detailed'" >
+
+            <div class="box-header with-border" ng-show="optionflag=='Detailed'">
+                <h3 class="box-title">NoticeBoard Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body" ng-if="optionflag=='Detailed'">
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{reportlist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+
+                            <th>SL.NO</th>
+                            <th>Title</th>
+                            <th>Description  </th>
+                            <th> Start date </th>
+                            <th> End date </th>
+                            <th> Display date </th>
+                            <th>Notice For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr dir-paginate="user in filterValue1=(reportlist  | filter:search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" pagination-id="paginate1">
+
+
+                            <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                            <td style="text-align:center">{{ user.INTB_Title}}</td>
+                            <td style="text-align:center">{{ user.INTB_Description}}</td>
+                            <td style="text-align:center">{{ user.INTB_StartDate |date:'dd-MM-yyyy'}}</td>
+                            <td style="text-align:center">{{ user.INTB_EndDate |date:'dd-MM-yyyy'}}</td>
+
+                            <td style="text-align:center">{{ user.INTB_DisplayDate |date:'dd-MM-yyyy'}}</td>
+                            <td style="text-align:center">{{ user.notice_for}}</td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <dir-pagination-controls max-size="5" pagination-id="paginate1" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                <hr />
+                <!--<div class="" ng-if="optionflag='consolidated'" >
+                 
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel1('#tableex1')" target="_blank">
+                            Export to Excel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="printData1();">
+                            Print
+                        </md-button>
+
+
+                    </div>
+                </div>
+
+                <div  ng-if="optionflag='Detailed'" >
+              
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#tableex')" target="_blank">
+                            Export to Excel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="printData();">
+                            Print
+                        </md-button>
+                    </div>
+                </div>-->
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-if="reportlist.length>0 && optionflag=='consolidated'" >
+
+            <div class="box-header with-border" ng-show="optionflag=='consolidated'">
+                <h3 class="box-title">NoticeBoard Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body" ng-if="optionflag=='consolidated'">
+                <!---->
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{reportlist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+
+                            <th>SL.NO</th>
+                            <th>Course</th>
+                            <th>Count</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr dir-paginate="user in filterValue1=(reportlist  | filter:search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage2" current-page="currentPage2" pagination-id="paginate2">
+
+
+                            <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                            <td style="text-align:center">{{ user.AMCO_CourseName}}</td>
+                            <td style="text-align:center">{{ user.total_count}}</td>
+                          
+                            <td ng-if="hidden">{{user.AMCO_Id}}</td>
+                            <td>
+                                <span>
+                                    <a a href="javascript:void(0)" data-toggle="modal" title="PDA"
+                                       style="font-size: 18px; font-weight:bold;"
+                                       ng-click="showdetails(user)">View</a>
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <dir-pagination-controls max-size="5" pagination-id="paginate2" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                <hr />
+                <!--gg-->
+              
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+
+        <div id="tableex" ng-show=false class="table-bordered text-center" style="overflow:scroll">
+            <h3>Noticeboard Detailed Report for {{typeflag}}</h3>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+
+                        <th>SL.NO</th>
+                        <th>Title</th>
+                        <th>Description  </th>
+                        <th> Start date </th>
+                        <th> End date </th>
+                        <th> Display date </th>
+                        <th>Notice For</th>
+
+
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in filterValue1=(reportlist  | filter:search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" pagination-id="paginate1">
+
+
+                        <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                        <td style="text-align:center">{{ user.INTB_Title}}</td>
+                        <td style="text-align:center">{{ user.INTB_Description}}</td>
+                        <td style="text-align:center">{{ user.INTB_StartDate |date:'dd-MM-yyyy'}}</td>
+                        <td style="text-align:center">{{ user.INTB_EndDate |date:'dd-MM-yyyy'}}</td>
+
+                        <td style="text-align:center">{{ user.INTB_DisplayDate |date:'dd-MM-yyyy'}}</td>
+                        <td style="text-align:center">{{ user.notice_for}}</td>
+
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="tableex1" ng-show=false class="table-bordered text-center" style="overflow:scroll">
+            <h3>Noticeboard Detailed Report for {{typeflag}}</h3>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+
+                        <th>SL.NO</th>
+                        <th>Course</th>
+                        <th>Count</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in filterValue1=(reportlist  | filter:search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" pagination-id="paginate1">
+
+
+                        <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                        <td style="text-align:center">{{ user.AMCO_CourseName}}</td>
+                        <td style="text-align:center">{{ user.total_count}}</td>
+
+
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!--print-->
+        <div id="printSectionId" ng-show="false" style="overflow:scroll">
+            <div class="">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+            </div>
+            <center> <h4><u>NoticeBoard Report for {{optionflag}} </u></h4></center>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+
+                        <th>SL.NO</th>
+                        <th>Title</th>
+                        <th>Description  </th>
+                        <th> Start date </th>
+                        <th> End date </th>
+                        <th> Display date </th>
+                        <th>Notice For</th>
+
+
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr ng-repeat="user in reportlist | orderBy:sortKey:reverse">
+
+
+                        <td>{{$index+1}}</td>
+                        <td style="text-align:center">{{ user.INTB_Title}}</td>
+                        <td style="text-align:center">{{ user.INTB_Description}}</td>
+                        <td style="text-align:center">{{ user.INTB_StartDate |date:'dd-MM-yyyy'}}</td>
+                        <td style="text-align:center">{{ user.INTB_EndDate |date:'dd-MM-yyyy'}}</td>
+
+                        <td style="text-align:center">{{ user.INTB_DisplayDate |date:'dd-MM-yyyy'}}</td>
+                        <td style="text-align:center">{{ user.notice_for}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <div id="printSectionId1" ng-show="false" style="overflow:scroll">
+            <div class="">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+            </div>
+            <center> <h4><u>NoticeBoard Report for {{optionflag}} </u></h4></center>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>SL.NO</th>
+                        <th>Course</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr ng-repeat="user in reportlist | orderBy:sortKey:reverse">
+
+
+                        <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                        <td style="text-align:center">{{ user.AMCO_CourseName}}</td>
+                        <td style="text-align:center">{{ user.total_count}}</td>
+
+
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+    </form>
+</section>
+<div id="myModall" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog  modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <span style="text-align:center"><b>List Of Uploads</b></span>
+
+            </div>
+            <div class="modal-body">
+
+                <div class="box-body margin-top-10">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+
+                                <th>SL.NO</th>
+                                <th>Title</th>
+                                <th>Description  </th>
+                                <th> Start date </th>
+                                <th> End date </th>
+                                <th> Display date </th>
+                                <th>Notice For</th>
+
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr dir-paginate="user in filterValue1=(view_array  | filter:search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage3" current-page="currentPage3" pagination-id="paginate3">
+
+
+                                <td>{{itemsPerPage3 *(currentPage3-1)+$index+1}}</td>
+                                <td style="text-align:center">{{ user.INTB_Title}}</td>
+                                <td style="text-align:center">{{ user.INTB_Description}}</td>
+                                <td style="text-align:center">{{ user.INTB_StartDate |date:'dd-MM-yyyy'}}</td>
+                                <td style="text-align:center">{{ user.INTB_EndDate |date:'dd-MM-yyyy'}}</td>
+
+                                <td style="text-align:center">{{ user.INTB_DisplayDate |date:'dd-MM-yyyy'}}</td>
+                                <td style="text-align:center">{{ user.notice_for}}</td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5" pagination-id="paginate3" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+
+</div>
+
+<!--//added-->
+<!--<div id="popup111" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+
+
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10" id="asdf">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>-->

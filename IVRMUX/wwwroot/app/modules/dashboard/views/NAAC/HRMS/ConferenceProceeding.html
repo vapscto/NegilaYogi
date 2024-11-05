@@ -1,0 +1,421 @@
+﻿<script type="text/javascript">
+    function refreshDialer() {
+        document.getElementById("idpdf").contentWindow.location.reload(true);
+    }
+</script>
+
+<style>
+    #wrapper {
+        overflow-x: scroll;
+        width: 1072px;
+    }
+
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+
+    .UploadEmpDoc .file-blue:before {
+        content: 'Upload Doc' !important;
+        font-size: 12px;
+    }
+</style>
+<section class="content" data-ng-init="onLoadGetDataEmployeeType()">
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <!--<h3 class="box-title">EMPLOYEE SELECTION</h3>-->
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class=" fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="groupType in groupTypedropdown">
+                                        <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType.selected)">
+                                        <span class="lbl padding-8">
+                                            {{groupType.hrmgT_EmployeeGroupType}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-right-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="department in departmentdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)">
+                                        <span class="lbl padding-8">
+                                            {{department.hrmD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="designation in designationdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                        <span class="lbl padding-8">
+                                            {{designation.hrmdeS_DesignationName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Employee :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="empname" ng-model="obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" ng-change="emp_Sel(obj.hrmE_Id)" title="Select Employee" required>
+                                    <ui-select-match placeholder="Select or search Employee in the list...">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in employee | propsFilter: {hrmE_EmployeeFirstName: $select.search}" value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm1.empname)" ng-messages="myForm1.empname.$error">
+                                <div ng-message="required" style="margin-left:270px;"> Select Employee First</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm9" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Conference proceedings as full papers.(abstracts not to be included):</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class=" fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Title of the Paper:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="title" data-ng-model="conference.hreconF_PaperTitle" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.title)" ng-messages="myForm9.title.$error">
+                                    <div ng-message="required">Please enter Subject Name</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Conference Name: <span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="name" data-ng-model="conference.hreconF_ConferenceName" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.name)" ng-messages="myForm9.name.$error">
+                                    <div ng-message="required">Please enter Subject Name</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                National/Int:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <div class="text-center">
+                                    <label class="radio-inline">
+                                        <input type="radio" ng-model="conference.hreconF_NatIntFlg" value="National" name="NATINT{{$index+1}}" required>
+                                        <span class="lbl padding-8">National<strong style="color:red;display:inline; font-weight: bolder;">*</strong></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" ng-model="conference.hreconF_NatIntFlg" value="International" name="NATINT{{$index+1}}" required>
+                                        <span class="lbl padding-8">International<strong style="color:red;display:inline; font-weight: bolder;">*</strong></span>
+                                    </label>
+                                </div>
+                                <span class="error-messages col-sm-offset-5" ng-if="interacted9(myForm9.NATINT)" ng-messages="myForm9.NATINT.$error">
+                                    <span ng-message="required">Select National/International</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                List of Author: <span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="Authors" data-ng-model="conference.hreconF_Authors" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.Authors)" ng-messages="myForm9.Authors.$error">
+                                    <div ng-message="required">Please enter Authors Name</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Journal Name:<span style="color:red">*</span></label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="journal" data-ng-model="conference.hreconF_Journal" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.journal)" ng-messages="myForm9.journal.$error">
+                                    <div ng-message="required">Please enter journal Name</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Publisher Name:<span style="color:red">*</span></label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="PublisherName" data-ng-model="conference.hreconF_PublisherName" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.PublisherName)" ng-messages="myForm9.PublisherName.$error">
+                                    <div ng-message="required">Please enter Publisher Name</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Volume:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="Volume" data-ng-model="conference.hreconF_Volume" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.Volume)" ng-messages="myForm9.Volume.$error">
+                                    <div ng-message="required">Please enter Volume</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Issue No:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="IssueNo" data-ng-model="conference.hreconF_IssueNo" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.IssueNo)" ng-messages="myForm9.IssueNo.$error">
+                                    <div ng-message="required">Please enter Issue No</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Page No:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="PageNo" data-ng-model="conference.hreconF_PageNo" type="text" ng-pattern="^[0-9]$" allow-pattern="^[0-9]$" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.PageNo)" ng-messages="myForm9.PageNo.$error">
+                                    <div ng-message="required">Please enter Page No</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Year:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="Year" data-ng-model="conference.hreconF_Year" type="text" ng-pattern="^[0-9]$" allow-pattern="^[0-9]$" maxlength="4" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.Year)" ng-messages="myForm9.Year.$error">
+                                    <div ng-message="required">Please enter Year Name</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                From Date:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <md-datepicker name="FromDate" style="width: 150px;" ng-model="conference.hreconF_Fromdate" onkeydown="return false" md-placeholder="Select date" ng-change="CalculateDuration(conference)"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted9(myForm9.FromDate)" ng-messages="myForm9.FromDate.$error">
+                                    <div ng-message="required">Please Enter From Date</div>
+                                    <div ng-message="valid">The entered value is not a date!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                To date:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <md-datepicker name="ToDate" style="width: 150px;" ng-model="conference.hreconF_Todate" onkeydown="return false" md-placeholder="Select date" ng-change="CalculateDuration(conference)"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted9(myForm9.ToDate)" ng-messages="myForm9.ToDate.$error">
+                                    <div ng-message="required">Please Enter To Date</div>
+                                    <div ng-message="valid">The entered value is not a date!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Duration:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="Duration" data-ng-model="conference.hreconF_Duration" type="text" ng-pattern="/^[0-9\d_.#\,\:\-]*/" allow-pattern="(\s|[0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.Duration)" ng-messages="myForm9.Duration.$error">
+                                    <div ng-message="required">Please enter Duration</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                ISBN Number:<span style="color:red">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <input class="form-control" style="width: 200px;" name="ProceddingsISBN" data-ng-model="conference.hreconF_ProceddingsISBN" type="text" ng-pattern="/^[A-z\d_.#\,\:\-]*/" allow-pattern="(\s|[a-zA-Z0-9]|#|-|,|:|.)" maxlength="200" required>
+                                <div class="error-messages" ng-if="interacted9(myForm9.ProceddingsISBN)" ng-messages="myForm9.ProceddingsISBN.$error">
+                                    <div ng-message="required">Please enter Proceddings ISBN</div>
+                                    <div ng-message="pattern">Pattern does not match</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="well text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-click="validateConferenceDetails(obj)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="clear_Conference_tab();">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <embed id="idpdf" ng-src="{{content}}" onload="refreshDialer();" style="width: 100%;" height="1000" />
+                <div class="modal-body" oncontextmenu="return false"></div>
+            </div>
+        </div>
+    </div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:50%;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                            <!--ng-init="zoomWidth = 100;imgStyle = {width:'100px'}" ng-style="imgStyle"
+                            ng-mouse-wheel-up="zoomWidth = zoomWidth + 20; imgStyle.width = zoomWidth +'px'; "
+                            ng-mouse-wheel-down="zoomWidth = zoomWidth - 20;imgStyle.width = zoomWidth  +'px'; " />-->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-center">
+                        <button class="btn" ng-click="zoomin()"><i class="fa fa-plus text-black"></i></button>
+                        <button class="btn" ng-click="zoomout()"><i class="fa fa-minus text-black"></i></button>
+                    </div>
+                    <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Close
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Conference Proceeding List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div ui-grid="gridOptions" ui-grid-pagination class="grid"></div>
+        </div>
+    </div>
+</section>

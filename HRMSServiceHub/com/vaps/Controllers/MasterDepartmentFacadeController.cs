@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using HRMSServicesHub.com.vaps.Interfaces;
+using PreadmissionDTOs.com.vaps.HRMS;
+
+// For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace HRMSServicesHub.com.vaps.Controllers
+{
+    [Route("api/[controller]")]
+    public class MasterDepartmentFacadeController : Controller
+    {
+        // GET: api/values
+
+        public MasterDepartmentInterface _ads;
+
+        public MasterDepartmentFacadeController(MasterDepartmentInterface adstu)
+        {
+            _ads = adstu;
+        }
+
+        // GET: api/values
+        [Route("onloadgetdetails")]
+        public HR_Master_DepartmentDTO getinitialdata([FromBody]HR_Master_DepartmentDTO dto)
+        {
+            return _ads.getBasicData(dto);
+        }
+
+
+        [Route("Onchangedetails")]
+        public HR_Master_DepartmentDTO orderchangedata([FromBody]HR_Master_DepartmentDTO dto)
+        {
+            return _ads.changeorderData(dto);
+        }
+
+        // POST api/values
+        [HttpPost]
+        public HR_Master_DepartmentDTO Post([FromBody]HR_Master_DepartmentDTO dto)
+        {
+            return _ads.SaveUpdate(dto);
+        }
+
+        [Route("getRecordById/{id:int}")]
+
+        public HR_Master_DepartmentDTO getcatgrydet(int id)
+        {
+            // id = 12;
+            return _ads.editData(id);
+        }
+        [Route("deactivateRecordById")]
+        public HR_Master_DepartmentDTO deactivateRecordById([FromBody]HR_Master_DepartmentDTO dto)
+        {
+            return _ads.deactivate(dto);
+        }
+    }
+}

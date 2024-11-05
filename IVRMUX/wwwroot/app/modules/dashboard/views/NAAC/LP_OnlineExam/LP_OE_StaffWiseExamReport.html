@@ -1,0 +1,302 @@
+<style>
+    .margin-top-10 {
+        margin-top: 10px !important;
+    }
+
+    .padding-right-30 {
+        padding-right: 30px !important;
+    }
+
+    .padding-left-10 {
+        padding-left: 10px;
+    }
+
+    .headerfixed {
+        position: fixed;
+        padding: 8em;
+        left: 75%;
+        top: 0%;
+        width: 60%;
+        transform: translateX(-50%);
+    }
+
+    .questionstyle {
+        padding-left: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        font-family: Times New Roman !important;
+    }
+
+    .optionssytle {
+        font-size: 16px !important;
+        font-weight: bold !important;
+        font-family: Times New Roman !important;
+    }
+
+    .imgdisplay {
+        height: 100px !important;
+        width: 200px !important;
+    }
+
+    .imgdisplayoptions {
+        height: 100px !important;
+        width: 155px !important;
+        border: 0.5px solid black;
+    }
+
+    .padding-left0px {
+        padding-left: 0px;
+    }
+
+    .levelheading {
+        font-size: 25px !important;
+        font-weight: bold !important;
+        color: black !important;
+        text-transform: none;
+    }
+
+    .padding-left12px {
+        padding-left: 12px;
+    }
+
+    .padding-left18px {
+        padding-left: 18px !important;
+    }
+
+    .padding-left-35 {
+        padding-left: 35px;
+    }
+
+    .styleborder {
+        border: 1px solid black;
+        border-radius: 10px;
+        margin-top: 10px !important;
+    }
+
+    .padding-left12px {
+        padding-left: 12px;
+    }
+</style>
+
+<section class="content" data-ng-init="LoadReport()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Online Exam Created Count Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="text-center well" ng-init="entry='ClassWiseCount'">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="entry" value="ClassWiseCount" ng-change="OnChangeRadiobtn()">
+                                        <span class="lbl padding-8">Class Wise Count</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="entry" value="SubjectWiseCount" ng-change="OnChangeRadiobtn()">
+                                        <span class="lbl padding-8">Subject Wise Count</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel2" ng-model="ASMAY_Id" name="clsid" required ng-change="OnChangeYear()">
+                                        <option value="">Select Academic Year </option>
+                                        <option ng-repeat="option in getyearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == ASMAY_Id}}"> {{option.asmaY_Year}} </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.clsid)" ng-messages="myForm.clsid.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-4 input-group text-right" style="">
+                                    <md-datepicker ng-model="FromDate" onkeydown="return false" name="From_Date" id="sel5" md-placeholder="Enter  date"
+                                                   required md-max-date="maxdate" md-min-date="mindate" >
+                                    </md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required">Please Select Date</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-4 input-group text-right" style="">
+                                    <md-datepicker ng-model="ToDate" onkeydown="return false" name="To_Date" id="sel6" md-placeholder="Enter  date"
+                                                   md-max-date="maxdate" md-min-date="FromDate" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required">Please Select Date</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">
+                                    <input name="option[]" value="1" type="checkbox" ng-model="obj.all2" ng-click="Toggle_header()">
+                                    <span class="lbl padding-12">Select All Class : </span><strong class="text-red">*</strong>
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-12" style="height:15em">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                        <label ng-repeat="role in getclasslist | filter:filterchkbx">
+                                            <input type="checkbox" value="{{role.asmcL_Id}}" name="check" ng-model="role.selected" ng-click="addColumn(role)"
+                                                   data-ng-checked="checked" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">{{role.asmcL_ClassName}}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="error-messages col-sm-12" ng-if="interacted(myForm.check)" ng-messages="myForm.check.$error">
+                                    <div ng-message="required">Please Select the Above Fields</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="GetReport()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#excelSectionId')"
+                               ng-disabled="reportbtn==true">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData(printSectionId);"
+                               ng-disabled="reportbtn==true">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-if="GetReportDetails.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Online Exam Created Count Report </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                        data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th>Class Name</th>
+                        <th>Section Name</th>
+                        <th ng-if="entry=='SubjectWiseCount'">Subject Name</th>
+                        <th>Staff Name</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="dd in GetReportDetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{dd.ASMCL_ClassName}}</td>
+                        <td class="text-left">{{dd.ASMC_SectionName}}</td>
+                        <td class="text-left" ng-if="entry=='SubjectWiseCount'">{{dd.ISMS_SubjectName}}</td>
+                        <td class="text-left">{{dd.StaffName}}</td>
+                        <td class="text-center">{{dd.StaffConductedExams}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="{{colspan}}"><b>Total</b></td>
+                        <td><b>{{finalamt}}</b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<div id="printSectionId" ng-show="export_table_flag">
+    <div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>
+    <br />
+    <center> <h4><u> Online Exam Created Count Report From Date : {{FromDate | date :'dd/MM/yyyy'}} To Date : {{ToDate | date :'dd/MM/yyyy'}}</u></h4></center>
+    <br />
+    <table class="table table-bordered" id="table1" ng-show="tadprint">
+        <thead>
+            <tr>
+                <th>Sl.No</th>
+                <th>Class Name</th>
+                <th>Section Name</th>
+                <th ng-if="entry=='SubjectWiseCount'">Subject Name</th>
+                <th>Staff Name</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="dd in GetReportDetails">
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-left">{{dd.ASMCL_ClassName}}</td>
+                <td class="text-left">{{dd.ASMC_SectionName}}</td>
+                <td class="text-left" ng-if="entry=='SubjectWiseCount'">{{dd.ISMS_SubjectName}}</td>
+                <td class="text-left">{{dd.StaffName}}</td>
+                <td class="text-center">{{dd.StaffConductedExams}}</td>
+            </tr>
+            <tr>
+                <td colspan="{{colspan}}"><b>Total</b></td>
+                <td><b>{{finalamt}}</b></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="excelSectionId" ng-show="export_table_flag">
+    <table>
+        <tr style="border:0.5px solid black">
+            <td colspan="{{colspan+1}}" style="text-align:center">
+                Online Exam Created Count Report From Date : {{FromDate | date :'dd/MM/yyyy'}} To Date : {{ToDate | date :'dd/MM/yyyy'}}
+            </td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+            <tr style="border:0.5px solid black">
+                <th>Sl.No</th>
+                <th>Class Name</th>
+                <th>Section Name</th>
+                <th ng-if="entry=='SubjectWiseCount'">Subject Name</th>
+                <th>Staff Name</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border:0.5px solid black" ng-repeat="dd in GetReportDetails">
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-left">{{dd.ASMCL_ClassName}}</td>
+                <td class="text-left">{{dd.ASMC_SectionName}}</td>
+                <td class="text-left" ng-if="entry=='SubjectWiseCount'">{{dd.ISMS_SubjectName}}</td>
+                <td class="text-left">{{dd.StaffName}}</td>
+                <td class="text-center">{{dd.StaffConductedExams}}</td>
+            </tr>
+            <tr style="border:0.5px solid black">
+                <td colspan="{{colspan}}"><b>Total</b></td>
+                <td><b>{{finalamt}}</b></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

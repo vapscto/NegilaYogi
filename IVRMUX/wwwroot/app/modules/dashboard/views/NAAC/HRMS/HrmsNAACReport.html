@@ -1,0 +1,980 @@
+﻿<style>
+    #wrapper {
+        overflow-x: scroll;
+        width: 1072px;
+    }
+
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+
+    .UploadEmpDoc .file-blue:before {
+        content: 'Upload Doc' !important;
+        font-size: 12px;
+    }
+</style>
+<section class="content">
+    <div class="box box-primary" ng-app="MyModule" data-ng-init="onLoadGetDataEmployeeType()">
+        <div class="box-header with-border">
+            <h3 class="box-title">HRMS NAAC REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <form class="form-horizontal" role="form" name="myForm1" novalidate>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="groupType in groupTypedropdown">
+                                        <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType)">
+                                        <span class="lbl padding-8">
+                                            {{groupType.hrmgT_EmployeeGroupType}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-right-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="department in departmentdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)">
+                                        <span class="lbl padding-8">
+                                            {{department.hrmD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="designation in designationdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                        <span class="lbl padding-8">
+                                            {{designation.hrmdeS_DesignationName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Employee :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="empname" ng-model="obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Employee" required>
+                                    <ui-select-match placeholder="Select or search Employee in the list...">
+                                        {{$select.selected.hrmE_EmployeeFirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in employee | propsFilter: {hrmE_EmployeeFirstName: $select.search}" value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm1.empname)" ng-messages="myForm1.empname.$error">
+                                <div ng-message="required" style="margin-left:270px;"> Select Employee First</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label class="control-label col-sm-4">Assessment Period From Date :<span style="color:Red">*</span></label>
+                                <md-datepicker name="assfromdate" ng-model="obj.assessmentfrom" onkeydown="return false" md-placeholder="Select date" required></md-datepicker>
+                                <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm1.assfromdate)" ng-messages="myForm1.assfromdate.$error">
+                                    <div ng-message="required">Select From Date Of Assessment Period</div>
+                                    <div ng-message="valid">The entered value is not a date!</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="control-label col-sm-4">To Date:<span style="color:Red">*</span></label>
+                                <md-datepicker name="asstodate" ng-model="obj.assessmentto" onkeydown="return false" md-placeholder="Select date" required></md-datepicker>
+                                <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm1.asstodate)" ng-messages="myForm1.asstodate.$error">
+                                    <div ng-message="required">Select To Date Of Assessment Period</div>
+                                    <div ng-message="valid">The entered value is not a date!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="emp_Sel(obj.hrmE_Id)">
+                        Generate
+                        <i class="fa fa-chevron" aria-hidden="true"></i>
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                </div>
+            </div>
+        </form>
+        
+
+        <div class="box box-primary" ng-show="EmployeeDis">
+            <div class="box-header with-border">
+                <h3 class="box-title">HRMS NAAC REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="container-fluid">
+                <div class="box-body" id="EmpNaacHRMS">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h2 class="text-center"> Teresian College, Siddharthanagar</h2>
+                            <h2 class="text-center"> Mysore</h2>
+                        </div>
+                        <div class="col-sm-12">
+                            <h4>Format Version-1.0</h4>
+                        </div>
+                        <div class="col-sm-12">
+                            <h3 class="text-center">Annual Self-Assessment for the Performance Based Self Appraisal System Form</h3>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><u><b>General Information</b></u></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Name of Employee :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{empPersonaldetails.hrmE_EmployeeFirstName}}{{empPersonaldetails.hrmE_EmployeeMiddleName}}{{empPersonaldetails.hrmE_EmployeeLastName}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Course :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    Undergraduate / Post-graduate
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Departments :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{empPersonaldetails.hrmD_DepartmentName}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date of appointment :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{empPersonaldetails.hrmE_DOJ|date:'dd-MM-yyyy'}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Qualification :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{empPersonaldetails.hrmE_QualificationName}}
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-6"><u><b>Total No. of Publications/Patents/Books/Book Chapaters</b></u></label>
+                            </div>
+                        </div>
+
+                        <!--<div class="col-sm-12">
+        <table>
+            <tr>
+                <td>International(Peer-reviewed journals) :</td>
+                <td>{{internatiolnalcount}}</td>
+            </tr>
+            <tr>
+                <td>National(Peer-reviewed journals) :</td>
+                <td>{{nationalcount}}</td>
+            </tr>
+            <tr>
+                <td>Papers in Non-refered Journals :</td>
+                <td>{{nonrefjoucount}}</td>
+            </tr>
+            <tr>
+                <td>Patents :</td>
+                <td>{{patentcount}}</td>
+            </tr>
+            <tr>
+                <td>Books :</td>
+                <td>{{bookcount}}</td>
+            </tr>
+            <tr>
+                <td>Book Chapters :</td>
+                <td>{{bookchaptercount}}</td>
+            </tr>
+            <tr>
+                <td>Total Citations :</td>
+                <td>{{citationcount}}</td>
+            </tr>
+            <tr>
+                <td>H-Index :</td>
+                <td>{{hindexcount}}</td>
+            </tr>
+            <tr>
+                <td>I10 Index :</td>
+                <td>{{itenindexcount}}</td>
+            </tr>
+        </table>
+    </div>-->
+
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">International(Peer-reviewed journal) :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{internatiolnalcount}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">National(Peer-reviewed journals) :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{nationalcount}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Papers in Non-refered Journals :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{nonrefjoucount}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Patents :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{patentcount}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Books :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{bookcount}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Book Chapters :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{bookchaptercount}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Total Citations :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{citationcount}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">H-Index :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{hindexcount}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">I10 Index :<span style="color:Red">*</span></label>
+                                <label class="control-label col-sm-6">
+                                    {{itenindexcount}}
+                                </label>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="col-sm-12">
+                            <label>Assessment Period: <b>{{date23|date:'dd-MM-yyyy'}}</b> to <b>{{date34|date:'dd-MM-yyyy'}}</b></label>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><u><b>Academic Performance Indicator</b></u></label>
+                        </div>
+                        <div class="col-sm-12">
+                            <p><b>1. Whether acquired any degree or academic qualification during this academic year(If yes, Provide details) :</b></p>
+                        </div>
+                        <div class="text-center col-sm-6">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Degree</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in qualifctionDetails">
+                                        <td>{{doc.hrmE_QualificationName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <br />
+                        <br />
+                        <br />
+                        <div class="col-sm-12">
+                            <p><b>2.Academic staff college orientation/refresher course attended during the year:</b></p>
+                        </div>
+                        <br />
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Name of the Coure/FDP/Summer School</th>
+                                        <th>Place</th>
+                                        <th style="width:auto">Duration</th>
+                                        <th style="width:auto">Date(yy/mm/dd)</th>
+                                        <th>Sponsoring  Authority</th>
+                                        <th>Upload support document(Mandatory field)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentList">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hreorcO_OrientationCourse}}</td>
+                                        <td>{{doc.hreorcO_Place}}</td>
+                                        <td>
+                                            <table class="text-center">
+                                                <tr>
+                                                    <td>Total No of days = {{doc.hreorcO_Duration}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>From : {{doc.hreorcO_From|date:'dd-MM-yyyy'}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>To : {{doc.hreorcO_To|date:'dd-MM-yyyy'}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td>{{doc.hreorcO_From|date:'yy/MM/dd'}}</td>
+                                        <td>{{doc.hreorcO_SposoringAuthority}}</td>
+                                        <!--<td>{{doc.hreorcO_Document}}</td>-->
+                                        <td>
+                                            <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.hreorcO_Document}}">
+                                                View Document
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p><b>3.Workload allocated(Lectures,Seminars,Practical,Contact hours (Semester wise details)</b></p>
+                        <p><b>separate odd and even semester(Mandatory)</b></p>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Semester</th>
+                                        <th>Course/Paper</th>
+                                        <th>Mode of Teaching(Weekly allocation)</th>
+                                        of
+                                        <th>No. of classes allocated per week</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><label class="control-label"></label></td>
+                                        <td><label class="control-label"></label></td>
+                                        <td><label class="control-label"></label></td>
+                                        <td><label class="control-label"></label></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <br />
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><u><b>4.Examination duties(Invigilation,question paper setting, evaluation/assessment of answer script) as per allotment</b></u></label>
+                            <br />
+                            <div class="row">
+                                <table border="0" class="text-center col-sm-4">
+                                    <tr>
+                                        <td ng-if="examinationlist.length > 0">
+                                            <table class="table table-hover table-responsive table-bordered text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sl. No.</th>
+                                                        <th>Examination Duties</th>
+                                                        <th>Examiner</th>
+                                                        <th>College/University</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="doc in examinationlist">
+                                                        <td>{{$index+1}}</td>
+                                                        <td>{{doc.hreexdT_ExamDutyType}}</td>
+                                                        <td>{{doc.hreexdT_ExaminerType}}</td>
+                                                        <td>{{doc.hreexdT_CollUniName}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            </b>
+                                        </td>
+                                        <td ng-if="examinationlist.length == 0"><b>No</b></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <br />
+                            <!--<div class="row">
+                                <label class="control-label"><u><b>External Examiner(If applicable):</b></u></label>
+                                <br />
+                                <table border="0" class="text-center col-sm-4">
+                                    <tr>
+                                        <td><b>Yes</b></td>
+                                        <td><b>No</b></td>
+                                        <td><b>Not Applicable</b></td>
+                                    </tr>
+                                </table>
+                            </div>-->
+                        </div>
+                        <br />
+                        <div class="col-sm-12">
+                            <label class="control-label"><u><b>5.Student related co-curricular, extension and field-based activities</b></u></label>
+                            <label class="control-label"><u>(Such as extension work through NSS/NCC,IQAC,NAAC and other channels, cultural activities, subject related events, advertising and counselling)</u></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Type of Activity</th>
+                                        <th>Date</th>
+                                        <th>Role</th>
+                                        <th>Sponsoring agency</th>
+                                        <th>Support Document</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListStuActivity">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hresacT_TypeOfActivity}}</td>
+                                        <td>{{doc.hresacT_ActivityDate|date:'dd-MM-yyyy'}}</td>
+                                        <td>{{doc.hresacT_Role}}</td>
+                                        <td>{{doc.hresacT_OrgAgency}}</td>
+                                        <td>
+                                            <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.hresacT_Document}}">
+                                                View Document
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><u><b>6.Professional Development Acivities</b></u></label>
+                            <label class="control-label"><u>(Such as participation in seminars/conferences, short term training courses, lectures, membership of associations, invited talks): in</u></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Type of Activity</th>
+                                        <th>Level</th>
+                                        <th>Date</th>
+                                        <th>Organizing agency</th>
+                                        <th>Place</th>
+                                        <th>Duration</th>
+                                        <th>Role</th>
+                                        <th>Support Document(Mandatory field)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListProfActivity">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hredacT_DevelopmentActivity}}</td>
+                                        <td>{{doc.hredacT_ActivityLevel}}</td>
+                                        <td>{{doc.hredacT_ActivityDate|date:'dd-MM-yyyy'}}</td>
+                                        <td>{{doc.hredacT_OrgAgency}}</td>
+                                        <td>{{doc.hredacT_Place}}</td>
+                                        <td>{{doc.hredacT_Duration}} Days</td>
+                                        <td>{{doc.hredacT_Role}}</td>
+                                        <td>
+                                            <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.hredacT_Document}}">
+                                                View Document
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><u><b>7.Research publications/conference proceedings/book chapters/books/patents :</b></u></label>
+                            <br />
+                            <label class="control-label"><b>i) Research publications in refereed journals</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Title of the Paper</th>
+                                        <th>Author</th>
+                                        <th>Published Journal</th>
+                                        <th>ISSN/ISBN</th>
+                                        <th>Impact Factor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListRefJournal">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hrejornL_ArticleTitle}}</td>
+                                        <td>{{doc.hrejornL_Authors}}</td>
+                                        <td>
+                                            <table class="text-center">
+                                                <tr>
+                                                    <td>Name: {{doc.hrejornL_JournalName}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Volume: {{doc.hrejornL_Volume}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Issue: {{doc.hrejornL_IssueNo}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Page Nos: {{doc.hrejornL_PageNo}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td>{{doc.hrejornL_ISSNISBN}}</td>
+                                        <td>{{doc.hrejornL_ImpactFactor}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><b>ii) Research publications in non-refereed journals with ISSN/ISBN</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Title of the Paper</th>
+                                        <th>Author</th>
+                                        <th>Journal published</th>
+                                        <th>ISSN/ISBN</th>
+                                        <th>Impact Factor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListNonRefJournal">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hrejornL_ArticleTitle}}</td>
+                                        <td>{{doc.hrejornL_Authors}}</td>
+                                        <td>
+                                            <table class="text-center">
+                                                <tr>
+                                                    <td>Name: {{doc.hrejornL_JournalName}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Volume: {{doc.hrejornL_Volume}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Issue: {{doc.hrejornL_IssueNo}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Page Nos: {{doc.hrejornL_PageNo}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td>{{doc.hrejornL_ISSNISBN}}</td>
+                                        <td>{{doc.hrejornL_ImpactFactor}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><b>iii) Conference proceedings as full papers, etc.(abstracts not to be included)</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Title of the Paper</th>
+                                        <th>Author</th>
+                                        <th>Journal Proceedings/published</th>
+                                        <th>Year</th>
+                                        <th>Venue</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListConference">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hreconF_PaperTitle}}</td>
+                                        <td>{{doc.hreconF_Authors}}</td>
+                                        <td>{{doc.hreconF_ConferenceName}}</td>
+                                        <!--<table class="text-center">
+                        <tr>
+                            <td>{{doc.hrejornL_JournalName}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{doc.hrejornL_Volume}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{doc.hrejornL_IssueNo}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{doc.hrejornL_PageNo}}</td>
+                        </tr>
+                    </table>-->
+                                        <td>{{doc.hreconF_Year}}</td>
+                                        <td>{{doc.hreconF_ConferenceVenue}}</td>
+                                        <td>{{doc.hreconF_Duration}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><b>iv) Books/Book Chapters published by international/national publishers with established peer-review system</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Title of the Book/Book Chapter</th>
+                                        <th>Author</th>
+                                        <th>Publishing agency</th>
+                                        <th>Year</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListBook">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hrebK_BookName}}</td>
+                                        <td>{{doc.hrebK_Author}}</td>
+                                        <td>
+                                            <table class="text-center">
+                                                <tr>
+                                                    <td>Name: {{doc.hrebK_PublisherName}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Volume: {{doc.hrebK_Volume}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Issue: {{doc.hrebK_IssueNo}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Page Nos: {{doc.hrebK_PageNo}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <!--<td>{{doc.HREBK_PublisherName}}</td>-->
+                                        <td>{{doc.hrebK_Year}}</td>
+                                    </tr>
+                                    <tr ng-repeat="doc in documentListBookChapter">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hrebkcP_BookName}}</td>
+                                        <td>{{doc.hrebkcP_Author}}</td>
+                                        <td>
+                                            <table class="text-center">
+                                                <tr>
+                                                    <td>Name: {{doc.hrebkcP_PublisherName}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Volume: {{doc.hrebkcP_Volume}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Issue: {{doc.hrebkcP_IssueNo}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Page Nos: {{doc.hrebkcP_PageNo}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <!--<td>{{doc.hrebkcP_PublisherName}}</td>-->
+                                        <td>{{doc.hrebkcP_Year}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><b>8. Research Projects(Ongoing/Completed)</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Title of the Project</th>
+                                        <th>Principal Investigator</th>
+                                        <th>Funding Agency</th>
+                                        <th>Period</th>
+                                        <th>Total funding</th>
+                                        <th>Role</th>
+                                        <th>Status of the project</th>
+                                        <th>Year</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListResProject">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hrerepR_ProjectTitle}}</td>
+                                        <td>{{doc.hrerepR_PInvestigatorId}}</td>
+                                        <td>{{doc.hrerepR_FundingAgency}}</td>
+                                        <td>{{doc.hrerepR_Period}}</td>
+                                        <td>{{doc.hrerepR_FundsReceived}}</td>
+                                        <td>{{doc.hrerepR_Role}}</td>
+                                        <td>{{doc.hrerepR_ProjectStatus}}</td>
+                                        <td>{{doc.hrerepR_Year}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><b>9. Research Guidance:</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Title of the Thesis</th>
+                                        <th>Name of the Student</th>
+                                        <th>Year</th>
+                                        <th>Course(Ph.D/M.Phil/M.Sc)</th>
+                                        <th>Status of the Thesis</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListResGuidance">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hreregU_ThesisTitle}}</td>
+                                        <td>{{doc.hreregU_StudentName}}</td>
+                                        <td>{{doc.hreregU_Year}}</td>
+                                        <td>{{doc.hreregU_Course}}</td>
+                                        <td>{{doc.hreregU_ThesisStatus}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><b>10. Role and Responsibilities in BOS/BOE:</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>BOS/BOE</th>
+                                        <th>Subject</th>
+                                        <th>University/College/Autonomous College</th>
+                                        <th>Year</th>
+                                        <th>Period From-To date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListBOSBOE">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hreboS_BOSBOEFlg}}</td>
+                                        <td>{{doc.hreboS_Subject}}</td>
+                                        <td>{{doc.hreboS_UnvCollegeFlg}}</td>
+                                        <td>{{doc.hreboS_Year}}</td>
+                                        <td>
+                                            <table class="text-center">
+                                                <tr>
+                                                    <td>From : {{doc.hreboS_FromToDate|date:'dd-MM-yyyy'}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>To: {{doc.hreboS_ToDate|date:'dd-MM-yyyy'}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><b>11. Role and Responsibilities in various committees/cells/clubs in the college:</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Committee/Cell/Club</th>
+                                        <th>Year</th>
+                                        <th>Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListCommettee">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hrecoM_Flg}}</td>
+                                        <td>{{doc.hrecoM_Year}}</td>
+                                        <td>{{doc.hrecoM_Role}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!--<div class="col-sm-12">
+                            <label class="control-label"><b>12. Furnish details of any other credential, significant contributions, awards received etc.</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No.</th>
+                                        <th>Year</th>
+                                        <th>Details</th>
+                                        <th>Upload</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentListOtherDetails">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{doc.hreothdeT_Year}}</td>
+                                        <td>{{doc.hreothdeT_OtherDetails}}</td>
+                                        <td>
+                                            <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.hreothdeT_Document}}">
+                                                View Document
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label"><b>List of enclosures:</b></label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Sr.No.</th>
+                                        <th>Yes/No</th>
+                                        <th>Enclosure(Mandatory field)</th>
+                                        <th>File</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="doc in documentDetails">
+                                        <td>{{$index+1}}</td>
+                                        <td>Yes</td>
+                                        <td>{{doc.hrmedS_DocumentName}}</td>
+                                        <td>
+                                            <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.hrmedS_DocumentImageName}}">
+                                                View Document
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <label class="control-label">I certify that the information provided is correct.</label>
+                        </div>
+                        <div>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Nodal Officer</th>
+                                        <th>Implementation Eng.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Name:</td>
+                                        <td><label class="control-label"></label></td>
+                                        <td><label class="control-label"></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Signature & Seal:</td>
+                                        <td><label class="control-label"></label></td>
+                                        <td><label class="control-label"></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Date:</td>
+                                        <td><label class="control-label"></label></td>
+                                        <td><label class="control-label"></label></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" data-ng-click="printToCart('Baldwin')" ng-disabled="print_flag">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+
+    </div>
+</section>

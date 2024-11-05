@@ -1,0 +1,301 @@
+﻿<style>
+    .classborder {
+        border: 1px solid black !important;
+        border-radius: 10px !important;
+        padding-left: 20px;
+    }
+
+    .classtextarea {
+        resize: none;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">STUDENT DISCIPLINE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-8 input-group">
+                                    <md-datepicker ng-model="obj.FromDate" name="aemonadfrom" onkeypress="return false" md-placeholder="Enter Date"
+                                                   required md-max-date="maxDatedof1">
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.aemonadfrom)" ng-messages="myForm.aemonadfrom.$error || myForm.aemonadfrom.$dirty">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-8 input-group">
+                                    <md-datepicker ng-model="obj.ToDate" name="aemonadto" onkeypress="return false" md-placeholder="Enter Date"
+                                                   required md-min-date="obj.FromDate" md-max-date="maxDatedof1">
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.aemonadto)" ng-messages="myForm.aemonadto.$error || myForm.aemonadto.$dirty">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false"
+                                   ng-click="report(obj);">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()" ng-model="clr" value="cl">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false"
+                                   ng-click="exportToExcel('#table1')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Excel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="box box-primary" ng-if="getreport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">STUDENT DISCIPLINE REPORT DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered" id="tabel1sads">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="">Student Details</a></th>
+                        <th><a href="">Class Name</a></th>
+                        <th><a href="">Section Name</a></th>
+                        <th><a href="">Year</a></th>
+                        <th><a href="">Date</a></th>
+                        <th><a href="">Subject</a></th>
+                        <th><a href="">Remarks</a></th>
+                        <th><a href="">File</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in getreport | filter:searchValue">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user.AMST_FirstName}} : {{user.AMST_AdmNo}}</td>
+                        <td class="text-left">{{user.ASMCL_ClassName}}</td>
+                        <td class="text-left">{{user.ASMC_SectionName}}</td>
+                        <td class="text-center">{{user.ASMAY_Year}}</td>
+                        <td class="text-center">{{user.ASCOMP_Date}}</td>
+                        <td class="text-left">{{user.ASCOMP_Subject}}</td>
+                        <td class="text-left">{{user.ASCOMP_Complaints}}</td>
+                        <td class="text-left">
+                            <span ng-if="user.ASCOMP_FilePath !=null && user.ASCOMP_FilePath !=''">
+
+                                <a>
+                                    {{user.ASCOMP_FileName}}
+                                </a>
+                                |
+                                <a ng-if="user.filetype=='jpg' || user.filetype=='png' || user.filetype=='svg'|| user.filetype=='jpeg'
+                                                       || user.filetype=='gif'"
+                                   style="color:red;display:inline; font-weight: bolder;"
+                                   data-ng-click="showmothersign(user.ASCOMP_FilePath,user.ASCOMP_FileName)">
+                                    Image
+                                </a>
+                                <a ng-if="user.filetype=='pdf'" style="color:blue;display:inline;"
+                                   ng-click="onview(user.ASCOMP_FilePath,user.ASCOMP_FileName)">
+                                    <b style="color:orangered;display:inline; ">Pdf</b>
+                                </a>
+                                <a ng-if="user.filetype=='doc'|| user.filetype=='docx'"
+                                   style="color:blue;display:inline;"
+                                   href="{{user.document_Pathnew}}" target="_blank">
+                                    <b style="color:orangered;display:inline;">Document</b>
+                                </a>
+                                <a ng-if="user.filetype=='ppt'|| user.filetype=='pptx'"
+                                   style="color:blue;display:inline;"
+                                   href="{{user.document_Pathnew}}" target="_blank">
+                                    <b style="color:orangered;display:inline;">PPT</b>
+                                </a>
+                                <a ng-if="user.filetype=='xls'|| user.filetype=='xlsx'"
+                                   style="color:blue;display:inline;"
+                                   href="{{user.document_Pathnew}}" target="_blank">
+                                    <b style="color:orangered;display:inline;">Excel</b>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<div id="printSectionId" ng-show="table_flag">
+    <div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>
+    <center><h4>STUDENT DISCIPLINE REPORT DETAILS</h4></center>
+    <br />
+    <table class="table table-hover table-responsive table-bordered" id="tabel1d">
+        <thead>
+            <tr>
+                <th>SL.No.</th>
+                <th>Student Details</th>
+                <th>Class Name</th>
+                <th>Section Name</th>
+                <th>Year</th>
+                <th>Date</th>
+                <th>Subject</th>
+                <th>Remarks</th>
+                <th>File</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in getreport| filter:searchValue">
+                <td class="text-center">{{$index+1}}</td>
+                <td class="text-left wordwrap">{{ user.AMST_FirstName}} : {{user.AMST_AdmNo}}</td>
+                <td class="text-left">{{user.ASMCL_ClassName}}</td>
+                <td class="text-left">{{user.ASMC_SectionName}}</td>
+                <td class="text-center">{{user.ASMAY_Year}}</td>
+                <td class="text-center">{{user.ASCOMP_Date}}</td>
+                <td class="text-left wordwrap">{{user.ASCOMP_Subject}}</td>
+                <td class="text-left wordwrap ">{{user.ASCOMP_Complaints}}</td>
+                <td class="text-left" style="word-wrap:break-word">
+                    <a style="color: blue;" href="{{user.ASCOMP_FilePath}}">
+                        {{user.ASCOMP_FileName}}
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="table1" ng-show="sdfsdfsdfds">
+    <table>
+        <tr style="border:0.5px solid black !important">
+            <td colspan="9" style="text-align:center"><b>STUDENT DISCIPLINE REPORT DETAILS</b></td>
+        </tr>
+        <tr style="border:0.5px solid black !important">
+            <td colspan="9">&nbsp;</td>
+        </tr>
+        <tr style="border:0.5px solid black !important">
+            <td colspan="9">&nbsp;</td>
+        </tr>
+        <tr style="border:0.5px solid black !important">
+            <th>SL.No.</th>
+            <th>Student Details</th>
+            <th>Class Name</th>
+            <th>Section Name</th>
+            <th>Year</th>
+            <th>Date</th>
+            <th>Subject</th>
+            <th>Remarks</th>
+            <th>File</th>
+        </tr>
+        <tr style="border:0.5px solid black !important" ng-repeat="user in getreport| filter:searchValue">
+            <td class="text-center">{{$index+1}}</td>
+            <td class="text-left wordwrap">{{ user.AMST_FirstName}} : {{user.AMST_AdmNo}}</td>
+            <td class="text-left">{{user.ASMCL_ClassName}}</td>
+            <td class="text-left">{{user.ASMC_SectionName}}</td>
+            <td class="text-center">{{user.ASMAY_Year}}</td>
+            <td class="text-center">{{user.ASCOMP_Date}}</td>
+            <td class="text-left wordwrap">{{user.ASCOMP_Subject}}</td>
+            <td class="text-left wordwrap ">{{user.ASCOMP_Complaints}}</td>
+            <td class="text-left">
+                <a style="color: blue;" href="{{user.ASCOMP_FilePath}}">
+                    {{user.ASCOMP_FileName}}
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="myModalimg" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="preview" class="img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-small" id="popup15" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+        </div>
+        <div class="modal-content">
+            <div class="modal-body">
+                <div ng-repeat="vi1 in view_videos" style="padding-bottom:20px">
+                    <video width="320" height="240" controls="controls" crossorigin="anonymous" controlsList="nodownload" oncontextmenu="return false;">
+                        <source ng-src="{{vi1.coeeV_Videos | trustUrl}}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="pauseOrPlay()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdf" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div id="pdfviewdd"></div>
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>
+    </div>
+</div>
+
+<div id="showppt" class="modal fade" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <iframe ng-src="{{contantppt}}" width='100%' height='1000' frameborder='0'></iframe>
+        </div>
+    </div>
+</div>

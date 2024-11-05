@@ -1,0 +1,349 @@
+﻿
+<section class="content" data-ng-init="loadInitialData()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Class Teacher Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHidden">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="text-center">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="cat" required ng-change="setfromdate(asmaY_Id)">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in newuser1" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected===true}}">{{option.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="categoryflag==true">
+                            <label class="control-label col-sm-4">Category:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="objj.amC_Id" ng-change="getclass()" name="catg" required>
+                                    <option value="">Select Category</option>
+                                    <option value="0">All</option>
+                                    <option ng-repeat="cat in categoryDropdown" value="{{cat.amC_Id}}">{{cat.amC_Name}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.catg)" ng-messages="myForm.catg.$error">
+                                    <div ng-message="required">Select Category</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="text-center well" ng-init="type=1">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type" ng-value="3" name="all" ng-change="radiobtn()">
+                                <span class="lbl padding-8">Class Teacher</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type" ng-value="1" name="all" ng-change="radiobtn()">
+                                <span class="lbl padding-8">Class Teacher having Attendance Privilege</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type" ng-value="2" name="all" ng-change="radiobtn()">
+                                <span class="lbl padding-8">Subject Teacher</span>
+                            </label>
+                        </div>
+
+                        <hr />
+                        <div class="">
+                            <div class="text-center">
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="savetmpldata();">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+
+                                <md-button type="button" class="md-raised md-warn" ng-click="cancel()" ng-model="clr" value="cl">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" ng-click="exportToExcel()">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Excel
+                                </md-button>
+                                <md-button type="submit" class="md-raised md-warn" ng-disabled="print_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="class">
+            <!--<div ng-show="count > 0">-->
+            <div class="box-header with-border">
+                <h3 class="box-title">Class Section Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <label>
+                                    <input type="checkbox" ng-model="all2" ng-click="toggleAll()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th><a href="">SL.No</a></th>
+                            <th><a href="" ng-click="sortBy('IVRMSTAUL_UserName')">Staff Name</a></th>
+                            <th><a href="" ng-click="sortBy('ASMCL_ClassName')">Class</a></th>
+                            <th><a href="" ng-click="sortBy('ASMC_SectionName')">Section</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--orderBy:sortKey:reverse|-->
+                        <tr dir-paginate="user in filterValue1=(loginPData |filter:searchValue )| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage " current-page="currentPage" ng-class-odd="'odd'">
+                            <td class="text-center">
+                                <label>
+                                    <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{ user.IVRMSTAUL_UserName}}</td>
+                            <td>{{ user.ASMCL_ClassName}}</td>
+                            <td>{{ user.ASMC_SectionName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+            <!--</div>-->
+          
+            <div id="printSectionId" ng-show="table_flag">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>Class Teacher List For Year - {{yearname}}</h4></center>
+                <br />
+                <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center"> SL. No.</th>
+                            <th class="text-center">Staff Name</th>
+                            <th class="text-center">Class</th>
+                            <th class="text-center">Section</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in printdatatable|filter :searchValue">
+                            <td>{{$index+1}}</td>
+                            <td>{{ user.IVRMSTAUL_UserName}}</td>
+                            <td>{{ user.ASMCL_ClassName}}</td>
+                            <td>{{ user.ASMC_SectionName}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="16" class="col-sm-12 text-center ">
+                                <label>
+                                    Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                </label>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div id="printSectionId3" ng-show="table_flag">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>Subject Teacher List For Year - {{yearname}}</h4></center>
+                <br />
+                <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center"> SL. No.</th>
+                            <th class="text-center">Staff Name</th>
+                            <th class="text-center">Class</th>
+                            <th class="text-center">Section</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in printdatatable|filter :searchValue">
+                            <td>{{$index+1}}</td>
+                            <td>{{ user.IVRMSTAUL_UserName}}</td>
+                            <td>{{ user.ASMCL_ClassName}}</td>
+                            <td>{{ user.ASMC_SectionName}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="16" class="col-sm-12 text-center ">
+                                <label>
+                                    Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                </label>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="subject">
+            <div class="box-header with-border">
+                <h3 class="box-title">Class Section Subject Report List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue1!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue2.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue1" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <label>
+                                    <input type="checkbox" ng-model="all3" ng-click="toggleAll2()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>SL.No</th>
+                            <th><a href="" ng-click="sortBy1('IVRMSTAUL_UserName')">Staff Name</a></th>
+                            <th><a href="" ng-click="sortBy1('ASMCL_ClassName')">Class</a></th>
+                            <th><a href="" ng-click="sortBy1('ASMC_SectionName')">Section</a></th>
+                            <th><a href="" ng-click="sortBy1('PAMS_SubjectName')">Subject</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--|orderBy:sortKey:reverse-->
+                        <tr dir-paginate="user1 in filterValue2=(loginPDatasubject |filter:searchValue1 ) |orderBy:propertyName1:reverse1 |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td class="text-center">
+                                <label>
+                                    <input type="checkbox" ng-model="user1.selected" value="{{user1.Id}}" ng-change="optionToggled2(user1,itemsPerPage *(currentPage-1)+$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{ user1.IVRMSTAUL_UserName}}</td>
+                            <td>{{ user1.ASMCL_ClassName}}</td>
+                            <td>{{ user1.ASMC_SectionName}}</td>
+                            <td>{{user1.PAMS_SubjectName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+            <div id="printSectionId2" ng-show="table_flag">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>Class Teacher having Attendance Privilege List For {{yearname}}</h4></center>
+                <br />
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                    <thead>
+                        <tr>
+                            <th class="text-center">SL. No.</th>
+                            <th class="text-center" ng-click="sortBy1('IVRMSTAUL_UserName')">Staff Name</th>
+                            <th class="text-center" ng-click="sortBy1('ASMCL_ClassName')">Class</th>
+                            <th class="text-center" ng-click="sortBy1('ASMC_SectionName')">Section</th>
+                            <th class="text-center" ng-click="sortBy1('PAMS_SubjectName')">Subject Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user1 in printdatatablesubject|filter :searchValue1">
+                            <td>{{$index+1}}</td>
+                            <td>{{ user1.IVRMSTAUL_UserName}}</td>
+                            <td>{{ user1.ASMCL_ClassName}}</td>
+                            <td>{{ user1.ASMC_SectionName}}</td>
+                            <td>{{user1.PAMS_SubjectName}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="16" class="col-sm-12 text-center ">
+                                <label>
+                                    Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                </label>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+    </form>
+    <!-- Modal -->
+</section>

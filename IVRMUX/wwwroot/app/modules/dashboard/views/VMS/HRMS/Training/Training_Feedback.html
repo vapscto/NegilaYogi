@@ -1,0 +1,192 @@
+﻿<style>
+    .multiselect {
+        width: 22em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 4%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+    .aaa {
+        margin-top: 28px;
+        margin-right: 10px;
+        padding-right: 1px;
+        text-align: center;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Training Feedback</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div style="text-align:center;" data-ng-init="feedbacktype='Trainer'">
+                        <input value="Trainer" ng-model="feedbacktype" type="radio" name="feedbacktype">
+                        <span class="lbl padding-8">
+                            Feedback For Trainer
+                        </span>
+                        <input value="Trainee" ng-model="feedbacktype" type="radio" name="feedbacktype">
+                        <span class="lbl padding-8">
+                            Trainee Evalution
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12" ng-show="feedbacktype=='Trainer'">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savetrainerfeedback()" name="myForm" method="post" novalidate>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Training Feedback Form</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-8 col-sm-offset-3 text-center">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Training Program Name:<span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="sel1" name="program" data-ng-model="hrtcR_Id" required ng-change="getQuestions()">
+                                                <option value="">--Select Program Name--</option>
+                                                <option ng-repeat="class in traninglisttrainer" value="{{class.hrtcR_Id}}" ng-selected="{{class.Selected == true}}">
+                                                    {{class.hrtcR_PrgogramName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.program)" ng-messages="myForm.program.$error">
+                                            <div ng-message="required">Select Training Program Name</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Trainer Name:<span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="seltrnr" name="trainername" data-ng-model="hrtfeeD_TrainerId" required>
+                                                <option value="">--Select Trainer Name--</option>
+                                                <option ng-repeat="trnr in trainerlist" value="{{trnr.hrmE_Id}}" ng-selected="{{trnr.Selected == true}}">
+                                                    {{trnr.hrmE_EmployeeFirstName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.trainername)" ng-messages="myForm.trainername.$error">
+                                            <div ng-message="required">Select Trainer Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div ng-repeat="user1 in mappedquestionlist" style="padding:0.5% 2% 0.5% 2%;">
+                                <h4 class="text-left Question">
+                                    {{$index+1}} . {{user1.hrmfqnS_QuestionName}}
+                                    <input type="hidden" value="{{user1.hrmfqnS_Id}}" />
+                                </h4>
+                                <label class="radio-inline" ng-repeat="user2 in tempoptionarray">
+                                    <input type="radio" ng-model="user1.answer" name="t1_{{user1.hrmfqnS_QuestionName}}" ng-if="user1.hrmfqnS_Id==user2.hrmfqnS_Id" value="{{user2.hrmfopT_Id}}" required />
+                                    <span class="lbl padding-8" ng-if="user1.hrmfqnS_Id==user2.hrmfqnS_Id">{{user2.hrmfopT_OptionName}}</span>
+                                </label>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm['t1_'+user1.hrmfqnS_QuestionName])"
+                                     ng-messages="myForm['t1_'+user1.hrmfqnS_QuestionName].$error">
+                                    <div ng-message="required">Select Your Answer</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <input type="hidden" ng-model="Id" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-sm-12" ng-show="feedbacktype=='Trainee'">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savetraineefeedback()" name="myForm2" method="post" novalidate>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">INDUCTION TRAINING: TRAINEE EVALUTION FORM</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-sm-8 col-sm-offset-3 text-center">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Training Program Name:<span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="sel1" name="program" data-ng-model="hrtcR_Id" required ng-change="getQuestions()">
+                                                <option value="">--Select Program Name--</option>
+                                                <option ng-repeat="class in traninglisttrainee" value="{{class.hrtcR_Id}}" ng-selected="{{class.Selected == true}}">
+                                                    {{class.hrtcR_PrgogramName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted2(myForm2.program)" ng-messages="myForm2.program.$error">
+                                            <div ng-message="required">Select Training Program Name</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Trainee Name:<span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="seltrainee" name="traineename" data-ng-model="hrmE_Id" required>
+                                                <option value="">--Select Trainee Name--</option>
+                                                <option ng-repeat="trnee in traineelist" value="{{trnee.hrmE_Id}}" ng-selected="{{trnee.Selected == true}}">
+                                                    {{trnee.HRME_EmployeeFirstName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted2(myForm2.traineename)" ng-messages="myForm2.traineename.$error">
+                                            <div ng-message="required">Select Trainee Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div ng-repeat="user1 in mappedquestionlist" style="padding:0.5% 2% 0.5% 2%;">
+                                <h4 class="text-left Question">
+                                    {{$index+1}} . {{user1.hrmfqnS_QuestionName}}
+                                    <input type="hidden" value="{{user1.hrmfqnS_Id}}" />
+                                </h4>
+                                <label class="radio-inline" ng-repeat="user2 in tempoptionarray">
+                                    <input type="radio" ng-model="user1.answer" name="t1_{{user1.hrmfqnS_QuestionName}}" ng-if="user1.hrmfqnS_Id==user2.hrmfqnS_Id" value="{{user2.hrmfopT_Id}}" required />
+                                    <span class="lbl padding-8" ng-if="user1.hrmfqnS_Id==user2.hrmfqnS_Id">{{user2.hrmfopT_OptionName}}</span>
+                                </label>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted2(myForm2['t1_'+user1.hrmfqnS_QuestionName])"
+                                     ng-messages="myForm2['t1_'+user1.hrmfqnS_QuestionName].$error">
+                                    <div ng-message="required">Select Your Answer</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <input type="hidden" ng-model="Id" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>    
+</section>

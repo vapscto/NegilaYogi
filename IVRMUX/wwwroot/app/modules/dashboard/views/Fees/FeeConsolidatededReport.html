@@ -1,0 +1,331 @@
+﻿<style>
+
+    .k-grid-toolbar {
+        text-align: center;
+    }
+
+    .gridTitle {
+        text-align: center;
+    }
+
+    .titlecolor {
+        color: white !important;
+    }
+
+    .k-filter-row th, .k-title, .k-grid-header th.k-header {
+        font-weight: bold !important;
+    }
+
+    .k-grid-header .k-link, .k-grid-header .k-link:link, .k-pager-info, .k-scheduler-agendaview .k-scheduler-datecolumn, .k-scheduler-header {
+        color: black !important;
+    }
+
+    .k-pdf-export .k-grid-excel, .k-pdf-export .k-grid-pdf, .k-pdf-export .k-pager-wrap {
+        display: none;
+        width: 20%;
+        margin: auto;
+    }
+
+    .k-filter-row > th:first-child, .k-grid tbody td:first-child, .k-grid tfoot td:first-child, .k-grid-header th.k-header:first-child {
+        color: black;
+    }
+</style>
+
+
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <!--data-ng-submit="ShowReportdata()"-->
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Consolidated Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3" ng-init="Selectionrd='allr'">
+                        <div class="well text-center">
+                            <label class="radio-inline">
+                                <input type="radio" value="allr" data-ng-model="Selectionrd" data-ng-click="onclickloaddataclass()" required />
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="Indi" data-ng-model="Selectionrd" data-ng-click="onclickloaddataclass()" required />
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row">
+                    <!--<div class="col-sm-6 col-sm-offset-3">
+                    <!--<div class="col-sm-6 col-sm-offset-3">
+                <div class="text-center">
+                    <div class="text-center subwell">
+                        <label class="radio-inline">
+                            <input type="radio" value="Academic" name="" ng-model="rbns" ng-click="onclickloaddata()">
+                            <span class="lbl padding-8">Academic Year Wise</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" value="Consolidated" name="" ng-model="rbns" ng-click="onclickloaddata()">
+                            <span class="lbl padding-8">Consolidated</span>
+                        </label>
+                    </div>
+                </div>
+        </div>-->
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="seluse" name="acd_year" data-ng-model="acayyearbindM" required>
+                                    <option value="" label="Select Year"> </option>
+                                    <option ng-repeat="option in acayyearbind" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required">Please Select the Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="seluse1" name="secid" data-ng-model="sectiondrpreM" data-ng-change="onselectclasssection()"  required>
+                                    <option value="" label="Select Section"> </option>
+                                    <option ng-repeat="option1 in sectiondrpre" value="{{option1.amsC_Id}}" ng-selected="{{option1.Selected == true}}">
+                                        {{option1.asmc_sectionname}}
+                                    </option>
+                                    <!--<option value="0">--All--</option>-->
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.secid)" ng-messages="myForm.secid.$error">
+                                    <div ng-message="required">Please Select the Section</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="selus2e" data-ng-model="clsdrpdownM" name="classid" data-ng-change="onselectclass()" required>
+                                    <option value="" label="Select class"> </option>
+                                    <option ng-repeat="option11 in clsdrpdown" value="{{option11.asmcL_Id}}" ng-selected="{{option11.Selected == true}}">
+                                        {{option11.asmcL_ClassName}}
+                                    </option>
+                                    <!--<option value="0">--All--</option>-->
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.classid)" ng-messages="myForm.classid.$error">
+                                    <div ng-message="required">Please Select the Class</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="text-center">
+                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="showreport(asmaY_Id, asmcL_Id, asmC_Id, amst_Id, termlst,due_date)">
+                    <i class="fa fa-edit" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+                <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#table1')" target="_blank" ng-show="export_flag">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export to Excel
+                </md-button>
+                <md-button type="submit" class="md-raised md-warn" ng-click="printData(Table);" ng-show="export_flag">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+            </div>
+        </div>
+        <!--<div class="box box-primary" ng-show="report">
+        <div class="box-header with-border">
+            <h3 class="box-title">Fee ClassWiseReport Grid View</h3>
+
+        </div>
+        <div class="box-body">
+            <div ui-i18n="en" class="grid ui-grid ng-isolate-scope grid1535517505380" id="grid1" ui-grid="gridOptions" ui-grid-grouping="" ui-grid-exporter="" ui-grid-auto-resize="" style="height: 437px;">
+
+
+            </div>
+        </div>
+    </div>-->
+        <div class="box box-primary" ng-show="result">
+
+            <div class="box-header with-border">
+                <h3 class="box-title">FEE Consolidated REPORT RESULT</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+
+
+            <div class="box-body" ng-show="stddetails">
+                <div id="grid123">
+
+                </div>
+            </div>
+
+            <div class="box-body" ng-show="gridview">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{totcountfirst}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchString!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{students1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-offset-2 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchString" type="text" placeholder="search here..." ng-show="file_disable">
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                    <thead style="border:solid 1px; border-color:#fff;">
+
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order('sno')">SLNO</a>
+                            </th>
+                            <th><a href="" ng-click="sort('StudentName')">Student Name</a> </th>
+                            <th><a href="" ng-click="sort('Admno')">Adm.No</a> </th>
+                            <th>
+                                <a href="" ng-click="sort('Class')">Class & Section </a>
+                            </th>
+                            <th><a href="" ng-click="sort('FeeGroup')">Paid Amount</a> </th>
+                            <th><a href="" ng-click="sort('FeeHead')">Receipt No</a> </th>
+                            <th><a href="" ng-click="sort('Concession')">Bank Name</a> </th>
+                            <th><a href="" ng-click="sort('Netamount')">Date</a> </th>
+                            <th><a href="" ng-click="sort('Concession')">Cheque No</a> </th>
+                            <th><a href="" ng-click="sort('Concession')">Cheque Date</a> </th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in students1=(reportdatelist |filter:searchString)  | orderBy:propertyName:reverse | filter:search |orderBy:sortKey:reverse">
+
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.selected" ng-change="optionToggled(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{$index+1}}</td>
+                            <td>{{ user.StudentName}}</td>
+                            <td>{{ user.AMST_AdmNo}}</td>
+                            <td>{{user.ClassName}}-{{user.SectionName}}</td>
+                            <td>{{ user.Paid}}</td>
+                            <td>{{ user.ReceiptNo}}</td>
+                            <td>{{ user.FYP_Bank_Name}}</td>
+                            <td>{{ user.Date}}</td>
+                            <td>{{ user.ChequeNo}}</td>
+                            <td>{{ user.FYP_DD_Cheque_Date}}</td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div id="Table" ng-show="export_table_flag">
+
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center> <h4><u> FEE STUDENT CONSOLIDATED REPORT </u></h4></center>
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                    <thead>
+                        <tr>
+
+                            <th>SL.NO</th>
+                            <th>Student Name</th>
+                            <th>Adm.No</th>
+                            <th>Class & Section</th>
+                            <th>Paid Amount</th>
+                            <th>Receipt No </th>
+                            <th>Bank Name</th>
+                            <th>Date</th>
+                            <th>Cheque No</th>
+                            <th>Cheque Date</th>
+                            
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in printdatatable | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                            <td>{{$index+1}}</td>
+                            <td>{{ user.StudentName}}</td>
+                            <td>{{ user.AMST_AdmNo}}</td>
+                            <td>{{user.ClassName}}-{{user.SectionName}}</td>
+                            <td>{{ user.Paid}}</td>
+                            <td>{{ user.ReceiptNo}}</td>
+                            <td>{{ user.FYP_Bank_Name}}</td>
+                            <td>{{ user.Date}}</td>
+                            <td>{{ user.ChequeNo}}</td>
+                            <td>{{ user.FYP_DD_Cheque_Date}}</td>
+                        </tr>
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="16" class="col-sm-12 text-center ">
+                                <label>
+                                    Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                </label>
+                            </td>
+                        </tr>
+
+                    </tfoot>
+                </table>
+
+
+
+            </div>
+
+
+
+
+
+        </div>
+    </form>
+</section>

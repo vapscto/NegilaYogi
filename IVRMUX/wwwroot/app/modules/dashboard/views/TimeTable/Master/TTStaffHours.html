@@ -1,0 +1,193 @@
+﻿<section class="content">
+    <div class="box box-primary" data-ng-init="BindData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">Staff Wise Working Hours</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" ng-click="ShowHide1()" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <form class="form-horizontal" role="form" name="myForm"  novalidate>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel" name="acd" ng-model="asmaY_Id" ng-change="get_category()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="year in year_list" value="{{year.asmaY_Id}}" ng-selected="{{year.Selected == true}}">
+                                        {{year.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd)" ng-messages="myForm.acd.$error">
+                                    <div ng-message="required">Please Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Staff Name :<span style="color:Red">*</span></label>
+              
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                <label>
+                                    <input name="staf" value="1" ng-model="usercheck" type="checkbox" data-ng-click="all_check()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label data-ng-model="staf" ng-repeat="staff in staff_list |filter:filterchkbx" value="{{staff.hrmE_Id}}" ng-click="binddata(staff_list)">
+
+                                    <input name="staf" value="1" data-ng-model="staff.stf" type="checkbox" ng-required="isOptionsRequired();" ng-click="togchkbx();">
+                                    <span class="lbl padding-8">
+                                        {{staff.staffName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.staf)" ng-messages="myForm.staf.$error" style="padding-left:188px">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                   
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="submit" class="md-raised md-primary" data-ng-click="GetReport()">
+                    <i class="fa fa-file" aria-hidden="true"></i> Report
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                </md-button>
+                <md-button type="button" ng-click="printData()" class="md-raised md-primary" ng-disabled="griddata.length==0">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    print
+                </md-button>
+                <md-button type="button" ng-click="exportToExcel('#tabel11')" target="_blank" class="md-raised md-primary" ng-disabled="griddata.length==0">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Export to Excel
+                </md-button>
+
+            </div>
+        </form>
+    </div>
+    <div class="box box-primary tt" ng-show="grid_view">
+        <div class="box-header with-border">
+            <h3 class="box-title">Staff Wise Working Hours</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{griddata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" border="1" id="tabel11" style="border-collapse:collapse">
+
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.No.
+                            </th>
+                            <th><a href="" ng-click="sortBy('TRTOB_BookingDate')">STAFF NAME</a></th>
+                            <th><a href="" ng-click="sortBy('TRTOB_BookingId')">DAY</a></th>
+                            <th><a href="" ng-click="sortBy('TRTP_HirerName')">WORKING HOURS</a> </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1=(griddata | filter : searchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{ user.EmpName}}</td>
+                            <td>{{ user.TTMD_DayName}}</td>
+                            <td>{{ user.WorkingHrs}}</td>
+                          
+                        </tr>
+
+                    </tbody>
+
+
+
+
+                </table>
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>
+            </div>
+
+
+            <div id="printareaId" ng-show="tadprint">
+                <!--<div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>-->
+                <center> <h4>STAFF WISE WORKING HOURS</h4></center>
+                <br />
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                SL.No.
+                            </th>
+                            <th>STAFF NAME</th>
+                            <th>DAY</th>
+                            <th>WORKING HOURS</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="rt in griddata">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td>{{ rt.EmpName}}</td>
+                            <td>{{ rt.TTMD_DayName}}</td>
+                            <td>{{ rt.WorkingHrs}}</td>
+                        </tr>
+
+                    </tbody>
+                    <!--<tfoot>
+                        <tr>
+                            <td colspan="16" class="col-sm-12 text-center ">
+                                <label>
+                                    Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                </label>
+                            </td>
+                        </tr>
+
+                    </tfoot>-->
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>

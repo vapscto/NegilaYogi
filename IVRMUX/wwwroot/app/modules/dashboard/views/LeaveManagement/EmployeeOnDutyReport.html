@@ -1,0 +1,144 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="onLoadGetData()" name="myForm" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee On-Duty Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-6 col-sm-offset-3">
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-5">
+                            From Date :
+                            <span class="lbl padding-8" style="color:red;font-weight:700">*</span>
+                        </label>
+                        <div class="col-sm-6">
+                            <md-datepicker name="frmdate" ng-model="myDate_from" md-placeholder="From Date"
+                                           required md-max-date="maxdate" ng-change="Onchangefromdate()"></md-datepicker>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="error-messages" ng-if="interacted(myForm.frmdate)" ng-messages="myForm.frmdate.$error">
+                            <div ng-message="required" class="col-sm-offset-6">Please Select From Date</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-5">
+                            To Date :
+                            <span class="lbl padding-8" style="color:red;font-weight:700">*</span>
+                        </label>
+                        <div class="col-sm-6">
+                            <md-datepicker name="tdate" ng-model="myDate_to" md-placeholder="To Date"
+                                           required md-min-date="myDate_from" md-max-date="todatemax" ng-change="compdate()"></md-datepicker>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                            <div class="col-sm-offset-6" ng-message="required">Please Select To Date</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div data-ng-init="allind ='All'">
+                            <input type="radio" value="All" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                            <span class="lbl padding-8">All</span>
+                            <input type="radio" value="Indi" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                            <span class="lbl padding-8">Individual</span>
+                        </div>
+                        <div class="form-group" ng-show="allind == 'Indi'">
+                            <label class="control-label col-sm-6">
+                                Employee  : <strong style="color:red;" ng-show="!disabledata">*</strong>
+                            </label>
+                            <div class="multiselect col-sm-8" style="height:150px !important">
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                <input type="checkbox" name="ckeckempl" ng-model="empl" ng-true-value="true" ng-false-value="false" data-ng-click="all_check_empl()">
+                                <span class="lbl padding-8"> All</span>
+                                <label data-ng-model="PASR_Id" ng-repeat="emp in employeedropdown | filter:search" value="{{emp.hrmE_Id}}">
+                                    <input name="emp1" value="1" ng-model="emp.selected" type="checkbox" ng-required="isOptionsRequired3() && allind == 'Indi'" ng-true-value="true" ng-false-value="false" ng-change="addColumn4()">
+                                    <span class="lbl padding-8"> {{emp.hrmE_EmployeeFirstName}} </span>
+                                </label>
+                                <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                    <div ng-message="required" style="padding-left: 30px"> Select Employee</div>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.empl)" ng-messages="myForm.empl.$error">
+                                <div ng-message="required" style="padding-left: 30px">Select Employee</div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Generate
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="box box-primary">
+            <!--ng-if="Empreport.length>0">-->
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee On-Duty Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="col-sm-12 table-wrap">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+
+                                <th>FromDate </th>
+                                <th>ToDate</th>
+                                <th>Employee Name</th>
+                                <th>ApplicationStatus</th>
+                                <th>InTime</th>
+                                <th>OutTime</th>
+                                <th>LeaveName</th>
+                                <th>LeaveCode</th>
+                                <th>SanctioningLevel</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr ng-repeat="item in empreport">
+
+                                <td>{{item.HRELAP_FromDate}}</td>
+                                <td>{{item.HRELAP_ToDate}}</td>
+                                <td>
+                                    {{item.empname}}
+
+                                </td>
+                                <td>{{item.HRELAP_ApplicationStatus}}</td>
+                                <td>{{item.HRELAPD_InTime}}</td>
+                                <td>{{item.HRELAPD_OutTime}}</td>
+                                <td>{{item.HRML_LeaveName}}</td>
+                                <td>{{item.HRML_LeaveCode}}</td>
+                                <td>{{item.HRELAPA_SanctioningLevel}}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

@@ -1,0 +1,579 @@
+﻿<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student - Settlement</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div>
+                    <md-content>
+                        <md-tabs md-dynamic-height md-border-bottom>
+                            <md-tab label="Import" md-on-select="onTabChanges(0)">
+                                <md-content class="md-padding">
+                                    <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myForm1" novalidate>
+                                        <div class="box box-primary">
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title">Import</h3>
+                                                <div class="box-tools pull-right">
+                                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-sm-offset-3">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-3">Academic Year:<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" name="acd1" ng-model="ASMAY_Id" ng-change="getdates(ASMAY_Id)" required>
+                                                                    <option value="">--Select--</option>
+                                                                    <option ng-repeat="acd in year_list" value="{{acd.asmaY_Id}}" ng-selected="{{acd.asmaY_Id==ASMAY_Id}}">
+                                                                        {{acd.asmaY_Year}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted1(myForm1.acd1)" ng-messages="myForm1.acd1.$error">
+                                                                    <div ng-message="required">Please Select Academic Year</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-3">Payment Gateway:<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" name="paygateway" ng-model="IMPG_Id" required ng-change="fillmerchants(IMPG_Id)">
+                                                                    <option value="">--Select--</option>
+                                                                    <option ng-repeat="merchpay in paygatewaylist" value="{{merchpay.impG_Id}}" ng-selected="{{merchpay.Selected==true}}">
+                                                                        {{merchpay.impG_PGName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted1(myForm1.paygateway)" ng-messages="myForm1.paygateway.$error">
+                                                                    <div ng-message="required">Please Select Payment Gateway</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group" ng-show="false">
+                                                            <label class="control-label col-sm-4">Date :<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <div class="col-sm-4 input-group text-right" style="">
+                                                                    <md-datepicker ng-model="Selected_Date" onkeydown="return false" name="sel_date" id="date1" md-placeholder="Enter  date" md-min-date="minDatemf" md-max-date="maxDatemf" ng-change="valid_date(Selected_Date)" md-date-filter="onlyWeekendsPredicate" required></md-datepicker>
+                                                                </div>
+                                                                <div class="error-messages" ng-if="interacted1(myForm1.sel_date)" ng-messages="myForm1.sel_date.$error">
+                                                                    <div ng-message="required">Select Date</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" ng-show="merchant_list.length>0">
+                                                            <label class="control-label col-sm-3">Merchant Id:<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel1" name="merchant" ng-model="FPGD_Id" required>
+                                                                    <option value="">--Select--</option>
+                                                                    <option ng-repeat="merch in merchant_list" value="{{merch.fpgD_Id}}" ng-selected="{{merch.Selected==true}}">
+                                                                        {{merch.fpgD_MerchantId}} / {{merch.fpgD_SubMerchantId}} - {{merch.fpgD_PGName}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted1(myForm1.merchant)" ng-messages="myForm1.merchant.$error">
+                                                                    <div ng-message="required">Please Select Merchant</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr />
+                                                <div class="text-center">
+                                                    <input type="hidden" ng-model="EMCA_Id" value="{{EMCA_Id}}" />
+                                                    <md-button type="submit" class="md-raised md-primary" ng-click="saveddata()" id="save-btn" ng-show="merchant_list.length>0">
+                                                        <i class="fa fa-save" aria-hidden="true"></i>
+                                                        Save
+                                                    </md-button>
+                                                    <md-button type="button" class="md-raised md-warn" data-ng-click="clear1()">
+                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                        Cancel
+                                                    </md-button>
+
+                                                    <md-button type="submit" ng-show="pages.length>0" class="md-raised md-primary" ng-disabled="form.$invalid" id="excel-btn" ng-click="exportToExcel('#port_id')">
+                                                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                                        Export To Excel
+                                                    </md-button>
+                                                    <md-button type="submit" ng-show="pages.length>0" class="md-raised md-warn" ng-disabled="form.$invalid" id="print-btn" ng-click="printData();">
+                                                        <i class="fa fa-print" aria-hidden="true"></i>
+                                                        Print
+                                                    </md-button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="box box-primary" ng-show="pages.length>0">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Settlement details</h3>
+                                            <div class="box-tools pull-right">
+                                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="">
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            <b> Total Grid Records :</b>
+                                                            <label class="badge">
+                                                                {{pages.length}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group" ng-if="searchValue!=''">
+                                                        <label class="control-label">
+                                                            <b>Total Records Searched : </b>
+                                                            <label class="badge">
+                                                                {{filterValue.length}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4 pull-right">
+                                                    <div class="form-group">
+
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-search"></i>
+                                                            </span>
+                                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <table class="table table-hover table-responsive table-bordered text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            SL NO
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort('fyppsT_Settlement_Id')">Settlement Id</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort('fyppsT_Settlement_Date')">Settlement Date</a>
+                                                        </th>
+
+                                                        <th>
+                                                            <a href="" ng-click="sort('fyppsT_Settlement_Amount')">Settlement Amount</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort('fyppsT_UTR_No')">UTR No</a>
+                                                        </th>
+
+                                                        <th>View</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+
+                                                    <tr dir-paginate="user in filterValue=( pages  | filter : search1) |orderBy:sortKey:reverse  | itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+
+                                                        <td>{{ itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                                        <td>{{ user.fyppsT_Settlement_Id}}</td>
+                                                        <td>{{ user.fyppsT_Settlement_Date|date:'dd-MM-yyyy'}}</td>
+                                                        <td>{{ user.fyppsT_Settlement_Amount}}</td>
+                                                        <td>{{ user.fyppsT_UTR_No}}</td>
+
+                                                        <td class="text-center">
+                                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#popup" data-backdrop="static" ng-click="viewrecordspopup(user);"> <i class="fa fa-eye text-purple"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                            <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                                     direction-links="true"
+                                                                     boundary-links="true">
+                                            </dir-pagination-controls>
+                                        </div>
+                                    </div>
+
+                                    <div id="printSectionId" ng-show="print_data" style="overflow:scroll">
+                                        <div class="baldwin text-center">
+                                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                        </div>
+                                        <center><h4>Settlement Report {{year}}</h4></center>
+                                        <br />
+                                        <table class="table table-hover table-responsive table-bordered text-center" id="port_id">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        SL NO
+                                                    </th>
+                                                    <th>
+                                                        Settlement Id
+                                                    </th>
+                                                    <th>
+                                                        Settlement Date
+                                                    </th>
+
+                                                    <th>
+                                                        Settlement Amount
+                                                    </th>
+                                                    <th>
+                                                        UTR No
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="user in pages | orderBy:sortKey:reverse">
+                                                    <td>{{ $index+1}}</td>
+                                                    <td>{{ user.fyppsT_Settlement_Id}}</td>
+                                                    <td>{{ user.fyppsT_Settlement_Date|date:'dd-MM-yyyy'}}</td>
+                                                    <td>{{ user.fyppsT_Settlement_Amount}}</td>
+                                                    <td>{{ user.fyppsT_UTR_No}}</td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="16" class="col-sm-12 text-center ">
+                                                        <label>
+                                                            Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+
+
+                                    </div>
+
+                                    <div id="exportexonId" ng-show="print_data" style="overflow:scroll">
+                                        <div class="baldwin text-center">
+                                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                        </div>
+                                        <center><h4>Settlement Report {{year}}</h4></center>
+                                        <br />
+                                        <table class="table table-hover table-responsive table-bordered text-center" id="port_id">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        SL NO
+                                                    </th>
+                                                    <th>
+                                                        Settlement Id
+                                                    </th>
+                                                    <th>
+                                                        Settlement Date
+                                                    </th>
+
+                                                    <th>
+                                                        Settlement Amount
+                                                    </th>
+                                                    <th>
+                                                        UTR No
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="user in pages | orderBy:sortKey:reverse">
+                                                    <td>{{ $index+1}}</td>
+                                                    <td>{{ user.fyppsT_Settlement_Id}}</td>
+                                                    <td>{{ user.fyppsT_Settlement_Date|date:'dd-MM-yyyy'}}</td>
+                                                    <td>{{ user.fyppsT_Settlement_Amount}}</td>
+                                                    <td>{{ user.fyppsT_UTR_No}}</td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="16" class="col-sm-12 text-center ">
+                                                        <label>
+                                                            Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+
+
+                                    </div>
+
+                                </md-content>
+                            </md-tab>
+                         
+                            <md-tab label="Report" md-on-select="onTabChanges(3)">
+                                <md-content class="md-padding">
+                                    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm3" novalidate>
+                                        <div class="box box-primary">
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title">Head-Wise Report</h3>
+                                                <div class="box-tools pull-right">
+                                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-sm-offset-3">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <select class="form-control" id="sel11" name="acd3" ng-model="ASMAY_Id1" ng-change="get_classes()" required>
+                                                                    <option value="">--Select--</option>
+                                                                    <option ng-repeat="acd in year_list" value="{{acd.asmaY_Id}}" ng-selected="{{acd.Selected==true}}">
+                                                                        {{acd.asmaY_Year}}
+                                                                    </option>
+                                                                </select>
+                                                                <div class="error-messages" ng-if="interacted2(myForm3.acd3)" ng-messages="myForm3.acd3.$error">
+                                                                    <div ng-message="required">Please Select Academic Year</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">From Date :<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <div class="col-sm-4 input-group text-right">
+                                                                    <md-datepicker ng-model="From_Date" onkeydown="return false" name="frm_date1" id="date1" md-placeholder="Enter  date" md-min-date="minDatemf1" md-max-date="maxDatemf1" ng-change="To_Date=null; report_list = [];" required></md-datepicker>
+                                                                </div>
+                                                                <div class="error-messages" ng-if="interacted2(myForm3.frm_date1)" ng-messages="myForm3.frm_date1.$error">
+                                                                    <div ng-message="required">Select Date</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">To Date :<span style="color:Red">*</span></label>
+                                                            <div class="col-sm-8">
+                                                                <div class="col-sm-4 input-group text-right">
+                                                                    <md-datepicker ng-model="To_Date" onkeydown="return false" name="to_date1" id="date1" md-placeholder="Enter  date" md-min-date="From_Date" md-max-date="maxDatemf1" ng-change="report_list = [];" required></md-datepicker>
+                                                                </div>
+                                                                <div class="error-messages" ng-if="interacted2(myForm3.to_date1)" ng-messages="myForm3.to_date1.$error">
+                                                                    <div ng-message="required">Select Date</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <hr />
+                                                <div class="text-center">
+
+                                                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="getreport1()">
+                                                        <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                        Report
+                                                    </md-button>
+                                                    <md-button type="button" class="md-raised md-warn" data-ng-click="clear3()">
+                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                        Cancel
+                                                    </md-button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    </form>
+
+                                    <!--<div class="box box-primary" ng-show="report_list.length>0">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Settlement Report</h3>
+                                            <div class="box-tools pull-right">
+                                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="">
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            <b> Total Grid Records :</b>
+                                                            <label class="badge">
+                                                                {{report_list.length}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group" ng-if="searchValue1!=''">
+                                                        <label class="control-label">
+                                                            <b>Total Records Searched : </b>
+                                                            <label class="badge">
+                                                                {{filterValue1.length}}
+                                                            </label>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4 pull-right">
+                                                    <div class="form-group">
+
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-search"></i>
+                                                            </span>
+                                                            <input class="form-control" ng-model="searchValue1" type="text" placeholder="search here...">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <table class="table table-hover table-responsive table-bordered text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            SL NO
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('amsT_FirstName')">Student Name</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('asmcL_ClassName')">Class</a>
+                                                        </th>
+
+                                                        <th>
+                                                            <a href="" ng-click="sort2('asmC_SectionName')">Section</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('amsT_AdmNo')">ADM .No</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('fyppsD_Payment_Mode')">UTR.No</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('fyppsD_Payment_Id')">Payment Id</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('fyppsD_PAYU_Id')">PAYU Ref. Id</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('fyppsD_Payment_Amount')">Amount</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('fyppsD_Transaction_Date')">Trnsaction Date</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('fyppsT_Settlement_Date')">Settlement Date</a>
+                                                        </th>
+                                                        <th>
+                                                            <a href="" ng-click="sort2('fyppsT_UTR_No')">UTR No</a>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr dir-paginate="user in filterValue1=(report_list  | filter : searchValue1) |orderBy:sortKey2:reverse2  | itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page2">
+                                                        <td>{{ itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                                        <td>{{ user.amsT_FirstName}}</td>
+                                                        <td>{{ user.asmcL_ClassName}}</td>
+                                                        <td>{{ user.asmC_SectionName}}</td>
+                                                        <td>{{ user.amsT_AdmNo}}</td>
+                                                        <td>{{ user.fyppsD_Payment_Mode}}</td>
+                                                        <td>{{ user.fyppsD_Payment_Id}}</td>
+                                                        <td>{{ user.fyppsD_PAYU_Id}}</td>
+                                                        <td>{{ user.fyppsD_Payment_Amount}}</td>
+                                                        <td>{{ user.fyppsD_Transaction_Date|date:'dd-MM-yyyy'}}</td>
+                                                        <td>{{ user.fyppsT_Settlement_Date|date:'dd-MM-yyyy'}}</td>
+                                                        <td>{{ user.fyppsT_UTR_No}}</td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                            <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                                     direction-links="true"
+                                                                     boundary-links="true">
+                                            </dir-pagination-controls>
+                                        </div>
+                                    </div>-->
+                                </md-content>
+
+                            </md-tab>
+
+                        </md-tabs>
+                    </md-content>
+                    <div class="box box-primary" ng-show="testgrd==true">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Settlement Report</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div id="gridind">
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.box-body -->
+
+        </div>
+
+    </div>
+</section>
+<div class="modal fade  modal-medium" id="popup" role="dialog">
+    <div class="modal-dialog modal-md">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            <h4 class="modal-title text-white">"{{Settlement_Id}}" Transaction Details</h4>
+
+            <button type="submit" ng-show="pages.length>0" class="md-raised md-primary" ng-disabled="form.$invalid" id="excel-btn" ng-click="exportToExcelmodel('#export_id_modal')">Export to Excel</button>
+
+        </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <!--  <div ui-grid="gridOptionspopup" ui-grid-pagination class="grid text-center" style="height: 270px;"></div>-->
+                <table class="table table-hover table-responsive table-bordered text-center" id="export_id_modal">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL NO
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort1('fyppsD_PAYU_Id')">PAYU Id</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort1('fyppsD_Payment_Id')">Payment Id</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort1('fyppsD_Payment_Mode')">Payment Mode</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort1('fyppsD_Payment_Status')">Payment Status</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort1('fyppsD_Transaction_amount')">Transaction Amount</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort1('fyppsD_Transaction_Date')">Transaction Date</a>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="user in viewrecordspopupdisplay | orderBy:sortkey1:reverse1" ng-class-odd="'odd'">
+                            <td>{{$index+1}}</td>
+                            <td>{{ user.fyppsD_PAYU_Id}}</td>
+                            <td>{{ user.fyppsD_Payment_Id}}</td>
+                            <td>{{ user.fyppsD_Payment_Mode}}</td>
+                            <td>{{ user.fyppsD_Payment_Status}}</td>
+                            <td>{{ user.fyppsD_Transaction_amount}}</td>
+                            <td>{{ user.fyppsD_Transaction_Date|date:'dd-MM-yyyy'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+

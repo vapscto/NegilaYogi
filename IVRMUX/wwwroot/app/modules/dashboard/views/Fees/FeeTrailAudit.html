@@ -1,0 +1,537 @@
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Trail Audit Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 ">
+                        <div class="well text-center" ng-init="rpttyp='receipt'">
+                            <label class="radio-inline">
+                                <input type="radio" value="receipt" ng-model="rpttyp" name="rpt" ng-click="clear_valids()">
+                                <span class="lbl padding-8">Receipt wise</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="studentttt" ng-model="rpttyp" name="stu" ng-click="clear_valids()">
+                                <span class="lbl padding-8">Student Wise</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="date" ng-model="rpttyp" name="dt" ng-click="clear_valids()">
+                                <span class="lbl padding-8">Date Wise</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 ">
+                        <div class="well text-center form-group" ng-init="statustyp='IU'">
+                            <label class="radio-inline">
+                                <input type="radio" value="IU" ng-model="statustyp" name="sa_up" ng-click="clear_status()">
+                                <span class="lbl padding-8">Save/Update</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="D" ng-model="statustyp" name="del" ng-click="clear_status()">
+                                <span class="lbl padding-8">Delete</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="rpttyp=='receipt' || rpttyp=='studentttt'">
+                            <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="academicyear" id="sel1" data-ng-model="cfg.ASMAY_Id" required disabled>
+                                    <option ng-repeat="option in yearlst" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == cfg.ASMAY_Id}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.academicyear)" ng-messages="myForm.academicyear.$error">
+                                    <div ng-message="required">Select Academic Year </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="rpttyp=='studentttt'">
+                            <label class="control-label col-sm-4">
+                                <span class="lbl padding-8">Student :<span style="color:red;">*</span></span>
+                            </label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="studentname" ng-model="$parent.Amst_Id" theme="bootstrap" ng-keyup="searchfilter($select,rpttyp);" ng- title="Select Student">
+                                    <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.amsT_FirstName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in studentlst | filter: $select.search " value="{{option.amst_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.amsT_FirstName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="rpttyp=='receipt'">
+                            <label class="control-label col-sm-4">
+                                <span class="lbl padding-8">Receipt :<span style="color:red;">*</span></span>
+                            </label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="receiptno" ng-model="$parent.FYP_Id" theme="bootstrap" ng-keyup="searchfilter($select,rpttyp);" ng-change="onselectreceipt($parent.FYP_Id)" title="Select Receipt No">
+                                    <ui-select-match ng-trim="false" placeholder="Select or search Receipt No in the list...">{{$select.selected.fyP_Receipt_No}}</ui-select-match>
+                                    <ui-select-choices repeat="option in studentrecelst | filter: $select.search " value="{{option.FYP_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.fyP_Receipt_No | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="rpttyp=='date'">
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">From Date:<span style="color:red;">*</span></label>
+
+                                    <div class="col-sm-4 input-group text-right" style="">
+                                        <md-datepicker ng-model="fromdate" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" ng-required="rpttyp=='date'"></md-datepicker>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                        <div ng-message="required" style="margin-left:195px;">Select From Date</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">To Date:<span style="color:red;">*</span></label>
+
+                                    <div class="col-sm-4 input-group text-right" style="">
+                                        <md-datepicker ng-model="todate" onkeydown="return false" name="To_Date" id="date1" md-placeholder="Enter  date" ng-required="rpttyp=='date'"></md-datepicker>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                        <div ng-message="required" style="margin-left:195px;">Select To Date</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">
+                                        <input type="checkbox" name="Alddl" ng-model="Userstatus_flag" ng-disabled="rpttyp=='receipt' || rpttyp=='studentttt'">
+                                        <span class="lbl padding-8">User</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-4" ng-show="statustyp!='D'">
+                        <div class="" style="height:60px;border:1px solid #ccc;" id="style-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    <input type="checkbox" name="All" ng-model="Save_flag" ng-click="chk_flags_s(Save_flag)">
+                                    <span class="lbl padding-8">Save</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    <input type="checkbox" name="All" ng-model="Update_flag" ng-click="chk_flags_u(Update_flag)">
+                                    <span class="lbl padding-8">Update</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2" ng-show="statustyp!='D'">
+                        <i class="fa fa-question" style="color:red;"></i>
+                        <md-tooltip md-direction="right">
+                            Atleast One Status Has To Select
+                        </md-tooltip>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-click="ShowReportdata()">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="clear()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel('#printSectionId')" target="_blank" ng-show="printdatatable.length>0">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-warn" ng-show="printdatatable.length>0" id="print-btn" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+
+
+        </div>
+        <!--<div class="box box-primary" ng-show="Main_Details.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Trail Audit Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" id="divTableDataHolder">
+
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+
+                            <div class="input-group">
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table" >
+
+
+                       <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="stdall" ng-click="toggleAllstd()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th><a href="">SL NO</a></th>
+                            <th><a href="" >Receipt No</a></th>
+                            <th><a href="" ng-click="order('user_Name')">User</a></th>
+                            <th><a href="" ng-click="order('name')">Name</a> </th>
+                            <th><a href="" ng-click="order('fyP_Bank_Or_Cash')">TransAction Type</a> </th>
+                            <th><a href="" ng-click="order('itaT_Date')">Date</a> </th>
+                            <th><a href="" ng-click="order('itaT_Time')">Time</a> </th>
+                            <th><a href="" ng-click="order('fyP_Tot_Amount')">Amount</a> </th>
+                            <th><a href="" ng-click="order('fyP_Tot_Concession_Amt')">Concession</a> </th>
+                            <th><a href="" ng-click="order('fyP_Tot_Waived_Amt')">Waive</a> </th>
+                            <th><a href="" ng-click="order('fyP_Tot_Fine_Amt')">Fine</a> </th>
+                            <th><a href="" ng-click="order('itaT_Operation')">Status</a> </th>
+                            <th><a href="" ng-click="order('itaT_IPV4Address')">Ip Address</a> </th>
+                            <th ><a href="" >Mac Address</a> </th>
+                            <th ng-if="statustyp!='D'"><a href="" ng-click="order('Fine')">View</a> </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in Main_Details | orderBy:predicate:default | filter:search" >
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.stdselected" value="{{user.Id}}" ng-change="optionToggledstd(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.fyP_Receipt_No}}</td>
+                            <td>{{ user.user_Name}}</td>
+                            <td>{{ user.name}}</td>
+                            <td>{{ user.fyP_Bank_Or_Cash}} </td>
+                            <td>{{ user.itaT_Date| date:'dd/MM/yyyy'}}</td>
+                            <td>{{ user.itaT_Time}}</td>
+                            <td>{{ user.fyP_Tot_Amount}}</td>
+                            <td>{{ user.fyP_Tot_Concession_Amt}}</td>
+                            <td>{{ user.fyP_Tot_Waived_Amt}}</td>
+                            <td>{{ user.fyP_Tot_Fine_Amt}}</td>
+                            <td>{{ user.itaT_Operation}}</td>
+                            <td>{{ user.itaT_IPV4Address}}</td>
+                            <td>{{ user.itaT_MAACAddress}}</td>
+                            <td ng-if="statustyp!='D'">
+                                <a ng-if="user.itaT_Operation=='Insert'" href="javascript:void(0)" data-toggle="modal" data-target="#details" data-backdrop="static" ng-click="viewdetails(user);">
+                                    <i class="fa fa-eye text-purple"></i>
+                                    <md-tooltip md-direction="down">
+                                        View Inserted Values
+                                    </md-tooltip>
+                                </a><a ng-if="user.itaT_Operation=='Update'" href="javascript:void(0)" data-toggle="modal" data-target="#details" data-backdrop="static" ng-click="viewdetails(user);">
+                                    <i class="fa fa-eye text-purple"></i>
+                                    <md-tooltip md-direction="down">
+                                        View Previous Values
+                                    </md-tooltip>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="Div_p" ng-show="false">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="Table_p" ng-show="false">
+
+
+                        <thead>
+                            <tr>
+                                <th>SL NO</th>
+                                <th>Receipt No</th>
+                                <th>User</th>
+                                <th>Name</th>
+                                <th>TransAction Type</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Amount</th>
+                                <th>Concession</th>
+                                <th>Waive</th>
+                                <th>Fine</th>
+                                <th>Status</th>
+                                <th>Ip Address</th>
+                                <th>Mac Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatable | filter:search">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.fyP_Receipt_No}}</td>
+                                <td>{{ user.user_Name}}</td>
+                                <td>{{ user.name}}</td>
+                                <td>{{ user.fyP_Bank_Or_Cash}} </td>
+                                <td>{{ user.itaT_Date| date:'dd/MM/yyyy'}}</td>
+                                <td>{{ user.itaT_Time}}</td>
+                                <td>{{ user.fyP_Tot_Amount}}</td>
+                                <td>{{ user.fyP_Tot_Concession_Amt}}</td>
+                                <td>{{ user.fyP_Tot_Waived_Amt}}</td>
+                                <td>{{ user.fyP_Tot_Fine_Amt}}</td>
+                                <td>{{ user.itaT_Operation}}</td>
+                                <td>{{ user.itaT_IPV4Address}}</td>
+                                <td>{{ user.itaT_MAACAddress}}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>-->
+
+
+        <div class="box box-primary" ng-show="Main_Details.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Trail Audit Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" id="divTableDataHolder">
+
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+
+                        <div class="input-group">
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="stdall" ng-click="toggleAllstd()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th><a href="">SL NO</a></th>
+                            <th><a href="">Student Name</a></th>
+                            <th><a href="" ng-click="order('user_Name')">Adm no</a></th>
+                            <th><a href="" ng-click="order('name')">Class</a> </th>
+                            <th><a href="" ng-click="order('fyP_Bank_Or_Cash')">Section</a> </th>
+                            <th><a href="" ng-click="order('itaT_Date')">Amount</a> </th>
+                            <th><a href="" ng-click="order('itaT_Date')">Date</a> </th>
+                            <th><a href="" ng-click="order('itaT_Date')">Time</a> </th>
+                            <th><a href="" ng-click="order('itaT_Operation')">Status</a> </th>
+                            <th><a href="" ng-click="order('itaT_IPV4Address')">Ip Address</a> </th>
+                            <th><a href="">Mac Address</a> </th>
+                            <th ng-if="statustyp=='D'">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr dir-paginate="user in filterValue=(Main_Details  | filter : search) |orderBy:sortKey:reverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.stdselected" value="{{user.Id}}" ng-change="optionToggledstd(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{ user.StudentName}}</td>
+                            <td>{{ user.AMST_AdmNo}}</td>
+                            <td>{{ user.ASMCL_ClassName}}</td>
+                            <td>{{ user.ASMC_SectionName}} </td>
+                            <td>{{ user.FTP_TotalPaidAmount}}</td>
+                            <td>{{ user.ITAT_Date| date:'dd/MM/yyyy'}}</td>
+                           <!-- <td>{{ user.ITAT_Time |date :'hh:mm:ss'}}</td>-->
+                            <td>{{ user.ITAT_Date | date : 'shortTime' }}</td>
+                            <td>
+                                <span ng-if="user.ITAT_Operation=='D'">Delete</span>
+                                <span ng-if="user.ITAT_Operation=='I'">Save</span>
+                                <span ng-if="user.ITAT_Operation=='U'">Update</span>
+                                <!--{{ user.ITAT_Operation}}-->
+                            </td>
+                            <td>{{ user.ITAT_NetworkIp}}</td>
+                            <td>{{ user.ITAT_MAACAddress}}</td>
+                            <td hidden="hidden">{{user.FYP_Id}}</td>
+                            <td ng-if="statustyp=='D'">
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Click To View Details"
+                                   data-ng-model="receiptdetails"
+                                   data-target="#details" data-ng-click="viewdetails(user)">
+                                    Click to View Details
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+
+    </form>
+
+    <div id="printSectionId" ng-show="table_flag">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <table style="width:100%;">
+            <tr>
+                <td colspan="11" class="text-center">
+                    <center><h4>Fee Trail Audit Report </h4></center>
+                </td>
+            </tr>
+        </table>
+        <br />
+        <table class="table-bordered" id="table">
+            <thead>
+                <tr>
+                    <th>SL NO</th>
+                    <th>Student Name</th>
+                    <th>Adm no</th>
+                    <th>Class</th>
+                    <th>Section</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Ip Address</th>
+                    <th>Mac Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in printdatatable | filter : searchValue">
+                    <td>{{$index+1}}</td>
+                    <td>{{ user.StudentName}}</td>
+                    <td>{{ user.AMST_AdmNo}}</td>
+                    <td>{{ user.ASMCL_ClassName}}</td>
+                    <td>{{ user.ASMC_SectionName}} </td>
+                    <td>{{ user.FTP_TotalPaidAmount}}</td>
+                    <td>{{ user.ITAT_Date| date:'dd/MM/yyyy'}}</td>
+                    <td>{{ user.ITAT_Time |date :'h:mm:ss a'}}</td>
+                    <td>
+                        <span ng-if="user.ITAT_Operation=='D'">Delete</span>
+                        <span ng-if="user.ITAT_Operation=='I'">Save</span>
+                        <span ng-if="user.ITAT_Operation=='U'">Update</span>
+                        <!--{{ user.ITAT_Operation}}-->
+                    </td>
+                    <td>{{ user.ITAT_NetworkIp}}</td>
+                    <td>{{ user.ITAT_MAACAddress}}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td rowspan="2" colspan="11" class="text-center">
+                        <center>
+                            <h4>Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}</h4>
+                        </center>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+
+
+</section>
+
+<div class="modal fade modal-medium" id="details" role="dialog">
+    <div class="modal-dialog modal-md">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            <!--<h4 class="modal-title text-white">"{{Name}}-{{Receipt_No}}" Previous Details</h4>-->
+        </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sort('emgS_Id')">SL NO</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('ismS_SubjectName')">Name</a>
+                            </th>
+                            <th><a href="" ng-click="sort('ismS_SubjectName')">Value</a>  </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="user in view_details">
+                            <td>{{$index+1}}</td>
+                            <td>{{ user.columname}}</td>
+                            <td>{{ user.IATD_PreviousValue}}</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+                <table class="table table-hover table-responsive table-bordered text-center" ng-show="view_type=='Insert'">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sort('emgS_Id')">SL NO</a>
+                            </th>
+
+                            <th>
+                                <a href="" ng-click="sort('ismS_SubjectName')">Name</a>
+                            </th>
+                            <th><a href="" ng-click="sort('ismS_SubjectName')">Value</a>  </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="user in view_details">
+                            <td>{{$index+1}}</td>
+                            <td>{{ user.iatD_ColumnName}}</td>
+                            <td>{{ user.iatD_CurrentValue}}</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,360 @@
+﻿<script src="js/kendographs.js"></script>
+
+
+
+<style>
+    #wrapper {
+        white-space: nowrap;
+        overflow-x: visible;
+        overflow-y: hidden;
+        width: 76em;
+    }
+
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+
+    .multiselect {
+        width: 21.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    img {
+        cursor: -webkit-zoom-in;
+        cursor: -moz-zoom-in;
+    }
+
+    input[type=file] {
+        color: #000;
+    }
+</style>
+
+<section class="content" data-ng-init="onLoadGetData()">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Department Wise Gender Count Report </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <form class="form-horizontal" role="form" name="myForm" data-ng-submit="Getreport()" novalidate>
+                <div class="col-sm-12 ">
+
+                    <div class="col-sm-6 ">
+                        <div class="form-group">
+                            <div class="col-sm-4 radio-inline">
+                                <label class="lbl">
+                                    Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                </label>
+                            </div>
+                            <div class="multiselect col-sm-6">
+                                <label>
+                                    <input name="option[]" value="All" type="checkbox" checked>
+                                    <span class="lbl padding-8">
+                                        <b>All</b>
+                                    </span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="selclass" checked>
+                                    <span class="lbl padding-8" value="{{department.selected1.hrmD_DepartmentName}}">
+                                        HIGH SCHOOL
+                                    </span>
+
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="selclass" checked>
+                                    <span class="lbl padding-8" value="{{department.selected1.hrmD_DepartmentName}}">
+                                        MIDDLE SCHOOL
+                                    </span>
+
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="selclass" checked>
+                                    <span class="lbl padding-8" value="{{department.selected1.hrmD_DepartmentName}}">
+                                        PRIMARY SCHOOL
+                                    </span>
+
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="selclass" checked>
+                                    <span class="lbl padding-8" value="{{department.selected1.hrmD_DepartmentName}}">
+                                        PE DEPT
+                                    </span>
+
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="selclass" checked>
+                                    <span class="lbl padding-8" value="{{department.selected1.hrmD_DepartmentName}}">
+                                        NCC
+                                    </span>
+
+                                </label>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6 " style="margin-top:3%">
+
+                        <div class="form-group">
+                            <div class="text-center">
+                                <label class="col-sm-4 radio-inline">
+                                    <span class="lbl">
+                                        Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </span>
+                                </label>
+                                <label class=" col-sm-8 radio-inline">
+                                    <span class="lbl padding-3">
+                                        <select class="form-control" id="sel1" data-ng-model="yearvalue" name="country" required ng-change="statelist()">
+                                            <option value=""> 2020-2021 </option>
+                                        </select>
+
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                    <div class="col-sm-12 " ng-hide="true">
+                        <div class="col-sm-6" hidden>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-12">
+                                        <label class="control-label">
+                                            State:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </label>
+                                        <input name="option[]" value="All" type="checkbox" ng-model="Allmi_id" ng-true-value="true" ng-false-value="false" ng-change="all_check(Allmi_id)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </div>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="state in statedropdown | filter : searchValue" value="{{state.ivrmmS_Id}}">
+                                            <input name="state" ng-model="state.selected" type="checkbox" ng-click="mi_click();" ng-required="isOptionsRequired()" value="{{state.selected.ivrmmS_Id}}" ng-change="get_depts(state)">
+                                            <span class="lbl padding-8" value="{{state.selected.ivrmmS_Id}}">
+                                                {{state.ivrmmS_Name}}
+                                            </span>
+                                        </label>
+                                        <span class="error-messages" ng-if="interacted(myForm.state)" ng-messages="myForm.state.$error">
+                                            <span ng-message="required">Select State</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 padding-left-right-none" ng-if="departmentdropdown.length>0">
+                            <div class="form-group" hidden>
+                                <div class="col-sm-12">
+                                    <div class="col-sm-12">
+                                        <label class="control-label">
+                                            Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </label>
+                                        <input name="option[]" value="All" type="checkbox" ng-model="dprtmetall" ng-true-value="true" ng-false-value="false" ng-change="alldepartment(dprtmetall)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </div>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="department in departmentdropdown  | filter : searchValue1" value="{{department.hrmD_DepartmentName}}">
+                                            <input type="checkbox" name="selclass" ng-model="department.selected1" value="department.hrmD_Id" ng-required="isOptionsRequired1()" ng-true-value="true" ng-false-value="false">
+                                            <span class="lbl padding-8" value="{{department.selected1.hrmD_DepartmentName}}">
+                                                {{department.hrmD_DepartmentName}}
+                                            </span>
+                                        </label>
+                                        <span class="error-messages" ng-if="interacted(myForm.selclass)" ng-messages="myForm.selclass.$error">
+                                            <span ng-message="required">Select Department</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="col-sm-4 padding-left-none" style="margin-top:5%">
+            <div class="form-group">
+                <div class="text-center">
+                    <label class="col-sm-4 radio-inline">
+                        <span class="lbl padding-3">
+                            Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                        </span>
+                    </label>
+                    <label class=" col-sm-8 radio-inline">
+                        <span class="lbl padding-3">
+                            <select class="form-control" id="sel1" data-ng-model="hrmlY_LeaveYear" name="year" required>
+                                <option value="">Select</option>
+                                <option ng-repeat="yar in yearlist" value="{{yar.hrmlY_LeaveYear}}" ng-selected="{{yar.Selected===true}}">
+                                    {{yar.hrmlY_LeaveYear}}
+                                </option>
+                            </select>
+                            <span class="error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                <span ng-message="required">Select Year</span>
+                            </span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="text-center">
+                    <label class="col-sm-4 radio-inline">
+                        <span class="lbl padding-3">
+                            Month :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                        </span>
+                    </label>
+                    <label class=" col-sm-8 radio-inline">
+                        <span class="lbl padding-3">
+                            <select class="form-control" id="sel1" data-ng-model="ivrM_Month_Name" name="month" required>
+                                <option value="">Select</option>
+                                <option ng-repeat="mnt in monthlist" value="{{mnt.ivrM_Month_Name}}" ng-selected="{{mnt.Selected===true}}">
+                                    {{mnt.ivrM_Month_Name}}
+                                </option>
+                            </select>
+                            <span class="error-messages" ng-if="interacted(myForm.month)" ng-messages="myForm.month.$error">
+                                <span ng-message="required">Select Month</span>
+                            </span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>-->
+                    </div>
+
+
+
+</form>
+
+
+        </div>
+
+
+    </div>
+    <div class="box box-primary" >
+        <div class="box-header with-border">
+            <h3 class="box-title">Department Wise Gender Count Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="col-sm-12 well">
+                <div class="text-center">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="form-group">
+                            <table class="table table-hover table-responsive table-bordered" border="1">
+                                <thead class="text-center">
+                                    <tr><th colspan="5">Gender Report</th></tr>
+                                    <tr>
+                                        <th class="text-center">Year</th>
+                                        <th class="text-center">Department</th>
+                                        <th class="text-center">Male</th>
+                                        <th class="text-center">Female</th>
+                                        <th class="text-center">Others</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2020</td>
+                                        <td>HIGH SCHOOL</td>
+                                        <td>55</td>
+                                        <td>88</td>
+                                        <td>12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2020</td>
+                                        <td>MIDDLE SCHOOL</td>
+                                        <td>5</td>
+                                        <td>8</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2020</td>
+                                        <td>PRIMARY SCHOOL</td>
+                                        <td>9</td>
+                                        <td>2</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2020</td>
+                                        <td>PE DEPT</td>
+                                        <td>5</td>
+                                        <td>5</td>
+                                        <td>22</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2020</td>
+                                        <td>NCC</td>
+                                        <td>18</td>
+                                        <td>77</td>
+                                        <td>5</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box box-danger">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">DEPARTMENT WISE GENDER COUNT BAR Graph</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body" >
+                        <div id="chart123" style="height: 350px; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--<div id="example">
+
+            <div class="demo-section k-content wide">
+                <div id="chart123" style="height: 500px;"></div>
+            </div>
+
+            <div class="demo-section k-content wide">
+                <div id="chart" style="height:400px;"></div>
+            </div>
+
+            <div class="demo-section k-content wide">
+                <div id="chart1" style="height:400px;"></div>
+            </div>
+
+            <div class="demo-section k-content wide">
+                <div id="chart2" style="height:400px;"></div>
+            </div>
+        </div>-->
+
+
+
+    </div>
+
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+

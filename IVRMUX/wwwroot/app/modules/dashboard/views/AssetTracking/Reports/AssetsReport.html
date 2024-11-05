@@ -1,0 +1,175 @@
+﻿
+<section class="content twocoloumn">
+    <div ng-init="loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Assets Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year :<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="coYear" name="fyear" ng-change="onyearChange()" required>
+                                    <option value="">--Select Year-- </option>
+                                    <option ng-repeat="option in get_AssetsReportdetails" value="{{option.imfY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.imfY_FinancialYear}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.fyear)" ng-messages="myForm.fyear.$error">
+                                    <div ng-message="required">Please Select Year </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Location :</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="invmlO_Id" name="grps" ng-change="onlocationChange()">
+                                    <option value="">--Select Location-- </option>
+                                    <option ng-repeat="option in get_locations" value="{{option.INVMLO_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.INVMLO_LocationRoomName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                            <label class="control-label col-sm-4">Location :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="location" ng-model="$parent.obj.invmlO_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Location" ng-change="onlocationChange()">
+                                    <ui-select-match ng-trim="false" placeholder="Select or search location in the list...">{{$select.selected.INVMLO_LocationRoomName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in get_locations | filter: $select.search " value="{{option.INVMLO_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.INVMLO_LocationRoomName   | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.location)" ng-messages="myForm.location.$error">
+                                    <div ng-message="required">Please Select location </div>
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="getreportClick()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-list-alt" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                    <md-button ng-show="get_AssetsReport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button ng-show="get_AssetsReport.length>0 && selectionflag=='Location'" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printARL')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>
+                  
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box box-primary" ng-show="get_AssetsReport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Assets Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="text-left col-sm-9" style="font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight: 600; font-size: 15px; color: black;">
+                        <b>Location Name:</b>  {{location}}
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                <thead>
+                    <tr>
+                        <th colspan="3">
+                            <a href="" ng-click="sortBy('sno')">Stock Report For the year: {{imfY_FinancialYear1}}</a>
+                        </th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('INVMI_ItemName')">Name of the item</a> </th>
+                        <th><a href="" ng-click="sortBy('checkoutQty')">Quantity </a> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in get_AssetsReport">
+                        <td class="text-left">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{user.INVMI_ItemName}}</td>
+                        <td class="text-left">{{user.checkoutQty}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+            <div class="text-left" style="font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight: 600; font-size: 15px; color: black;">
+                <b>Incharge Name:</b>  {{incharge}}
+            </div>
+        </div>
+
+    </div>
+
+
+    <div ng-hide="true">
+        <div id="printARL">
+            <div class="text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="checkin" width="100%">
+            </div>
+            <br />
+            <div class="col-sm-12">
+                <div class="text-left col-sm-9" style="font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight: 600; font-size: 15px; color: black;">
+                  <b>Location Name: </b>  {{location}}
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                <thead>
+                    <tr>
+                        <th colspan="3">
+                            <a href="" ng-click="sortBy('sno')">Asset Report For the year:  {{imfY_FinancialYear1}}</a>
+                        </th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('INVMI_ItemName')">Name of the item</a> </th>
+                        <th><a href="" ng-click="sortBy('checkoutQty')">Quantity </a> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in get_AssetsReport">
+                        <td class="text-left">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{user.INVMI_ItemName}}</td>
+                        <td class="text-left">{{user.checkoutQty}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+            <div class="text-left" style="font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight: 600; font-size: 15px; color: black;">
+               <b>Incharge Name:</b>  {{incharge}}
+            </div>
+        </div>
+    </div>
+
+
+
+
+</section>

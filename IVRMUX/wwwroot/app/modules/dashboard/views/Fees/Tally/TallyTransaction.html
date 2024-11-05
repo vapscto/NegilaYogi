@@ -1,0 +1,340 @@
+﻿<div data-ng-init="formload()">
+    <section class="content" >
+        <form name="myform" class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savedata(totalgrid,finslab1,finslab2)" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">JV/RV Import</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <!--data-ng-click="onclickloaddata()"-->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <div class="well">
+                                <div class="text-center" ng-init="Vchtype='Journal'">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" data-ng-model="Vchtype" value="Journal" required ng-change="changevouchertype(Vchtype)">
+                                        <span class="lbl padding-8">Journal Voucher</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" data-ng-model="Vchtype" value="Receipt" required ng-change="changevouchertype(Vchtype)">
+                                        <span class="lbl padding-8">Receipt and Payment Voucher</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                                    <div ng-message="required">Select any one of the radio button</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="academicyear" id="sel1" data-ng-model="cfg.ASMAY_Id" ng-change="onselectacademic(yearlst)" required>
+                                        <option ng-repeat="option in yearlst" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == cfg.ASMAY_Id}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.academicyear)" ng-messages="myform.academicyear.$error">
+                                        <div ng-message="required">Select Academic Year </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="Vchtype=='Journal'">
+                                <label class="control-label col-sm-4">Class:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="ASMCL_Id" name="clsnme" required>
+                                        <option value="" label="">--Select Class--</option>
+                                        <option ng-repeat="option in classcount" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myform.clsnme)" ng-messages="myform.clsnme.$error">
+                                        <div ng-message="required">Select Class </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="Vchtype=='Journal'">
+                                <label class="control-label col-sm-4">Terms:</label>
+
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8" style="">
+                                        <label data-ng-model="FMT_Id" ng-repeat="option in inscount">
+                                            <input name="option[]" ng-model="option.selected" type="checkbox" value="{{option.fmT_Id}}">
+                                            <span class="lbl padding-8">
+                                                {{option.fmT_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group" ng-show="Vchtype=='Receipt'">
+                                <label class="control-label col-sm-4">From Date:</label>
+                                <div class="col-sm-4 input-group text-right" style="">
+                                    <md-datepicker ng-model="FMCB_fromDATE" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" ng-required="Vchtype=='Receipt'"></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myform.From_Date)" ng-messages="myform.From_Date.$error">
+                                    <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-show="Vchtype=='Receipt'">
+                                <label class="control-label col-sm-4">To Date:</label>
+                                <div class="col-sm-4 input-group text-right" style="">
+                                    <md-datepicker ng-model="FMCB_toDATE" onkeydown="return false" name="To_Date" id="date2" md-placeholder="Enter  date" ng-required="Vchtype=='Receipt'"></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myform.To_Date)" ng-messages="myform.To_Date.$error">
+                                    <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="ee-btn" data-ng-click="GENERATEJV()" ng-show="Vchtype=='Journal' && totalgrid.length>0">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        GENERATE JV
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="ee-btn" data-ng-click="GENERATERV()" ng-show="Vchtype=='Receipt'">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        GENERATE RV
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="ee-btn" data-ng-click="GENERATECONCESSIONJV()" ng-show="Vchtype=='Journal' && totalgrid.length>0">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        GENERATE CONCESSION JV
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="ee-btn" data-ng-click="GENERATEPAYMENTRV()" ng-show="Vchtype=='Receipt'">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        GENERATE PAYMENT RV
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="SHOWSTU(inscount)" ng-show="Vchtype=='Journal'">
+                        <i class="a fa-floppy-o" aria-hidden="true"></i>
+                        SHOW
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="Import()">
+                        <i class="a fa-floppy-o" aria-hidden="true"></i>
+                        Import from Tally
+                    </md-button>
+                    <!--<md-button type="button" class="md-raised md-primary" data-ng-click="Export()">
+                        <i class="a fa-floppy-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>-->
+                </div>
+            </div>
+
+
+            <div class="box box-primary" ng-show="totalgrid.length>0 && Vchtype=='Journal'">
+                <div class="box-header with-border">
+                    <h3 class="box-title">STUDENT LIST</h3>
+
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{totcountfirst}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header  style="height:400px;overflow:auto;"-->
+                <div class="box-body">
+
+                    <table class="table table-table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th class="hdTH">
+                                    <label>
+                                        <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th><a href="" ng-click="order('sno')">SLNO</a></th>
+                                <th><a href="" ng-click="order('Fee')">Student Admno </a></th>
+                                <th><a href="" ng-click="order('Fee')">Student Name </a></th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!--<tr ng-repeat="user in totalgrid track by $index | orderBy:predicate:default | filter:search" ng-class-odd="'odd'" ng-form="dataform">-->
+                            <tr ng-repeat="user in totalgrid |filter:searchString  | orderBy:propertyName:reverse | filter:search |orderBy:sortKey:reverse">
+                                <td>
+                                    <label>
+                                        <input name="option[]" value="1" type="checkbox" ng-model="user.isSelected">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+
+                                    <md-tooltip md-direction="right">
+                                        {{user.amsT_FirstName}}
+                                    </md-tooltip>
+                                </td>
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.amsT_AdmNo}}</td>
+                                <td>{{ user.amsT_FirstName}}</td>
+                                <td hidden="hidden">{{ user.amsT_Id}}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+          
+            <div class="box box-primary" ng-show="Grid_view">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Report Grid View</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                 
+                    <div class="col-sm-offset-2 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchString" type="text" placeholder="search here..." ng-show="file_disable">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                        <thead style="border:solid 1px; border-color:#fff;">
+                            <tr>
+                                <!--<th class="hdTH">
+                                    <label>
+                                        <input type="checkbox" value="" ng-model="allexp" ng-click="toggleAllEX()">
+                                        <span class="lbl padding-8">Export</span>
+                                    </label>
+                                </th>-->
+                                <th>
+                                    <a href="" ng-click="order('sno')">SLNO</a>
+                                </th>
+                                <th><a href="" ng-click="sort('Date')">Transaction Date</a> </th>
+                                <th><a href="" ng-click="sort('VOUCHER_TYPE')">Voucher Type</a> </th>
+                                <th> <a href="" ng-click="sort('VOUCHER_NO')">Vouche No</a></th>
+                                <th><a href="" ng-click="sort('L_Name')">Ledger Name</a> </th>
+                                <th><a href="" ng-click="sort('DR_CR')">Cr/Dr</a> </th>
+                                <th><a href="" ng-click="sort('AMOUNT')">Amount</a> </th>
+                                <th><a href="" ng-click="sort('CHEQUE_NO')">Cheque No</a> </th>
+                                <th><a href="" ng-click="sort('CHEQUE_DATE')">Cheque Date</a> </th>
+                                <th><a href="" ng-click="sort('VAPS_ID')">VAPS ID</a> </th>
+                                <th><a href="" ng-click="sort('STATUS')">Status</a> </th>
+                                <th><a href="" ng-click="sort('NARRATION')">Naration</a> </th>
+                                <th><a href="" ng-click="sort('UNDER')">Group Under</a> </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in students1=(students |filter:searchString)  | orderBy:propertyName:reverse | filter:search |orderBy:sortKey:reverse">
+                                <!--<td class="text-center  hdTD">
+                                    <label>
+                                        <input type="checkbox" ng-model="user.selected" ng-change="optionToggled(user,$index)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>-->
+                                <!--<td></td>-->
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.Date | date:"dd-MM-yyyy"}}</td>
+                                <td>{{ user.VOUCHER_TYPE}}</td>
+                                <td>{{user.VOUCHER_NO}}</td>
+                                <td>{{ user.L_Name}}</td>
+                                <td>{{ user.DR_CR}}</td>
+                                <td>{{ user.AMOUNT}}</td>
+                                <td>{{ user.CHEQUE_NO}}</td>
+                                <td>{{ user.CHEQUE_DATE | date:"dd-MM-yyyy"}}</td>
+                                <td>{{ user.VAPS_ID}}</td>
+                                <td>{{ user.STATUS}}</td>
+                                <td>{{ user.NARRATION}}</td>
+                                <td>{{ user.UNDER}}</td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+                <div id="printSectionId" ng-show="export_table_flag">
+
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center> <h4><u> Export To Tally Data </u></h4></center>
+                    <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                        <thead>
+                            <tr>
+
+                                <th>SL.NO</th>
+                                <th>Student Name</th>
+                                <th>Adm.No</th>
+                                <th>Class & Section</th>
+                                <th>FeeGroup</th>
+                                <th>FeeHead </th>
+                                <th>Reason</th>
+                                <th>Net Amount</th>
+                                <th>Concession</th>
+
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatable | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.StudentName}}</td>
+                                <td>{{ user.Admno}}</td>
+                                <td>{{user.Class}}-{{user.Section}}</td>
+                                <td>{{ user.FeeGroup}}</td>
+                                <td>{{ user.FeeHead}}</td>
+                                <td>{{ user.FSC_ConcessionReason}}</td>
+                                <td>{{ user.Netamount}}</td>
+                                <td>{{ user.Concession}}</td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7"><b>Total:</b></td>
+                                <td><b>{{totA_p}}</b></td>
+                                <td><b>{{totB_p}}</b></td>
+                            </tr>
+
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+
+
+
+                </div>
+
+            </div>
+
+
+        </form>
+    </section>
+</div>

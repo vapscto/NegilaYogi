@@ -1,0 +1,218 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary" data-ng-init="BindData()">
+            <div class="box-header with-border">
+                <h3 class="box-title">Schedule Wise Bus Route </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="">
+                    <div class="row">
+
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="asmaY_Id" name="acd_year" required>
+                                        <option value="">Select</option>
+                                        <option ng-repeat="year in YearList" value="{{year.asmaY_Id}}"> {{year.asmaY_Year}} </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                        <div ng-message="required">Please Select the Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <br />
+                    <hr />
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="getreport(obj)">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                            </md-button>
+                            <md-button type="button" ng-click="printData()" class="md-raised md-primary" ng-disabled="griddata.length==0">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                print
+                            </md-button>
+                            <md-button type="button" ng-click="exportToExcel('#tabel1')" target="_blank" class="md-raised md-primary" ng-disabled="griddata.length==0">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<GRID VIEW>-->
+            <!--< Table>-->
+            <div class="box box-primary" ng-show="grid">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Schedule Wise Bus Route Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{griddata.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                   
+                       
+                       <table class="table table-hover table-responsive table-bordered" border="1" id="tabel1" style="border-collapse:collapse">
+                            <thead style="font-weight: bold;">
+                                <tr>
+                                    <th class="text-center"> SL.No. </th>
+                                    <th class="text-center"> <a href="" ng-click="sort('RouteName')">Route Name </a></th>
+                                    <th class="text-center"><a href="" ng-click="sort('TwoWayPickupCount')">TwoWayPickupCount</a></th>
+                                    <th class="text-center"><a href="" ng-click="sort('OneWayPickupCount')">OneWayPickupCount</a></th>
+                                    <th class="text-center"><a href="" ng-click="sort('OneWayDropCount')">OneWayDropCount</a></th>
+                                    <!--<th class="text-center"><a href="" ng-click="sort('schedule1DropCount')">12:30 PM DropCount</a></th>
+
+                                    <th class="text-center"><a href="" ng-click="sort('schedule2DropCount')">3:30 PM DropCount</a></th>-->
+                                    <th><b>TOTAL</b></th>
+
+                                    <!--<th class="text-center">Total</th>-->
+                                </tr>
+                               
+                            </thead>
+                            <!--<tr ng-repeat="rt in griddata">-->
+                            <tr ng-repeat="rt in filterValue1 = (griddata | filter : searchValue)  |orderBy:sortKey:sortReverse">
+                                <!--|itemsPerPage:itemsPerPage" current-page="currentPage"-->
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center">{{rt.RouteName}}</td>
+                                <td class="text-center">{{rt.TwoWayPickupCount}}</td>
+                                <td class="text-center">{{rt.OneWayPickupCount}}</td>
+
+                                <td class="text-center">{{rt.OneWayDropCount}}</td>
+                                <!--<td class="text-center">{{rt.schedule2DropCount}}</td>
+                                <td class="text-center">{{rt.schedule1DropCount}}</td>-->
+                                <td class="text-center"> <b>{{rt.vartotal}}</b></td>
+
+                                <!--<td class="text-center"><b>{{rt.Total}}</b></td>-->
+
+
+
+                            </tr>
+                           <tr>
+                               <td colspan="2">
+                                   <b>TOTAL</b>
+                               </td>
+                               <td><b>{{TwoWayPickupCounttotal}}</b></td>
+                               <td><b>{{OneWayPickupCounttotal}}</b></td>
+                               <td><b>{{OneWayDropCounttotal}}</b></td>
+                               <!--<td><b>{{schedule2DropCounttotal}}</b></td>
+                               <td><b>{{schedule1DropCounttotal}}</b></td>-->
+                               <td style="font-size:16px"><b style="font-size:16px">{{finalvtotal}}</b></td>
+                           </tr>
+
+                        </table>
+                 
+
+
+                    <div id="printareaId" ng-show="tadprint" style="overflow:scroll">
+                        <div class="baldwin text-center">
+                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                        </div>
+                        <center><h4>Schedule Wise Bus Route  Details Report--{{yearname}}</h4></center>
+                        <br /><table class="table table-hover table-responsive table-bordered" border="1" id="tabel1" style="border-collapse:collapse">
+                            <thead style="font-weight: bold;">
+                                <tr>
+                                    <th class="text-center"> SL.No. </th>
+                                    <th class="text-center"> Route Name </th>
+                                    <th class="text-center">TwoWayPickupCount</th>
+                                    <th class="text-center">OneWayPickupCount</th>
+                                    <th class="text-center">OneWayDropCount</th>
+                                    <th class="text-center">12:30 PM DropCount</th>
+
+                                    <th class="text-center">3:30 PM DropCount</th>
+                                    <th><b>TOTAL</b></th>
+                                    <!--<th class="text-center">Total</th>-->
+                                </tr>
+                            </thead>
+                            <!--<tr ng-repeat="rt in griddata">-->
+                            <tr ng-repeat="rt in filterValue1 = (griddata | filter : searchValue) ">
+                                <!--|orderBy:sortKey:sortReverse-->
+                                <!--|itemsPerPage:itemsPerPage" current-page="currentPage"-->
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center">{{rt.RouteName}}</td>
+                                <td class="text-center">{{rt.TwoWayPickupCount}}</td>
+                                <td class="text-center">{{rt.OneWayPickupCount}}</td>
+
+                                <td class="text-center">{{rt.OneWayDropCount}}</td>
+
+                                <td class="text-center">{{rt.schedule2DropCount}}</td>
+                                <td class="text-center">{{rt.schedule1DropCount}}</td>
+                                <td class="text-center"> <b>{{rt.vartotal}}</b></td>
+
+
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="text-center">
+                                    <b>TOTAL</b>
+                                </td>
+                                <td class="text-center"><b>{{TwoWayPickupCounttotal}}</b></td>
+                                <td class="text-center"><b>{{OneWayPickupCounttotal}}</b></td>
+                                <td class="text-center"><b>{{OneWayDropCounttotal}}</b></td>
+                                <td class="text-center"><b>{{schedule2DropCounttotal}}</b></td>
+                                <td class="text-center"><b>{{schedule1DropCounttotal}}</b></td>
+                                <td class="text-center" style="font-size:16px"><b style="font-size:16px">{{finalvtotal}}</b></td>
+                            </tr>
+
+                        </table></div>
+                        <!--<dir-pagination-controls max-size="5"
+                                 direction-links="true"
+                                 boundary-links="true">
+        </dir-pagination-controls>-->
+                    </div>
+
+              
+
+
+         
+            </div>
+
+        </div>
+    </form>
+</section>

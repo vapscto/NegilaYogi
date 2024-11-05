@@ -1,0 +1,249 @@
+﻿<style>
+    .multiselectCheck {
+        width: 19.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content" ng-init="loaddata();">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> 1.1.2 Curricular Aspects Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Cycle:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="cycleid" name="acdYear" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="val in getinstitutioncycle" value="{{val.cycleid}}" ng-selected="val.cycleid==cycleid">
+                                        {{val.cyclename}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdYear)" ng-messages="myForm.acdYear.$error">
+                                    <div ng-message="required">Select Cycle</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                          
+                                <label class="col-sm-4"> Approved data :</label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" data-ng-model="approvedflag" >
+                                    <span class="lbl padding-8">Approved data</span>
+                                </label>
+                   
+                       </div>-->
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Institution Name:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="multiselectCheck col-sm-8">
+                                    <label ng-model="MI_Id" ng-repeat="year in getparentidzero |filter:filterchkbx" value="{{year.mI_Id}}">
+                                        <input name="year" value="1" data-ng-model="year.select" type="checkbox" ng-click="togchkbx();" ng-required="isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            {{year.mI_Name}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                    <div ng-message="required" style="color:red">Select Institution Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="get_report()">
+                        <i class="fa " aria-hidden="true">SHOW DETAILS</i>
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#printSectionId')" ng-show="showflag">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </md-button>
+                    <md-button ng-hide="gridOptions.data.length>0" type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="printData()" ng-show="showflag">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="showflag">
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+            <div class="box-body">
+                <div class="box-header with-border">
+                    <h3 class="box-title text-center">CURRICULAR ASPECTS</h3>
+                </div>
+                <table style="font-size:14px;text-align:left">
+                    <tr>
+                        <td colspan="6">1. Curricular Aspects (150)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6"> 1.1 Curriculum Design and Development (50)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6"> 1.1.2 Percentage of programmes where syllabus revision was carried out during the last five years (20)</td>
+                    </tr>
+                </table>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr><td>Sl.No.</td>
+                                    <th>Program Code</th>
+                                    <th>Program Name</th>
+                                    <th style="word-break:break-word">Name Of the Certification/Diploma Introduced in Last 5 Years</th>
+                                    <th>Year Of Introduction</th>
+                                    <th>Status</th>
+                                    <th style="word-break:break-word">Link Of The Relevent Documents</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in reportlist">
+                                <tr><td>{{$index+1}}</td>
+                                    <td>{{user.AMB_BranchCode}}</td>
+                                    <td>{{user.AMB_BranchName}}</td>
+                                    <td>{{user.NCACPR112_ProgramName}}</td>
+                                    <td>{{user.ASMAY_Year}}</td>
+                                    <td style="color:green"><b>{{user.NCACPR112_StatusFlg}}</b></td>
+                                    <td style="padding:0px">
+                                        <div>
+                                            <table style="width:100%">
+                                                <tr ng-if="user.listdata.length==1" ng-repeat="ff in user.listdata" style="width:100%;height:100%">
+                                                    <td style="width:100%;height:100%;padding:8px">
+                                                        <span ng-if="ff.ncacpR112F_FilePath!='' && ff.ncacpR112F_StatusFlg!=''">
+                                                            {{ff.ncacpR112F_FileName}} &nbsp; <b style="color:green">{{ff.ncacpR112F_StatusFlg}}</b>
+                                                        </span>
+                                                        <span ng-if="ff.ncacpR112F_FilePath!='' && ff.ncacpR112F_StatusFlg==''">
+                                                            <a style="color: blue; text-decoration:underline;" href="{{ff.ncacpR112F_FilePath}}">
+                                                                {{ff.ncacpR112F_FileName}}
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-if="user.listdata.length>1" ng-repeat="ff in user.listdata" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%">
+                                                    <td style="width:100%;height:100%;padding:8px">
+                                                        <span ng-if="ff.ncacpR112F_FilePath!='' && ff.ncacpR112F_StatusFlg!=''" >
+                                                            {{ff.ncacpR112F_FileName}} &nbsp; <b style="color:green">{{ff.ncacpR112F_StatusFlg}}</b>
+                                                        </span>
+                                                        <span ng-if="ff.ncacpR112F_FilePath!='' && ff.ncacpR112F_StatusFlg==''">
+                                                            <a style="color: blue; text-decoration:underline;" href="{{ff.ncacpR112F_FilePath}}">
+                                                                {{ff.ncacpR112F_FileName}}
+                                                            </a>
+                                                        </span>
+                                                       
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="false">
+            <div class="box-body" id="printSectionId">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table>
+                            <tr>
+                                <td style=" text-align :left; font-size:20px;text-align:center" colspan="7">
+                                    <b>CURRICULAR ASPECTS</b>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <table style="font-size:14px;text-align:left">
+                    <tr>
+                        <td colspan="6">1. Curricular Aspects (150)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6"> 1.1 Curriculum Design and Development (50)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6"> 1.1.2 Percentage of programmes where syllabus revision was carried out during the last five years (20)</td>
+                    </tr>
+                </table>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No.</th>
+                                    <th>Program Code</th>
+                                    <th>Program Name</th>
+                                    <th style="word-break:break-word">Name Of the Certification/Diploma Introduced in Last 5 Years</th>
+                                    <th>Year Of Introduction</th>
+                                    <th>Status</th>
+                                    <th style="word-break:break-word">Link Of The Relevent Documents</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="user in reportlist">
+                                <tr>
+                                    <td>{{$index+1}}</td>
+                                    <td>{{user.AMB_BranchCode}}</td>
+                                    <td>{{user.AMB_BranchName}}</td>
+                                    <td>{{user.NCACPR112_ProgramName}}</td>
+                                    <td>{{user.ASMAY_Year}}</td>
+                                    <td style="color:green"><b>{{user.NCACPR112_StatusFlg}}</b></td>
+                                    <td style="padding:0px">
+                                        <div>
+                                            <table style="width:100%">
+                                                <tr ng-if="user.listdata.length==1" ng-repeat="ff in user.listdata" style="width:100%;height:100%">
+                                                    <td style="width:100%;height:100%;padding:8px">
+                                                        <span ng-if="ff.ncacpR112F_FilePath!='' && ff.ncacpR112F_StatusFlg!=''">
+                                                            {{ff.ncacpR112F_FileName}} &nbsp; <b style="color:green">{{ff.ncacpR112F_StatusFlg}}</b>
+                                                        </span>
+                                                        <span ng-if="ff.ncacpR112F_FilePath!='' && ff.ncacpR112F_StatusFlg==''">
+                                                            <a style="color: blue; text-decoration:underline;" href="{{ff.ncacpR112F_FilePath}}">
+                                                                {{ff.ncacpR112F_FileName}}
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-if="user.listdata.length>1" ng-repeat="ff in user.listdata" style="border-bottom:0.8px solid #cad4de;width:100%;height:100%">
+                                                    <td style="width:100%;height:100%;padding:8px">
+                                                        <span ng-if="ff.ncacpR112F_FilePath!='' && ff.ncacpR112F_StatusFlg!=''">
+                                                            {{ff.ncacpR112F_FileName}} &nbsp; <b style="color:green">{{ff.ncacpR112F_StatusFlg}}</b>
+                                                        </span>
+                                                        <span ng-if="ff.ncacpR112F_FilePath!='' && ff.ncacpR112F_StatusFlg==''">
+                                                            <a style="color: blue; text-decoration:underline;" href="{{ff.ncacpR112F_FilePath}}">
+                                                                {{ff.ncacpR112F_FileName}}
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

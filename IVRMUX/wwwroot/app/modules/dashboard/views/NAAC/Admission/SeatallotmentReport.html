@@ -1,0 +1,138 @@
+﻿<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" ng-init="BindData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Seat Allotment Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">No Of Year For Report :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" ng-blur="clearreport()" allow-patten="[0-9]" ng-model="Noofyears" maxlength="2" required id="ye" name="noofye" />
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.noofye)" ng-messages="myForm.noofye.$error">
+                                    <div ng-message="required">Enter No Of Year For Report</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="Year" ng-model="ASMAY_Id" data-ng-change="onselectAcdYear(ASMAY_Id)" required>
+                                        <option value="" label="Select Academic Year"> </option>
+                                        <option ng-repeat="option1 in acdlist" value="{{option1.asmaY_Id}}" ng-selected="{{option1.Selected == true}}">
+                                            {{option1.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.Year)" ng-messages="myForm.Year.$error">
+                                    <div ng-message="required">Please Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button ng-hide="gridOptions.data.length>0" type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-hide="catreport" id="save-btn" ng-click="printData()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-hide="catreport" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#table')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export To Excel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-hide="catreport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Seat Allotment Reportt</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-hover table-responsive table-bordered text-center" id="tabel1">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Year</th>
+                        <th colspan="{{head.list.length}}" ng-repeat="head in mainheading">{{head.name}}</th>
+                    </tr>
+                    <tr>
+                        <td ng-repeat="heading in exam_list">
+                            {{heading.categoryname}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in getyearlist">
+                        <td>{{ user.yearname}}</td>
+                        <td ng-repeat="heading in exam_list">
+                            <span ng-repeat="mn in getdetails" ng-if="user.yearname==mn.yearname && heading.id==mn.id && mn.ACQC_Id==heading.ACQC_Id">
+                                {{mn.seats}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="printSectionId" ng-show="table_flag">
+            <div class="baldwin text-center">
+                <!--<img src="{{imgname}}" class="img-responsive" alt="baldwin">-->
+            </div>
+            <center><h4>Seat Allotment Report For Last {{Noofyears}} Years </h4></center>
+            <br />
+            <table class="table table-hover table-responsive table-bordered text-bold" id="table">
+                <thead>
+                    <tr>
+                        <th class="text-bold" width="100" rowspan="2">Year</th>
+                        <th class="text-bold" colspan="{{head.list.length}}" ng-repeat="head in mainheading">{{head.name}}</th>
+                    </tr>
+                    <tr>
+                        <td class="text-bold" width="100" style="word-wrap:break-word;" ng-repeat="heading in exam_list">
+                            {{heading.categoryname}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in getyearlist">
+                        <!--<td>{{$index+1}}</td>-->
+                        <td class="text-bold">{{ user.yearname}}</td>
+                        <td class="text-center text-bold" ng-repeat="heading in exam_list">
+                            <span ng-repeat="mn in getdetails" ng-if="user.yearname==mn.yearname && heading.id==mn.id && mn.ACQC_Id==heading.ACQC_Id">
+                                {{mn.seats}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+                <!--<tfoot>
+                    <tr>
+                        <td colspan="16" class="col-sm-12 text-center ">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+                </tfoot>-->
+            </table>
+        </div>
+    </div>
+</section>

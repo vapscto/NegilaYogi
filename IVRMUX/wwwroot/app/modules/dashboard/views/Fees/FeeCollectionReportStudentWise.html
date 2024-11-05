@@ -1,0 +1,539 @@
+
+<style>
+
+    .error-messages.ng-active {
+        color: red;
+    }
+
+    .k-grid-toolbar {
+        text-align: center;
+    }
+
+    .gridTitle {
+        text-align: center;
+    }
+
+    .titlecolor {
+        color: white !important;
+    }
+
+    .k-filter-row th, .k-title, .k-grid-header th.k-header {
+        font-weight: bold !important;
+    }
+
+    .k-grid-header .k-link, .k-grid-header .k-link:link, .k-pager-info, .k-scheduler-agendaview .k-scheduler-datecolumn, .k-scheduler-header {
+        color: black !important;
+    }
+
+    .k-pdf-export .k-grid-excel, .k-pdf-export .k-grid-pdf, .k-pdf-export .k-pager-wrap {
+        display: none;
+        width: 20%;
+        margin: auto;
+    }
+
+    .k-filter-row > th:first-child, .k-grid tbody td:first-child, .k-grid tfoot td:first-child, .k-grid-header th.k-header:first-child {
+        color: black;
+    }
+</style>
+
+<div data-ng-init="loaddata()">
+
+    <section class="content">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Yearly Fee Collection Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="well text-center" ng-init="rpttyp='year'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="year" ng-model="rpttyp" name="yearly" data-ng-click="onclickloaddata()">
+
+                                    <span class="lbl padding-8">Yearly Wise</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="date" ng-model="rpttyp" name="yearly" data-ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">Date Wise</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-sm-8 text-center">
+                            <div class="well">
+                                <label class="radio-inline">
+                                    <input type="radio" value="FSW" ng-model="result" name="Fee" ng-change="student_install_wise()" ng-disabled="true">
+                                    <span class="lbl padding-8">Student Wise</span>
+                                </label>                               
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Academic Year:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7">
+                                    <select class="form-control" id="sel1" ng-model="asmaY_Id" ng-change="onselectyear(obj)" name="acd_year" required>                                       
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="options in arrlist6" value="{{options.asmaY_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                        <div ng-message="required">Please Enter the Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row" ng-show="groupterm">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <span class="lbl padding-8">Custom Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong><!--ng-hide="custom_check_flag"-->
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in custom" ng-model="fmgG_Id" value="{{role.fmgG_Id}}" ng-click="get_groups()">
+                                            <input type="checkbox" data-ng-model="role.fmgG_Id_chk1" name="fee_ct1" ng-selected="{{option.Selected == true}}" ng-required="groupterm && is_optionrequired_groupterm_cg()"><!--ng-disabled="custom_check_flag"-->
+                                            <span class="lbl padding-8">
+                                                {{role.fmg_groupname}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_ct1)" ng-messages="myForm.fee_ct1.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <span class="lbl padding-8">Fee Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong><!--ng-hide="group_check_flag"-->
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in group" ng-model="fmG_Id" value="{{role.fmG_Id}}" ng-click="binddatagrp3(group)">
+                                            <input type="checkbox" data-ng-model="role.fmG_Id_chk1" name="fee_gp1" ng-selected="{{option.Selected == true}}" ng-required="groupterm && is_optionrequired_groupterm_grp()"><!--ng-disabled="group_check_flag"-->
+                                            <span class="lbl padding-8">
+                                                {{role.fmG_GroupName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_gp1)" ng-messages="myForm.fee_gp1.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" name="All" ng-model="group_check" ng-true-value="1" ng-false-value="0" data-ng-click="load_group_check()" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="term">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <span class="lbl padding-8">Custom Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong>
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in custom" ng-model="fmgG_Id" value="{{role.fmgG_Id}}" ng-click="get_groups()">
+                                            <input type="checkbox" data-ng-model="role.fmgG_Id_chk" name="fee_ct" ng-required="term && is_optionrequired_trm_cg()">
+                                            <span class="lbl padding-8">
+                                                {{role.fmg_groupname}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_ct)" ng-messages="myForm.fee_ct.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+
+                                <div class="col-sm-12">
+                                    <label class="control-label">Fee Group:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="multiselect col-sm-12">
+                                        <input class="form-control" ng-model="checkallhrd1" type="checkbox" ng-change="hrdallcheck1()" />
+                                        <span class="lbl padding-8"> ALL </span>
+                                        <label ng-repeat="role in group" ng-model="fmG_Id" value="{{role.fmG_Id}}" ng-click="binddatagrp3(role.fmG_Id_chk)">
+                                            <input type="checkbox" data-ng-model="role.fmG_Id_chk" name="feegroup" ng-required="term && is_optionrequired_trm_grp()">
+                                            <span class="lbl padding-8">
+                                                {{role.fmG_GroupName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.feegroup)" ng-messages="myForm.feegroup.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" name="All" ng-model="group_check" ng-true-value="1" ng-false-value="0" data-ng-click="load_group_check()" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <label class="control-label">Term Name<strong style="color:red;display:inline; font-weight : bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="multiselect col-sm-12">
+                                        <input class="form-control" ng-model="checkallterm1" type="checkbox" ng-change="termallcheck1()" />
+                                        <span class="lbl padding-8"> ALL </span>
+                                        <label ng-repeat="role in groupcount" ng-model="fmT_Id" value="{{role.fmT_Id}}" ng-click="binddatagrp2(role.fmT_Id_chk)">
+                                            <input type="checkbox" data-ng-model="role.fmT_Id_chk" name="feeterm" ng-required="term && is_optionrequired_trm_trm()">
+                                            <span class="lbl padding-8">
+                                                {{role.fmT_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.feeterm)" ng-messages="myForm.feeterm.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2" ng-show="frmdt" ng-init="chequedate='1'">
+                            <label class="checkbox-inline">
+                                <input type="radio" value="1" ng-model="chequedate" />
+                                <span class="lbl padding-8">Transaction Date</span>
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="radio" value="2" ng-model="chequedate" />
+                                <span class="lbl padding-8">Cheque Date</span>
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="radio" value="4" ng-model="chequedate" />
+                                <span class="lbl padding-8">Transaction & Cheque</span>
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="radio" value="3" ng-model="chequedate" />
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="text-center">
+                                    <div class="well">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="act" ng-model="active" name="All" ng-true-value="1" ng-false-value="0" ng-checked="false">
+                                            <span class="lbl padding-4">Active</span>
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="dact" ng-model="deactive" name="All" ng-true-value="1" ng-false-value="0" ng-checked="false">
+                                            <span class="lbl padding-4">Deactive</span>
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="lft" ng-model="left" name="All" ng-true-value="1" ng-false-value="0" ng-checked="false">
+                                            <span class="lbl padding-4">Left</span>
+                                        </label>
+                                        <div class="error-messages" ng-if="interacted(myForm.All)" ng-messages="myForm.All.$error">
+                                            <div ng-message="required" style="margin-left:20px;">Please Select Status</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">
+                                        <span class="lbl padding-8">Class :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></span>
+                                    </label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" id="class" ng-model="fmG_Class" name="studentclass" required>
+                                            <option value="" label="Select Class"> </option>
+                                            <option ng-repeat="option in classcount" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                                {{option.asmcL_ClassName}}
+                                            </option>
+                                            <option value="0">--All--</option>
+                                        </select>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.studentclass)" ng-messages="myForm.studentclass.$error">
+                                        <div ng-message="required">Please Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Section :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control" id="section" ng-model="asmC_Id" name="studentsection" required>
+                                            <option value="">Select Section</option>
+                                            <option ng-repeat="option in sectioncount" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                                {{option.asmC_SectionName}}
+                                            </option>
+                                            <option value="0">--All--</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.studentsection)" ng-messages="myForm.studentsection.$error">
+                                            <div ng-message="required">Please Select Section</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3" ng-show="frmdt">
+                            <div class="form-group" id="frmdt">
+                                <label class="control-label col-sm-3">From Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-3 input-group text-right" style="">
+                                    <md-datepicker ng-model="fromDate" md-min-date="minDatemf" md-max-date="maxDatemf" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" ng-required="frmdt"></md-datepicker><!--ng-change='setTodate(fromDate)'-->
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3" ng-show="frmdt">
+                            <div class="form-group" id="frmdt">
+                                <label class="control-label col-sm-3">To Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-3 input-group text-right">
+                                    <md-datepicker ng-model="todate" onkeydown="return false"
+                                     md-min-date="minDatemf" md-max-date="maxDatemf" name="To_Date" id="date2" md-placeholder="Enter  date" ng-required="frmdt"></md-datepicker><!--ng-change='checkErr(fromDate,todate)'-->
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="ShowReport(fmG_Id, asmaY_Id, fromDate, todate, result, status, rpttyp)">
+                            <i class="fa fa-edit" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" id="clear-btn" ng-click="Cancel()">Clear</md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel()" target="_blank" ng-if="showbutton == true">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-primary" ng-if="showbutton == true" id="print-btn" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="box-body" ng-show="termflg == true">
+                <div id="grid123">
+                </div>
+            </div>
+
+            <div class="box-body" ng-show="stdtermflg == true">
+                <div id="grid1234">
+
+                </div>
+            </div>
+
+            <div class="box-body" ng-show="fpw == true">
+                <div id="fpw1234">
+                </div>
+            </div>
+        </form>
+
+         <!--Gridview showing purpose------------------------------------------------------------->
+        <div class="box box-primary" ng-show="Grid_view">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Wise Fee Collection Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" ng-show="std==true">
+                <div id="gridall"></div>
+            </div>
+            <div class="box-body">
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                    <thead>
+
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="stdall" ng-click="toggleAllstd()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No</th>
+                            <th>StudentName </th>
+                            <th>Admission No</th>                            
+                            <th>Class Name</th>
+                            <th ng-if="totalpayable != true">
+                                <a href="" ng-click="order2('totalpayable')">Total Payable</a>
+                            </th>
+                            <th ng-if="PaidAmount != true">
+                                <a href="" ng-click="order2('FSS_PaidAmount')">Paid Amount</a>
+                            </th>
+                            <th ng-if="Balance != true">
+                                <a href="" ng-click="order2('balance')">Balance</a>
+                            </th>
+                            <th ng-if="Concession != true">
+                                <a href="" ng-click="order2('concession')">Concession</a>
+                            </th>
+                            <th ng-if="Fine != true">
+                                <a href="" ng-click="order2('fine')">Fine</a>
+                            </th>
+                            <th ng-if="Rebate != true">
+                                <a href="" ng-click="order2('rebate')">Rebate</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order2('waived')">Waived</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order2('adjusted')">Adjusted</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order2('openingbalance')">Opening Balance</a>
+                            </th>
+                            <th ng-if="Waived != true">
+                                <a href="" ng-click="order2('Excess')">Excess</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in students | orderBy:sortKey2:reverse2 | filter:search" ng-class-odd="'odd'">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.stdselected" value="{{user.Id}}" ng-change="optionToggledstd(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{user.StudentName}}</td>
+                            <td>{{user.AMST_AdmNo}}</td>
+                            <td>{{user.ASMCL_ClassName }}</td>
+                            <td ng-if="TotalPayable !=true">{{user.totalpayable}}</td>
+                            <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                            <td ng-if="Balance != true">{{ user.balance }}</td>
+                            <td ng-if="Concession != true">{{ user.concession }}</td>
+                            <td ng-if="Fine != true">{{ user.fine}}</td>
+                            <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                            <td ng-if="Waived != true">{{ user.waived}}</td>
+                            <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                            <td>{{ user.openingbalance}}</td>
+                            <td>{{ user.Excess}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">Total</td>
+                            <td ng-if="TotalPayable !=true">{{s_total_totalpayable}}</td>
+                            <td ng-if="PaidAmount != true">{{s_total_FSS_PaidAmount}}</td>
+                            <td ng-if="Balance != true">{{s_total_balance}}</td>
+                            <td ng-if="Concession != true">{{s_total_concession}}</td>
+                            <td ng-if="Fine != true">{{s_total_fine}}</td>
+                            <td ng-if="Rebate != true">{{s_total_rebate}}</td>
+                            <td ng-if="Waived != true">{{s_total_waived}}</td>
+                            <td>{{s_total_adjusted}}</td>
+                            <td>{{s_total_openingbalance}}</td>
+                            <td>{{s_total_Excess}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="printSectionIdstd" style="overflow:scroll" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <br />
+                    <center>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr style="text-align:center;font-size:20px;margin-left:5px">
+                                        <td><b>StudentWise Fee Collection Report</b> <span ng-if="rpttyp=='date'">    <b>: {{fromDate | date:'dd/MM/yyyy'}} To {{todate | date:'dd/MM/yyyy'}}</b></span></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tablestd">
+                        <thead>
+                            <tr>
+                                <th>Sl No </th>
+                                <th>StudentName </th>
+                                <th ng-if="PaidAmount != true">
+                                    Paid Amount
+                                </th>
+                                <th ng-if="Balance != true">
+                                    Balance
+                                </th>
+                                <th ng-if="Concession != true">
+                                    Concession
+                                </th>
+                                <th ng-if="Fine != true">
+                                    Fine
+                                </th>
+                                <th ng-if="Rebate != true">
+                                    Rebate
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Waived Off
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Adjusted
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Opening Balance
+                                </th>
+                                <th ng-if="Waived != true">
+                                    Excess
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatablestd | orderBy:sortKey2:reverse2 ">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.StudentName }}</td>
+                                <td ng-if="PaidAmount != true">{{ user.FSS_PaidAmount }}</td>
+                                <td ng-if="Balance != true">{{ user.balance }}</td>
+                                <td ng-if="Concession != true">{{ user.concession }}</td>
+                                <td ng-if="Fine != true">{{ user.fine}}</td>
+                                <td ng-if="Rebate != true">{{ user.rebate}}</td>
+                                <td ng-if="Waived != true">{{ user.waived}}</td>
+                                <td ng-if="Waived != true">{{ user.adjusted}}</td>
+                                <td ng-if="Waived != true">{{ user.openingbalance}}</td>
+                                <td ng-if="Waived != true">{{ user.Excess}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Total</td>
+                                <td ng-if="PaidAmount != true">{{s_total_FSS_PaidAmount}}</td>
+                                <td ng-if="Balance != true">{{s_total_balance}}</td>
+                                <td ng-if="Concession != true">{{s_total_concession}}</td>
+                                <td ng-if="Fine != true">{{s_total_fine}}</td>
+                                <td ng-if="Rebate != true">{{s_total_rebate}}</td>
+                                <td ng-if="Waived != true">{{s_total_waived}}</td>
+                                <td>{{s_total_adjusted}}</td>
+                                <td>{{s_total_openingbalance}}</td>
+                                <td>{{s_total_Excess}}</td>
+                            </tr>
+                        </tbody>                       
+                    </table>
+                </div>
+            </div>
+        </div>                               
+    </section>
+</div>
+

@@ -1,0 +1,597 @@
+<!--<link type="text/css" media="print" rel="stylesheet" href="css/print/BBKV/BBKVTC/BBKVTCPdf.css" />-->
+
+<style>
+    table {
+        border-collapse: collapse;
+        border-style: double;
+    }
+
+
+    table {
+        width: 100%;
+        height: auto;
+    }
+
+    .table-bordered {
+        border: 5px double #808080;
+    }
+
+        .table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
+            border: 0.8px solid #808080;
+            padding: 5px;
+            vertical-align: middle;
+        }
+</style>
+
+
+<div data-ng-init="loaddata()" class="challan">
+    <section class="content">
+        <form class="form-horizontal" role="form" method="post" name="myform">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TC Custom Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Last Year:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="stcrclstyr" required>
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                        <div ng-message="required">Select Last Year.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="well text-center">
+                                <label class="radio-inline">
+                                    <input type="radio" value="regno" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Admno</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="stdname" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Name</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" ng-show="std_name">
+                                <label class="control-label col-sm-4">Student Name:</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="amsT_Id" ng-change="stdnamechange()" required>
+                                        <option value="" label="Select Student"> </option>
+                                        <option ng-repeat="student in studentDropdown" value="{{student.amsT_Id}}" ng-selected="{{student.Selected == true}}">
+                                            {{student.studentname}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="well text-center" ng-init="tctempper='per'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="temp" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Temp Student</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="per" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Permanent Student</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Promoted Class:</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmcL_Id" name="stcrclstyrd">
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="classs in class" value="{{classs.asmcL_Id}}">{{classs.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyrd)" ng-messages="myform.stcrclstyrd.$error">
+                                        <div ng-message="required">Select Class.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <div class="well text-center" ng-init="tctempperformat='bbs'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="bbs" name="stcrcradtcc" ng-model="tctempperformat"  required>
+                                        <span class="lbl padding-8">Balabharathi Format</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="viv" name="stcrcradtcc" ng-model="tctempperformat"  required>
+                                        <span class="lbl padding-8">Vivekanad Format</span>
+                                    </label>
+                                </div>
+                            </div>-->
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-show="report_flag" ng-click="savetmpldata();">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-primary" ng-click="printToCart()"  ng-show="report">
+                            <!--ng-show="Print_flag"-->
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+
+            <link href="css/print/balabarathi/TC/jnstc.css" rel="stylesheet" />
+            <div ng-show="report">
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Student TC</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="box-body">
+                            <div id="VivekanandaTC">
+                                <table class="table" >
+                                    <tr>
+                                        <td >
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="35%"></td>
+                                                    <td width="30%">
+                                                        <img src="{{header}}" class="img-responsive" />
+                                                    </td>
+                                                    <td width="35%"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td  class="margin-bottom-10" width="100%" colspan="3">
+                                                        <h2>TRANSFER CERTIFICATE&nbsp;-&nbsp;ವರ್ಗಾವಣೆ ಪ್ರಮಾಣ ಪತ್ರ</h2>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    
+                                                    <td width="100%" style="text-align:right" colspan="3">NO:&nbsp;{{tcno}}</td>
+
+                                                </tr>
+                                            </table>
+                                        </td>
+
+                                    </tr>
+                                  
+                                   
+                                  
+                                </table>
+                               
+
+                                <table class="table-bordered">
+
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table">
+                                                <tr>
+                                                    <td>
+                                                        1.&nbsp; Name of the College:<br>&nbsp;&nbsp;&nbsp;&nbsp;ಕಾಲೇಜಿನ ಹೆಸರು:
+                                                    </td>
+                                                    <td style="border-bottom:none;text-align:center">
+                                                        JANASEVA RESIDENTIAL PU COLLEGE
+                                                        <br />
+                                                        College Code :AS499 <br />
+                                                        <span style="font-size:14px">
+                                                            Janaseva Res PU College Channenahalli Kadabgere Post Bangalore-562130
+                                                        </span>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="width:100%;" colspan="4">
+                                            <table class="table">
+                                                <tr>
+                                                    <td style="width:25%">
+                                                        2a.&nbsp; Admission No : <br>&nbsp;&nbsp;&nbsp;&nbsp;ಪ್ರವೇಶ ಸಂಖ್ಯೆ
+                                                    </td>
+                                                    <td style="border-bottom:none;text-align:left;width:25%">
+                                                        {{admno}}
+                                                    </td>
+                                                    <td style="width:25%">
+                                                        2b.&nbsp;Student No.:<br>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp; ವಿದ್ಯಾರ್ಥಿ ಸಂಖ್ಯೆ
+                                                    </td>
+                                                    <td style="border-bottom:none;text-align:left;width:25%">
+                                                        {{govtadmno}}
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td style="width:100%;" colspan="4">
+                                            <table class="table">
+                                                <tr>
+                                                    <td style="width:40%">
+                                                        3. &nbsp; Name of the student in full: <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ವಿದ್ಯಾರ್ಥಿಯ ಪೂರ್ಣ ಹೆಸರು:
+                                                    </td>
+                                                    <td style="border-bottom:none;text-align:left;width:60%">
+                                                        {{lblstdname}}
+                                                    </td>
+
+                                                </tr>
+
+                                            </table>
+
+
+
+
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td width="25%">
+                                            4.Place of Birth &nbsp; ಹುಟ್ಟಿದ ಸ್ಥಳ: <br />&nbsp;&nbsp;&nbsp;&nbsp;
+                                            &nbsp;&nbsp; {{lblpobirth}}
+
+                                        </td>
+                                        <td width="25%">
+                                            5.Taluk    ತಾಲ್ಲೂಕು:<br />
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{amsT_Taluk}}
+
+                                        </td>
+                                        <td width="25%">
+                                            6.District  &nbsp;  ಜಿಲ್ಲೆ:<br />
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{amsT_Distirct}}
+
+                                        </td>
+                                        <td width="25%">
+                                            7. State &nbsp; ರಾಜ್ಯ:<br />
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{statename}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+
+                                            8. Gender ಲಿಂಗ :    &nbsp;&nbsp; {{AMST_Sex}}
+
+                                        </td>
+
+                                        <td colspan="2">
+
+                                            9.Nationality ರಾಷ್ಟ್ರೀಯತೆ: &nbsp;&nbsp;{{lblnationality}}
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="33%">
+                                                        10. Caste
+                                                        ಜಾತಿ:  &nbsp;&nbsp;{{studcaste}}
+                                                    </td>
+                                                    <td width="33%">
+                                                        11.Religion
+                                                        ಧರ್ಮ: &nbsp;&nbsp;{{lblreligioncaste}}
+                                                    </td>
+                                                    <td width="33%">
+                                                        12.Sub Caste
+                                                        ಉಪ ಜಾತಿ: &nbsp;&nbsp;{{subcaste}}
+                                                    </td>
+
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="40%">13.Name of the Father <br>ತಂದೆಯ ಹೆಸರು:  </td>
+                                                    <td width="60%"> {{lblfathername}}</td>
+
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table">
+                                                <tr>
+
+                                                    <td width="40%">14. Name of the Mother  <br>ತಾಯಿಯ ಹೆಸರು: </td>
+                                                    <td width="60%">  {{lblmothername}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="90%">
+                                                        15.Whether the Student belongs to
+                                                        Scheduled Caste or Scheduled Tribe?<br>
+                                                        ವಿದ್ಯಾರ್ಥಿಯ ಪರಿಶಿಷ್ಟ ಜಾತಿ ಅಥವಾ ಪರಿಶಿಷ್ಟ ಪಂಗಡ?
+                                                    </td>
+                                                    <td width="10%">
+                                                        <b></b>
+                                                    </td>
+
+
+                                                </tr>
+                                            </table>
+
+
+                                        </td>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="90%">
+                                                        16. Whether qualified for promotion to the next standard<br>
+                                                        ಮುಂದಿನ ಮಾನದಂಡಕ್ಕೆ ಬಡ್ತಿ ಪಡೆಯಲು ಅರ್ಹತೆ ಇದೆಯೇ? :
+                                                    </td>
+                                                    <td width="10%">
+                                                        <b>{{promotionflag}}</b>
+                                                    </td>
+
+
+                                                </tr>
+                                            </table>
+
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table">
+                                                <tr>
+
+                                                    <td width="30%">17.Date of Birth(in figures and words): <br>ಹುಟ್ಟಿದ ದಿನಾಂಕ (ಅಂಕಿ ಮತ್ತು ಪದಗಳಲ್ಲಿ) </td>
+
+                                                    <td width="15%">{{lbldob | date :'dd/MM/yyyy'}} 	</td>
+                                                    <td width="55%">{{lbldobwords}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table">
+                                                <tr>
+
+                                                    <td width="70%">
+                                                        18.Standard in which the student was studying at the time of leaving the College (in words)<br>
+                                                        ಕಾಲೇಜಿನಿಂದ ಹೊರಡುವ ಸಮಯದಲ್ಲಿ ವಿದ್ಯಾರ್ಥಿ ಓದುತ್ತಿದ್ದ
+                                                        ತರಗತಿ (ಪದಗಳಲ್ಲಿ)
+                                                    </td>
+                                                    <td width="30%">{{laststudiedinwords}}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+
+                                                    <td width="100%">
+                                                        19.&nbsp; Details of subjects studied in I/II PUC <br />
+                                                        &nbsp;&nbsp;&nbsp;&nbsp; ಪ್ರಥಮ/
+                                                        ದ್ವಿತೀಯ ಪಿಯುಸಿಯಲ್ಲಿ ಅಧ್ಯಯನ ಮಾಡಿದ ವಿಷಯಗಳು
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="100%">
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;    Part I-Languages studied  ಭಾಗ I-ಅಧ್ಯಯನ ಮಾಡಿದ್
+                                                        ವಿಷಯಗಳು
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;    <b>{{subjectsstudied}}</b>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="100%">
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;    part II-Opt.subjects studied  ಭಾಗ 2 -ಅಧ್ಯಯನ ಮಾಡಿದ್ ವಿಷಯಗಳು
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;    <b>{{elective}}</b>
+                                                    </td>
+
+                                                </tr>
+                                            </table>
+
+                                        </td>
+
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="80%">
+                                                        20.Medium of Instruction
+                                                        <br />
+                                                        ಬೋಧನೆಯ ಮಧ್ಯಮ
+                                                    </td>
+                                                    <td width="20%">{{medium}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="80%">
+                                                        21.Date of Admission or Promotion
+                                                        to that class or Standard:
+                                                        <br />
+                                                        ಆ ವರ್ಗ ಅಥವಾ ಮಾನದಂಡಕ್ಕೆ ಪ್ರವೇಶ ಅಥವಾ ಬಡ್ತಿ ದಿನಾಂಕ:
+                                                    </td>
+                                                    <td width="20%">{{lbldoa |date:'dd/MM/yyyy'}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="80%">
+                                                        22.Whether all Balance of fees paid or not?
+                                                        <br />
+                                                        ಎಲ್ಲಾ ಶುಲ್ಕವನ್ನು ವಿದ್ಯಾರ್ಥಿಯಿಂದ ಪಡೆಯಲಾಗಿದೆ?
+                                                    </td>
+                                                    <td width="20%">{{feedue}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            23.Fee concessions,if any(nature and period to be specified) <br>
+                                            &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;  ಶುಲ್ಕ ರಿಯಾಯಿತಿಗಳು, ಯಾವುದಾದರೂ ಇದ್ದರೆ (ನಿರ್ದಿಷ್ಟಪಡಿಸಬೇಕಾದ ಸ್ವರೂಪ ಮತ್ತು ಅವಧಿ)
+                                            <br />
+                                            &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;     <b>{{feeconcession}}</b>
+
+                                        </td>
+                                        <td colspan="2">
+                                            24.Scholarship if any (nature and period to be specified) <br> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; ವಿದ್ಯಾರ್ಥಿವೇತನ ಯಾವುದಾದರೂ ಇದ್ದರೆ  :
+                                            <br />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="70%">
+                                                        25.Date of student's last attendance at College: <br>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; ವಿದ್ಯಾರ್ಥಿಯ
+                                                        ಹಾಜರಾತಿ ಕೊನೆಯ ದಿನಾಂಕ:
+                                                    </td>
+                                                    <td width="30%">{{last_date_attended |date:'dd/MM/yyyy'}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="70%">
+                                                        26. Number Of College Days Upto the date of Leaving :   <br>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; ಹೊರಡುವ ದಿನಾಂಕದವರೆಗೆ ಕಾಲೇಜು ದಿನಗಳ ಸಂಖ್ಯೆ
+                                                    </td>
+                                                    <td width="30%">{{totalworkingdays}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="70%">
+                                                        27. Total number of days the student attended:<br>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+                                                        ವಿದ್ಯಾರ್ಥಿ ಹಾಜರಿದ್ದ ಒಟ್ಟು ದಿನಗಳ ಸಂಖ್ಯೆ
+                                                    </td>
+                                                    <td width="30%">{{noworkingdays}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="70%">
+                                                        28.Date on which the application for the Transfer Certificate was received : <br>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+                                                        ವರ್ಗಾವಣೆ ಪ್ರಮಾಣಪತ್ರಕ್ಕಾಗಿ ಅರ್ಜಿಯನ್ನು ಸ್ವೀಕರಿಸಿದ ದಿನಾಂಕ
+                                                    </td>
+                                                    <td width="30%">{{ASTC_TCApplicationDate |date :'dd/MM/yyyy'}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+
+
+                                    </tr>
+
+
+
+                                    <tr>
+
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="70%">
+                                                        29.Date of issue of the Transfer Certificate:<br />
+                                                        &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+                                                        ವರ್ಗಾವಣೆ ಪ್ರಮಾಣಪತ್ರವನ್ನು ನೀಡಿದ ದಿನಾಂಕ
+                                                    </td>
+                                                    <td width="30%">{{lbldate |date:'dd/MM/yyyy'}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+                                        <td colspan="2">
+                                            <table class="table">
+                                                <tr>
+                                                    <td width="70%">
+                                                        30.Character and Conduct : <br>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+                                                        ಅಕ್ಷರ ಮತ್ತು ನಡವಳಿಕೆ
+                                                    </td>
+                                                    <td width="30%">{{lblconduct}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </td>
+
+
+                                    </tr>
+                                    <!--<tr>
+                                        <td colspan="4">
+                                            <table class="table margin-top-50">
+                                                <tr>
+                                                    <td colspan="4" class="float-right">Signature of Head of the Institution</td>
+                                                </tr>
+                                            </table>
+                                            <table class="table margin-top-50">
+                                                <tr>
+                                                    <td colspan="4">Signature of the Parents/Student</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>-->
+
+                                </table>
+                            </div>
+              
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+        </form>
+    </section>
+</div>
+

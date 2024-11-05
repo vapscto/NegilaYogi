@@ -1,0 +1,199 @@
+﻿
+<section class="content">
+    <div>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Oral Test\Interaction Schedule Marks</h3>
+                <a href="">
+                    <md-tooltip md-direction="right">
+                        This functionality helps the admin to update the student’s oral test marks on basis of schedule name & oral test conducted by the staff/teacher
+                    </md-tooltip><i class="fa fa-question-circle-o text-orange"></i>
+                </a>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" ng-init="BindData()" novalidate>
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" ng-model="EntryDate" style="font-weight:bold;font-size: 12px;"></label>
+                            </div>
+                            <div class="form-group" ng-if="myValue==true">
+                                <label class="control-label col-sm-4">
+                                    Schedule Name :
+
+                                    <span style="color:Red">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="schname" data-ng-model="paotS_Id" ng-change="onSelectGetStudent(paotS_Id)" required>
+                                        <option value="" label="Select Schedule Name">Select Schedule Name</option>
+                                        <option ng-repeat="ScName in ScheduleName" ng-model="PAOTS_Id" value="{{ScName.paotS_Id}}" ng-selected="{{ScName.Selected == true}}">
+                                            {{ScName.paotS_ScheduleName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.schname)" ng-messages="myForm.schname.$error">
+                                        <div ng-message="required">Please Select Schedule Name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Oral Test By: <span style="color:Red">*</span>
+                                    <a href="">
+                                        <md-tooltip md-direction="right">
+                                            Oral test by – Oral test taken by how many teachers/Staff
+                                        </md-tooltip><i class="fa fa-question-circle-o text-orange"></i>
+                                    </a>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="oraltest" ng-disabled="OralByDis" data-ng-model="OralBy" required>
+                                        <option value="" label="Select Oral Test By">Select Oral Test By</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.oraltest)" ng-messages="myForm.oraltest.$error">
+                                        <div ng-message="required">Please Select Oral Test By</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" ng-if="StudentName.length>0">
+
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-4">
+                                    Student: <span style="color:Red">*</span>
+                                    <br />
+                                    <label for="sel2j" class="control-label">
+                                        Select All Students :
+                                        <label>
+                                            <input type="checkbox" value="" ng-click="toggleAll(all);" ng-model="all">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </label>
+                                </label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin-left: 3%;">
+                                    <div class="multiselect col-sm-8">
+
+                                        <label data-ng-model="PASR_Id" ng-repeat="StuName in StudentName|filter:searchchkbx" value="{{StuName.pasR_Id}}">
+                                            <input type="checkbox" ng-model="StuName.checked" ng-change="optionToggled()" name="Studentoption" ng-required="isOptionsRequired();">
+                                            <span class="lbl padding-8">{{StuName.name}}</span>
+                                        </label>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.Studentoption)" ng-messages="myForm.Studentoption.$error">
+                                        <div ng-message="required">Please Select Students</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-click="BindGrid(StudentName)" ng-disabled="form.$invalid" id="search-btn">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="hidestudents">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" novalidate>
+                    <div class="row box-body">
+                        <!--<div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <select class="form-control" id="sel1">
+                                        <option>All</option>
+                                        <option>Name</option>
+                                        <option>SNO</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>-->
+                        <table>
+                            <tr>
+                                <td>
+
+                                    <b> <label class="control-label " style="font-size:medium;font-weight:600;color:black;">Total Grid Records:<span class="badge">{{presentCountgrid}}</span>&nbsp;&nbsp;&nbsp;</label></b>
+
+                                </td>
+
+
+                            </tr>
+                        </table>
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO</th>
+                                    <th>
+                                        <a href="" ng-click="order('pasR_FirstName')">Student Name</a>
+                                    </th>
+                                    <!--<th ng-repeat="SelectedOralBy in wirettenTestStudentMarks" ng-if="SelectedOralBy.flagsubject == 'Common'">
+                                        <content>{{SelectedOralBy.oralTestByPerson+ " (" + SelectedOralBy.oral_MaxMarks +")"}}</content>
+                                    </th>-->
+                                    <th ng-repeat="SelectedOralBy in oralmarks">
+                                        {{SelectedOralBy.header}}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="StuName in datanames |orderBy:sortKey:reverse1 |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                    <!--<td>{{itemsPerPageff *(currentPage1-1)+$index+1}}</td>-->
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td style="text-align:left"> {{StuName.name}} </td>
+                                    <td ng-repeat="Marks in wirettenTestStudentMarks" ng-if="Marks.pasR_Id == StuName.pasR_Id" ng-form="validatemarks">
+                                        <input type="number" name="oralmarks" allow-pattern="\d" data-ng-model="Marks.obtMarks" max="{{Marks.oral_MaxMarks}}" min="0" class="form-control" id="id{{StuName.pasR_Id}}" value="{{Marks.obtMarks}}" required>
+                                        <div class="error-messages" ng-if="interacted1(validatemarks.oralmarks)" ng-messages="validatemarks.oralmarks.$error">
+                                            <div ng-message="max">marks should be less than Max marks!</div>
+                                            <div ng-message="required">Please Enter marks</div>
+                                        </div>
+
+                                    </td>
+                                    <td hidden="hidden">{{StuName.pasR_Id}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                    <hr />
+                    <div class="">
+                        <div class="text-center">
+                            <!--<span ng-show="userPrivileges.ivrmirP_AddFlag===true">-->
+                            <md-button type="submit" class="md-raised md-primary" ng-click="saveWrittenTestMarksEntrydata(wirettenTestStudentMarks)" ng-disabled="form.$invalid" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <!--</span>-->
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

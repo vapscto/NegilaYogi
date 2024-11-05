@@ -1,0 +1,429 @@
+﻿<style>
+    .colef {
+        margin-left: 19%;
+    }
+
+    .appv {
+        margin-left: 22%;
+    }
+
+    .ntapp {
+        margin-left: -5%;
+    }
+
+    .aaa {
+        margin-left: -3%;
+    }
+
+    .hdr {
+        background: darkslategray;
+    }
+
+    .ddd {
+        padding-top: 1px;
+    }
+
+    .clsbtn {
+        margin-left: 0px;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savedata()" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">TC FEE Approval</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-7 col-sm-offset-3 colef">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Student:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8" ng-hide="editopn">
+                                <select class="form-control" id="sel11" ng-model="AMST_Id" name="cltpjt" ng-change="getstudetails(AMST_Id)" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="stu in student_dd" value="{{stu.AMST_Id}}" ng-selected="{{stu.Selected==true}}"> {{stu.studentname}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cltpjt)" ng-messages="myForm.cltpjt.$error">
+                                    <div ng-message="required">Select Student Name</div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-8" ng-show="editopn">
+                                <input class="form-control" name="remart" id="usr1" type="text" data-ng-model="studentname" ng-disabled="true">
+                                <div class="error-messages" ng-if="interacted(myForm.remart)" ng-messages="myForm.remart.$error">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div ng-show="libstudetails.length>0">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+
+                                    <tr>
+                                        <th>
+                                            <label>
+                                                <input type="checkbox" value="" ng-model="stdall" ng-click="toggleAllstd()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>
+                                        <th>SLNO</th>
+                                        <th>Group Name</th>
+                                        <th>Arrear</th>
+                                        <th>Current Year Charges</th>
+                                        <th>Concession</th>
+                                        <th>Total Amount</th>
+                                        <th>Paid Amount</th>
+                                        <th>Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in libstudetails">
+                                        <td class="text-center">
+                                            <label>
+                                                <input name="feename" ng-disabled="user.Balance>0" type="checkbox" ng-model="user.stdselected" value="{{user.Id}}" ng-change="optionToggledstd(user,$index)" ng-required="isRequiredlocation()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                        <td>{{ $index+1}}</td>
+                                        <td>{{ user.FMG_GroupName}}</td>
+                                        <td>{{ user.Arrear}}</td>
+                                        <td>{{ user.CurrentYrCharges}}</td>
+                                        <td>{{ user.ConcessionAmount}}</td>
+                                        <td>{{ user.Total_amount}}</td>
+                                        <td>{{ user.Paid_amount}}</td>
+                                        <td>{{ user.Balance}}</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <div class="error-messages" ng-if="interacted(myForm.feename)" ng-messages="myForm.feename.$error">
+                                <div ng-message="required">Please Select Atleast One checkbox</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Approved Date:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8 aaa">
+                                <md-datepicker name="dob" data-ng-model="ATCFAPP_ApprovedDate" md-placeholder="Select date" required></md-datepicker>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.dob)" ng-messages="myForm.dob.$error">
+                                <div ng-message="required">Select Approved Date</div>
+                            </div>
+                        </div>
+
+                        <!--<div class="form-group">
+                            <div class="col-sm-4 appv">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" value="libraryApproval" name="attap" data-ng-model="ATCFAPP_ApprovalFlg" required>
+                                    <span class="lbl padding-4">FEE Approval</span>
+                                </label>
+                                <div class="error-messages" ng-if="interacted(myForm.attap)" ng-messages="myForm.attap.$error">
+                                    <div ng-message="required">Select FEE Approval</div>
+
+                                </div>
+                            </div>
+
+                        </div>-->
+
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Remarks:<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" name="remart" id="usr1" type="text" data-ng-model="ATCFAPP_Remarks" required></textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.remart)" ng-messages="myForm.remart.$error">
+                                    <div ng-message="required">Enter Remarks</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="Id" />
+
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-disabled="user.stdselected==false">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">TC FEE Approval List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" ng-if="searchValue!=''">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th>Student Name</th>
+                        <th>Approve Date</th>
+                        <!--<th>Remark</th>-->
+                        <th>Fee Approval</th>
+                        <th>View Fee Approval</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    <tr dir-paginate="bm in filterValue1 = (tc_fee_list | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}
+                        <td class="text-center">{{bm.studentname}}</td>
+                        <td class="text-center">{{bm.ATCFAPP_ApprovedDate|date:'dd-MM-yyyy'}}</td>
+                        <!--<td class="text-center">{{bm.ATCFAPP_Remarks}}</td>-->
+
+                        <td class="text-center">
+                            <span ng-if="bm.ATCFAPP_ApprovalFlg === true">
+                                <a class="text-green" title="Approved">
+                                    Approved
+                                </a>
+                            </span>
+                            <span ng-if="bm.ATCFAPP_ApprovalFlg === false">
+
+                                <a class="text-danger" href="" ng-click="notapproval(bm)" data-toggle="modal" data-placement="bottom" data-target="#myModalfee_new" title="Not Approved">
+                                    Not Approved
+                                </a>
+
+                            </span>
+                        </td>
+
+
+                        <td class="text-center">
+                            <a class="text-aqua" href="" ng-click="view(bm)" data-toggle="modal" data-placement="bottom" data-target="#myModalfee" title="View">
+                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div id="myModalfee" class="modal fade" role="dialog" data-backdrop="false" name="formm">
+    <div class="modal-dialog modal-lg" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <h4>Fee Group Approval List</h4>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+
+                            <th>Group Name</th>
+                            <th>Arrear</th>
+                            <th>Current Year Charges</th>
+                            <th>Concession</th>
+                            <th>Total Amount</th>
+                            <th>Paid Amount</th>
+                            <th>Balance</th>
+                            <!--<th>Approval Flag</th>-->
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user1 in feehead_details">
+                            <td>{{$index+1}}</td>
+                            <td>{{ user1.FMG_GroupName}}</td>
+                            <td>{{ user1.Arrear}}</td>
+                            <td>{{ user1.CurrentYrCharges}}</td>
+                            <td>{{ user1.ConcessionAmount}}</td>
+                            <td>{{ user1.Total_amount}}</td>
+                            <td>{{ user1.Paid_amount}}</td>
+                            <td>{{ user1.Balance}}</td>
+                            <!--<td class="text-center">
+                                <span ng-if="user1.ATCFAPP_ApprovalFlg === true">
+                                    <a class="text-green" title="Approved">
+                                        Approved
+                                    </a>
+                                </span>
+                                <span ng-if="user1.ATCFAPP_ApprovalFlg === false">
+                                    <a class="text-danger" title=" Not Approved">
+                                        Not Approved
+                                    </a>
+                                </span>
+                            </td>-->
+
+                        </tr>
+                </table>
+
+            </div>
+
+
+            <div class="modal-footer custom-footer">
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalfee_new" class="modal fade" role="dialog" data-backdrop="true" >
+    <form  role="form"  name="myForm1" method="post" novalidate>
+        <div class="modal-dialog modal-lg" style="width: 60%;">
+
+            <div class="modal-content pding">
+                <div class="modal-body">
+                    <div class="modal-header hdr">
+                        <button type="button" class="close text-white clsbtn" data-dismiss="modal"><b class="clsbtn">Close</b></button>
+                        <h4 class="modal-title text-white">Fee Group Approval List &nbsp &emsp; &emsp; <b class="text-red">Name: {{studentname_new}}</b></h4>
+                    </div>
+
+
+
+                    <div ng-show="libstudetails_new.length>0" class="ddd">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+
+                                <tr>
+                                    <th>
+                                        <label>
+                                            <input type="checkbox" value="" ng-model="stdall" ng-click="toggleAllstd()">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </th>
+                                    <th>SLNO</th>
+                                    <th>Group Name</th>
+                                    <th>Arrear</th>
+                                    <th>Current Year Charges</th>
+                                    <th>Concession</th>
+                                    <th>Total Amount</th>
+                                    <th>Paid Amount</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user1 in libstudetails_new">
+                                    <td class="text-center">
+                                        <label>
+                                            <input name="feename" ng-disabled="user1.Balance>0" type="checkbox" ng-model="user1.stdselected" value="{{user.Id}}" ng-change="optionToggledstd(user1,$index)" ng-required="isRequiredlocation()">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td>{{ $index+1}}</td>
+                                    <td>{{ user1.FMG_GroupName}}</td>
+                                    <td>{{ user1.Arrear}}</td>
+                                    <td>{{ user1.CurrentYrCharges}}</td>
+                                    <td>{{ user1.ConcessionAmount}}</td>
+                                    <td>{{ user1.Total_amount}}</td>
+                                    <td>{{ user1.Paid_amount}}</td>
+                                    <td>{{ user1.Balance}}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        <div class="error-messages" ng-if="interacted1(myForm.feename)" ng-messages="myForm1.feename.$error">
+                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Approved Date:<span style="color:Red">*</span></label>
+                        <div class="col-sm-8 aaa">
+                            <md-datepicker name="dob" data-ng-model="ATCFAPP_ApprovedDate1" md-placeholder="Select date" required></md-datepicker>
+                        </div>
+                        <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1.dob)" ng-messages="myForm1.dob.$error">
+                            <div ng-message="required">Select Approved Date</div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Remarks:<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" name="remart" id="usr1" type="text" data-ng-model="ATCFAPP_Remarks1" required></textarea>
+                            <div class="error-messages" ng-if="interacted1(myForm1.remart)" ng-messages="myForm1.remart.$error">
+                                <div ng-message="required">Enter Remarks</div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <input type="hidden" ng-model="Id" />
+
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="save_pending()" ng-disabled="user1.stdselected==false">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+
+
+
+                </div>
+            </div>
+            <hr />
+
+
+        </div>
+</form>
+</div>
+

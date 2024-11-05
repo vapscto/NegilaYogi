@@ -1,0 +1,620 @@
+﻿
+<section class="content" ng-init="loadInitialData()">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Entry</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" data-ng-model="att.asmaY_Id" name="aeacdyr" required ng-change="loadInitialData()">
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="academicyear in academicYearList" value="{{academicyear.asmaY_Id}}" ng-selected="{{academicyear.Selected == true}}">{{academicyear.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.aeacdyr)" ng-messages="myForm.aeacdyr.$error || myForm.aeacdyr.$dirty">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" data-ng-model="att.asmcL_Id" name="aeclass" ng-change="getStudentBYClass()" required>
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="class in classList" value="{{class.asmcL_Id}}">{{class.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.aeclass)" ng-messages="myForm.aeclass.$error || myForm.aeclass.$dirty">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-switch="att.entry" ng-show="entry_flag==true">
+            <div ng-switch-default>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Attendance Entry Inputs</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="text-center well">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailyonce" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Once</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailytwice" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Twice</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="monthly" disabled="disabled">
+                                        <span class="lbl padding-8">Monthly</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="period" disabled="disabled">
+                                        <span class="lbl padding-8">Period Wise</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Daily once wise-->
+            <div ng-switch-when="Dailyonce">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Daily Once</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-primary" data-ng-click="ViewAttendanceDetailsStaffWise(att ,'Dailyonce')" ng-if="att.asmC_Id>0">
+                                <i class="fa fa-eye" title="View Attendance Details" aria-hidden="true"></i>View Period Wise Attendance
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="text-center well">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailyonce" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Once</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailytwice" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Twice</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="monthly" disabled="disabled">
+                                        <span class="lbl padding-8">Monthly</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="period" disabled="disabled">
+                                        <span class="lbl padding-8">Period Wise</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" data-ng-model="att.asmC_Id" name="aesec" ng-change="getStudent()" required>
+                                            <option value="">Select Section</option>
+                                            <option ng-repeat="section in sectionList" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.aesec)" ng-messages="myForm.aesec.$error || myForm.aesec.$dirty">
+                                            <div ng-message="required">Select Section</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="">
+                                    <label class="control-label col-sm-4">DOE:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker ng-model="att.ASA_Entry_DateTime" onkeypress="return false" name="aedoe" md-placeholder="Enter Date" md-date-filter="onlyWeekendsPredicate" md-min-date="minDatedof" md-max-date="maxDatedof" ng-change="getdatewiseatt()" required></md-datepicker>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.aedoe)" ng-messages="myForm.aedoe.$error || myForm.aedoe.$dirty">
+                                        <div ng-message="required">Select DOE</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Daily twice wise-->
+            <div ng-switch-when="Dailytwice">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">DAILY TWICE</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-primary" data-ng-click="ViewAttendanceDetailsStaffWise(att ,'Dailytwice')" ng-if="att.asmC_Id>0">
+                                <i class="fa fa-eye" title="View Attendance Details" aria-hidden="true"></i>View Period Wise Attendance
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="text-center well">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailyonce" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Once</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailytwice" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Twice</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="monthly" disabled="disabled">
+                                        <span class="lbl padding-8">Monthly</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="period" disabled="disabled">
+                                        <span class="lbl padding-8">Period Wise</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" data-ng-model="att.asmC_Id" name="aedtsec" ng-change="getStudent()" required>
+                                            <option value="">Select Section</option>
+                                            <option ng-repeat="section in sectionList" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.aedtsec)" ng-messages="myForm.aedtsec.$error || myForm.aedtsec.$dirty">
+                                            <div ng-message="required">Select Section</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">DOE:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8 input-group">
+                                        <md-datepicker ng-model="att.ASA_Entry_DateTime" name="aedtdoe" onkeypress="return false" ng-change="getdatewiseatt()" md-date-filter="onlyWeekendsPredicate" md-placeholder="Enter Date" md-min-date="minDatedtf" md-max-date="maxDatedtf" required></md-datepicker>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.aedtdoe)" ng-messages="myForm.aedtdoe.$error || myForm.aedtdoe.$dirty">
+                                        <div ng-message="required">Select DOE</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Month wise-->
+            <div ng-switch-when="monthly">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">MONTHLY</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-primary" data-ng-click="ViewAttendanceDetailsStaffWise(att ,'monthly')" ng-if="att.asmC_Id>0">
+                                <i class="fa fa-eye" title="View Attendance Details" aria-hidden="true"></i>View Period Wise Attendance
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="text-center well">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailyonce" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Once</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailytwice" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Twice</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="monthly" disabled="disabled">
+                                        <span class="lbl padding-8">Monthly</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="period" disabled="disabled">
+                                        <span class="lbl padding-8">Period Wise</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="aesec1" data-ng-model="att.asmC_Id" ng-change="getStudent()" required>
+                                            <option value="">Select Section</option>
+                                            <option ng-repeat="section in sectionList" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.aesec1)" ng-messages="myForm.aesec1.$error || myForm.aesec1.$dirty">
+                                            <div ng-message="required">Select Section</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Month:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="aemont" data-ng-model="att.ivrM_Month_Id" required ng-change="getmonthclassheld()">
+                                            <option value="">Select Month</option>
+                                            <option ng-repeat="mnth in monthList" value="{{mnth.ivrM_Month_Id}}">{{mnth.ivrM_Month_Name}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.aemont)" ng-messages="myForm.aemont.$error || myForm.aemont.$dirty">
+                                            <div ng-message="required">Select Month</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Attendance Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8 input-group">
+                                        <md-datepicker ng-model="att.ASA_FromDate" name="aemonadfrom" onkeypress="return false" md-placeholder="Enter Date" disabled="disabled"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.aemonadfrom)" ng-messages="myForm.aemonadfrom.$error || myForm.aemonadfrom.$dirty">
+                                            <div ng-message="required">Select Attendance Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">DOE:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker ng-model="att.ASA_Entry_DateTime" onkeypress="return false" name="aemonaddoe" md-placeholder="Enter Date" disabled="disabled" md-min-date="minDatemf" md-max-date="maxDatemf" required></md-datepicker>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.aemonaddoe)" ng-messages="myForm.aemonaddoe.$error || myForm.aemonaddoe.$dirty">
+                                        <div ng-message="required">Select Attendance Date</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4" style="font:bold">Total Class Helds: {{countclass}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8 input-group">
+                                        <md-datepicker ng-model="att.ASA_ToDate" name="aemonad" onkeypress="return false" md-placeholder="Enter Date" disabled="disabled"></md-datepicker>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.aemonad)" ng-messages="myForm.aemonad.$error || myForm.aemonad.$dirty">
+                                        <div ng-message="required">Select Attendance Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--period wise-->
+            <div ng-switch-when="period">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">PERIOD WISE ENTRY</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-primary" data-ng-click="ViewAttendanceDetailsStaffWise(att ,'period')" ng-if="att.asmC_Id>0">
+                                <i class="fa fa-eye" title="View Attendance Details" aria-hidden="true"></i>View Period Wise Attendance
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="text-center well">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailyonce" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Once</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="Dailytwice" disabled="disabled">
+                                        <span class="lbl padding-8">Daily Twice</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="monthly" disabled="disabled">
+                                        <span class="lbl padding-8">Monthly</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="att.entry" value="period" disabled="disabled">
+                                        <span class="lbl padding-8">Period Wise</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="aepwsec" data-ng-model="att.asmC_Id" ng-change="getStudent()" required>
+                                            <option value="">Select Section</option>
+                                            <option ng-repeat="section in sectionList" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.aepwsec)" ng-messages="myForm.aepwsec.$error || myForm.aepwsec.$dirty">
+                                            <div ng-message="required">Select Section</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Subject:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="aepwsub" ng-change="getbatchlist()" data-ng-model="att.ismS_Id" ng-disabled="attcount" required>
+                                            <option value="">Select Subject</option>
+                                            <option ng-repeat="sbj in subjectList" value="{{sbj.ismS_Id}}">{{sbj.ismS_SubjectName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.aepwsub)" ng-messages="myForm.aepwsub.$error || myForm.aepwsub.$dirty">
+                                            <div ng-message="required">Select Subject</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Period:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" data-ng-model="att.ttmP_Id" name="ttperiod" ng-change="getstdlistperiod()" ng-disabled="attcount1" required>
+                                            <option value="">Select Period</option>
+                                            <option ng-repeat="period in periodlist" value="{{period.ttmP_Id}}" ng-selected="{{period.Selected == true}}">{{period.ttmP_PeriodName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.ttperiod)" ng-messages="myForm.ttperiod.ttperiod">
+                                            <div ng-message="required">Select Period</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">DOE:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker ng-model="att.ASA_Entry_DateTime" name="aepwdoe" onkeypress="return false" md-placeholder="Enter Date"
+                                                       md-min-date="minDatedf" md-max-date="maxDatedf" required ng-change="getperioddatewiseatt()"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.aepwdoe)" ng-messages="myForm.aepwdoe.$error || myForm.aepwdoe.$dirty">
+                                            <div ng-message="required">Select DOE</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Batch:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-if="batchno1==1">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="aepwbat" data-ng-model="att.asasB_Id" ng-required="batchno1==1" ng-change="getperiod()" ng-disabled="batchno">
+                                            <option value="">Select Batch</option>
+                                            <option ng-repeat="btch in batchList" value="{{btch.asasB_Id}}">{{btch.asasB_BatchName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.aepwbat)" ng-messages="myForm.aepwbat.$error || myForm.aepwbat.$dirty">
+                                            <div ng-message="required">Select Batch</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center well" ng-init="att.ASA_Regular_Extra='Regular'">
+                                    <label class="radio-inline">
+                                        <input name="aepwrep" type="radio" value="Regular" data-ng-model="att.ASA_Regular_Extra"  required>
+                                        <span class="lbl padding-8">Regular</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="aepwrep" type="radio" value="Extra Period" data-ng-model="att.ASA_Regular_Extra" required>
+                                        <span class="lbl padding-8">Extra Period</span>
+                                    </label>
+                                    <div class="error-messages" ng-if="interacted(myForm.aepwrep)" ng-messages="myForm.aepwrep.$error">
+                                        <div ng-message="required">Select Regular/Extra Period</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="studentgrid">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <label class="col-sm-6" style="font:bold ; color:blue; font-size:20px;"> {{attentrytype}}</label>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group pull-right">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SL. NO.</th>
+                                <th><a href="" ng-click="sortBy('studentname')">Student Name</a> </th>
+                                <th ng-show="showadmno"><a href="" ng-click="sortBy('amsT_AdmNo')">Admission No.</a> </th>
+                                <th ng-show="showregno"><a href="" ng-click="sortBy('amsT_RegistrationNo')">Registration No.</a> </th>
+                                <th ng-show="showrollno"><a href="" ng-click="sortBy('amaY_RollNo')">Roll No.</a> </th>
+                                <th ng-show="att.entry!='Dailytwice' && att.entry!='monthly'">Attendance </th>
+                                <th ng-show="att.entry=='monthly'"><a href="">Days</a></th>
+                                <th ng-show="att.entry=='Dailytwice'"><a href="">I Half  </a></th>
+                                <th ng-show="att.entry=='Dailytwice'"><a href="">II Half</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr dir-paginate="user in studentlist|filter:filterValue|itemsPerPage:itemsPerPage |orderBy:sortKey:sortReverse"
+                                ng-form="newform" current-page="currentPage" ng-class-odd="'odd'">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left">{{ user.studentname}}</td>
+                                <td class="text-left" ng-show="showadmno">{{ user.amsT_AdmNo}}</td>
+                                <td class="text-left" ng-show="showregno">{{user.amsT_RegistrationNo}}</td>
+                                <td class="text-center" ng-show="showrollno">{{ user.amaY_RollNo}}</td>
+                                <td class="text-center" ng-show="att.entry!='Dailytwice' && att.entry!='monthly'">
+                                    <input type="checkbox" id="check-{{user.AMST_Id}}" ng-disabled="AttendenceCheckDis" ng-model="user.selected" name="aemoncb">
+                                    <span class="lbl padding-8"></span>
+                                </td>
+                                <td class="text-center" ng-if="att.entry=='monthly'">
+                                    <label>
+                                        <input class="text-center" type="text" data-ng-model="user.pdays" name="aemoninp"
+                                               allow-pattern="[0-9.]" ng-pattern="/^[0-9]+(\.[0,5]{1})?$/" maxlength="4" ng-required="user.Selected"
+                                               ng-blur="addtopdays(user)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                    <div class="error-messages" ng-if="interacted(newform.aemoninp)" ng-messages="newform.aemoninp.$error || newform.aemoninp.$dirty">
+                                        <div ng-message="pattern">Please Enter valid input format e.g., 15.5, 10.5,10</div>
+                                    </div>
+                                </td>
+                                <td class="text-center" ng-show="att.entry=='Dailytwice'">
+                                    <input type="checkbox" id="check-{{user.AMST_Id}}" ng-disabled="AttendenceCheckDis" ng-model="user.FirstHalfflag" name="aemoncb">
+                                    <span class="lbl padding-8"></span>
+                                </td>
+                                <td class="text-center" ng-show="att.entry=='Dailytwice'">
+                                    <input type="checkbox" id="check-{{user.AMST_Id}}" ng-disabled="AttendenceCheckDis" ng-model="user.SecondHalfflag" name="aemoncb">
+                                    <span class="lbl padding-8"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="error-messages" ng-if="interacted(myForm.aemoncb)" style="margin-left:885px;margin-top:-16px;" ng-messages="myForm.aemoncb.$error || myForm.aemoncb.$dirty">
+                        <div ng-message="required">Select Atleast One Check Box</div>
+                    </div>
+                    <div class="error-messages" ng-if="interacted(myForm.aemoninp)" ng-messages="myForm.aemoninp.$error || myForm.aemoninp.$dirty">
+                        <div ng-message="required">Enter Days of selected checkbox</div>
+                    </div>
+                </div>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" on-page-change="pageChanged(newPageNumber)">
+                </dir-pagination-controls>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" value="{{asA_Id}}" data-ng-model="att.asA_Id" />
+                    <input type="hidden" value="{{pamS_Id}}" data-ng-model="att.pamS_Id" />
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="SaveStudentAttendance(att);" ng-if="userPrivileges.ivrmirP_AddFlag===true && update==0" ng-disabled="SaveDis">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="SaveStudentAttendance(att);" ng-if="userPrivileges.ivrmirP_UpdateFlag===true && update!=0" ng-disabled="SaveDis">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>Update
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="Deleteattendance(att);" ng-if="userPrivileges.ivrmirP_DeleteFlag===true && update!=0" ng-disabled="SaveDis">
+                        <i class="fa fa-trash" aria-hidden="true"></i>Delete
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-warn" ng-click="clearData();">
+                        <i class="fa fa-times" aria-hidden="true"></i>Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade" id="MymodalViewAttendance" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" style="width:90% !important">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">Attendance Details</h4>
+                </div>
+                <div class="modal-body" style="background:white !important">
+                    <div class="row">
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="searchValue_att_del" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row col-sm-12">
+                        <div style="overflow-x: auto">
+                            <table class="table table-bordered" style="background-color:white !important">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Attendance Details</th>
+                                        <th>Attendance Date</th>
+                                        <th>Entry Date</th>
+                                        <th ng-if="att_entry_type_Temp=='period'">Subject</th>
+                                        <th ng-if="att_entry_type_Temp=='period'">Period</th>
+                                        <th>Entry By</th>
+                                        <th ng-if="att_entry_type_Temp=='period'">Total Count</th>
+                                        <th ng-if="att_entry_type_Temp=='period'">Present Count</th>
+                                        <th ng-if="att_entry_type_Temp=='period'">Absent Count</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="user in filterValue_att_del = (viewStudentPeriodWiseAttDetails | filter : searchValue_att_del)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage1"
+                                        current-page="currentPage1" ng-class-odd="'odd'" pagination-id="page1">
+                                        <td class="text-center">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                        <td class="text-left">
+                                            <div class="row">
+                                                <label class="col-sm-12">
+                                                    <b>Academic Year : {{user.ASMAY_Year}}</b>
+                                                </label>
+                                            </div>
+                                            <div class="row">
+                                                <label class="col-sm-12">
+                                                    <b>Class : {{user.ASMCL_ClassName}}</b>
+                                                </label>
+                                            </div>
+                                            <div class="row">
+                                                <label class="col-sm-12">
+                                                    <b>Section : {{user.ASMC_SectionName}}</b>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">{{user.ASA_FROMDATE}}</td>
+                                        <td class="text-center">{{user.ASA_Entry_DateTime}}</td>
+                                        <td ng-if="att_entry_type_Temp=='period'" class="text-left">{{user.ISMS_SUBJECTNAME}}</td>
+                                        <td ng-if="att_entry_type_Temp=='period'" class="text-left">{{user.TTMP_PeriodName}}</td>
+                                        <td class="text-left">{{user.EMPLOYEENAME}}</td>
+                                        <td ng-if="att_entry_type_Temp=='period'" class="text-right">{{user.TotalCount}}</td>
+                                        <td ng-if="att_entry_type_Temp=='period'" class="text-right">{{user.PresentCount}}</td>
+                                        <td ng-if="att_entry_type_Temp=='period'" class="text-right">{{user.AbsentCount}}</td>
+                                        <td class="text-center">
+                                            <span ng-if="userPrivileges.ivrmirP_DeleteFlag===true && user.DELETE_FLAG==1">
+                                                <i class="fa fa-trash text-red" aria-hidden="true" ng-click="AttendanceDeleteRecordWise(user);"
+                                                   title="Delete Attendance"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+

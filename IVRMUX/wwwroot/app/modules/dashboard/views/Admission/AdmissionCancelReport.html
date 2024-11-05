@@ -1,0 +1,206 @@
+﻿
+<style>
+    .border-col-sm-4 {
+        border: 1px solid black !important;
+        border-style: solid !important;
+        border-radius: 20px !important;
+    }
+
+    .textareaclass {
+        resize: none !important;
+    }
+</style>
+
+<div data-ng-init="OnLoadAdmissionCancelReport()">
+    <section class="content">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Student Cancel Or Withdraw Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Academic Year :<strong style="color:red;">*</strong>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="stuayear" ng-model="ASMAY_Id" required
+                                            ng-change="OnChangeAdmissionCancelReportYear()">
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="acedmicYear in allAcademicYear" value="{{acedmicYear.asmaY_Id}}"
+                                                ng-selected="{{acedmicYear.selected == true}}">
+                                            {{acedmicYear.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myform.stuayear)" ng-messages="myform.stuayear.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group text-center">
+                                <md-button type="button" class="md-raised md-warn" ng-click="cleardata()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+
+                                <md-button type="button" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false"
+                                           ng-click="exportToExcel('#excelreport')">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                   Export To Excel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-disabled="excel_flag" id="print-btn" aria-disabled="false"
+                                           ng-click="printData();">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="box box-primary" ng-show="getwdstudentdetails.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">STUDENT'S CANCEL OR WITH DRAW REPORT DETAILS</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4 pull-right">
+                            <input type="text" ng-model="search" class="form-control" placeholder="Search Here" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <td>Sl.No</td>
+                                    <td>Year</td>
+                                    <td>Student Name</td>
+                                    <td>Admno</td>
+                                    <td>Class</td>
+                                    <td>Section</td>
+                                    <td>Date</td>
+                                    <td>Reason</td>
+                                    <td>Cancelled Fee</td>
+                                    <td>Refund Amount</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="Student in filterValue1=(getwdstudentdetails |filter:search) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">{{ Student.asmaY_Year }}</td>
+                                    <td class="text-left">{{ Student.studentname }}</td>
+                                    <td class="text-left">{{ Student.amsT_AdmNo }}</td>
+                                    <td class="text-center">{{ Student.asmcL_ClassName}}</td>
+                                    <td class="text-left">{{ Student.asmC_SectionName }}</td>
+                                    <td class="text-left">{{ Student.aacA_ACDate | date :'dd-MM-yyyy' }}</td>
+                                    <td class="text-left">{{ Student.aacA_ACReason }}</td>
+                                    <td class="text-left">{{ Student.aacA_CancellationFee }}</td>
+                                    <td class="text-left">{{ Student.aacA_ToRefundAmount }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div id="excelreport" ng-show="fdsfsdfd">
+    <table>
+        <tr style="border:0.5px solid black">
+            <td colspan="9" style="text-align:center; font-weight:bold">Admission Cancelled Report : {{yearname}}  </td>
+        </tr>
+        <tr style="border:0.5px solid black">
+            <td colspan="9">&nbsp;</td>
+        </tr>
+        <tr style="border:0.5px solid black">
+            <td>Sl.No</td>
+            <td>Student Name</td>
+            <td>Admno</td>
+            <td>Class</td>
+            <td>Section</td>
+            <td>Date</td>
+            <td>Reason</td>
+            <td>Cancelled Fee</td>
+            <td>Refund Amount</td>
+        </tr>
+        <tr ng-repeat="details in getwdstudentdetails" style="border:0.5px solid black">
+            <td>{{$index+1}}</td>
+            <td>{{ details.studentname }}</td>
+            <td>{{ details.amsT_AdmNo }}</td>
+            <td>{{ details.asmcL_ClassName}}</td>
+            <td>{{ details.asmC_SectionName }}</td>
+            <td>{{ details.aacA_ACDate | date :'dd-MM-yyyy' }}</td>
+            <td>{{ details.aacA_ACReason }}</td>
+            <td>{{ details.aacA_CancellationFee }}</td>
+            <td>{{ details.aacA_ToRefundAmount }}</td>
+        </tr>
+    </table>
+</div>
+
+<div id="printreport" ng-show="fdsfsdfd">
+    <div class="row" ng-if="imgname!=null && imgname!=''">
+        <div class="baldwin col-sm-12 text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <h4 class="text-center">Admission Cancelled Report : {{yearname}}</h4>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td>Sl.No</td>
+                        <td>Student Name</td>
+                        <td>Admno</td>
+                        <td>Class</td>
+                        <td>Section</td>
+                        <td>Date</td>
+                        <td>Reason</td>
+                        <td>Cancelled Fee</td>
+                        <td>Refund Amount</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="details in getwdstudentdetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{ details.studentname }}</td>
+                        <td class="text-left">{{ details.amsT_AdmNo }}</td>
+                        <td class="text-center">{{ details.asmcL_ClassName}}</td>
+                        <td class="text-left">{{ details.asmC_SectionName }}</td>
+                        <td class="text-left">{{ details.aacA_ACDate | date :'dd-MM-yyyy' }}</td>
+                        <td class="text-left">{{ details.aacA_ACReason }}</td>
+                        <td class="text-left">{{ details.aacA_CancellationFee }}</td>
+                        <td class="text-left">{{ details.aacA_ToRefundAmount }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

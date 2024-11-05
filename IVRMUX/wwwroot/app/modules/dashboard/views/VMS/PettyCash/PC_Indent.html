@@ -1,0 +1,593 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <di class="box-header with-border">
+                <h3 class="box-title">INDENT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </di>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Organization: <strong class="text-red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="MI_Id" id="id1" name="miname" required ng-change="OnChangeInstitution()" 
+                                        ng-disabled="editflag==true">
+                                    <option value="">-- Select Organization --</option>
+                                    <option ng-repeat="ins in getuserinstitution" value="{{ins.mI_Id}}" ng-selected="ins.mI_Id==MI_Id">
+                                        {{ins.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.miname)" ng-messages="myForm.miname.$error">
+                                    <div ng-message="required">Select Organization</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Requisition From Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7 input-group">
+                                    <md-datepicker ng-model="PCINDENT_Date_From" id="sel2" name="appl_date1" onkeypress="return false"
+                                                   md-placeholder="Enter Date" md-max-date="maxdate" ng-change="onchangefromdate()" ng-disabled="editflag==true">
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.appl_date1)" ng-messages="myForm.appl_date1.$error">
+                                        <div ng-message="required">Select From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Requisition To Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7 input-group">
+                                    <md-datepicker ng-model="PCINDENT_Date_To" id="sel2" name="appl_date1" onkeypress="return false"
+                                                   md-placeholder="Enter Date" md-min-date="PCINDENT_Date_From" md-max-date="maxdate" ng-change="onchangedate()"
+                                                   ng-disabled="PCINDENT_Date_From==null || editflag==true" >
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.appl_date1)" ng-messages="myForm.appl_date1.$error">
+                                        <div ng-message="required">Select To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-if="requisitiondetais.length>0">
+                    <hr />
+                    <div class="col-sm-12">
+                        <div class="well">
+                            <di class="box-header with-border">
+                                <h3 class="box-title">Requisition Details</h3>
+                            </di>
+                            <div class="box-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="hdTH text-center">
+                                                <label>
+                                                    <input type="checkbox" value="" ng-model="obj.all2" ng-click="toggleAll(obj.all2)">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>
+                                            </th>
+                                            <th><a href="">SLNO</a></th>
+                                            <th><a href="">Requisition No.</a></th>
+                                            <th><a href="">Department</a></th>
+                                            <th><a href="">Requested By</a></th>
+                                            <th><a href="">Date</a></th>
+                                            <th><a href="">Total Amount</a></th>
+                                            <th><a href="">Purpose</a></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="user in requisitiondetais">
+                                            <td class="text-center  hdTD">
+                                                <label>
+                                                    <input type="checkbox" ng-model="user.selected" value="{{user.pcreqtN_Id}}" ng-change="optionToggled(user)">
+                                                    <span class="lbl padding-8"></span>
+                                                </label>
+                                            </td>
+                                            <td class="text-center">{{$index+1}}</td>
+                                            <td class="text-left">{{user.pcreqtN_RequisitionNo}}</td>
+                                            <td class="text-left">{{user.departmentname}}</td>
+                                            <td class="text-left">{{user.employeename}}</td>
+                                            <td class="text-left">{{user.pcreqtN_Date | date :'dd/MM/yyyy'}}</td>
+                                            <td class="text-center">{{user.pcreqtN_TotAmount}}</td>
+                                            <td class="text-left">{{user.pcreqtN_Purpose}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-if="requisitionparticulardetais.length>0 || geteditparticularsdata.length>0">
+                    <hr />
+                    <div class="row" ng-if="requisitionparticulardetais.length>0">
+                        <div class="col-sm-12">
+                            <div class="well">
+                                <di class="box-header with-border">
+                                    <h3 class="box-title">Requisition Paricular Details</h3>
+                                </di>
+                                <div class="box-body">
+                                    <table class="table table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th class="hdTH">
+                                                    <label>
+                                                        <input type="checkbox" value="" ng-model="obj.all21" ng-click="toggleAll1(obj.all21)">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </th>
+                                                <th><a href="">SLNO</a></th>
+                                                <th><a href="">Requisition No.</a></th>
+                                                <th><a href="">Particulars</a></th>
+                                                <th><a href="">Requested Amount</a></th>
+                                                <th><a href="">Approved Amount</a></th>
+                                                <th><a href="">Remark</a></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in requisitionparticulardetais">
+                                                <td class="text-center  hdTD">
+                                                    <label>
+                                                        <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled1(user)">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </td>
+                                                <td>{{$index+1}}</td>
+                                                <td>{{user.pcreqtN_RequisitionNo}}</td>
+                                                <td>{{user.pcmparT_ParticularName}}</td>
+                                                <td>{{user.pcreqtndeT_Amount}}</td>
+                                                <td>
+                                                    <input type="text" class="form-control" id="amt{{$index}}" name="amount{{$index}}" allow-pattern="[0-9.]"
+                                                           ng-pattern="/^[0-9]+(\.[0-5]{1,2})?$/" ng-model="user.amount" ng-required="user.selected"
+                                                           ng-blur="onchangeamount(user)" ng-disabled="!user.selected" />
+                                                    <div class="error-messages" ng-if="interacted(myForm['amount'+$index])"
+                                                         ng-messages="myForm['amount'+$index].$error">
+                                                        <div ng-message="required">Enter Amount</div>
+                                                        <div ng-message="pattern">Enter valid Format[For Example 10.5.10,20.5,......]</div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" ng-model="user.remarks" id="rmks{{$index}}" name="remarks{{$index}}"
+                                                           ng-disabled="!user.selected" />
+                                                    <div class="error-messages" ng-if="interacted(myForm['remarks'+$index])"
+                                                         ng-messages="myForm['remarks'+$index].$error">
+                                                        <div ng-message="required">Enter Remarks</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="geteditparticularsdata.length>0">
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="well">
+                                        <di class="box-header with-border">
+                                            <h3 class="box-title">Indent Paricular Details</h3>
+                                        </di>
+                                        <div class="box-body">
+                                            <table class="table table-bordered text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="hdTH">
+                                                            <label>
+                                                                <input type="checkbox" value="" ng-model="obj.all22" ng-click="toggleAll2(obj.all22)">
+                                                                <span class="lbl padding-8"></span>
+                                                            </label>
+                                                        </th>
+                                                        <th><a href="">SLNO</a></th>
+                                                        <th><a href="">Indent No.</a></th>
+                                                        <th><a href="">Particulars</a></th>
+                                                        <th><a href="">Requested Amount</a></th>
+                                                        <th><a href="">Approved Amount</a></th>
+                                                        <th><a href="">Remark</a></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="user in geteditparticularsdata">
+                                                        <td class="text-center  hdTD">
+                                                            <label>
+                                                                <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled2(user)">
+                                                                <span class="lbl padding-8"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td>{{$index+1}}</td>
+                                                        <td>{{user.pcindenT_IndentNo}}</td>
+                                                        <td>{{user.pcmparT_ParticularName}}</td>
+                                                        <td>{{user.pcindentdeT_Amount}}</td>
+                                                        <td>
+                                                            <input type="text" class="form-control" id="amt{{$index}}" name="amount{{$index}}" allow-pattern="[0-9.]"
+                                                                   ng-pattern="/^[0-9]+(\.[0-5]{1,2})?$/" ng-model="user.amount" ng-required="user.selected"
+                                                                   ng-blur="onchangeamount(user)" ng-disabled="!user.selected" />
+                                                            <div class="error-messages" ng-if="interacted(myForm['amount'+$index])"
+                                                                 ng-messages="myForm['amount'+$index].$error">
+                                                                <div ng-message="required">Enter Amount</div>
+                                                                <div ng-message="pattern">Enter valid Format[For Example 10.5.10,20.5,......]</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control" ng-model="user.remarks" id="rmks{{$index}}"
+                                                                   name="remarks{{$index}}" ng-disabled="!user.selected" />
+                                                            <div class="error-messages" ng-if="interacted(myForm['remarks'+$index])"
+                                                                 ng-messages="myForm['remarks'+$index].$error">
+                                                                <div ng-message="required">Enter Remarks</div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-5">Total Requested Amount:</label>
+                                    <div class="col-sm-7 input-group">
+                                        <input type="text" class="form-control" ng-model="PCINDENT_RequestedAmount_Temp" disabled />
+                                        <input type="hidden" ng-model="PCINDENT_RequestedAmount" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-5">Total Approved Amount:</label>
+                                    <div class="col-sm-7 input-group">
+                                        <input type="text" class="form-control" ng-model="PCINDENT_ApprovedAmt_Temp" disabled />
+                                        <input type="hidden" ng-model="PCINDENT_ApprovedAmt" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Indent Date:<span style="color:red;">*</span></label>
+                                    <div class="col-sm-8 input-group">
+                                        <md-datepicker ng-model="PCINDENT_Date" id="sel2" name="appl_date1" onkeypress="return false"
+                                                       md-placeholder="Enter Date" required md-max-date="maxdate">
+                                        </md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.appl_date1)" ng-messages="myForm.appl_date1.$error">
+                                            <div ng-message="required">Indent Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Description :</label>
+                                    <div class="col-sm-8 input-group">
+                                        <input class="form-control" name="stsnam" id="sel4" type="text" ng-model="obj12.PCINDENT_Desc"
+                                               placeholder="Enter Description">
+                                        <div class="error-messages" ng-if="interacted(myForm.stsnam)" ng-messages="myForm.stsnam.$error">
+                                            <div ng-message="required">Enter Description</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <input type="hidden" ng-model="PCINDENT_Id" value="{{PCINDENT_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saverecord()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="getloaddata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">INDENT DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="" ng-click="sort('pcindenT_IndentNo')">Indent No.</a></th>
+                        <th><a href="" ng-click="sort('departmentname')">Department</a></th>
+                        <th><a href="" ng-click="sort('employeename')">Approved By</a></th>
+                        <th><a href="" ng-click="sort('pcindenT_Date')">Date</a></th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in filterValue=(getloaddata | filter : filterValue1) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage"
+                        current-page="currentPage">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{user.pcindenT_IndentNo}}</td>
+                        <td class="text-left">{{user.departmentname}}</td>
+                        <td class="text-left">{{user.employeename}}</td>
+                        <td class="text-center">{{user.pcindenT_Date | date:'dd/MM/yyyy'}}</td>
+                        <td style="text-align:center">
+                            <span>
+                                <a href="" title="View Detais">
+                                    <i class="fa fa-eye" style="color:black;" data-target="#mymodalviewdetailsfirsttab" data-toggle="modal"
+                                       title="View Detais" ng-click="Viewdata(user);"></i>
+                                </a>
+                            </span>
+                            |
+                            <span ng-if="user.approvedflag==false">
+                                <a href="javascript:void(0)" ng-click="EditData(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                |
+                                <span ng-if="user.pcindenT_ActiveFlg === true">
+                                    <a href="" ng-click="deactiveY(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.pcindenT_ActiveFlg === false">
+                                    <a href="" ng-click="deactiveY(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                    </a>
+                                </span>
+                            </span>
+                            <span ng-if="user.approvedflag==true">
+                                <i class="fa fa-print" style="color:black;" data-target="#mymodalviewdetailsfirsttabprint" data-toggle="modal"
+                                   title="Print Cash Approved Detais" ng-click="Viewdataprint(user);"></i>
+                                |
+                            </span>
+                            <span ng-if="user.approvedflag==true">
+                                <a href="" title="Approved">
+                                    <i class="fa fa-check text-green" title="Approved"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div id="mymodalviewdetailsfirsttab" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Indnet Details : {{indentno}}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL.No</th>
+                                    <th>Particular</th>
+                                    <th>Requested Amount</th>
+                                    <th>Approved Amount</th>
+                                    <th>Remarks</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="userclient in getviewdata">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{userclient.pcmparT_ParticularName}}</td>
+                                    <td class="text-center">{{userclient.pcindentdeT_Amount}}</td>
+                                    <td class="text-center">{{userclient.pcindentdeT_ApprovedAmt}}</td>
+                                    <td class="text-left">{{userclient.pcindentdeT_Remarks}}</td>
+                                    <td class="text-center">
+                                        <span ng-if="editapprovedflag==false">
+                                            <span ng-if="userclient.pcindentdeT_ActiveFlg === true">
+                                                <a href="" ng-click="deactiveparticulars(userclient)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="userclient.pcindentdeT_ActiveFlg === false">
+                                                <a href="" ng-click="deactiveparticulars(userclient)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                                </a>
+                                            </span>
+                                        </span>
+                                        <span ng-if="editapprovedflag==true">
+                                            <a href="" title="Approved">
+                                                <i class="fa fa-check text-green" title="Approved"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mymodalviewdetailsfirsttabprint" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Indent Approved Details : {{indentno}}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="co-sm-12">
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL.No</th>
+                                    <th>Particular</th>
+                                    <th>Requested Amount</th>
+                                    <th>Approved Amount</th>
+                                    <th>Remarks</th>
+                                    <!--<th>Action</th>-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="userclient in getviewdataprint">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{userclient.pcmparT_ParticularName}}</td>
+                                    <td class="text-center">{{userclient.pcindentapdT_RequestedAmount}}</td>
+                                    <td class="text-center">{{userclient.pcindentapT_SanctionedAmt}}</td>
+                                    <td class="text-left">{{userclient.pcindentapdT_Remarks}}</td>
+                                    <!--<td class="text-center">
+                                        <span ng-if="userclient.pcindentdeT_ActiveFlg === true">
+                                            <a href="" ng-click="deactiveparticulars(userclient)"
+                                               class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                <i class="fa fa-toggle-on text-green" aria-hidden="true" title="Deactive Record"></i>
+                                            </a>
+                                        </span>
+                                        <span ng-if="userclient.pcindentdeT_ActiveFlg === false">
+                                            <a href="" ng-click="deactiveparticulars(userclient)"
+                                               class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                <i class="fa fa-toggle-off text-red" aria-hidden="true" itle="Activate Record"></i>
+                                            </a>
+                                        </span>
+                                    </td>-->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <md-button type="button" class="md-raised md-primary" data-ng-click="Print()">
+                <i class="fa fa-print" aria-hidden="true"></i> Print
+            </md-button>
+        </div>
+    </div>
+</div>
+
+
+<div id="printSectionId" ng-show="table_flag">
+    <div class="row" ng-if="imagenew!=null && imagenew!=''">
+        <div class="baldwin text-center">
+            <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+
+    <div class="row margin-top-10">
+        <div class="col-sm-12">
+            <div class="col-sm-6">
+                <h3>Indent No. {{indentno}}</h3>
+            </div>
+            <div class="col-sm-4 pull-right">
+                Date : {{pcindentapT_Dated | date:'dd/MM/yyyy'}}
+            </div>
+        </div>
+    </div>
+
+    <div class="row margin-top-10">
+        <center><h4 style="text-decoration:underline">Petty Cash Requisition</h4></center>
+    </div>
+    <br />
+    <div class="row margin-top-10">
+        <table class="table-bordered" id="table">
+            <thead>
+                <tr>
+                    <th class="text-center">SL. No.</th>
+                    <th class="text-center">Description</th>
+                    <th class="text-center">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in getviewdataprint">
+                    <td class="text-center">{{$index+1}}</td>
+                    <td class="text-left">{{user.pcmparT_ParticularName}}</td>
+                    <td class="text-right">{{ user.pcindentapT_SanctionedAmt | number : 2}}</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td class="text-center"><b>Total</b></td>
+                    <td class="text-right"><b>{{totalapprovedamt | number : 2 }}</b></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row margin-top-30">
+        <div class="col-sm-12">
+            <div class="col-sm-4 pull-left">
+                <b>Prepared By</b>
+            </div>
+            <div class="col-sm-4 text-center">
+                <b>Checked By</b>
+            </div>
+            <div class="col-sm-4 text-center">
+                <b>Approved By</b>
+            </div>
+        </div>
+    </div>
+    <div class="row margin-top-30">
+        <div class="col-sm-12">
+            <div class="col-sm-4 pull-left">
+                &nbsp;
+            </div>
+            <div class="col-sm-4 text-center">
+                &nbsp;
+            </div>
+            <div class="col-sm-4 text-center">
+                &nbsp;
+            </div>
+        </div>
+    </div>
+</div>

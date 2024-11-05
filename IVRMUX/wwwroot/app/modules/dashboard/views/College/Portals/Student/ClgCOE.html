@@ -1,0 +1,300 @@
+﻿<section class="content" ng-init="loaddata()">
+    <div data-ng-init="">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    COE Report
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                    <div class="row text-center">
+                        <div class="col-sm-6 col-sm-offset-3">
+
+                            <div class="text-center well" ng-show="labeldisable">
+                                <label class="text-danger">Please Select Radio Button to Proceed</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row text-center">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="well">
+                                <div class="form-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="M" name="all1" data-ng-model="all1" ng-click="onradiobuttonSelect(all1)" required>
+                                        <span class="lbl padding-8">Monthly</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="C" name="all1" data-ng-model="all1" ng-click="onradiobuttonSelect(all1)" required>
+                                        <span class="lbl padding-8">Course-wise</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.all1)" ng-messages="myForm.all1.$error">
+                                <div ng-message="required">Select any one of the radio button</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="all1=='M' || all1=='C'">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year: <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="acd" required>
+                                        <option value="">--Select-- </option>
+                                        <option ng-repeat="option in yearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd)" ng-messages="myForm.acd.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group" ng-show="all1=='M'">
+                                <label class="control-label col-sm-4">Month: <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="month" name="mnth" ng-required="all1=='M'" required>
+                                        <option value="">--Select-- </option>
+                                        <option ng-repeat="option in calenderlist" value="{{option.ivrM_Month_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.ivrM_Month_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.mnth)" ng-messages="myForm.mnth.$error">
+                                        <div ng-message="required">Select Month</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group" ng-show="all1=='C'">
+                                <label class="control-label col-sm-4">Course :<span style="color:Red">*</span></label>
+                                <div class="multiselect col-sm-8">
+                                    <label>
+                                        <input name="course" value="usercheckC" ng-model="usercheckC" type="checkbox" data-ng-click="all_checkC(usercheckC)">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-model="course" ng-repeat="option in course_rp" value="{{option.amcO_Id}}">
+                                        <input name="course" value="branch" data-ng-model="option.cors" type="checkbox" ng-click="togchkbxC();">
+                                        <span class="lbl padding-8">
+                                            {{option.amcO_CourseName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 error-messages" ng-if="interacted2(myForm.course)" ng-messages="myForm.course.$error" style="padding-left:188px">
+                                    <div ng-message="required">Select Atleast one Checkbox</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" id="submit" ng-click="onmonthchange(asmaY_Id)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="clear()" id="clr-btn">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-show="coereport_grd.length>0" ng-click="exportToExcel('#printrcp')">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Export
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-show="coereport_grd.length>0" ng-click="printToCart()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-show="coereportlst.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">COE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="printrcp">
+                    <!--<div class="text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="grn">
+                    </div>-->
+                    <br />
+
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                </th>
+                                <th><a href="" ng-click="sortBy('coemE_EventName')">Event Name</a></th>
+                                <th><a href="" ng-click="sortBy('coemE_EventDesc')">Event Description</a></th>
+                                <th><a href="" ng-click="sortBy('coeE_EStartDate')">Start Date</a></th>
+                                <th><a href="" ng-click="sortBy('coeE_EEndDate')">End Date</a> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1 = (coereportlst | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.coemE_EventName}}</td>
+                                <td>
+                                    {{ user.coemE_EventDesc}}&nbsp;&nbsp;&nbsp;
+                                    <span ng-show="user.coeeI_Images !=null && user.coeeI_Images !=''">
+                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View" data-ng-model="itemOption" ng-click="previewimg_new(user.coeeI_Images)">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </td>
+                                <td>{{ user.coeE_EStartDate |date:'dd-MM-yyyy'}}</td>
+                                <td>{{ user.coeE_EEndDate |date:'dd-MM-yyyy'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+        <!--<div class="box box-primary" ng-show="coereport_grd.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">COE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" id="printrcp1" ng-show="false">
+                <thead>
+                    <tr>
+                        <th>
+                            <a>SL NO</a>
+                        </th>
+                        <th>
+                            <a>Event Name</a>
+                        </th>
+                        <th><a>Event Description</a> </th>
+                        <th><a>Event Start Date</a> </th>
+                        <th><a>Event End Date</a> </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                        <tr ng-repeat="user in coereport_grd | orderBy:predicate:default | filter:paginate| filter:search" ng-class-odd="'odd'">
+                        <td>{{$index+1}}</td>
+                        <td>{{ user.COEME_EventName}}</td>
+                        <td>{{ user.COEME_EventDesc}}</td>
+                        <td>{{ user.COEE_EStartDate |date:'dd-MM-yyyy'}}</td>
+                        <td>{{ user.COEE_EEndDate |date:'dd-MM-yyyy'}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>-->
+
+    </div>
+    <!--<div id="printrcp" ng-show="printsection">
+        <div class="">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+        </div>
+        <center> <h4><u>COE REPORT</u></h4></center>
+        <table class="table table-responsive" id="table">
+            <thead>
+                <tr>
+                    <th>SL.NO</th>
+                    <th>Event Name</th>
+                    <th>Event Description</th>
+                    <th>Event Start Date</th>
+                    <th>Event End Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in coereport_grd">
+                    <td>{{$index+1}}</td>
+                    <td>{{ user.COEME_EventName}}</td>
+                    <td>{{ user.COEME_EventDesc}}</td>
+                    <td>{{ user.COEE_EStartDate |date:'dd-MM-yyyy'}}</td>
+                    <td>{{ user.COEE_EEndDate |date:'dd-MM-yyyy'}}</td>
+
+                </tr>
+            </tbody>
+            <tfoot class="text-center" style="border:none;">
+                <tr>
+                    <td>
+                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                    </td>
+                </tr>
+
+            </tfoot>
+        </table>
+
+    </div>-->
+    <!--==================== Image Preview Model ===========================-->
+    <div id="myimagePreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:55%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h3>{{filenames}}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

@@ -1,0 +1,546 @@
+<style>
+    .multiselect {
+        width: 22.4em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .k-grid-toolbar {
+        text-align: center;
+    }
+
+    .gridTitle {
+        text-align: center;
+    }
+
+    .titlecolor {
+        color: white !important;
+    }
+
+    .k-filter-row th, .k-title, .k-grid-header th.k-header {
+        font-weight: bold !important;
+    }
+
+    .k-grid-header .k-link, .k-grid-header .k-link:link, .k-pager-info, .k-scheduler-agendaview .k-scheduler-datecolumn, .k-scheduler-header {
+        color: black !important;
+    }
+
+    .k-pdf-export .k-grid-excel, .k-pdf-export .k-grid-pdf, .k-pdf-export .k-pager-wrap {
+        display: none;
+        width: 20%;
+        margin: auto;
+    }
+
+    .k-filter-row > th:first-child, .k-grid tbody td:first-child, .k-grid tfoot td:first-child, .k-grid-header th.k-header:first-child {
+        color: black;
+    }
+</style>
+
+
+
+<div data-ng-init="loaddata()">
+    <section class="content">
+        <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fee Installment Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-7 col-sm-offset-3">
+                            <div class="well text-center" ng-init="catg='Category'">
+                                <label class="checkbox-inline">
+                                    <input type="radio" value="Category" ng-model="catg" data-ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">Category Wise</span>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="radio" value="Class" ng-model="catg" data-ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">Class Wise</span>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="radio" value="transport" ng-model="catg" data-ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">Transport</span>
+                                </label>
+
+                                <label class="checkbox-inline">
+                                    <input type="radio" value="Consolidate" ng-model="catg" data-ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">Consolidate</span>
+                                </label>
+
+                                <label class="checkbox-inline">
+                                    <input type="radio" value="GroupWise" ng-model="catg" data-ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">Group Wise</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box-body" ng-show="catg=='Consolidate'">
+                    <div class="row">
+                        <div class="col-sm-4 col-sm-offset-4">
+                            <div class="well text-center" ng-init="con='Datewise'">
+
+                                <label class="checkbox-inline">
+                                    <input type="radio" value="Datewise" ng-model="con" data-ng-click="onclickdata(con)">
+                                    <span class="lbl padding-8">Date Wise</span>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="radio" value="Classwise" ng-model="con" data-ng-click="onclickdata(con)">
+                                    <span class="lbl padding-8">Class Wise</span>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="year">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="feeinsacdyr" id="sel1" data-ng-model="asmaY_Id" data-ng-change="onselectyear(arrlist6)" required>
+                                    <option value="">Select Year</option>
+                                    <option ng-repeat="options in arrlist6" value="{{options.asmaY_Id}}" ng-selected="(options.asmaY_Id==asmaY_Id)">
+                                        {{options.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.feeinsacdyr)" ng-messages="myForm.feeinsacdyr.$error">
+                                    <div ng-message="required">Please Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="categorywise">
+                            <label class="control-label col-sm-4">Category<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="fmcC_Id" name="catg_name" ng-required="catg =='Category'">
+                                    <option value="">Select Category </option>
+                                    <option ng-repeat="role in arrlistchk" value="{{role.fmcC_Id}}">
+                                        {{role.fmcC_ClassCategoryName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.catg_name)" ng-messages="myForm.catg_name.$error">
+                                    <div ng-message="required">Please Select Category</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="clswise || con=='Classwise'">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmcL_Id" ng-change="onselectclass()" name="class_name" ng-required="catg =='Class'">
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="option in classcount" value="{{option.asmcL_Id}}">
+                                        {{option.asmcL_ClassName}}
+                                    </option>
+                                    <option value="0">--All--</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.class_name)" ng-messages="myForm.class_name.$error">
+                                    <div ng-message="required">Please Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="clswise || con=='Classwise'">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="amsC_Id" name="sec_name" ng-required="catg =='Class'">
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="option in sectioncount" value="{{option.amsC_Id}}">
+                                        {{option.asmc_sectionname}}
+                                    </option>
+                                    <option value="0">--All--</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sec_name)" ng-messages="myForm.sec_name.$error">
+                                    <div ng-message="required">Please Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="trpwise">
+                            <label class="control-label col-sm-4">Group:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="fmG_Id" ng-change="onselectgroup()" name="fmG_Group" ng-required="catg=='transport'">
+                                    <option value="" label="Select Group"> </option>
+                                    <option ng-repeat="option in groupcount" value="{{option.fmG_Id}}">
+                                        {{option.fmg_groupname}}
+                                    </option>
+                                    <option value="0">All</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.fmG_Group)" ng-messages="myForm.fmG_Group.$error">
+                                    <div ng-message="required">Please Select Group</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="trpwise" ng-if="catg=='transport'" >
+                            <label class="control-label col-sm-4">Bus Route:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="trmR_Id" name="route" ng-required="catg=='transport'">
+                                    <option value="" label="Select Group"> </option>
+                                    <option ng-repeat="option in routecount" value="{{option.trmR_Id}}">
+                                        {{option.trmR_RouteNo}} :
+                                        {{option.trmR_RouteName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.route)" ng-messages="myForm.route.$error">
+                                    <div ng-message="required">Please Select Route</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="terms">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="All" ng-model="termswise" ng-true-value="1" ng-false-value="0" />
+                                <span class="lbl padding-8">Terms Wise</span>
+                            </label>
+                        </div>
+                        <div class="form-group" ng-show="termswise">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="active" ng-model="active" ng-true-value="1" ng-false-value="0" />
+                                <span class="lbl padding-8">Active</span>
+                            </label>
+
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="deactive" ng-model="deactive" ng-true-value="1" ng-false-value="0" />
+                                <span class="lbl padding-8">De-Active</span>
+                            </label>
+
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="Left" ng-model="left" ng-true-value="1" ng-false-value="0" />
+                                <span class="lbl padding-8">Left</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group" ng-show="trpwise" ng-if="catg=='transport'" >
+                            <label class="control-label col-sm-2">Fee Head<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="multiselect col-sm-6">
+                                <label data-ng-model="fmH_Id" ng-repeat="role in fillhead">
+                                    <input type="checkbox" ng-model="role.selected1" name="selrole1" ng-required="catg=='transport' && isOptionsRequired1()">
+                                    <span class="lbl padding-8">{{role.fmH_FeeName}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.selrole1)" ng-messages="myForm.selrole1.$error">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="con=='Datewise' && catg=='Consolidate'">
+
+                            <div class="col-sm-4">
+                                <div class="">
+                                    <md-datepicker id="FromDate" md-min-date="maxfromdate" md-max-date="mintodate" ng-model="fromdate" onkeydown="return false" name="fdate" md-placeholder="From Date" ng-required="con=='Datewise'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                        <div ng-message="required">Select the from date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5" style="margin-left: 12%;">
+                                <div class="">
+                                    <md-datepicker id="ToDate" name="tdate" ng-model="todate" onkeydown="return false" md-placeholder="To Date" md-min-date="maxfromdate" md-max-date="mintodate" ng-required="con=='Datewise'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                                        <div ng-message="required">Select the To date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!--<div class="form-group" ng-show="con=='Classwise'">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="amsC_Id" name="sec_name" ng-required="catg =='Class'">
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="option in sectioncount" value="{{option.amsC_Id}}">
+                                        {{option.asmc_sectionname}}
+                                    </option>
+                                    <option value="0">--All--</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sec_name)" ng-messages="myForm.sec_name.$error">
+                                    <div ng-message="required">Please Select Section</div>
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+
+
+                        <div class="form-group" ng-show="termswise && catg!='GroupWise'">
+                            <label class="control-label col-sm-4">Terms <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="multiselect col-sm-6">
+                                <label data-ng-model="fmT_Id" ng-repeat="trm in termslist">
+                                    <input type="checkbox" ng-model="trm.selected5" name="selrole5" ng-required="termswise && isOptionsRequired5()">
+                                    <span class="lbl padding-8">{{trm.fmT_Name}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.selrole5)" ng-messages="myForm.selrole5.$error">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-hide="termswise  || catg=='transport' || catg=='Consolidate'" ng-if="catg!='Groupwise'" >
+                            <label class="control-label col-sm-4">Installment<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+
+                            <div class="multiselect col-sm-6">
+                                <label data-ng-model="ftI_Id" ng-repeat="role in arrlstinst">
+                                    <!--value="{{role.ftI_Id}}"-->
+                                    <input type="checkbox" ng-model="role.selected" name="selrole" ng-click="binddata(arrlstinst,insarray)" ng-required="isOptionsRequired() && catg!='Groupwise'"> <!--data-ng-change="onselectinst(arrlstinst)-->
+                                    <span class="lbl padding-8">{{role.ftI_Name}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.selrole)" ng-messages="myForm.selrole.$error">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="termswise">
+                            <label class="control-label col-sm-2">Group <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="multiselect col-sm-6">
+                                <label data-ng-model="fmH_Id" ng-repeat="grp in fillgroup">
+                                    <input type="checkbox" ng-model="grp.selected6" name="selrole6" ng-required="termswise && isOptionsRequired6()">
+                                    <span class="lbl padding-8">{{grp.fmg_groupname}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.selrole6)" ng-messages="myForm.selrole6.$error">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <hr />
+            </div>
+            <div class="text-center">
+                <md-button type="submit" class="md-raised md-primary" ng-show="repcanbtn" ng-disabled="form.$invalid" id="save-btn" ng-click="ShowReport()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-show="repcanbtn" data-ng-click="Clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+
+                <md-button ng-show="catg=='Consolidate' && consuldatelist.length>0" type="submit" class="md-raised md-primary" ng-click="exportToExcel('#tableex')" target="_blank">
+                    Export to Excel
+                </md-button>
+                <md-button ng-show="catg=='Consolidate' && consuldatelist.length>0" type="submit" class="md-raised md-warn" ng-click="printData();">
+                    Print
+                </md-button>
+
+            </div>
+
+            <div class="box box-primary" ng-show="result">
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">FEE INSTALLMENT REPORT</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div id="grid123">
+
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="box box-primary" ng-show="twise">
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">FEE INSTALLMENT REPORT</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div id="grid567">
+
+                    </div>
+
+
+                </div>
+            </div>
+
+
+            <div class="box box-primary" ng-show="catg=='Consolidate' && consuldatelist.length>0">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Consolidate Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+
+                    <div class="">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{consuldatelist.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+
+                                <th>SL.NO</th>
+                                <th>Terms Name </th>
+                                <th>Today Paid Count </th>
+                                <th> Today Collection</th>
+                                <th> Still Now Paid Count</th>
+                                <th> Still Now Total Collection</th>
+                                <th> Total Strength</th>
+                                <th> Defaulters</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr ng-repeat="user in consuldatelist">
+
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.FMT_Name}}</td>
+                                <td>{{ user.TodayPaidCount}}</td>
+                                <td>{{ user.TodayCollection}}</td>
+                                <td>{{ user.TillNowPaidCount}}</td>
+                                <td>{{ user.TillNowTotalCollection}}</td>
+                                <td>{{ user.TotalStrength}}</td>
+                                <td>{{ user.Defaulters}}</td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+
+                    <hr />
+
+                </div>
+                <div id="printSectionId" ng-show="print_data" style="overflow:scroll">
+                    <div class="">
+                        <div class="baldwin text-center">
+                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                        </div>
+                    </div>
+                    <center> <h4><u> Consolidate Report </u></h4></center>
+                    <table class="table-bordered" id="table">
+                        <thead>
+                            <tr>
+                                <th>SL.NO</th>
+                                <th>Terms Name </th>
+                                <th>Today Paid Count </th>
+                                <th> Today Collection</th>
+                                <th> Still Now Paid Count</th>
+                                <th> Still Now Total Collection</th>
+                                <th> Total Strength</th>
+                                <th> Defaulters</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in consuldatelist">
+
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.FMT_Name}}</td>
+                                <td>{{ user.TodayPaidCount}}</td>
+                                <td>{{ user.TodayCollection}}</td>
+                                <td>{{ user.TillNowPaidCount}}</td>
+                                <td>{{ user.TillNowTotalCollection}}</td>
+                                <td>{{ user.TotalStrength}}</td>
+                                <td>{{ user.Defaulters}}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="margin-top-10">
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center margin-top-2">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}} {{coptyright}}
+                                    </label>
+
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+
+
+                <div id="tableexcell" ng-show="print_data_excell" class="table-bordered text-center" style="overflow:scroll">
+
+
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tableex">
+                        <thead>
+                            <tr style="border:0.5px solid black">
+                                <th>SL.NO</th>
+                                <th>Terms Name </th>
+                                <th>Today Paid Count </th>
+                                <th> Today Collection</th>
+                                <th> Still Now Paid Count</th>
+                                <th> Still Now Total Collection</th>
+                                <th> Total Strength</th>
+                                <th> Defaulters</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in consuldatelist">
+
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.FMT_Name}}</td>
+                                <td>{{ user.TodayPaidCount}}</td>
+                                <td>{{ user.TodayCollection}}</td>
+                                <td>{{ user.TillNowPaidCount}}</td>
+                                <td>{{ user.TillNowTotalCollection}}</td>
+                                <td>{{ user.TotalStrength}}</td>
+                                <td>{{ user.Defaulters}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>

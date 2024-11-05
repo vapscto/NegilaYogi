@@ -1,0 +1,311 @@
+﻿
+<section class="content">
+    <div data-ng-init="onLoadGetData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Candidate Report Generation</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="GetReport()" novalidate>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Institution:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="mrfCand.mI_Id" name="msint" ng-change="getcandidatename(mrfCand.mI_Id)" required>
+                                        <option value="">--Select Institution--</option>
+                                        <option ng-repeat="val in institutionlist" value="{{val.mI_Id}}" ng-selected="val.mI_Id==mI_Id">
+                                            {{val.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.msint)" ng-messages="myForm.msint.$error">
+                                        <div ng-message="required">Select Institution</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Candidate Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <!--<select class="form-control" id="sel1" name="candidatename" data-ng-model="Candidate.hrcD_Id" ng-change="loaddata(Candidate.hrcD_Id)" required>
+                                        <option value="">--Select Candidate Name--</option>
+                                        <option ng-repeat="cand in candidatelist" value="{{cand.hrcD_Id}}" ng-selected="{{cand.Selected == true}}">
+                                            {{cand.hrcD_FirstName}} {{cand.hrcD_MiddleName}} {{cand.hrcD_LastName}}
+                                        </option>
+                                    </select>-->
+                                    <div>
+                                        <ui-select id="sel2" name="candidatename" ng-model="$parent.hrcD_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" ng-change="loaddata(hrcD_Id)" title="Select Candidate" required>
+                                            <ui-select-match placeholder="Select OR Search Candidate in the list...">
+                                                {{$select.selected.hrcD_FirstName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="option in candidatelist | propsFilter: {hrcD_FirstName: $select.search}"
+                                                               value="{{option.hrcD_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.hrcD_FirstName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.candidatename)" ng-messages="myForm1.candidatename.$error">
+                                        <div ng-message="required">Select Candidate Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary">
+                            <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-disabled="!EmployeeDis" id="print-btn" aria-disabled="false" ng-click="printDataappoint();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+                <hr />
+            </form>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <div class="box box-primary" ng-show="EmployeeDis">
+        <div class="box-header with-border">
+            <h3 class="box-title">Candidate Details View</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!--style="overflow:scroll"-->
+        <div class="box-body">
+            <div id="table">
+                <h5 class="box-title">Candidate Profile</h5>
+                <div class="col-sm-8">
+                    <table class="table-bordered text-center margin-bottom-10 col-sm-8" ng-repeat="employee in all_employees">
+                        <tr>
+                            <td style="text-align:left">Candidate Name</td>
+                            <td style="text-align:left">{{employee.hrcD_FirstName}} {{employee.hrcD_MiddleName}} {{employee.hrcD_LastName}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left">Mobile No</td>
+                            <td style="text-align:left">{{employee.hrcD_MobileNo}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left">Email Id</td>
+                            <td style="text-align:left">{{employee.hrcD_EmailId}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left">Experience (Year)</td>
+                            <td style="text-align:left">{{employee.hrcD_ExpFrom}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left">Current Company</td>
+                            <td style="text-align:left">{{employee.hrcD_CurrentCompany}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left">Reference Code</td>
+                            <td style="text-align:left">{{employee.hrcD_RefCode}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left">Last CTC</td>
+                            <td style="text-align:left">{{employee.hrcD_LastCTC}}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left">Expected CTC</td>
+                            <td style="text-align:left">{{employee.hrcD_ExpectedCTC}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-sm-4">
+                    <table class="table text-center">
+                        <tr>
+                            <td>
+                                <div style="width:120px;height:120px;border:1px solid #ccc;margin:auto;">
+                                    <img style="width:120px;height:120px;cursor: none;" id="blah">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="text-align:center;" ng-if="all_employees[0].hrcD_Resume !=null && all_employees[0].hrcD_Resume !=''">
+                                    <a style="color: blue; text-decoration:underline; font-size:large" href="{{all_employees[0].hrcD_Resume}}">
+                                        Download Resume
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-sm-12">
+                    <h5 ng-show="interviewlist.length > 0" class="box-title">Candidate Interview Details</h5>
+                    <table ng-show="interviewlist.length > 0" class="col-sm-12 table-bordered text-center margin-bottom-10">
+                        <thead>
+                            <tr>
+                                <th>Sr. No.</th>
+                                <th>Interview Date</th>
+                                <th>Venue</th>
+                                <th>Interview Round</th>
+                                <th>Interviewer Name</th>
+                                <th>Candidate Status</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="int in interviewlist">
+                                <td>{{$index+1}}</td>
+                                <td>{{int.hrcisC_InterviewDateTime|date:'dd/MM/yyyy'}}</td>
+                                <td>{{int.hrcisC_InterviewVenue}}</td>
+                                <td>{{int.hrcisC_InterviewRounds}}</td>
+                                <td>{{int.hrmE_employeename}}</td>
+                                <td>{{int.hrciS_CandidateStatus}}</td>
+                                <td>{{int.hrciS_InterviewFeedBack}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<section class="content" data-ng-init="onLoadGetData()">
+    <div class="box box-primary" ng-app="MyModule">
+        <div class="box-header with-border">
+            <h3 class="box-title">Candidate Report Generation</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="box-body">
+        <form class="form-horizontal" role="form" name="myForm1" novalidate>
+            <div>
+                <md-content class="md-padding">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">Candidate Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="candidatename" data-ng-model="Candidate.hrcD_Id" ng-change="loaddata(Candidate.hrcD_Id)" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="cand in candidatelist" value="{{cand.hrcD_Id}}" ng-selected="{{cand.Selected == true}}">
+                                            {{cand.hrcD_FirstName}} {{cand.hrcD_MiddleName}} {{cand.hrcD_LastName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myForm1.candidatename)" ng-messages="myForm1.candidatename.$error">
+                                        <div ng-message="required">Select Candidate Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="saveAppointmentdata(Candidate)">
+                            SAVE
+                            <i class="fa fa-chevron" aria-hidden="true"></i>
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Clear
+                        </md-button>
+                    </div>
+                </md-content>
+            </div>
+        </form>
+    </div>
+
+    <div id="salaryslip" class="box box-primary" ng-show="EmployeeDis">
+        <div class="box-header with-border">
+            <h3 class="box-title">Candidate Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="col-sm-12" ng-repeat="employee in all_employees">
+            <div class="col-sm-12 table-bordered text-center margin-bottom-10">
+                <table>
+                    <tr>
+                        <td>Candidate Name : </td>
+                        <td>{{employee.hrcD_FirstName}} {{employee.hrcD_MiddleName}} {{employee.hrcD_LastName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile No : </td>
+                        <td>{{employee.hrcD_MobileNo}}</td>
+                    </tr>
+                    <tr>
+                        <td>Email Id : </td>
+                        <td>{{employee.hrcD_EmailId}}</td>
+                    </tr>
+                    <tr>
+                        <td>Experiance (Year) : </td>
+                        <td>{{employee.hrcD_ExpFrom}} - {{employee.hrcD_ExpTo}}</td>
+                    </tr>
+                    <tr>
+                        <td>Current Company : </td>
+                        <td>{{employee.hrcD_CurrentCompany}}</td>
+                    </tr>
+                    <tr>
+                        <td>Reference Code : </td>
+                        <td>{{employee.hrcD_RefCode}}</td>
+                    </tr>
+                    <tr>
+                        <td>Last CTC : </td>
+                        <td>{{employee.hrcD_LastCTC}}</td>
+                    </tr>
+                    <tr>
+                        <td>Expected CTC : </td>
+                        <td>{{employee.hrcD_ExpectedCTC}}</td>
+                    </tr>
+                </table>
+            </div>
+            <br />
+            <div class="col-sm-12 table-bordered text-center margin-bottom-10">
+                <h5>Interview Details</h5>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Sr. No.</th>
+                            <th>Interview Date</th>
+                            <th>Venue</th>
+                            <th>Interview Round</th>
+                            <th>Interviewer Name</th>
+                            <th>Status</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="int in interviewlist">
+                        <td>{{$index+1}}</td>
+                        <td>{{int.hrcisC_InterviewDateTime|date:'dd/MM/yyyy'}}</td>
+                        <td>{{int.hrcisC_InterviewVenue}}</td>
+                        <td>{{int.hrcisC_InterviewRounds}}</td>
+                        <td>{{int.hrmE_employeename}}</td>
+                        <td>{{int.hrciS_Status}}</td>
+                        <td>{{int.hrciS_InterviewFeedBack}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</section>-->

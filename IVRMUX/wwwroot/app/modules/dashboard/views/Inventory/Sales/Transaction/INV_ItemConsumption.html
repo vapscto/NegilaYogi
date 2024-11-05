@@ -1,0 +1,564 @@
+﻿
+<style>
+    .gridflow {
+        width: 1180px;
+        height: 110px;
+        overflow: auto;
+    }
+</style>
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">ITEM CONSUMPTION</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <div class="well">
+                                    <div class="text-center" ng-init="invmiC_StuOtherFlg='Staff'">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Staff" name="staff" ng-disabled="editS" ng-model="invmiC_StuOtherFlg" ng-change="userchange()">
+                                            <span class="lbl padding-8"> Staff </span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Department" name="department" ng-disabled="editS" ng-model="invmiC_StuOtherFlg" ng-change="userchange()">
+                                            <span class="lbl padding-8">Department</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Student" name="student" ng-disabled="editS" ng-model="invmiC_StuOtherFlg" ng-change="userchange()">
+                                            <span class="lbl padding-8">Student</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">IC Date :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="invmiC_ICDate" ng-disabled="editS" name="podate" md-placeholder="Select Date"></md-datepicker>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">IC No.:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control active" name="refno" placeholder="Enter Item Consumption No." ng-model="invmiC_ICNo">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Store :<span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="invmsT_Id" name="store" ng-change="storeChange();" ng-disabled="editS" required>
+                                        <option value="">Select Store </option>
+                                        <option ng-repeat="option in get_Store" value="{{option.invmsT_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.invmS_StoreName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.store)" ng-messages="myForm.store.$error">
+                                        <div ng-message="required">Please Select Store </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+
+                            <div class="form-group" ng-show="invmiC_StuOtherFlg=='Staff'">
+                                <label for="sel2" class="control-label col-sm-3">Staff : <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_employee.length>0">
+                                            <input class="form-control" ng-model="searchValue1" type="text" placeholder="search Staff here...">
+                                        </span>
+                                        <label>
+                                            <input name="stafflist" value="1" ng-model="staffCk" ng-disabled="editS" type="checkbox" ng-click="all_check(usercheck)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-model="hrme" ng-repeat="user in get_employee | filter : searchValue1">
+                                            <input name="staff" ng-model="user.hrmeid" type="checkbox" ng-click="togchkbx();" ng-disabled="transgrid" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                {{user.employeename}} : {{user.hrmE_EmployeeCode}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.staff)" ng-messages="myForm.staff.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-10 col-sm-offset-8" ng-show="get_employee.length>0">
+                                    <md-button type="button" class="md-raised md-primary" ng-click="showtrans()">
+                                        <i class="fa fa-angle-down" aria-hidden="true"></i> Show
+                                    </md-button>
+                                </div>
+                            </div>
+
+                            <div class="" ng-show="invmiC_StuOtherFlg=='Department'">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Department:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div ng-show="!editS">
+                                            <ui-select id="sel1" name="department" ng-model="$parent.obj.hrmD_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Department" ng-required="invmiC_StuOtherFlg == 'Department'">
+                                                <ui-select-match ng-trim="false" placeholder="Select or search Department in the list...">{{$select.selected.hrmD_DepartmentName}}</ui-select-match>
+                                                <ui-select-choices repeat="option in get_Department | filter: $select.search " value="{{option.hrmD_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.hrmD_DepartmentName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="error-messages" ng-if="interacted(myForm.department)" ng-messages="myForm.department.$error">
+                                                <div ng-message="required">Please Select Department</div>
+                                            </div>
+                                        </div>
+                                        <div ng-show="editS">
+                                            <span>
+                                                <label class="control-label col-sm-10" ng-model="hrmD_Id"><b>{{hrmD_DepartmentName}}</b></label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="" ng-show="invmiC_StuOtherFlg=='Student'">
+
+                              
+                                    <label for="sel2" class="control-label col-sm-3">Class & Section : <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8">
+                          
+                                            <select class="form-control" data-ng-model="asmcL_Id" name="cls" ng-change="classSectionC();">
+                                                <option value="">Select Class</option>
+                                                <option ng-repeat="clsec in get_Student_Cls_Sec" value="{{clsec.asmcL_Id}}">{{clsec.asmcL_ClassName}}</option>
+                                            </select>
+                                            <select class="form-control" ng-model="asmS_Id" name="clssec" ng-change="classSectionCS();">
+                                                <option value="">Select Section</option>
+                                                <option ng-repeat="clse in get_sectionlist" value="{{clse.asmS_Id}}">{{clse.asmC_SectionName}}</option>
+                                            </select>
+
+                                            <span ng-if="get_Studentlist.length>0">
+                                                <input class="form-control" ng-model="searchValueCS" type="text" placeholder="search Student here...">
+                                            </span>
+                                            <label>
+                                                <input name="classes" value="" ng-model="usercheckCS" ng-disabled="transgrid" type="checkbox" ng-click="all_checkCS()">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-repeat="sec in get_Studentlist | filter : searchValueCS">
+                                                <input name="section" ng-model="sec.secck" type="checkbox" ng-disabled="transgrid" ng-click="togchkbxCS();" ng-required="isOptionsRequired1()"> <!--ng-required="isOptionsRequired1()"-->
+                                                <span class="lbl padding-8">
+                                                    {{sec.studentname}} : {{sec.AMST_AdmNo}}
+                                                </span>
+                                            </label>
+
+                                        </div>
+                                        <div class="error-messages" ng-if="interacted(myForm.section)" ng-messages="myForm.section.$error">
+                                            <div ng-message="required">Please Select Atleast One checkbox</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-10 col-sm-offset-8" ng-if="get_Studentlist.length>0">
+                                        <md-button type="button" class="md-raised md-primary" ng-click="showtrans1()">
+                                            <i class="fa fa-angle-down" aria-hidden="true"></i> Show
+                                        </md-button>
+                                    </div>
+                               
+
+                            </div>
+                                <!--<div class="form-group">
+        <label class="control-label col-sm-3">Student:<span style="color:Red">*</span></label>
+        <div class="col-sm-8">
+            <div ng-show="!editS">
+                <ui-select id="sel1" name="student" ng-model="$parent.obj.amsT_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Student" ng-required="invmiC_StuOtherFlg == 'Student'">
+                    <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.studentname}}</ui-select-match>
+                    <ui-select-choices repeat="option in get_Student | filter: $select.search " value="{{option.amsT_Id}}" ng-selected="{{option.Selected == true}}">
+                        <div ng-bind-html="option.studentname +':'+option.amsT_AdmNo | highlight: $select.search"></div>
+                    </ui-select-choices>
+                </ui-select>
+                <div class="error-messages" ng-if="interacted(myForm.student)" ng-messages="myForm.student.$error">
+                    <div ng-message="required">Please Select Student</div>
+                </div>
+            </div>
+            <div ng-show="editS">
+                <span>
+                    <label class="control-label col-sm-10" ng-model="amsT_Id"><b>{{studentname}} : {{amsT_AdmNo}}</b></label>
+                </span>
+            </div>
+        </div>
+    </div>-->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- =====================================================Transcation=============================================================== -->
+                <div ng-show="transgrid">
+                    <div class="box-body" ng-show="get_item.length>0 || editS">
+                        <div class="clearfix">
+                            <div style="overflow:auto;  min-height:150px;">
+                                <table class="table table-responsive table-bordered clearfix">
+                                    <thead>
+                                        <tr>
+                                            <th ng-show="editS"></th>
+                                            <th width="50">SL NO</th>
+                                            <th width="200"><a href="" ng-click="sort('invmI_Id')">Item Name</a></th>
+                                            <th><a href="" ng-click="sort('invmuoM_Id')">UOM</a></th>
+                                            <th width="150"><a href="" ng-click="sort('invmuoM_Id')">Product</a></th>
+                                            <th><a href="" ng-click="sort('invoB_BatchNo')">Batch No</a></th>
+                                            <th><a href="" ng-click="sort('invoB_Qty')">Quantity</a></th>
+                                            <th><a href="" ng-click="sort('invoB_Naration')">Narration</a></th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr ng-repeat="objs in transrows" ng-form="dataform1">
+                                            <td ng-show="editS">
+                                                <label>
+                                                    <input type="checkbox" name="adcheckt" value="{{objs.editck}}" ng-model="objs.checkedvalue" ng-click="onitemchange(objs)"><span class="lbl padding-8"></span>
+                                                </label>
+                                            </td>
+                                            <td>{{$index+1}}</td>
+                                            <td>
+                                                <div ng-show="!editS">
+                                                    <ui-select id="sel1" name="itemic" ng-model="$parent.objs.invmI_Id" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="onitemchange(objs)" title="Select Item" required>
+                                                        <ui-select-match ng-trim="false" placeholder="Select or search Item in the list...">{{$select.selected.INVMI_ItemName}}</ui-select-match>
+                                                        <ui-select-choices repeat="option in get_item | filter: $select.search " value="{{option.INVMI_Id}}" ng-selected="{{option.Selected == true}}">
+                                                            <div ng-bind-html="option.INVMI_ItemName +' : '+ option.INVSTO_SalesRate  | highlight: $select.search"></div>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                    <div class="error-messages" ng-if="interacted(dataform1.itemic)" ng-messages="dataform1.itemic.$error">
+                                                        <div ng-message="required">Select any Item</div>
+                                                    </div>
+                                                </div>
+                                                <div ng-show="editS">
+                                                    <span>
+                                                        <label class="control-label col-sm-10" ng-model="objs.invmI_Id">{{objs.invmI_ItemName}}</label>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="uom" class="form-control active" ng-disabled="true" value="objs.invmuoM_Id" ng-model="objs.invmuoM_UOMName" placeholder="UOM" />
+                                            </td>
+                                            <td>
+                                                <div ng-show="!editS">
+                                                    <!--<ui-select id="sel1" name="itemob" ng-model="$parent.objs.invmP_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Product">
+                                                        <ui-select-match ng-trim="false" placeholder="Select or search Product in the list...">{{$select.selected.invmP_ProductName}}</ui-select-match>
+                                                        <ui-select-choices repeat="option in get_Product | filter: $select.search " value="{{option.invmP_Id}}" ng-selected="{{option.Selected == true}}">
+                                                            <div ng-bind-html="option.invmP_ProductName | highlight: $select.search"></div>
+                                                        </ui-select-choices>
+                                                    </ui-select>-->
+                                                    <select class="form-control" ng-model="objs.invmP_Id" name="product">
+                                                        <option value="">Select Product </option>
+                                                        <option ng-repeat="option in get_Product" value="{{option.invmP_Id}}" ng-selected="{{option.Selected == true}}">
+                                                            {{option.invmP_ProductName}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div ng-show="editS">
+                                                    <span>
+                                                        <label class="control-label col-sm-10" ng-model="objs.invmP_Id">{{objs.invmP_ProductName}}</label>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="batchno" class="form-control active" ng-model="objs.invtiC_BatchNo" placeholder="Batch No." />
+                                            </td>
+                                            <td>
+                                                <div class="row">
+                                                    <div ng-if="invmiC_StuOtherFlg=='Staff' ||invmiC_StuOtherFlg=='Student'">
+                                                        <div class="col-sm-4 padding-right-none">
+                                                            <input type="text" name="icquantity" class="form-control active" ng-model="objs.icqty" placeholder="No."
+                                                                   ng-blur="countAmt(objs,transrows)" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" />
+                                                        </div>
+                                                        <div class="col-sm-7 padding-left-none">
+                                                            <input type="text" name="icquantity" class="form-control active" ng-model="objs.invtiC_ICQty" ng-disabled="true" placeholder="Quantity" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div ng-if="invmiC_StuOtherFlg=='Department' ">
+                                                    <input type="text" name="icquantity" class="form-control active" ng-model="objs.invtiC_ICQty" ng-blur="countAmt(objs,transrows)" placeholder="Quantity" allow-pattern="(\s|[0-9.])" maxlength="18" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="naration" class="form-control active" ng-model="objs.invtiC_Naration" placeholder="Narration" />
+                                            </td>
+                                            <td>
+                                                <span class="" ng-hide="icrows.length > 4">
+                                                    <span ng-show="!editS">
+                                                        <a href="" ng-show="$last" ng-click="addicrows()">
+                                                            <i class="fa fa-plus"></i>
+                                                        </a>
+                                                    </span>
+                                                    <span ng-show="editS">
+                                                        <a href="">
+                                                            <i class="fa fa-ban"></i>
+                                                        </a>
+                                                    </span>
+                                                </span>
+                                                <span ng-show="!editS">
+                                                    <span class="" id="remove" ng-hide="transrows.length ==1">
+                                                        <a href="" ng-click="removeicrows($index,objs)">
+                                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                                        </a>
+                                                    </span>
+                                                </span>
+                                            </td>
+                                            <td hidden="hidden">{{objs.invtiC_Id}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="row margin-top-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Total Stock :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-7">
+                                        <input type="text" class="form-control active" name="availablestock" ng-disabled="true" placeholder="Max Stock" ng-model="availableitems">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Remarks :</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" rows="3" id="comment" ng-model="invmiC_Remarks"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="invmiC_Id" value="{{invmiC_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            <!--</div>-->
+
+        </form>
+
+        <div class="box box-primary" ng-show="get_itemconsumption.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Item Consumption Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('invmS_StoreName')">Store</a></th>
+                            <th><a href="" ng-click="sortBy('invmiC_StuOtherFlg')">Type</a></th>
+                            <th><a href="" ng-click="sortBy('invmiC_ICNo')">IC No.</a> </th>
+                            <th><a href="" ng-click="sortBy('invmiC_ICDate')">IC Date</a></th>
+                            <th><a href="" ng-click="sortBy('invmiC_Remarks')">Remarks</a></th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue1 = (get_itemconsumption | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.invmS_StoreName}}</td>
+                            <td>{{user.invmiC_StuOtherFlg}}</td>
+                            <td>{{user.invmiC_ICNo}}</td>
+                            <td>{{user.invmiC_ICDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.invmiC_Remarks}}</td>
+
+                            <td class="text-center">
+
+                                <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Item Consumption" data-ng-model="ViewOption"
+                                   data-target="#myModalgrid" data-ng-click="onviewform(user)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">View</i>
+                                </a>
+                                <span ng-show="user.invmiC_StuOtherFlg=='Staff'">
+                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Staff Details" data-ng-model="ViewOptionS"
+                                       data-target="#myModalStaff" data-ng-click="onviewform(user)">
+                                        <i class="fa fa-eye fa-1x" aria-hidden="true">Staff</i>
+                                    </a>
+                                </span>
+
+
+                                &nbsp;
+                                <span ng-if="user.invmiC_ActiveFlg === false">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.invmiC_ActiveFlg === true">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =======================Transcation Model ====================================-->
+    <div id="myModalgrid" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white">{{userflg}} : {{icuser}}</h4>
+                        <div ng-show="userflg=='Student'">
+                            <h4 class="modal-title text-white">{{admno}}</h4>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="text-center">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                        </th>
+                                        <th><a href="" ng-click="sortBy('invmI_ItemName')">Item Name</a></th>
+                                        <th><a href="" ng-click="sortBy('invmuoM_UOMName')">UOM</a> </th>
+                                        <th><a href="" ng-click="sortBy('invmP_ProductName')">Product</a> </th>
+                                        <th><a href="" ng-click="sortBy('invtiC_BatchNo')">Batch No.</a> </th>
+                                        <th><a href="" ng-click="sortBy('INVTIC_ICQty')">Quantity</a> </th>
+                                        <th><a href="" ng-click="sortBy('INVTIC_Naration')">Narration</a></th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in get_ICdetails">
+                                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td>{{user.invmI_ItemName}}</td>
+                                        <td>{{user.invmuoM_UOMName}}</td>
+                                        <td>{{user.invmP_ProductName}}</td>
+                                        <td>{{user.invtiC_BatchNo}}</td>
+                                        <td>{{user.invtiC_ICQty}}</td>
+                                        <td>{{user.invtiC_Naration}}</td>
+
+                                        <td class="text-center">
+                                            <span ng-if="user.invtiC_ActiveFlg === false">
+                                                <a href="" ng-click="deactive(user)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate" data-dismiss="modal">
+                                                    <i> Activate </i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="user.invtiC_ActiveFlg === true">
+                                                <a href="" ng-click="deactive(user)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate" data-dismiss="modal">
+                                                    <i> Deactivate</i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--===============================  Staff  Details ==================================-->
+    <div id="myModalStaff" class="modal fade" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    </div>
+                    <div class="box-body">
+                        <div class="text-center">
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th><a href="" ng-click="sort('employeename')">Employee Name</a></th>
+                                        <th><a href="" ng-click="sort('HRME_EmployeeCode')">Employee Code </a></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="userS in staffuser | orderBy:sortKey:reverse |filter:search">
+                                        <td>{{$index+1}}</td>
+                                        <td style="overflow-wrap:break-word">{{ userS.username}}</td>
+                                        <td style="overflow-wrap:break-word">{{ userS.HRME_EmployeeCode}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>

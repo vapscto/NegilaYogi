@@ -1,0 +1,292 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="StuAttRptDropdownList();" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Certificate Generated Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="text-center well">
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="obj.type23" value="Count" name="all" ng-change="getDataByType(obj.type23);">
+                                    <span class="lbl padding-8">Count Report </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="obj.type23" value="Detailed" name="all" ng-change="getDataByType(obj.type23);">
+                                    <span class="lbl padding-8">Detail Report</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Report Name:<strong style="color:red;" ng-if="obj.type23!='Count'">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ReportType" ng-change="OnChangeYear()" name="acd_year"
+                                        ng-required="obj.type23!='Count'" ng-disabled="obj.type23=='Count'">
+                                    <option value="">Select Report Name</option>
+                                    <option ng-repeat="academic in GetReportTypes" value="{{academic.reportType}}" ng-selected="{{academic.Selected == true}}">{{academic.reportType}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8 input-group">
+                                <md-datepicker name="sch_date" onkeypress="return false" data-ng-model="FromDate" placeholder="Enter date"
+                                               required md-max-date="maxdate" ng-change="OnChangeFromDate()"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                    <div ng-message="required">Select From Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">To Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8 input-group">
+                                <md-datepicker name="sch_date1" onkeypress="return false" data-ng-model="ToDate" placeholder="Enter date"
+                                               required md-max-date="maxdate" md-min-date="FromDate" ng-change="OnChangeToDate()"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.sch_date1)" ng-messages="myForm.sch_date1.$error">
+                                    <div ng-message="required">Select To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false"
+                                   ng-click="GetCertificateGeneratedReport();">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#table')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Excel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-disabled="excel_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <div class="box box-primary" ng-if="gridflag==true">
+        <div class="box-header with-border">
+            <h3 class="box-title">Certificate Generated Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row" ng-if="obj.type23=='Count'">
+                <div class="col-sm-12">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th><a href="" ng-click="sortBy('ReportName')">Certificate Name </a> </th>
+                                <th><a href="" ng-click="sortBy('Count')">Count </a> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue = (GetReportDetails | filter : searchValue)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-left">{{ user.ReportName}}</td>
+                                <td class="text-center">{{ user.Count}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5" pagination-id="page1"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+
+            <div class="row" ng-if="obj.type23!='Count'">
+                <div class="col-sm-12">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue1" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered" id="tabel1">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th><a href="" ng-click="sortBy('ReportName')">Student Name </a> </th>
+                                <th><a href="" ng-click="sortBy('ReportName')">Adm.No. </a> </th>
+                                <th><a href="" ng-click="sortBy('ReportName')">Certificate Name </a> </th>
+                                <th><a href="" ng-click="sortBy('ReportName')">Date</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1 = (GetReportDetails | filter : searchValue1)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage2" current-page="currentPage2" ng-class-odd="'odd'" pagination-id="page2">
+                                <td class="text-center">{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                                <td class="text-left">{{ user.StudnetName}}</td>
+                                <td class="text-left">{{ user.Admno}}</td>
+                                <td class="text-left">{{ user.ASC_ReportType}}</td>
+                                <td class="text-center">{{ user.Date}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5" pagination-id="page2"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+        <div id="printSectionId" ng-show="table_flag">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <center><h4>Certificate Generated Report : From {{FromDate_temp | date:'dd/MM/yyyy'}} To {{ToDate_temp | date:'dd/MM/yyyy'}} </h4></center>
+            <br />
+            <table class="table-bordered" id="table">
+                <thead>
+                    <tr>
+                        <th class="text-center">SL.No.</th>
+                        <th class="text-center">Report Name</th>
+                        <th class="text-center">Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in GetReportDetails | filter : searchValue">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user.ReportName}}</td>
+                        <td class="text-center">{{ user.Count}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="printSectionId2" ng-show="table_flag">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+
+            <center><h4>Certificate Generated Report : From {{FromDate_temp | date:'dd/MM/yyyy'}} To {{ToDate_temp | date:'dd/MM/yyyy'}} </h4></center>
+            <br />
+            <table class="table-bordered" id="table2">
+                <thead>
+                    <tr>
+                        <th class="text-center">SL.No.</th>
+                        <th class="text-center">Student Name</th>
+                        <th class="text-center">Adm.No.</th>
+                        <th class="text-center">Report Name</th>
+                        <th class="text-center">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in GetReportDetails | filter : searchValue">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{ user.StudnetName}}</td>
+                        <td class="text-left">{{ user.Admno}}</td>
+                        <td class="text-left">{{ user.ASC_ReportType}}</td>
+                        <td class="text-center">{{ user.Date}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="excelsection2" ng-show="table_flag">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="5" style="text-align:center; font-weight:bold">
+                        <b>Certificate Generated Report : From {{FromDate_temp | date:'dd/MM/yyyy'}} To {{ToDate_temp | date:'dd/MM/yyyy'}} </b>
+                    </td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="5">&nbsp;</td>
+                </tr>
+            </table>
+            <table class="table-bordered" id="table2">
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th class="text-center">SL.No.</th>
+                        <th class="text-center">Student Name</th>
+                        <th class="text-center">Adm.No.</th>
+                        <th class="text-center">Report Name</th>
+                        <th class="text-center">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border:0.5px solid black" ng-repeat="user in GetReportDetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{ user.StudnetName}}</td>
+                        <td class="text-left">{{ user.Admno}}</td>
+                        <td class="text-left">{{ user.ASC_ReportType}}</td>
+                        <td class="text-center">{{ user.Date}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="excelsection1" ng-show="table_flag">
+            <table>
+                <tr style="border:0.5px solid black">
+                    <td colspan="3" style="text-align:center; font-weight:bold">
+                        <b>
+                            Certificate Generated Report : From {{FromDate_temp | date:'dd/MM/yyyy'}} To {{ToDate_temp | date:'dd/MM/yyyy'}}
+                        </b>
+                    </td>
+                </tr>
+                <tr style="border:0.5px solid black">
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+            </table>
+            <table class="table-bordered" id="table2">
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th class="text-center">SL.No.</th>
+                        <th class="text-center">Report Name</th>
+                        <th class="text-center">Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border:0.5px solid black" ng-repeat="user in GetReportDetails">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{user.ReportName}}</td>
+                        <td class="text-center">{{ user.Count}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

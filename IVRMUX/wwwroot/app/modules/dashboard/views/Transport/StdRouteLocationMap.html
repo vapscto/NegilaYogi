@@ -1,0 +1,394 @@
+﻿<style>
+    .error-messages.ng-active {
+        color: red;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="ShowReportdata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Location fee group Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <!--ng-show="IsHiddenup"-->
+
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="acd" ng-model="asmaY_Id" name="acd_yr" ng-change="get_cls_secs()" required>
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="year in yearlist" value="{{year.asmaY_Id}}"> {{year.asmaY_Year}} </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.acd_yr)" ng-messages="myForm.acd_yr.$error">
+                                <div ng-message="required" style="margin-left:195px;">Please Select the Academic Year</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="selus2e" ng-model="clsdrp" name="stu_Class" ng-change="get_sections()" required>
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="option11 in class_list" value="{{option11.asmcL_Id}}" ng-selected="{{option11.Selected == true}}">
+                                        {{option11.asmcL_ClassName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.stu_Class)" ng-messages="myForm.stu_Class.$error">
+                                <div ng-message="required" style="margin-left:195px;">Please Select Class</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div class="col-sm-4 input-group text-right">
+                                    <md-datepicker ng-model="TRSR_Date" onkeydown="return false" name="att_from_date" id="date1" md-placeholder="Enter  date" md-min-date="minDatemf" md-max-date="maxDatemf"></md-datepicker><!--md-min-date="Today_td"-->
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.att_from_date)" ng-messages="myForm.att_from_date.$error">
+                                    <div ng-message="required">Select Date From The Calendar</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="seluse1" data-ng-model="sectiondrp" name="stu_Section" required>
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="option1 in section_list" value="{{option1.asmS_Id}}" ng-selected="{{option1.Selected == true}}">
+                                        {{option1.asmC_SectionName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.stu_Section)" ng-messages="myForm.stu_Section.$error">
+                                <div ng-message="required" style="margin-left:195px;">Please Select Section</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="Checkbox" name="savebtn" ng-model="automapping" ng-change="get_data()">
+                        <span class="lbl padding-8">Auto Mapping</span>
+                    </label>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        Show
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" id="clear-btn" ng-click="clear1()" ng-show="students.length==0">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div class="box box-primary" ng-show="students.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Students List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <!--<div class="row">-->
+                <div class="col-sm-3 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="search1" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+                <!--</div>-->
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+
+                                SLNO
+                            </th>
+                            <th>
+                                <label>
+                                    <input type="checkbox" value="" ng-click="toggleAll()" ng-model="all">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th style="width:200px">
+                                <a href="" ng-click="sort1('amsT_FirstName')">Student Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort1('amsT_AdmNo')">Admission No.</a>
+                            </th>
+
+                            <!--<th>
+        Groups
+    </th>-->
+                            <th>
+                                Route Name
+                            </th>
+                            <!--<th>
+        Pick-Up Schedule
+    </th>-->
+                            <th>
+                                Location
+                            </th>
+                            <th>
+                               Installments
+                            </th>
+                            <!--<th>
+        Drop  Route
+    </th>
+    <th>
+        Drop Schedule
+    </th>
+    <th>
+        Drop Location
+    </th>-->
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in students |orderBy:sortKey1:reverse1| filter:search1" ng-class-odd="'odd'">
+                            <!--| filter:paginate-->
+                            <td>{{ $index + 1}}</td>
+                            <td class="text-center">
+                                <label>
+                                    <input type="checkbox" name="adcheckt_{{user.amsT_Id}}" ng-model="user.checkedvalue" ng-change="optionToggled(user)">
+
+                                    <span class="lbl padding-8"></span>
+
+                                </label>
+
+                            </td>
+                            <td>{{user.amsT_FirstName}}</td>
+                            <td>{{user.amsT_AdmNo}}</td>
+
+                            <td>
+                                
+                                <select class="form-control" id="sel1" name="route_{{user.amsT_Id}}" ng-model="user.TRMR_Id" ng-change="on_pic_route_change(user.TRMR_Id)" ng-required="user.checkedvalue && (user.TRMR_Drop_Route==null || user.TRMR_Drop_Route=='')" ng-disabled="!user.checkedvalue" >
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in route_list" value="{{option.trmR_Id}}" ng-selected="{{option.trmR_Id == user.TRMR_Id}}">
+                                        {{option.trmR_RouteNo}} : {{option.trmR_RouteName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['route_'+user.amsT_Id])" ng-messages="myForm['route_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Pick-Up Route</div>
+                                </div>
+                            </td>
+                     
+                            <td>
+                                <select class="form-control" id="sel1" name="PUL_{{user.amsT_Id}}" ng-model="user.TRSR_PickUpLocation" ng-disabled="!user.checkedvalue"  ng-change="get_loca_sches_p1(user);" ng-required="user.checkedvalue &&  (user.TRMR_Id!=null && user.TRMR_Id!='')">
+                                    <!--ng-required="user.checkedvalue"-->
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in user.location_list_p" value="{{option.trmL_Id}}" ng-selected="{{option.trmL_Id == user.TRSR_PickUpLocation}}">
+                                        {{option.trmL_LocationName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['PUL_'+user.amsT_Id])" ng-messages="myForm['PUL_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select  PickUp Location</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <div class="col-sm-10">
+                                        <input type="checkbox" style="float:left;" name="allchbx1" data-ng-model="allstdcheck" ng-click="allstudentcheck();">
+                                        <span class="lbl padding-8">ALL</span>
+                                        <hr />
+                                        <ul class="">
+                                            <li >
+                                                <div class="col-sm-12" ng-repeat="usr1 in user.installmentlist" value="{{usr1.FTI_Id}}">
+
+                                                    <input type="checkbox" style="float:left;" name="selcolchbx1" data-ng-model="usr1.checkedgrplst1">
+                                                
+                                                    <span class="lbl padding-8">{{ usr1.FTI_Name }}</span>
+                                                </div>
+                                            </li>
+                                        </ul>
+
+                                    </div>
+                                </div>
+                            </td>
+                  
+
+                            <td hidden="hidden">{{user.amsT_Id}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div hidden="hidden">{{returntxt}}</div>
+                <input hidden="hidden" ng-model="TRSLM_Id"/>
+                <hr />
+                <div class="well text-center">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="savedata(students)" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student  Location fee group Mapped List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+
+            <!--<div class="col-sm-4">
+                <div class="form-group searchbox">
+                    <div class="input-group">
+
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                <span class="input-group-addon">
+                    <button class="btn" type="submit" ng-click="searchByColumn(search,obj.searchColumn1)"><i class="fa fa-search"></i></button>
+                </span>
+                <select class="form-control" id="sel1" ng-model="obj.searchColumn1" ng-change="getcolumnId(searchColumn1)">
+                    <option value="" ng-selected="true">Student Name</option>
+                    <option value="3">Route Name</option>
+                    <option value="4">Group Name</option>
+                </select>
+                    </div>
+                </div>
+            </div>-->
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{students_list.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <!--<div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>-->
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group pull-right">
+                        <div class="input-group pull-right">
+
+                            <input class="form-control pull-right" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+          
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            SLNO
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('asmaY_Year')">Academic Year</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('amsT_FirstName')">Student Name</a>
+                        </th>
+
+                        <!--<th>
+                    <a href="" ng-click="sort('trsR_Date')">Date</a>
+                </th>-->
+
+
+                        <th>
+                            <a href="" ng-click="sort('trmR_RouteName')">Route Name</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('fmG_GroupName')">Location Name</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('fmG_GroupName')">Group Name</a>
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--<tr ng-repeat="user in students_list | orderBy:sortKey:reverse  | filter:paginate| filter:search" ng-class-odd="'odd'">-->
+                    <tr dir-paginate="user in students_list |orderBy:sortKey:reverse |filter:searchValue |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.asmaY_Year}}</td>
+                        <td> {{user.amsT_FirstName}}</td>
+                        <td>
+                            {{user.amsT_AdmNo}}</td>
+                        <td>{{user.trmR_RouteName
+                            }}
+                        </td>
+                        <td>{{user.pickUp_LocationName}}</td>
+                        <td>{{user.fmG_GroupName}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="editvalue(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>||
+                            <!--<i class="fa fa-trash-o" style="font-size:48px;color:red"></i>-->
+                            <a href="javascript:void(0)" ng-click="deactive(user);">  <i class="fa fa-trash-o" style="color:red"></i></a>
+                            <!--<a ng-if="user.trsR_ActiveFlg === false" href="javascript:void(0)" style="color:green;" ng-click="deactive(user);"> <md-tooltip md-direction="down">Activate Now</md-tooltip> <i class="fa fa-toggle-off text-red" aria-hidden="true"></i></a>-->
+                            <!--&& user.opt_flag==true-->
+                            <!--<a ng-if="user.trsR_ActiveFlg === true" href="javascript:void(0)" style="color:red;" ng-click="deactive(user);">  <md-tooltip md-direction="down">Deactivate Now</md-tooltip> <i class="fa fa-toggle-on text-green" aria-hidden="true"></i></a>-->
+                            <!--&& user.opt_flag==true-->
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5" pagination-id="page"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+            <!--<pagination total-items="totalItems" ng-model="currentPage"
+                max-size="5" boundary-links="true"
+                items-per-page="numPerPage" class="pagination-sm">
+    </pagination>-->
+        </div>
+    </div>
+
+
+
+</section>

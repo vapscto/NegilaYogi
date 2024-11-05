@@ -1,0 +1,283 @@
+﻿
+<section class="content twocoloumn">
+    <div class="box box-primary" data-ng-init="BindData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">Exam-Promotion Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal" role="form" name="myForm" novalidate>
+                <div class="row">
+
+
+                    <div class="col-sm-12 text-center well" ng-init="examtype=0">
+
+                        <div class="form-group">
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="examtype" value="0" type="radio" ng-click="getlist()" ng-disabled="edit==true" required>
+                                <span class="lbl padding-8">Individual Exam</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="examtype" value="1" type="radio" ng-click="getlist()" ng-disabled="edit==true" required>
+                                <span class="lbl padding-8">promotion Exam</span>
+                            </label>
+                            <div class="error-messages" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                                <div ng-message="required">Select Radio Type</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="year" id="sel1" ng-model="ASMAY_Id" data-ng-change="get_class()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in year_list" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                <div ng-message="required">Select Academic Year</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="sec" data-ng-change="get_exam()" ng-model="ASMS_Id" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in sectionlist" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmC_SectionName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                <div ng-message="required">Select Section</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="category" ng-model="ASMCL_Id" data-ng-change="get_section()" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmcL_ClassName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.category)" ng-messages="myForm.category.$error">
+                                <div ng-message="required">Select Class</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-4">Exam: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="exa" ng-model="EME_Id" ng-required="examtype==0" ng-disabled="examtype==1">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="exam in exam_list" value="{{exam.emE_Id}}" ng-selected="{{exam.Selected == true}}">
+                                        {{exam.emE_ExamName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.exa)" ng-messages="myForm.exa.$error">
+                                    <div ng-message="required">Select Exam</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-click="search_student()">
+                        <i class="fa fa-search" aria-hidden="true"></i> Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="result_data" id="excel-btn" ng-click="ExportToExcel('#printIndExId')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="result_data" id="print-btn" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+            <div class="box box-primary" ng-show="student.length>0">
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">Exam-Promotion Report    </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{student.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="searchValue!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue1.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="">SLNO</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('AMST_Name')">Student Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('AMST_AdmNo')">Adm.No</a>
+                                </th>
+                                <th ng-if="examtype=='1'">
+                                    <a href="" ng-click="sort('EPRD_PromotionName')">Promotion</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('EPRD_Remarks')">Remarks</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('ASMCL_ClassName')">Class</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!--<tr ng-repeat="user in student | orderBy:sortKey:sortReverse | filter:paginate| filter:search" ng-class-odd="'odd'" ng-form="myformdtable">-->
+                            <tr dir-paginate="user in filterValue1 = (student | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <!--<td>{{ $index + 1}}</td>-->
+                                <td  style="word-wrap:break-word; width:25%">{{user.AMST_Name}}</td>
+                                <td>{{user.AMST_AdmNo}}</td>
+                                <td ng-if="examtype=='1'">{{user.EPRD_PromotionName}}</td>
+                                <td style="word-wrap:break-word; width:30%">{{user.EPRD_Remarks}}</td>
+                                <td>{{user.ASMCL_ClassName}}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+
+            </div>
+
+
+            <!--print Export data starts-->
+            <div id="printIndExId" ng-show="table_flag">
+              
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+
+                <h3 class="text-center">Exam-Promotion Report</h3>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label><b style="font-size:13px">Year : {{yearname}} </b></label>
+                    </div>
+                    <div class="col-sm-4">
+                        <label><b style="font-size:13px">Class :{{asmcL_ClassName}} </b></label>
+                    </div>
+                    <div class="col-sm-4">
+                        <label><b style="font-size:13px">Section : {{asmC_SectionName}}</b></label>
+                    </div>
+                    <div class="col-sm-4" ng-if="examtype=='0'">
+                        <label><b style="font-size:13px">Exam :{{emE_ExamName}} </b></label>
+                    </div>
+                </div>
+
+                <table class="table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width:10%">
+                              SLNO
+                            </th>
+                            <th>
+                               Student Name
+                            </th>
+                            <th class="text-center" style="width:13%">
+                                Adm.No
+                            </th>
+                            <th class="text-center" ng-if="examtype=='1'" style="width:14%">
+                                Promotion
+                            </th>
+                            <th class="text-center">
+                                Remarks
+                            </th>
+                            <th class="text-center" style="width:11%">
+                                Class
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in filterValue1">
+                            <td class="text-center">{{ $index + 1}}</td>
+                            <td class="text-left">{{user.AMST_Name}}</td>
+                            <td class="text-center">{{user.AMST_AdmNo}}</td>
+                            <td class="text-center" ng-if="examtype=='1'">{{user.EPRD_PromotionName}}</td>
+                            <td class="text-left" style="word-wrap: break-word;">{{user.EPRD_Remarks}}</td>
+                            <td class="text-center">{{user.ASMCL_ClassName}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="{{clsp}}" class="text-center">
+                                <label>
+
+                                    Date:{{ddate|date:'dd/MM/yyyy'}} &nbsp;&nbsp; UserName: {{usrname}}  {{coptyright}}
+                                </label>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!--print Export data end-->
+
+
+      
+ 
+
+</section>
+
+
+

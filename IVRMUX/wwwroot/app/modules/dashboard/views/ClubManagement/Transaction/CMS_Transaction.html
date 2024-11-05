@@ -1,0 +1,372 @@
+﻿<section class="content">
+    <div data-ng-init="loaddata();">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="savepages()" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">CMS Transaction</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6 form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Member Name:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <ui-select ng-model="obj.cmsmmeM_Id" name="stucst" ng-disabled="editflag==true" required>
+                                        <ui-select-match placeholder="Select Member Name">
+                                            <span ng-bind="$select.selected.cmsmmeM_MemberFirstName"></span>
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="item in (allCaste | filter: $select.search) track by item.cmsmmeM_Id" value="item.cmsmmeM_Id"
+                                                           ng-selected="{{item.Selected == true}}" >
+                                            <span ng-bind-html="item.cmsmmeM_MemberFirstName | highlight: $select.search"></span>
+                                        </ui-select-choices>
+                                    </ui-select>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.stucst)" ng-messages="myForm.stucst.$error">
+                                        <div ng-message="required"> Member name </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Finacial Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="IMFY_Id" name="year">
+                                        <option value="">Select Year </option>
+                                        <option ng-repeat="room in finacialyear" value="{{room.imfY_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{room.imfY_FinancialYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                        <div ng-message="required">
+                                            Enter finacial year <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Transction Number:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="mppn" data-ng-model="CMSTRANS_TransactionNo" allow-pattern="[0-9.]" maxlength="10" autocomplete="off" placeholder="Transction Number" ng-paste="$event.preventDefault()" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.mppn)" ng-messages="myForm.mppn.$error">
+                                        <div ng-message="required">
+                                            Enter Tranction Number <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Total Amount:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="tamount" allow-pattern="[0-9.]" ng-paste="$event.preventDefault()" data-ng-model="CMSTRANS_TotalAmount" maxlength="7" autocomplete="off" placeholder="Total amount" ng-change="totalAmountTwo()" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.tamount)" ng-messages="myForm.tamount.$error">
+                                        <div ng-message="required">
+                                            Total Amount <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Total tax:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="tax" allow-pattern="[0-9.]" ng-paste="$event.preventDefault()" data-ng-model="CMSTRANS_TotalTax" maxlength="3" autocomplete="off" placeholder="Total tax" ng-change="totalAmount()" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.tax)" ng-messages="myForm.tax.$error">
+                                        <div ng-message="required">
+                                            Enter Tax  <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Net Amount:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="netamount" allow-pattern="[0-9.]" data-ng-model="CMSTRANS_TotalNetAmount" maxlength="40" autocomplete="off" placeholder="Net Amount" ng-paste="$event.preventDefault()" ng-disabled="flagDisabble==true" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.netamount)" ng-messages="myForm.netamount.$error">
+                                        <div ng-message="required">
+                                            Enter Net Amont  <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Transcation Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="CMSTRANS_Date" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" md-min-date="plMaxdate" md-max-date="newdate" ng-required="From_Date" ng-paste="$event.preventDefault()"></md-datepicker>
+
+                                    <!--<input type="text" class="form-control" name="mppn" data-ng-model="CMSTRANS_TransactionNo" maxlength="40" allow-pattern="(\s|[a-zA-Z])" autocomplete="off" placeholder="Transction Number" required>-->
+                                    <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                        <div ng-message="required">
+                                            Enter Tranction Number <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Total Guest:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="guest" allow-pattern="[0-9.]" data-ng-model="CMSTRANS_NoOFGuests" maxlength="5" autocomplete="off" placeholder="Total Guest" ng-paste="$event.preventDefault()" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.guest)" ng-messages="myForm.guest.$error">
+                                        <div ng-message="required">
+                                            Enter guest  <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Guest Name:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="guest" data-ng-model="CMSTRANS_GuestsName" maxlength="40" allow-pattern="(\s|[a-zA-Z])" autocomplete="off" placeholder="Guest Name" ng-paste="$event.preventDefault()" required>
+                                    <div class="error-messages" ng-if="interacted(myForm.guest)" ng-messages="myForm.guest.$error">
+                                        <div ng-message="required">
+                                            Enter Guest Name <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Guest Contact No:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="contact" maxlength="12" data-ng-model="CMSTRANS_GuestContactNo" ng-paste="$event.preventDefault()" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d" placeholder="Contact Number" autocomplete="off" name="ContactNumber" required />
+                                    <div class="error-messages" ng-if="interacted(myForm.contact)" ng-messages="myForm.contact.$error">
+                                        <div ng-message="pattern">Enter valid Contact NO</div>
+                                        <div ng-message="required">Enter Mobile number</div>
+                                        <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                        <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                        <div ng-message="pattern">Mobile number must be numeric</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Remark :</label>
+                                <div class="col-sm-8">
+                                    <textarea maxlength="250" name="remarks" ng-model="CMSTRANS_Remarks" class="form-control" resize: none; rows="5" placeholder="Remark" />
+
+                                    <div class="error-messages" ng-if="interacted(myForm.remarks)" ng-messages="myForm.remarks.$error">
+                                        <div ng-message="required">
+                                            Enter Remark Name <div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 form-horizontal">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Club Mangement Transaction Member </h3>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="clearfix">
+                                    <div style="overflow:scroll !important">
+                                        <table class="table table-hover table-bordered clearfix" style="width:1500px !important">
+                                            <thead>
+                                                <tr>
+                                                    <th width="50">SL NO</th>
+                                                    
+                                                    <th width="200"><a href="" ng-click="sort('cmstransnmeM_NonMemberName')">Non Member Name </a></th>
+                                                    <th width="200"><a href="" ng-click="sort('cmstransnmeM_ContactNo')"> Contact Number</a></th>
+                                                    <th width="200"><a href="" ng-click="sort('cmstransnmeM_EmailId')">Email Id</a></th>
+                                                    <th width="200"><a href="" ng-click="sort('cmstransnmeM_Address')">Address</a></th>
+                                                
+
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                <tr ng-repeat="objg in transrows" ng-form="dataform1">
+                                                    <td>{{$index+1}}</td>
+                                                   
+                                                    <td>
+                                                        <input type="text" name="nonmem" class="form-control active" allow-pattern="(\s|[a-zA-Z])" maxlength="8" ng-model="objg.cmstransnmeM_NonMemberName" placeholder="Non Member Name" ng-paste="$event.preventDefault()" autocomplete="off" required />
+                                                        <div class="error-messages" ng-if="interactedone(dataform1.nonmem)" ng-messages="dataform1.nonmem.$error">
+                                                            <div ng-message="required">Member Name</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control"  maxlength="12" data-ng-model="objg.cmstransnmeM_ContactNo" ng-paste="$event.preventDefault()" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" allow-pattern="\d" placeholder="Contact Number" autocomplete="off" name="contactyyyy" required />
+                                                        <div class="error-messages" ng-if="interactedone(dataform1.contactyyyy)" ng-messages="dataform1.contactyyyy.$error">
+                                                            <div ng-message="pattern">Enter valid Contact NO</div>
+                                                            <div ng-message="required">Enter Mobile number</div>
+                                                            <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                                            <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                                            <div ng-message="pattern">Mobile number must be numeric</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control active" name="SpouseEmailId" placeholder="Email" ng-model="objg.cmstransnmeM_EmailId" type="text" ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" autocomplete="off" required>
+                                                        <div class="error-messages" ng-if="interactedone(dataform1.SpouseEmailId)" ng-messages="dataform1.SpouseEmailId.$error">
+                                                            <div ng-message="required"> Email</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <textarea class="form-control" ng-model="objg.cmstransnmeM_Address" name="desc" placeholder="Address"></textarea>
+
+                                                    </td>
+                                                    <td>
+                                                        <span class="" ng-hide="grnrows.length > 10">
+                                                            <a href="" ng-show="$last" ng-click="addgrnrows()">
+                                                                <i class="fa fa-plus"></i>
+                                                            </a>
+                                                        </span>
+                                                        <span class="" id="remove" ng-hide="transrows.length ==1">
+                                                            <a href="" ng-click="removegrnrows($index,objg)">
+                                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                              
+                <div class="">
+                    <div class="text-center">
+                        <input type="hidden" ng-model="CMSTRANS_Id" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button class="md-raised md-warn" data-ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+                </form>
+      
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Club Transction</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">
+                                SL.NO
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('membername')">Member Name</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('imfY_FinancialYear')">Fiancial Year</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('cmstranS_TransactionNo')">Transaction Number</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('cmstranS_TotalNetAmount')">Total Net Amount</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('cmstranS_Date')">Trans Date</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('cmstranS_NoOFGuests')">Number Guest</a>
+                            </th>
+                            
+                            <th style="text-align:center">Action</th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr dir-paginate="user in getreport |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                            <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td style="text-align:left">{{user.membername}}</td>
+                            <td>{{user.imfY_FinancialYear}}</td>
+                            <td style="text-align:left">{{user.cmstranS_TransactionNo}}</td>
+                            <td>{{user.cmstranS_TotalNetAmount}}</td>
+                            <td>{{user.cmstranS_Date | date:"dd-MM-yyyy" }}</td>
+                            <td>{{user.cmstranS_NoOFGuests}}</td>
+                            <td class="hidden">
+                                <span>
+                                    {{user.cmstranS_Id}}
+                                </span>
+                                <span>
+                                    {{user.cmsmmeM_Id}}
+                                </span>
+                                <span>
+                                    {{user.imfY_Id}}
+                                </span>
+                                <span>
+                                    {{user.cmstranS_TotalAmount}}
+                                </span>
+                                <span>
+                                    {{user.cmstranS_TotalTax}}
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                <span ng-if="user.cmstranS_ActiveFlg == true">
+                                    <a class="text-aqua" href="" ng-click="edit(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+                                    <a href="" ng-click="Deletedata(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.cmstranS_ActiveFlg == false">
+                                    <a href="" ng-click="Deletedata(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+
+    </div>
+
+
+</section>

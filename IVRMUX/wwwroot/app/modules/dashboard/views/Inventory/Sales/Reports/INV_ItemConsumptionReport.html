@@ -1,0 +1,214 @@
+﻿
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">ITEM CONSUMPTION REPORT</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-offset-3">
+                            <div class="well">
+                                <div class="text-center" ng-init="typeflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="All" ng-model="typeflag" ng-change="typerdochange(typeflag)">
+                                        <span class="lbl padding-8"> All </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Overall" name="Overall" ng-model="typeflag" ng-change="typerdochange(typeflag)">
+                                        <span class="lbl padding-8"> Overall </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Detailed" name="Detailed" ng-model="typeflag" ng-change="typerdochange(typeflag)">
+                                        <span class="lbl padding-8"> Detailed </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="typeflag=='Overall' || typeflag=='Detailed'">
+                            <div class="col-sm-8 col-lg-offset-2">
+                                <div class="well">
+                                    <div class="text-center">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Item" name="item" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                            <span class="lbl padding-8">Item</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Staff" name="Staff" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                            <span class="lbl padding-8">Staff</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Department" name="Department" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                            <span class="lbl padding-8">Department</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="Student" name="Student" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                            <span class="lbl padding-8">Student </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-9" ng-show="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <!-- ===========================ITEMS========================== -->
+                            <div class="form-group" ng-if="optionflag=='Item'">
+                                <label class="control-label col-sm-4">Item :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="item" ng-model="obj.INVMI_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Item" ng-required="optionflag=='Item'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Item in the list...">{{$select.selected.INVMI_ItemName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_ICreportdetails | filter: $select.search " value="{{option.INVMI_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.INVMI_ItemName +':'+ option.INVMI_ItemCode | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Item </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ======================= STAFF ============================ -->
+                            <div class="form-group" ng-if="optionflag=='Staff'">
+                                <label class="control-label col-sm-4">Select or Search Employee Name:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_ICreportdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Employee No. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="stall" type="checkbox" ng-click="all_checkST(stall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-model="HRME_Id" ng-repeat="st in get_ICreportdetails | filter : searchValue">
+                                            <input name="stor" ng-model="st.stck" type="checkbox" ng-click="togchkbxST();" ng-required="isOptionsRequired()">
+                                            <span class="lbl padding-8">
+                                                {{st.employeename}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.stor)" ng-messages="myForm.stor.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ======================= Department ============================ -->
+                            <div class="form-group" ng-if="optionflag=='Department'">
+                                <label class="control-label col-sm-4">Department :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select ng-model="obj.HRMD_ID" name="dept" required>
+                                        <ui-select-match placeholder="Select Department Name">
+                                            <span ng-bind="$select.selected.HRMD_DepartmentName"></span>
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="item in (get_ICreportdetails | filter: $select.search) track by item.HRMD_ID" value="item.HRMD_ID"
+                                                           ng-selected="{{item.Selected == true}}">
+                                            <span ng-bind-html="item.HRMD_DepartmentName | highlight: $select.search"></span>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <!--<ui-select id="sel1" name="dept" ng-model="obj.HRMD_ID" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Department" ng-required="optionflag=='Department'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Department in the list...">{{$select.selected.HRMD_DepartmentName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_ICreportdetails | filter: $select.search " value="{{option.HRMD_Id}}" ng-selected="{{option.HRMD_Id == obj.HRMD_ID}}">
+                                            <div ng-bind-html="option.HRMD_DepartmentName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>-->
+                                    <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                        <div ng-message="required">Please Select Department </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ======================= Student ============================ -->
+                            <div class="form-group" ng-if="optionflag=='Student'">
+                                <label class="control-label col-sm-4">Student :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="student" ng-model="obj.AMST_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Student" ng-required="optionflag=='Student'">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.studentname}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_ICreportdetails | filter: $select.search " value="{{option.AMST_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.studentname | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.student)" ng-messages="myForm.student.$error">
+                                        <div ng-message="required">Please Select Student </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <!--<md-button ng-show="get_ICReport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>-->
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+        <div class="box box-primary" ng-show="tablediv">
+            <div class="box-header with-border">
+                <h3 class="box-title">ITEM CONSUMPTION REPORT </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div id="gridall"></div>
+            </div>
+        </div>
+
+
+
+    </div>
+</section>

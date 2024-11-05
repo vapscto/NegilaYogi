@@ -1,0 +1,628 @@
+﻿
+<style>
+    .file-blue:before {
+        content: 'Upload Files';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .imgpfgdownload {
+        width: 30px;
+        height: 30px;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristiline ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">NAAC Academic Training</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row" ng-show="institutionlist.length > 1">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Institution:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="mI_Id" name="msint" required ng-change="loaddata();" ng-disabled="institute_flag">
+                                    <option ng-repeat="val in institutionlist" value="{{val.mI_Id}}" ng-selected="val.mI_Id==mI_Id">
+                                        {{val.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.msint)" ng-messages="myForm.msint.$error">
+                                    <div ng-message="required">Select Institution</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Year<strong style="color:red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="ASMAY_Id" name="acdyr" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in allacademicyear" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id==NCACAW342_AwardYear}}">{{option.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdyr)" ng-messages="myForm.acdyr.$error">
+                                    <div ng-message="required">Please Select Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Project Title<strong style="color:red">*</strong> </label>
+                            <div class="col-sm-8">
+                                <input class="form-control"  type="text" name="project" ng-model="projectname" required />
+                                <div class="error-messages" ng-if="interacted(myForm.project)" ng-messages="myForm.project.$error">
+                                    <div ng-message="required">Please Enter Project Title</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From Date:<span style="color:red">*</span> </label>
+                            <div class="col-sm-8 input-group">
+                                <md-datepicker name="fromdate" ng-model="from_date" md-placeholder="Enter Date" onkeydown="return false"
+                                               required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.fromdate)" ng-messages="myForm.fromdate.$error">
+                                    <div ng-message="required">Select From Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">To Date<span style="color:red">*</span> </label>
+                            <div class="col-sm-8 input-group">
+                                <md-datepicker name="todate" ng-model="to_date" md-placeholder="Enter Date" onkeydown="return false"
+                                               required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.todate)" ng-messages="myForm.fromdate.$error">
+                                    <div ng-message="required">Select To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-12">
+                                <input type="checkbox" name="dfsd" ng-model="usercheck" ng-true-value="1" ng-false-value="0" /><span class="lbl padding-12">Professional Development/Administrative Training</span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Participant Count:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" allow-pattern="[0-9]" maxlength="4" name="Participant" data-ng-model="count" ng-disabled="usercheck==0" ng-required="usercheck==1" />
+                                <div class="error-messages" ng-if="interacted(myForm.Participant)" ng-messages="myForm.Participant.$error">
+                                    <div ng-message="required">Please Enter Participant Count</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h4>Upload File</h4>
+                        <table class="table table-responsive table-bordered clearfix">
+                            <thead>
+                                <tr>
+                                    <th>SL.NO.</th>
+                                    <th>File</th>
+                                    <th>Description</th>
+                                    <th>View</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ProgramDetailsdet in ProgramDetails| orderBy:predicate:default | filter:paginate| filter:searchd" ng-class-odd="'odd'">
+                                    <td class="text-center">{{ $index + 1 }}</td>
+                                    <td class="text-center lessonplanner">
+                                        <input class="custom-file-input file-blue text-center" id="{{ProgramDetailsdet.lpmtR_Resources}}"
+                                               data-ng-model="ProgramDetailsdet.lpmtR_Resources" type="file"
+                                               accept="image/*,video/mp4" name="filetype{{$index}}"
+                                               onchange="angular.element(this).scope().UploadPhoto(this, angular.element(this).scope().ProgramDetailsdet)">
+                                        <div class="error-messages" ng-if="interacted(myForm['filetype'+$index])" ng-messages="myForm['filetype'+$index].$error">
+                                            <div ng-message="required">Upload File</div>
+                                        </div>
+
+                                    </td>
+                                    <td class="text-center">
+                                        <input class="form-control" type="text" name="Project" data-ng-model="ProgramDetailsdet.desc" />
+                                    </td>
+                                    <td>
+                                        <span ng-if="ProgramDetailsdet.lpmtR_Resources !=null && ProgramDetailsdet.lpmtR_Resources !=''">
+
+                                           
+                                            <a ng-if="ProgramDetailsdet.filetype=='jpg' || ProgramDetailsdet.filetype=='png' ||
+                                                               ProgramDetailsdet.filetype=='svg'|| ProgramDetailsdet.filetype=='jpeg'
+                                                               || ProgramDetailsdet.filetype=='gif'" style="color:red;display:inline;"
+                                               ng-click="showmothersign(ProgramDetailsdet.lpmtR_Resources,ProgramDetailsdet.lpmtR_FileName)">
+                                                Image
+                                            </a>
+                                            <a ng-if="ProgramDetailsdet.filetype=='mp4'"
+                                               style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                               data-ng-click="showGuardianPhotonew(ProgramDetailsdet)">
+                                                Video
+                                            </a>
+
+                                            <a ng-if="ProgramDetailsdet.filetype=='pdf'" style="color:blue;display:inline;"
+                                               ng-click="downloadview(ProgramDetailsdet.lpmtR_Resources,ProgramDetailsdet.lpmtR_FileName)">
+                                                <b style="color:orangered;display:inline; ">Pdf</b>
+                                            </a>
+
+                                            <a ng-if="ProgramDetailsdet.filetype=='doc'|| ProgramDetailsdet.filetype=='docx'"
+                                               style="color:blue;display:inline;"
+                                               href="{{ProgramDetailsdet.document_Pathnew}}" target="_blank">
+                                                <b style="color:orangered;display:inline;">Document</b>
+                                            </a>
+                                            <a ng-if="ProgramDetailsdet.filetype=='ppt'|| ProgramDetailsdet.filetype=='pptx'"
+                                               style="color:blue;display:inline;"
+                                               href="{{ProgramDetailsdet.document_Pathnew}}" target="_blank">
+                                                <b style="color:orangered;display:inline;">PPT</b>
+                                            </a>
+                                            <a ng-if="ProgramDetailsdet.filetype=='xls'|| ProgramDetailsdet.filetype=='xlsx'"
+                                               style="color:blue;display:inline;"
+                                               href="{{ProgramDetailsdet.document_Pathnew}}" target="_blank">
+                                                <b style="color:orangered;display:inline;">Excel</b>
+                                            </a>
+
+
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="" ng-hide="ProgramDetails.length > 9">
+                                            <a href="" ng-show="$last" ng-click="addNewsiblingguard()">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="" id="remove" ng-hide="ProgramDetails.length ==1">
+                                            <a href="" ng-click="removeNewsiblingguard($index)">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <input type="hidden" ng-model="NCAC633ADMTRG_Id" value="{{NCAC633ADMTRG_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="save()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </form>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Grid View</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <!--<div ui-grid="gridOptions" ui-grid-pagination class="grid text-center" id="style-4" style="height: 270px;">
+    </div>-->
+
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{alldata1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th><a href="" ng-click="sort('asmaY_Year')">Year</a></th>
+                        <th><a href="" ng-click="sort('name')">Project Title</a></th>
+                        <th><a href="" ng-click="sort('fdate')">From Date</a></th>
+                        <th><a href="" ng-click="sort('tdate')">To Date</a></th>
+                        <th><a href="" ng-click="sort('totalCount')">Participant Count</a></th>
+                        <th>View</th>
+                        <th>Comments</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (alldata1 | filter : search)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.asmaY_Year}}</td>
+                        <td>{{user.name}}</td>
+                        <td>{{user.fdate}}</td>
+                        <td>{{user.tdate}}</td>
+                        <td>{{user.totalCount }}</td>
+                        <td>
+                            <span>
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View Upload details" data-target="#popup11" ng-click="viewteacherguides(user)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                </a>
+                            </span>
+
+                        </td>
+
+                        <td class="text-center">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#mymodalviewuploaddocument" title="VIEW COMMENT" data-backdrop="static" ng-click="getorganizationdata(user);"> <i class="fa fa-eye text-blue"></i></a>
+                            <span></span>
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#mymodaladdcomments" title="ADD COMMENT" data-backdrop="static" ng-click="addcomments(user);"> <i class="fa fa-comments-o text-blue"></i></a>
+                        </td>
+
+                        <td class="text-center">
+                            <span ng-if="user.ncaC633ADMTRG_ApprovedFlg==1 && user.ncaC633ADMTRG_StatusFlg=='Approved'">
+                                <label style="color:blue"> Approved</label>
+                            </span>
+                            <span ng-if="user.ncaC633ADMTRG_ApprovedFlg!=1 &&  user.ncaC633ADMTRG_StatusFlg!='Approved'">
+                                <a class="text-aqua" href="" ng-click="edittab1(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                            </span>
+
+                            <span ng-if="!user.flag2">
+                                <a href="" ng-click="deactiveStudent(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="activate">
+                                    activate
+                                </a>
+                            </span>
+                            <span ng-if="user.flag2 &&  user.ncaC633ADMTRG_StatusFlg!='Approved'">
+                                <a href="" ng-click="deactiveStudent(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="deactivate">
+                                    de-activate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+
+        </div>
+
+        <div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                        <h4 class="modal-title text-white">
+                            VIEW UPLOADED FILE
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="box-body margin-top-10">
+                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>SL.NO</th>
+                                        <th>File Name</th>
+                                        <th>View</th>
+                                        <th>Action</th>
+                                        <th>Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="documents in uploaddocfiles">
+                                        <td class="text-center">{{ $index + 1 }}</td>
+                                        <td class="text-left">{{documents.fileName}}</td>
+                                        <td class="text-center">
+                                            <span ng-if="documents.filepath !=null && documents.filepath !=''">
+                                                <a ng-if="documents.filetype=='jpg' || documents.filetype=='png' || documents.filetype=='svg'||                                                 documents.filetype=='jpeg' || documents.filetype=='gif'"
+                                                   style="color:red;display:inline; font-weight: bolder;"
+                                                   data-ng-click="showmothersign(documents.filepath,documents.fileName)">
+                                                    <img class="imgpfgdownload" src="/images/Naac/pictures.png" title="Image" />
+                                                </a>
+                                                <a ng-if="documents.filetype=='mp4' || documents.filetype=='mp4'"
+                                                   style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                                   ng-click="showGuardianPhotonew(documents)">
+                                                    <img class="imgpfgdownload" src="/images/Naac/play-button.png" title="Video" />
+                                                </a>
+                                                <a ng-if="documents.filetype=='pdf'" style="color:blue;display:inline;"
+                                                   ng-click="downloadview(documents.filepath,documents.fileName)">
+                                                    <img class="imgpfgdownload" src="/images/Naac/pdf.png"
+                                                         title="View Pdf" />
+                                                </a>
+                                                <a ng-if="documents.filetype=='doc'|| documents.filetype=='docx'" style="color:blue;display:inline;"
+                                                   href="{{documents.document_Pathnew}}" target="_blank">
+                                                    <img class="imgpfgdownload" src="/images/Naac/filedoc.png" title="View Document" />
+                                                </a>
+                                                <a ng-if="documents.filetype=='ppt'|| documents.filetype=='pptx'" style="color:blue;display:inline;"
+                                                   href="{{documents.document_Pathnew}}" target="_blank">
+                                                    <img class="imgpfgdownload" src="/images/Naac/ppt.png" title="View PPT" />
+                                                </a>
+                                                <a ng-if="documents.filetype=='xls'|| documents.filetype=='xlsx'"
+                                                   style="color:blue;display:inline;"
+                                                   href="{{documents.document_Pathnew}}" target="_blank">
+                                                    <img class="imgpfgdownload" src="/images/Naac/excel.png" title="View Excel" />
+                                                </a>
+                                            </span>
+                                        </td>
+                                        <td class="text-center">                                          
+                                            <span ng-if="documents.ncaC633ADMTRGF_StatusFlg=='Approved'" class="">
+                                                <label style="color:blue"> Approved</label>
+                                            </span>
+                                            <span ng-if="documents.ncaC633ADMTRGF_StatusFlg!='Approved'">
+                                                <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal"
+                                                   ng-click="deleteuploadfile(documents)">
+                                                    <img class="imgpfgdownload" src="/images/Naac/delete.png" title="Delete" />
+                                                </a>
+                                            </span>
+                                        </td>
+
+                                        <td class="text-center">
+                                            <a href="javascript:void(0)" data-toggle="modal" title="VIEW COMMENT" data-target="#mymodalviewuploaddocument1" data-backdrop="static" ng-click="getorganizationdata1(documents);"> <i class="fa fa-eye text-blue"></i></a>
+                                            <span></span>
+                                            <a href="javascript:void(0)" data-toggle="modal" title="ADD COMMENT" data-target="#mymodaladdcomments1" data-backdrop="static" ng-click="addcomments1(documents);"> <i class="fa fa-comments-o text-blue"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--view comment row wise-->
+        <div class="modal fade modal-medium" id="mymodalviewuploaddocument" role="dialog" data-backdrop="static">
+            <div class="modal-dialog modal-md" style="width: 95%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" ng-click="onclosedata()" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white">Comments </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="reports">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-hover table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl.No.</th>
+                                                <th>Remarks</th>
+                                                <th>Remarks By</th>
+                                                <th>Created Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in commentlist">
+                                                <td>{{$index+1}}</td>
+                                                <td class="text-left">{{user.ncaC633ADMTRGC_Remarks}} </td>
+                                                <td class="text-left">{{user.userName}}</td>
+                                                <td class="text-left">{{user.ncaC633ADMTRGC_CreatedDate | date:'dd/MM/yyyy'}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <md-button type="button" class="md-raised md-warn" data-dismiss="modal" ng-click="onclosedata()"><i class="fa fa-close"></i> Close</md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- add comments for row wise -->
+        <div class="modal fade modal-medium" id="mymodaladdcomments" role="dialog" data-backdrop="static">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white">Add Comments</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label"> Comments :</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="">
+                                            <textarea class="form-control" name="othach" rows="10" ng-model="obj.generalcomments" id="comment"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <md-button type="button" class="md-raised md-primary" ng-click="savedatawisecomments(obj);"><i class="fa fa-save"></i> Save</md-button>
+                        <md-button type="button" class="md-raised md-warn" data-dismiss="modal"><i class="fa fa-close"></i> Close</md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--view file wise comments -->
+        <div class="modal fade modal-medium" id="mymodalviewuploaddocument1" role="dialog" data-backdrop="static">
+            <div class="modal-dialog modal-md" style="width: 95%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" ng-click="onclosedata()" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white">Comments For File </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="reports">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-hover table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl.No.</th>
+                                                <th>Remarks</th>
+                                                <th>Remarks By</th>
+                                                <th>Created Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in commentlist1">
+                                                <td>{{$index+1}}</td>
+                                                <td class="text-left">{{user.ncaC633ADMTRGFC_Remarks}} </td>
+                                                <td class="text-left">{{user.userName}}</td>
+                                                <td class="text-left">{{user.ncaC633ADMTRGFC_CreatedDate |date:'dd/MM/yyyy'}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <md-button type="button" class="md-raised md-warn" data-dismiss="modal" ng-click="onclosedata()"><i class="fa fa-close"></i> Close</md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--add comments file wise -->
+        <div class="modal fade modal-medium" id="mymodaladdcomments1" role="dialog" data-backdrop="static">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white">Add Comments</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label"> Comments :</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="">
+                                            <textarea class="form-control" name="othach" rows="10" ng-model="obj.generalcomments" id="comment"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <md-button type="button" class="md-raised md-primary" ng-click="savedatawisecomments1(obj);"><i class="fa fa-save"></i> Save</md-button>
+                        <md-button type="button" class="md-raised md-warn" data-dismiss="modal"><i class="fa fa-close"></i> Close</md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+</section>
+
+
+<div id="myModalimg" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="preview" class="img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!--<div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <object oncontextmenu="return false" width="860" id="pdf" height="1000" data="{{pdfurl}}#toolbar=0&navpanes=0"></object>
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>-->
+
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div id="pdfIdzz">
+
+            </div>
+        </div>
+
+    </div>
+</div>

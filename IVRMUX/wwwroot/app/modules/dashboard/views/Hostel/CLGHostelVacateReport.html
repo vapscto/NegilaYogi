@@ -1,0 +1,533 @@
+﻿<style>
+    .multiselect {
+        width: 22.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+
+<section class="content" data-ng-init="loaddata()">
+    <div class="">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Hostel Vacate Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3 text-center">
+                            <div class="form-group" ng-init="stuchk='student'">
+                                <div class="radio text-center well">
+                                    <label>
+                                        <input type="radio" value="student" data-ng-model="stuchk" ng-click="changeradio(stuchk)">
+                                        <span class="lbl padding-8">Student</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" value="staff" data-ng-model="stuchk" ng-click="changeradio(stuchk)">
+                                        <span class="lbl padding-8">Staff</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" value="guest" data-ng-model="stuchk" ng-click="changeradio(stuchk)">
+                                        <span class="lbl padding-8">Guest</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="stuchk=='student'">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Academic Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="acd1" ng-model="ASMAY_Id" ng-change="get_Studentdata()" ng-required="stuchk=='student'" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="acd in yeralist" value="{{acd.asmaY_Id}}" ng-selected="{{acd.asmaY_Id==ASMAY_Id}}">
+                                            {{acd.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted1(myForm.acd1)" ng-messages="myForm.acd1.$error">
+                                        <div ng-message="required">Please Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:red">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="startdate" ng-model="fromdate" md-placeholder="Select date..." required>
+                                    </md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                    <div ng-message="required" class="col-sm-8 col-sm-offset-6">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:red">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker name="enddate" ng-model="enddate" md-min-date="fromdate" md-placeholder="select date...." required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.enddate)" ng-messages="myForm.enddate.$error">
+                                    <div ng-message="required">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3 text-center">
+                            <div class="form-group" ng-init="radiobutton2='all'">
+                                <div class="radio text-center well">
+                                    <label>
+                                        <input type="radio" value="all" data-ng-model="radiobutton2" ng-click="checkradio()">
+                                        <span class="lbl padding-8">All</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" value="Hostel" data-ng-model="radiobutton2" ng-click="checkradio()">
+                                        <span class="lbl padding-8">Hostel</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" value="individual" data-ng-model="radiobutton2" ng-click="checkradio()">
+                                        <span class="lbl padding-8">Individual</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="hostelflag&&radiobutton2=='Hostel'">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Hostel Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="stdd" value="1" ng-model="usercheck" type="checkbox" data-ng-click="all_check()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label data-ng-model="HLMH_Id" ng-repeat="hostel in hostelist |filter:searchchkbx" value="{{class.hlmH_Id}}">
+                                        <input name="hostelname" value="1" data-ng-model="hostel.select" type="checkbox" ng-click="togchkbx();" ng-required="radiobutton2=='Hostel' && isOptionsRequired()">
+                                        <span class="lbl padding-8">
+                                            {{hostel.hlmH_Name}}
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="error-messages" ng-if="interacted(myForm.hostelname)" ng-messages="myForm.hostelname.$error">
+                                    <div ng-message="required" style="color:red">Select hostel name</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="studentflag &&stuchk=='student'&&radiobutton2=='individual'">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Student Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="stdd" value="1" ng-model="usercheck1" type="checkbox" data-ng-click="all_check1()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label data-ng-model="ASCMS_Id" ng-repeat="student in studentlist |filter:searchchkbx1" value="{{student.amcsT_Id}}">
+                                        <!--<input name="studname" value="1" data-ng-model="student.select" type="checkbox" ng-click="togchkbx1();" ng-required="stuchk=='student' && radiobutton2=='individual'">-->
+                                        <input name="studname" value="1" data-ng-model="student.select" type="checkbox" ng-click="togchkbx1();"  ng-required=" isOptionsRequired1()">
+                                        <span class="lbl padding-8">
+                                            {{student.studentname}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.studname)" ng-messages="myForm.studname.$error">
+                                    <div ng-message="required" style="color:red">Select student name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="staffflag&&stuchk=='staff'&&radiobutton2=='individual'">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Staff Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx2" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="stdd" value="1" ng-model="usercheck2" type="checkbox" data-ng-click="all_check2()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label data-ng-model="ASMS_Id" ng-repeat="staff in stafflist |filter:searchchkbx2" value="{{staff.hrmE_Id}}">
+                                        <input name="staffnam" value="1" data-ng-model="staff.select" type="checkbox" ng-click="togchkbx2();"
+                                               ng-required="stuchk=='staff'&& radiobutton2=='individual' && isOptionsRequired2()">
+                                        <span class="lbl padding-8">
+                                            {{staff.hrmE_EmployeeFirstName}}
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="error-messages" ng-if="interacted(myForm.staffnam)" ng-messages="myForm.staffnam.$error">
+                                    <div ng-message="required" style="color:red">Select staff name</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="guestflag &&stuchk=='guest'&&radiobutton2=='individual'">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Guest Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx3" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="stdd" value="1" ng-model="usercheck3" type="checkbox" data-ng-click="all_check3()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label data-ng-model="ASMS_Id" ng-repeat="guest in guestlist |filter:searchchkbx3" value="{{guest.hlhgstalT_Id
+                                         }}">
+                                        <input name="guestnam" value="1" data-ng-model="guest.select" type="checkbox" ng-click="togchkbx3();" ng-required="stuchk=='guest' && radiobutton2=='individual' && isOptionsRequired3()">
+                                        <span class="lbl padding-8">
+                                            {{guest.hlhgstalT_GuestName}}
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="error-messages" ng-if="interacted(myForm.guestnam)" ng-messages="myForm.guestnam.$error">
+                                    <div ng-message="required" style="color:red">Select guest name </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="text-center">
+                        <div class="">
+                            <div class="text-center">
+                                <md-button type="button" class="md-raised md-primary" ng-click="get_reportlist()" id="save-btn">
+                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                    report
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    cancel
+                                </md-button>
+                                <!--<md-button type="button" class="md-raised md-primary" ng-click="printdata()" ng-show="printflag">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="ExportToExcel('#printtable')" ng-disabled="printdoption">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Export to Excel
+                                </md-button>-->
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="studentflag&&stuchk=='student'">
+            <div class="box-header with-border">
+                <h3 class="box-title">Hostel Vacate Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{gridlistdata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filtervalue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div>
+
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No.
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('studentname')">Student Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('ASMCL_ClassName')">Course</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('ASMC_SectionName')">Semister</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLMH_Name')">Hostel Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HRMRM_RoomNo')">Room Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHSALTC_VacatedDate')"> Vacate date </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHSALTC_AllotmentDate')">Allot date </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHSALTC_VacateRemarks')">Remarks</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue=(gridlistdata | filter : search) | orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                <td>{{itemsPerPage *(currentPage-1) +$index+1}}</td>
+                                <td>{{user.studentname}}</td>
+                                <td>{{user.AMCO_CourseName}}</td>
+                                <td>{{user.AMSE_SEMName}}</td>
+                                <td>{{user.HLMH_Name}}</td>
+                                <td>{{user.HRMRM_RoomNo}}</td>
+                                <td>{{user.HLHSALTC_VacatedDate|date:dd/MM/yyyy}}</td>
+                                <td>{{user.HLHSALTC_AllotmentDate|date:dd/MM/yyyy}}</td>
+                                <td>{{user.HLHSALTC_VacateRemarks}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="staffflag&&stuchk=='staff'">
+            <div class="box-header with-border">
+                <h3 class="box-title">Hostel Vacate Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{gridlistdata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filtervalue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <table class="table table-hover table-responsive table-bordered text-center" ng-show="stuchk=='staff'">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No.
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('staffname')">Staff Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HRMD_DepartmentName')">Department</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HRMDES_DesignationName')">Designation</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLMH_Name')">Hostel Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HRMRM_RoomNo')">Room Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHSTALT_VacatedDate')"> Staff Vacate Date</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHSTALT_AllotmentDate')"> Staff Allot Date</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHSTALT_VacateRemarks')">staff Remarks</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue=(gridlistdata | filter : search) |  orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td>{{user.staffname}}</td>
+                                <td>{{user.HRMD_DepartmentName}}</td>
+                                <td>{{user.HRMDES_DesignationName}}</td>
+                                <td>{{user.HLMH_Name}}</td>
+                                <td>{{user.HRMRM_RoomNo}}</td>
+                                <td>{{user.HLHSTALT_VacatedDate | date:'dd/MM/yyyy'}}</td>
+                                <td>{{user.HLHSTALT_AllotmentDate | date:'dd/MM/yyyy'}}</td>
+                                <td>{{user.HLHSTALT_VacateRemarks}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="guestflag &&stuchk=='guest'">
+            <div class="box-header with-border">
+                <h3 class="box-title">Hostel Vacate Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{gridlistdata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filtervalue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No.
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHGSTALT_GuestName')">guest Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHGSTALT_GuestAddress')">guest Address</a>
+                                </th>
+
+                                <th>
+                                    <a href="" ng-click="sort('HLMH_Name')">Hostel Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HRMRM_RoomNo')">Room Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHGSTALT_VacatedDate')"> guest Vacate Date</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHGSTALT_AllotmentDate')"> guest Allot Date</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('HLHGSTALT_VacateRemarks')">guest Remarks</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue=(gridlistdata | filter : search) |  orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td>{{user.HLHGSTALT_GuestName}}</td>
+                                <td>{{user.HLHGSTALT_GuestAddress}}</td>
+                                <td>{{user.HLMH_Name}}</td>
+                                <td>{{user.HRMRM_RoomNo}}</td>
+                                <td>{{user.HLHGSTALT_VacatedDate | date:'dd/MM/yyyy'}}</td>
+                                <td>{{user.HLHGSTALT_AllotmentDate | date:'dd/MM/yyyy'}}</td>
+                                <td>{{user.HLHGSTALT_VacateRemarks}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>

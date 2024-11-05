@@ -1,0 +1,348 @@
+﻿<style>
+    .k-icon, .k-tool-icon {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        width: 0em !important;
+        height: 0em !important;
+        text-align: center;
+        vertical-align: middle;
+        background-image: none;
+        font: 16px/1 WebComponentsIcons;
+        speak: none;
+        font-variant: normal;
+        text-transform: none;
+        text-indent: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: inherit;
+    }
+
+    .k-filter-row th, .k-grid-header th.k-header {
+        overflow: hidden;
+        border-style: solid;
+        border-width: 0 0 1px 1px;
+        font-weight: 400;
+        white-space: normal !important;
+        text-overflow: ellipsis;
+        text-align: left;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="loaddata()" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee UserWise Daily Collection Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" ng-click="ShowHideup()"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="well text-center" ng-init="result='STW'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="STW" ng-model="result" />
+                                        <span class="lbl padding-8">Student Wise</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="TCW" ng-model="result" />
+                                        <span class="lbl padding-8">Total Collection</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMAY" name="acd_year" ng-change="onselectyear()" required>
+                                    <option value="">Select</option>
+                                    <option value="0">All</option>
+                                    <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == ASMAY}}">{{options.asmaY_Year}}</option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                <div ng-message="required" style="margin-left:195px;">Please Select the Academic Year</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                <span class="lbl padding-8">Group :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;" ng-hide="group_check_flag">*</strong></span>
+                            </label>
+                            <div class="col-sm-8">
+                                <div class="multiselect col-sm-8" style="width:100%;margin-left:0px;">
+                                    <input class="form-control" ng-model="checkallhrd1" type="checkbox" ng-change="hrdallcheck1()" />
+                                    <span class="lbl padding-8"> ALL </span>
+                                    <label ng-repeat="role in arrlistchkgroup" value="{{role.fmG_Id}}" ng-click="binddatagrp(arrlistchkgroup)">
+                                        <input ng-model="role.selected" type="checkbox" ng-disabled="group_check_flag" name="fee_group" ng-required="isOptionsRequired();" ng-selected="{{role.selected==true}}">
+                                        <span class="lbl padding-8">
+                                            {{role.fmG_GroupName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 error-messages" ng-if="interacted(myForm.fee_group)" ng-messages="myForm.fee_group.$error">
+                                    <div ng-message="required">Select Atleast one Checkbox</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="well">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-4 input-group text-right" style="">
+                                    <md-datepicker ng-model="FMCB_fromDATE" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" ng-change="fromdatechange()" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-4 input-group text-right" style="">
+                                    <md-datepicker ng-model="FMCB_toDATE" onkeydown="return false" name="To_Date" id="date2" md-placeholder="Enter  date" ng-change="todatechange()" required></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="ShowReport()">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel()" target="_blank" ng-if="showbutton == true">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-warn" ng-click="printData();" id="print-btn" ng-if="showbutton == true">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="Grid_view">
+            <div class="box-header with-border">
+                <h3 class="box-title">Report Grid View</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHiddendown">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{totcountfirst}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchString!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{students.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-offset-2 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchString" type="text" placeholder="search here..." ng-show="file_disable">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="stu">
+                    <thead style="border:solid 1px; border-color:#fff;">
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No </th>
+                            <th>Student Name</th>
+                            <th>Admission No</th>
+                            <th>Class Name</th>
+                            <th>Section Name</th>
+                            <th>Date</th>
+                            <th>Mode Of Payment</th>
+                            <th>Bank Name</th>
+                            <th>Cheque No</th>
+                            <th>Head Name</th>
+                            <th>Amount</th>
+                            <th>Receipt No</th>
+                            <th>GeneratedBy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in students1=(students |filter:searchString)  | orderBy:propertyName:reverse | filter:search |orderBy:sortKey:reverse">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.selected" ng-change="optionToggled(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.Student_Name }}</td>
+                            <td>{{ user.Admission_No }}</td>
+                            <td>{{ user.ClassName }}</td>
+                            <td>{{ user.SectionName }}</td>
+                            <td>{{ user.Date | date:"dd-MM-yyyy"}}</td>
+                            <td>{{ user.ModeOfPayment}}</td>
+                            <td>{{ user.BankName}}</td>
+                            <td>{{ user.DD_OR_CHeque_No}}</td>
+                            <td>{{ user.FMH_FeeName}}</td>
+                            <td>{{ user.Amount}}</td>
+                            <td>{{ user.Receipt_No}}</td>
+                            <td>{{ user.GeneratedBy}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="11"><b>Total</b></td>
+                            <td><b>{{totA_p}}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="printSectionIdstu" style="overflow:scroll" ng-show="tadprint">
+                    <center> <h4><u> StudentWise Daily Collection Report </u></h4></center>
+                    <table class="table table-hover table-responsive table-bordered text-center" id="student">
+                        <thead>
+                            <tr>
+                                <th>Sl No </th>
+                                <th>Student Name</th>
+                                <th>Admission No</th>
+                                <th>Class Name</th>
+                                <th>Section Name</th>
+                                <th>Date</th>
+                                <th>Mode Of Payment</th>
+                                <th>Bank Name</th>
+                                <th>Cheque No</th>
+                                <th>Head Name</th>
+                                <th>Amount</th>
+                                <th>Receipt No</th>
+                                <th>GeneratedBy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatable | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.Student_Name }}</td>
+                                <td>{{ user.Admission_No }}</td>
+                                <td>{{ user.ClassName }}</td>
+                                <td>{{ user.SectionName }}</td>
+                                <td>{{ user.Date | date:"dd-MM-yyyy"}}</td>
+                                <td>{{ user.ModeOfPayment}}</td>
+                                <td>{{ user.BankName}}</td>
+                                <td>{{ user.DD_OR_CHeque_No}}</td>
+                                <td>{{ user.FMH_FeeName}}</td>
+                                <td>{{ user.Amount}}</td>
+                                <td>{{ user.Receipt_No}}</td>
+                                <td>{{user.GeneratedBy}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="10"><b>Total</b></td>
+                                <td><b>{{totA_p}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!--Total Collection Report-->
+                <table class="table table-hover table-responsive table-bordered text-center" id="table1" ng-show="total">
+                    <thead style="border:solid 1px; border-color:#fff;">
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="ind" ng-click="toggleAlltot()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>Sl No </th>
+                            <th>Date</th>
+                            <th>Mode Of Payment</th>
+                            <th>Total Amount</th>
+                            <th>Receipt No</th>
+                            <th>GeneratedBy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in totcollection1=(totcollection |filter:searchString)  | orderBy:propertyName:reverse | filter:search |orderBy:sortKey:reverse">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.selected" ng-change="optionToggledtot(user,$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{$index+1}}</td>
+                            <td>{{user.Date | date:"dd-MM-yyyy"}}</td>
+                            <td>{{user.ModeOfPayment}}</td>
+                            <td>{{user.totalAmount}}</td>
+                            <td>{{user.Receipt_No}}</td>
+                            <td>{{user.GeneratedBy}}</td>
+                        </tr>                       
+                        <tr>
+                            <td colspan="4"><b>Total</b></td>
+                            <td><b>{{totA_p}}</b></td>
+                            <td><b>{{totA_receipt}}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="printSectionIdtot" style="overflow:scroll" ng-show="tadprint">
+                    <center> <h4><u> Total Collection Report </u></h4></center>
+                    <table class="table table-hover table-responsive table-bordered text-center" id="total">
+                        <thead>
+                            <tr>
+                                <th>Sl No </th>
+                                <th>Date</th>
+                                <th>Mode Of Payment</th>
+                                <th>Total Amount</th>
+                                <th>Receipt No</th>
+                                <th>GeneratedBy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatabletot | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                                <td>{{$index+1}}</td>
+                                <td>{{user.Date | date:"dd-MM-yyyy"}}</td>
+                                <td>{{user.ModeOfPayment}}</td>
+                                <td>{{user.totalAmount}}</td>
+                                <td>{{user.Receipt_No}}</td>
+                                <td>{{user.GeneratedBy}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"><b>Total</b></td>
+                                <td><b>{{totA_p}}</b></td>
+                                <td><b>{{totA_receipt}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+

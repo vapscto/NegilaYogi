@@ -1,0 +1,416 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="StuAttRptDropdownList();" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Overall Daily Attendance Report:</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="cat" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in yearDropdown" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected===true}}">{{option.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="categoryflag==true">
+                            <label class="control-label col-sm-4">Category:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="objj.amC_Id" name="catg" required>
+                                    <option value="">Select Category</option>
+                                    <option value="All">All</option>
+                                    <option ng-repeat="cat in categoryDropdown" value="{{cat.amC_Id}}">{{cat.amC_Name}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.catg)" ng-messages="myForm.catg.$error">
+                                    <div ng-message="required">Select Category</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="fdate" onkeydown="return false" ng-model="fromdate" md-placeholder="Enter date" md-min-date="minDatedof" md-max-date="maxDatedof" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="showReport()" id="save-btn" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="submit" ng-disabled="catreport_btn" ng-click="exportToExcel('#main_gid_export')" target="_blank" class="md-raised md-primary">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export
+                        </md-button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="catreport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Overall Daily Attendance Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="searchValue!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue1.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                <thead>
+                    <tr>
+                        <th class="hdTH">
+                            <label>
+                                <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('sno')">SL. No.</a>
+                        </th>
+
+                        <th>
+                            <a href="" ng-click="order('ASMCL_ClassName')">Class</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('ASMC_SectionName')">Section</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('TOTAL')">Strength</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('PRESENT')">Present</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('ABSENT')">Absent</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('HALFDAY')">Half Day</a>
+                        </th>
+                        <th>
+
+                            <a href="" ng-click="order('ABSENT')">Name of Absentees and Teachers</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in filterValue1 = (students | filter :searchValue)|orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td class="text-center  hdTD">
+                            <label>
+                                <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{ user.ASMCL_ClassName }}</td>
+                        <td>{{ user.ASMC_SectionName }}</td>
+                        <td>{{ user.TOTAL}}</td>
+                        <td>{{ user.PRESENT}}</td>
+                        <td>{{ user.ABSENT}}</td>
+                        <td>{{ user.HALFDAY}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Click To View Details" data-ng-model="receiptdetails"
+                               data-target="#myModal" data-ng-click="rowid(user)">
+                                Click to View Details
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                        <td hidden="hidden">{{user.ASMCL_Id}}</td>
+                        <td hidden="hidden">{{user.ASMS_ID}}</td>
+                        <!--<td><button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" ng-click="rowid(user)"> View Details</button></td>-->
+                    </tr>
+
+                    <tr>
+                        <td colspan="4">Total</td>
+                        <td>{{TOTAL}}</td>
+                        <td>{{PRESENT}}</td>
+                        <td>{{ABSENT}}</td>
+                        <td>{{HALFDAY}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Click To View Details" data-ng-model="receiptdetails"
+                               data-target="#myModal" data-ng-click="viewalldetails()">
+                                Click to View All Details
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+
+
+
+
+            </table>
+            <dir-pagination-controls max-size="4" direction-links="true" boundary-links="true"></dir-pagination-controls>
+        </div>
+
+
+
+
+
+        <div class="modal fade" id="myModal" role="dialog" ng-model="modal_div">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body" id="content_id1">
+                        <h4 class="modal-title">{{name}}</h4><br />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <p><b>Academic Year:</b>&nbsp;&nbsp;{{year_name}}</p>
+                                    <p ng-show="classshow==true"><b>Class-Section Name:</b>&nbsp;&nbsp;{{cls_sec_name}}</p>
+                                    <p><b>Total Present:</b>&nbsp;&nbsp;{{total_present}}</p>
+                                    <p><b>Half Day:</b>&nbsp;&nbsp;{{half_day}}</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <p><b>Date:</b>&nbsp;&nbsp;{{date_name|date:"dd-MM-yyyy"}}</p>
+                                    <p><b>Total Strength:</b>&nbsp;&nbsp;{{total_strength}}</p>
+                                    <p><b>Total Absent:</b>&nbsp;&nbsp;{{total_absent}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="teacher_stu_grid">
+                            <div class="col-sm-offset-8 input-group" style="margin-right:-13px;">
+                                <input class="form-control" ng-model="searchValue_model" type="text" placeholder="search here...">
+                            </div>
+                            <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                                <thead>
+                                    <tr>
+                                        <th class="hdTH">
+                                            <label>
+                                                <input type="checkbox" value="" ng-model="all_model" ng-click="toggleAll_model()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </th>
+                                        <th>
+                                            <a>SL. No.</a>
+                                        </th>
+                                        <th>
+                                            <a ng-click="order_model('name')">Absentees Names</a>
+                                        </th>
+                                        <th>
+                                            <a ng-click="order_model('HRME_EmployeeFirstName')">Teacher's Names</a>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr dir-paginate="stu_teac_name in filterValue2 = (student_teacherList_view_new | filter :searchValue_model)|orderBy:propertyName_model:reverse |itemsPerPage:itemsPerPage_model" current-page="currentPage">
+                                        <td class="text-center  hdTD">
+                                            <label>
+                                                <input type="checkbox" ng-model="stu_teac_name.selected_model" value="{{stu_teac_name.Id}}" ng-change="optionToggled_model(stu_teac_name,itemsPerPage *(currentPage-1)+$index)">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td>{{stu_teac_name.name}}</td>
+                                        <td>{{stu_teac_name.HRME_EmployeeFirstName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <dir-pagination-controls max-size="4" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                </div>
+
+                <div class="modal-footer" ng-show="model_btn">
+                    <md-button type="button" class="btn btn-default" data-dismiss="modal">Close</md-button>
+                    <md-button type="submit" ng-disabled="catreport_btn" ng-click="exportToExcel_mod('#content_id')" target="_blank" class="md-raised md-primary" ng-show="export_flag">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+
+
+
+     
+
+
+
+
+        <!----printing model----------------------------------------------------------------------------------->
+        <div class="modal fade" id="myModal" role="dialog" ng-model="modal_div">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-sm-offset-8 input-group" style="margin-right:-13px;">
+                            <input class="form-control" ng-model="searchValue_model" type="text" placeholder="search here...">
+                        </div>
+
+                        <div id="content_id">
+                            <p><b>OverAllDailyAttendance Report:</b></p>
+                            <table>
+                                <tr>
+                                    <td><b> Class-Section Name:&nbsp;&nbsp;{{cls_sec_name}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Academic Year:&nbsp;&nbsp;{{year_name}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Date:&nbsp;&nbsp;{{date_name|date:"dd-MM-yyyy"}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Total Strength:&nbsp;&nbsp;{{total_strength}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Total Present:&nbsp;&nbsp;{{total_present}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Total Absent:&nbsp;&nbsp;{{total_absent}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Half Day:&nbsp;&nbsp;{{half_day}}</b></td>
+                                </tr>
+
+                                <tr>
+                                    <td><b>Number of Selected Absentees:&nbsp;&nbsp;{{count_model}}</b></td>
+                                </tr>
+                            </table>
+
+                            <p><b>Absentees and Teacher's Names:</b></p>
+                            <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            SL. No.
+                                        </th>
+
+                                        <th>
+                                            Absentees Names
+                                        </th>
+                                        <th>
+                                            Teacher's Names
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr align="center" ng-repeat="stu_teac_name in printdatatable_model|orderBy:propertyName_model:reverse">
+                                        <td><b>{{$index+1}}</b></td>
+                                        <td><b>{{stu_teac_name.name}}</b></td>
+                                        <td><b>{{stu_teac_name.HRME_EmployeeFirstName}}</b></td>
+                                    </tr>
+                                </tbody>
+
+
+                            </table>
+                            <br />
+
+                            <!--<p>Absentees and Teachers Name:</p>-->
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" ng-show="model_btn">
+                    <md-button type="button" class="btn btn-default" data-dismiss="modal">Close</md-button>
+                    <md-button type="submit" ng-disabled="catreport_btn" ng-click="exportToExcel_mod('#content_id')" target="_blank" class="md-raised md-primary">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <!--  ------------------------------------------------->
+        <table class="table table-hover table-responsive table-bordered text-center" id="main_gid_export" ng-show="main_gid_export_flag">
+            <thead>
+                <tr>
+                    <th>
+                        SL. No.
+                    </th>
+
+                    <th>
+                        Class-Section
+                    </th>
+                    <th>
+                        Strength
+                    </th>
+                    <th>
+                        Present
+                    </th>
+                    <th>
+                        Absent
+                    </th>
+                    <th>
+                        Half Day
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr ng-repeat="user in printdatatable|orderBy:sortKey:reverse">
+                    <td style="text-align:center">{{$index+1}}</td>
+                    <td>{{ user.ASMCL_ClassName + '-' + user.ASMC_SectionName }}</td>
+                    <td>{{ user.TOTAL}}</td>
+                    <td>{{ user.PRESENT}}</td>
+                    <td>{{ user.ABSENT}}</td>
+                    <td>{{ user.HALFDAY}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

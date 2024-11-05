@@ -1,0 +1,264 @@
+
+
+<style>
+    .article {
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        padding-left: 10px;
+    }
+
+    .text-right {
+        text-align: right !important;
+    }
+</style>
+
+
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Offer And Experience Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="type" ng-model="Employee.hrmgT_Id" name="hrmgT_Id" required ng-change="getdepartment(Employee.hrmgT_Id)">
+                                        <option value="">Select</option>
+                                        <option ng-repeat="emptype in emptypedropdown" value="{{emptype.hrmgT_Id}}" ng-selected="{{emptype.Selected===true}}">
+                                            {{emptype.hrmgT_EmployeeGroupType}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.hrmgT_Id)" ng-messages="myForm.hrmgT_Id.$error">
+                                        <div ng-message="required">Select Type</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="Department" ng-model="Employee.hrmD_Id" name="Department" required ng-change="getdesignation(Employee.hrmgT_Id,Employee.hrmD_Id)" ng-disabled="departmentdisble">
+                                        <option value="">Select</option>
+                                        <option ng-repeat="emptype in departmentdropdown" value="{{emptype.hrmD_Id}}" ng-selected="{{emptype.Selected===true}}">
+                                            {{emptype.hrmD_DepartmentName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Department)" ng-messages="myForm.Department.$error">
+                                        <div ng-message="required">Select Department</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control active" id="Designation" name="Designation" ng-model="Employee.HRMDES_Id" required ng-change="GetEmployeeListByFilterSelection()" ng-disabled="designationdisble">
+                                        <option value="" ng-selected="true" label="Select">Select</option>
+                                        <option ng-repeat="emptype in designationdropdown" value="{{emptype.hrmdeS_Id}}" ng-selected="{{emptype.Selected == true}}">
+                                            {{emptype.hrmdeS_DesignationName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Designation)" ng-messages="myForm.Designation.$error">
+                                        <div ng-message="required">Select Designation</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <ui-select id="Employee" name="Employee" ng-model="Employee.hrmE_Id" required ng-change="setEmployeeDOJ(Employee.hrmE_Id)">
+                                        <ui-select-match placeholder="Select or search Employee...">
+                                            {{$select.selected.hrmE_EmployeeFirstName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="emptype in employeedropdown| filter: $select.search" value="{{emptype.hrmE_Id}}" ng-selected="{{emptype.Selected == true}}">
+                                                {{emptype.hrmE_EmployeeFirstName}} {{emptype.hrmE_EmployeeMiddleName}} {{emptype.hrmE_EmployeeLastName}}
+                                            </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Employee)" ng-messages="myForm.Employee.$error">
+                                        <div ng-message="required">Select Employee</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Current Date:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="currentdate" ng-model="Employee.hrmeR_Current_Date" onkeydown="return false" required></md-datepicker>
+                                    <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm.currentdate)" ng-messages="myForm.currentdate.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Date Of Joining:<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="hrmE_DOJ" ng-model="Employee.hrmE_DOJ" onkeydown="return false" md-min-date="minDatedoj" md-max-date="maxDatedoj" md-placeholder="Select Date" required ng-change="setdoj(Employee.hrmE_DOJ)"></md-datepicker> <!--ng-disabled="Employee.hrmeR_DOI == null"
+                                    <div class="error-messages" ng-if="interacted(myForm.hrmE_DOJ)" ng-messages="myForm.hrmE_DOJ.$error">
+                                        <div ng-message="required">Select Date Of Joining</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date Of Interview:<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="hrmeR_DOI" ng-model="Employee.hrmeR_DOI" onkeydown="return false" md-min-date="minDatedoi" md-max-date="maxDatedoi" md-placeholder="Select Date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.hrmeR_DOI)" ng-messages="myForm.hrmeR_DOI.$error">
+                                        <div ng-message="required">Select Date Of Interview</div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <!--<label class="control-label col-sm-4"> <strong style="color:red;display:inline; font-weight: bolder;"> </strong></label>-->
+                                <!--<div class="row">
+                                    <label class="radio-inline">
+                                        <input name="hrmeR_Offer_letter" type="radio" id="" value="offerletter" ng-model="Employee.hrmeR_Offer_letter" required>
+                                        <span class="lbl padding-8">Offer Letter</span>
+                                    </label>
+                                </div>-->
+                                <!--<div class="well text-center" ng-init="report='students'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="students" data-ng-model="report" />
+                                        <span class="lbl padding-8">Students</span>
+                                    </label>-->
+                                <div class="well text-center" ng-init="Employee.hrmeR_Offer_letter='experienceletter'">
+                                    <label class="radio-inline">
+                                        <input name="hrmeR_Offer_letter" type="radio" checked="checked" id="experienceletter" value="experienceletter" ng-model="Employee.hrmeR_Offer_letter" required>
+                                        <span class="lbl padding-8">Experience Certificate</span>
+                                    </label>
+                                </div>
+                                <!--<div class="row">
+                                    <label class="radio-inline">
+                                        <input name="hrmeR_Offer_letter" type="radio" id="servicecertificate" value="servicecertificate" ng-model="Employee.hrmeR_Offer_letter" required>
+                                        <span class="lbl padding-8">Service Certificate</span>
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <label class="radio-inline">
+                                        <input name="hrmeR_Offer_letter" type="radio" id="appontmentletter" value="appontmentletter" ng-model="Employee.hrmeR_Offer_letter" required>
+                                        <span class="lbl padding-8">Appointment Letter</span>
+                                    </label>
+                                </div>-->
+
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.hrmeR_Offer_letter)" ng-messages="myForm.hrmeR_Offer_letter.$error">
+                                <div ng-message="required">Select any one</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()" aria-disabled="false" ng-model="Employee.hrmeR_Offer_letter='experienceletter'">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="box box-primary" ng-show="empofferandexpletter">
+            <div class="box-header with-border">
+                <h3 class="box-title">EMPLOYEE OFFER AND EXPERIENCE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="PFChallan" id="Baldwin">
+                    <div id="PFChallan">
+
+                        <!--/Offer Letter-->
+                        <!--/Experiecnce Certificate-->
+
+                        <div class="left-width: 25px; margin-top-350" ng-if="Employee.hrmeR_Offer_letter == 'experienceletter'" id="Table">
+                            <!--<div class="left-width: 25px;">-->
+                            <div class="text-center" style="font-size:14px;">
+                                <!--<h4>{{institutionDetails.mI_Name}}</h4>
+                                <h6> {{CurrentInstuteAddress}}</h6>
+                                <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>-->
+                             
+                            </div> <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-12">
+                                    <h4 class="text-right" style="margin-bottom:50px;">
+                                        Date: {{HRMER_Current_Date  | date:"dd-MM-yyyy"}}
+                                    </h4>
+                                    </div>
+                                    <h3 class="text-center"> TO WHOMSOEVER IT MAY CONCERN</h3>
+                                    <br/>
+                                    <table class="table text-center">
+                                        <tbody>
+                                            <tr>
+                                                <td style="font-size:16px;">
+
+                                                    <p>This is to certify   that   Mr/Ms.<b>{{FullName}}</b> is a Permanent/Probationary employee of</p>
+                                                    <p>Our Institution working as a <b>{{DesignationName}}</b> since <b>{{dateofjoin | date:"dd-MM-yyyy"}}.</b></p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <br />
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="pull-left" style="font-size:14px;padding-left:25px;">
+                                                    <br />
+                                                    <br />
+                                                    <br />
+                                                    <p style="font-size:larger">Mrs. Phebe Sheela Rani</p>
+                                                    <b>	MANAGER </b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!--/Service Certificate-->
+                        <!--/Appointment  Letter-->
+
+
+
+                    </div>
+                </div>
+                <div class="text-center">
+                    <md-button type="button" ng-click="printToCart('Baldwin')" class="md-raised md-primary">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

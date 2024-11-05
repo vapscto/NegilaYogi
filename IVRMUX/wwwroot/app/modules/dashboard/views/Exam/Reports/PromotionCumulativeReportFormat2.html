@@ -1,0 +1,222 @@
+﻿
+<style>
+    .k-grid-toolbar {
+        text-align: center;
+    }
+
+    .gridTitle {
+        text-align: center;
+    }
+
+    .k-grid {
+        width: 100%;
+    }
+
+    #gridhhs table {
+        width: 100% !important;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onpageload()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Promotion Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmaY_Id" name="acdyr" required ng-change="onchangeyear()">
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in yearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdyr)" ng-messages="myForm.acdyr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmcL_Id" name="acclasss" ng-change="onchangeclass()" required>
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmcL_ClassName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acclasss)" ng-messages="myForm.acclasss.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmS_Id" name="acdsec" required ng-change="onchangesection()">
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in sectionlist" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmC_SectionName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdsec)" ng-messages="myForm.acdsec.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="left" data-ng-model="Left_Flag" ng-click="OnChangeLeftFlag()">
+                                <span class="lbl padding-8">Include Left Students</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="deactive" data-ng-model="Deactive_Flag" ng-click="OnChangeLeftFlag()">
+                                <span class="lbl padding-8">Include Deactive Students</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">
+                                <input name="allcheck" value="" ng-model="all" type="checkbox" ng-click="OnClickAll()">
+                                <span class="lbl padding-8">
+                                    Student :
+                                </span><span style="color:Red">*</span>
+                            </label>
+                            <div class="col-sm-8">
+                                <div class="multiselect">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                    <label data-ng-model="AMST_Id" ng-repeat="sub in studentlistdetails | filter:filterchkbx" value="{{sub.amsT_Id}}">
+                                        <input name="Subjectoption" value="" ng-click="individual()" ng-model="sub.checkedsub" type="checkbox" ng-required="isOptionsRequired3()">
+                                        <span class="lbl padding-8">
+                                            {{sub.amsT_FirstName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.Subjectoption)" ng-messages="myForm.Subjectoption.$error">
+                                    <div ng-message="required">Select Student</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="btndisable==false" id="save-btn" aria-disabled="false"
+                               data-ng-click="getpromotioncumulativereport()">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="printData()" ng-disabled="print_flag">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <!--<md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#A')" ng-disabled="print_flag">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>-->
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-if="reportdata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Promotion Report </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <!--<div id="gridhhs"></div>-->
+            <div style="overflow-x:auto">
+                <div id="printareaId55">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3 class="text-center">
+                                {{mI_name}}
+                            </h3>
+                            <h5 class="text-center">
+                                CLASS WISE PROMOTION CUMULATIVE REPORT
+                            </h5>
+                            <div class="row text-uppercase">
+                                <div class="col-sm-4 text-left">
+                                    <label> <b>ACADEMIC YEAR : {{yearname}} </b></label>
+                                </div>
+                                <div class="col-sm-4 text-center">
+                                    <label><b>CLASS : {{classname}}</b></label>
+                                </div>
+
+                                <div class="col-sm-4 text-right">
+                                    <label><b>SECTION : {{sectionname}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row col-sm-12">
+                        <table class="table table-bordered" id="A1">
+                            <thead>
+                                <tr>
+                                    <th style="word-wrap:break-word!important"><b>Sl.No</b></th>
+                                    <th style="word-wrap:break-word!important"><b>Student Details</b></th>
+                                    <th style="word-wrap:break-word!important"><b>Exam Name</b></th>
+                                    <th ng-repeat="sub in getsubjectlist" style="word-wrap:break-word!important"><b>{{sub.ismS_SubjectName}}</b></th>
+                                    <th style="word-wrap:break-word!important"><b>Total</b></th>
+                                    <th style="word-wrap:break-word!important"><b>Percentage</b></th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="stu in studentlist">
+                                <tr>
+                                    <td class="text-center" rowspan="{{getexamlist.length+1}}">{{$index+1}}</td>
+                                    <td class="text-center" rowspan="{{getexamlist.length+1}}">
+                                        <div class="row col-sm-12">
+                                            <b style="word-wrap:break-word !important ; font-size:medium">{{stu.amsT_FirstName}}</b>
+                                        </div>
+                                        <div class="row col-sm-12">
+                                            <b style="word-wrap:break-word !important ; font-size:medium">{{stu.amsT_AdmNo}}</b>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ng-if="getexamlist.length>0" ng-repeat="grp in getexamlist">
+                                    <td class="text-left" style="word-wrap:break-word!important">
+                                        {{grp.emE_ExamName}}
+                                    </td>
+                                    <td ng-repeat="sub in getsubjectlist">
+                                        <span ng-repeat="mrks in stu.student_marks" ng-if="sub.ismS_Id == mrks.ISMS_Id && grp.emE_Id==mrks.EME_Id">
+                                            <b ng-if="sub.apptoresult"> {{mrks.ObtainedMarks}} </b>
+                                            <b ng-if="!sub.apptoresult"> {{mrks.ObtainedGrade}} </b>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span ng-repeat="mrks in stu.student_marks" ng-if="mrks.ISMS_Id==0 && grp.emE_Id==mrks.EME_Id">
+                                            <b> {{mrks.ObtainedMarks}} </b>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span ng-repeat="mrks in stu.student_marks" ng-if="mrks.ISMS_Id==0 && grp.emE_Id==mrks.EME_Id">
+                                            <b> {{mrks.ObtainedPercentage}} </b>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

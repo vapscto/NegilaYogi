@@ -1,0 +1,340 @@
+﻿<style>
+    .tdclass {
+        background: #ffefd5 !important;
+    }
+
+    .tdclasspromoted {
+        color: Red !important;
+        font-family: Kunstler Script !important;
+        font-size: 30px !important;
+        font-weight: bold !important;
+    }
+
+    .divclass {
+        width: 80%;
+        padding-left: 10%;
+    }
+</style>
+
+<link href="css/print/JSHS/JSHSTermReportCard.css" rel="stylesheet" />
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" data-ng-submit="saveddata()" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Term Wise Cumulative Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+
+                    <div class="row">
+                        <div class="col-sm-6 ">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Academic Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="acd1" ng-model="ASMAY_Id" ng-disabled="selected_temp.length>0"
+                                            ng-change="onyearchange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="acd in year_list" value="{{acd.asmaY_Id}}" ng-selected="{{acd.Selected==true}}">
+                                            {{acd.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd1)" ng-messages="myForm.acd1.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Class:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="class" ng-model="ASMCL_Id" ng-change="onclasschange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="clas in class_list" value="{{clas.asmcL_Id}}" ng-selected="{{clas.Selected==true}}">
+                                            {{clas.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Section:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="cat" ng-model="ASMS_Id" ng-disabled="selected_temp.length>0"
+                                            ng-change="onsectionchange()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="section in section_list" value="{{section.asmS_Id}}" ng-selected="{{section.Selected==true}}">
+                                            {{section.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">Grade :<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="gr" ng-model="EMGR_Id" required>
+                                        <option value="" label="Select Grade"> </option>
+                                        <option ng-repeat="option in grade_list" value="{{option.emgR_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.emgR_GradeName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-3 error-messages" ng-if="interacted(myForm.gr)" ng-messages="myForm.gr.$error">
+                                    <div ng-message="required">Select Grade </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 ">
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-3">Term:<span style="color:Red">*</span></label>
+                                <div class="multiselect col-sm-8">
+                                    <label ng-repeat="termdetails in termlist">
+                                        <input name="option1" value="{{termdetails.ecT_Id}}" type="checkbox" ng-model="termdetails.ECT_Id"
+                                               ng-required="isOptionsRequired1();">
+                                        <span class="lbl padding-8">{{termdetails.ecT_TermName}}</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-8 error-messages" ng-if="interacted(myForm.option1)" ng-messages="myForm.option1.$error">
+                                    <div ng-message="required">Select Atleast One Term</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8">
+                                    <label> Conversion Required:</label>
+                                    <input name="mand" type="checkbox" ng-model="checkoruncheck">
+                                    <span class="lbl padding-16"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="">
+                        <div class="">
+                            <div class="text-center">
+                                <input type="hidden" ng-model="EME_ID" />
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                                    <i class="fa fa-list-alt " aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" ng-click="print_HHS02();" ng-disabled="reportdata==true">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel('#Baldwinexcel');" ng-disabled="reportdata==true">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Excel
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-if="JSHSReport==true">
+            <div class="box-body">
+                <div id="Baldwinddd">
+                    <div class="CumulativeReportBB divclass">
+                        <table class="text-center" style="width: 100%;">
+                            <tr class="row">
+                                <td colspan="{{colspan}}" class="text-center col-sm-12">
+                                    <h3>
+                                        {{inst_name}}
+                                    </h3>
+                                </td>
+                            </tr>
+                            <tr class="row">
+                                <td colspan="{{colspan}}" class="text-center col-sm-12">
+                                    <h5>
+                                        TERM WISE CUMULATIVE REPORT
+                                    </h5>
+                                </td>
+                            </tr>
+                            <tr class="row">
+                                <td colspan="{{colspan}}" class="text-uppercase col-sm-12 text-center">
+                                    <label> <b>ACADEMIC YEAR : {{yearname}} </b></label>
+                                </td>
+                            </tr>
+                            <tr class="row">
+                                <td colspan="{{colspan}}" class="text-uppercase col-sm-12 text-center">
+                                    <label><b>CLASS & SEC : {{classname}} - {{sectionname}}</b></label>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered" id="table1" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th><b>Sl No </b></th>
+                                    <th><b>Roll No</b></th>
+                                    <th><b>Student Name</b></th>
+                                    <th ng-repeat="column in temp_termlist"><b>{{column.termname}}</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in get_studentlist | orderBy:sortKey:reverse">
+                                    <td>{{ $index+1}}</td>
+                                    <td>{{ user.rollno }} </td>
+                                    <td class="text-left padding-left-5">{{ user.studentname }} </td>
+                                    <td ng-repeat="term in temp_termlist">
+                                        <span ng-repeat="marks in user.term_markslist" ng-if="term.termid==marks.termid">
+                                            {{marks.obtainedmarks}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row margin-top-50">
+                            <div class="col-sm-6 text-left">
+                                <b>Subject Teacher </b>
+                            </div>
+                            <div class="col-sm-6 text-right">
+                                <b>Principal </b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="Baldwin" ng-show="print">
+                <div class="CumulativeReportBB divclass">
+                    <table class="text-center" style="width: 100%;">
+                        <tr class="row">
+                            <td colspan="{{colspan}}" class="text-center col-sm-12">
+                                <h3>
+                                    {{inst_name}}
+                                </h3>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="{{colspan}}" class="text-center col-sm-12">
+                                <h5>
+                                    TERM WISE CUMULATIVE REPORT
+                                </h5>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="{{colspan}}" class="text-uppercase col-sm-12 text-center">
+                                <label> <b>ACADEMIC YEAR : {{yearname}} </b></label>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="{{colspan}}" class="text-uppercase col-sm-12 text-center">
+                                <label><b>CLASS & SEC : {{classname}} - {{sectionname}}</b></label>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered" id="table1" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th><b>Sl No </b></th>
+                                <th><b>Roll No</b></th>
+                                <th><b>Student Name</b></th>
+                                <th ng-repeat="column in temp_termlist"><b>{{column.termname}}</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in get_studentlist | orderBy:sortKey:reverse">
+                                <td><b>{{ $index+1}}</b></td>
+                                <td><b>{{ user.rollno }} </b> </td>
+                                <td class="text-left padding-left-5 wrap"><b>{{ user.studentname }}</b></td>
+                                <td ng-repeat="term in temp_termlist">
+                                    <span ng-repeat="marks in user.term_markslist" ng-if="term.termid==marks.termid">
+                                        <b> {{marks.obtainedmarks}}</b>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row margin-top-50">
+                        <div class="col-sm-6 text-left">
+                            <b>Subject Teacher </b>
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <b>Principal </b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="Baldwinexcel" ng-show="export">
+                <div class="">
+                    <table class="text-center" style="width: 100%;">
+                        <tr class="row" style="border : 0.5px solid black">
+                            <td colspan="{{colspan}}" style="text-align :center">
+                                <h3>
+                                    {{inst_name}}
+                                </h3>
+                            </td>
+                        </tr>
+                        <tr class="row" style="border : 0.5px solid black">
+                            <td colspan="{{colspan}}" style="text-align :center">
+                                <h5>
+                                    TERM WISE CUMULATIVE REPORT
+                                </h5>
+                            </td>
+                        </tr>
+                        <tr class="row" style="border : 0.5px solid black">
+                            <td colspan="{{colspan}}" style="text-align :center">
+                                <label> <b>ACADEMIC YEAR : {{yearname}} </b></label>
+                            </td>
+                        </tr>
+                        <tr class="row" style="border : 0.5px solid black">
+                            <td colspan="{{colspan}}" style="text-align :center">
+                                <label><b>CLASS & SEC : {{classname}} - {{sectionname}}</b></label>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered" id="table1" style="width: 100%;">
+                        <thead>
+                            <tr style="border : 0.5px solid black">
+                                <th><b>Sl No </b></th>
+                                <th><b>Roll No</b></th>
+                                <th><b>Student Name</b></th>
+                                <th ng-repeat="column in temp_termlist"><b>{{column.termname}}</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border : 0.5px solid black" ng-repeat="user in get_studentlist | orderBy:sortKey:reverse">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.rollno }} </td>
+                                <td style="text-align:left;padding-left:5px;">{{ user.studentname }} </td>
+                                <td ng-repeat="term in temp_termlist">
+                                    <span ng-repeat="marks in user.term_markslist" ng-if="term.termid==marks.termid">
+                                        {{marks.obtainedmarks}}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <br />
+                    <table>
+                        <tr style="border : 0.5px solid black">
+                            <td colspan="3" style="text-align:left">
+                                <b>Subject Teacher </b>
+                            </td>
+                            <td colspan="4" style="text-align:left">
+                                <b>Principal </b>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

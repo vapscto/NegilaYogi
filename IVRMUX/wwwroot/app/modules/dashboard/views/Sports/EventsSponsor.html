@@ -1,0 +1,151 @@
+﻿
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate ng-submit="saveRecord()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Events Sponsor Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Program Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="SPCCE_Id" name="events" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="val in events" value="{{val.spccE_Id}}" ng-selected="val.Selected==true">{{val.spccpM_Name}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.events)" ng-messages="myForm.events.$error">
+                                    <div ng-message="required">Select Event</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Sponsor:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="SPCCMSP_Id" name="sponsor" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="val in sponsorList" value="{{val.spccmsP_Id}}" ng-selected="val.Selected==true">{{val.spccmsP_SponsorName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sponsor)" ng-messages="myForm.sponsor.$error">
+                                    <div ng-message="required">Select Sponsor</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+    <div class="box box-primary" ng-show="sponsormappingList.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Events Sponsor List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+
+        </div>
+
+
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.NO.
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('eventName')">Program Name </a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sort('sponsorName')">Sponsor</a>
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="sponsors in filterValue1 = (sponsormappingList | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{sponsors.spccpM_Name}}</td>
+                        <td>{{sponsors.sponsorName}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="edit(sponsors.spccesP_Id)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            |
+                            <span ng-if="sponsors.spccesP_ActiveFlag === true">
+                                <a href="" ng-click="deactive(sponsors)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                            <span ng-if="sponsors.spccesP_ActiveFlag===false">
+                                <a href="" ng-click="deactive(sponsors)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+</section>

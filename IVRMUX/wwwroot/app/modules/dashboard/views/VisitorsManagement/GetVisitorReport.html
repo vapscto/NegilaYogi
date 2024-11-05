@@ -1,0 +1,534 @@
+﻿
+
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Visitors Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Search By:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="searchby" ng-change="change()" name="des" required>
+                                    <option value="">Select</option>
+                                    <option value="VMMV_VisitorName">Visitor Name</option>
+                                    <!--<option value="VMMV_MeetingDateTime">Meeting Date</option>-->
+                                    <option value="VMMV_VisitorContactNo">Contact No</option>
+                                    <option value="VMMV_VisitorEmailid">Email Id.</option>
+                                    <!--<option value="AMVM_To_Meet">Meet Person</option>-->
+                                    <option value="all">All</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.des)" ng-messages="myForm.des.$error">
+                                    <div ng-message="required" style="color:red">Select One Option</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6" ng-hide="columnall">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Enter {{column}} <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="meet" ng-model="txtbox" ng-required="columnall == false">
+                                <div class="error-messages" ng-if="interacted(myForm.meet)" ng-messages="myForm.meet.$error">
+                                    <div ng-message="required">Enter {{column}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6" ng-if="datevis">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Enter Date <span style="color:Red">*</span></label>
+                            <md-datepicker ng-model="qwe.VMMV_MeetingDateTime" onkeydown="return false" name="Date_visit1" md-max-date="maxDatemf" id="date1" md-placeholder="Enter date" ng-required="searchby == 'VMMV_MeetingDateTime'"></md-datepicker>
+                            <div class="error-messages" ng-if="interacted(myForm.Date_visit1)" ng-messages="myForm.Date_visit1.$error">
+                                <div ng-message="required">Please Select date</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-sm-6 col-sm-offset-2 text-center">
+                        <div class="">
+                            <div class="well text-center">
+                                <!--data-ng-init="all1 ='1'"-->
+                                <div class="form-group">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" value="1" name="all1" data-ng-model="all1">
+                                        <span class="lbl padding-8"> Between Days</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="0" name="all1" data-ng-model="all1">
+                                        <span class="lbl padding-8"> Month Wise</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.all1)" ng-messages="myForm.all1.$error">
+                                <div ng-message="required">Select any one of the radio button</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row" ng-show="all1 =='0'">
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-6 col-sm-offset-1">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">Month:<strong style="color:red;">*</strong></label>
+
+                                <div class="col-sm-6">
+                                    <select class="form-control" name="mnth" ng-model="month" ng-required="all1=='0'">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in month_list" value="{{option.monthid}}" ng-selected="option.Selected==true">
+                                            {{option.monthname}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.mnth)" ng-messages="myForm.mnth.$error">
+                                        <div ng-message="required">Please Select the month</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="row" ng-show="all1=='1'">
+
+
+                    <div class="col-sm-6">
+                        <label class="control-label col-sm-4">From Date:<strong style="color:red;">*</strong></label>
+                        <md-datepicker name="sch_date" onkeydown="return false" ng-model="startfromdate" md-max-date="maxDatemf" md-placeholder="Enter From date" ng-required="all1==1"></md-datepicker>
+
+                        <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                            <div ng-message="required">Select Date</div>
+                            <div ng-message="valid">The entered value is not a date!</div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="control-label col-sm-4">To Date:<strong style="color:red;">*</strong></label>
+                        <md-datepicker name="sch_date2" onkeydown="return false" ng-model="startenddate" md-placeholder="Enter To date" ng-required="all1==1" md-min-date="minDatemf" md-max-date="maxDatemf" ng-click="gettodate()"></md-datepicker>
+                        <div class="error-messages" ng-if="interacted(myForm.sch_date2) " ng-messages="myForm.sch_date2.$error">
+                            <div ng-message="required">Select Date</div>
+                            <div ng-message="valid">The entered value is not a date!</div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="report(qwe)" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-show="export" ng-click="exportToExcel('#printSectionId')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </md-button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+    <div  class="box box-primary" ng-show="Cumureport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Visitors report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>        
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{newuser.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-bordered text-center" id="datatable">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">
+                                SL. No.
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Visitor Name</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Contact No</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Email Id</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Date</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">In Time</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Out Time</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Meeting Location</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Status</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Purpose</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr ng-repeat="newuser1 in newuser">
+            <td>{{$index+1}}</td>-->
+                        <tr dir-paginate="obj in filterValue1 = (newuser | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td>{{obj.amvM_Name}}</td>
+                            <td>{{obj.amvM_Contact_No}}</td>
+                            <td>{{obj.amvM_Emailid}}</td>
+                            <td>{{obj.date_Visit | date:'dd/MM/yyyy'}}</td>
+                            <td>{{obj.time_Visit}}</td>
+                            <td>{{obj.amvM_Out_Time}}</td>
+                            <td>{{obj.VMMV_MeetingLocation}}</td>
+                            <td>{{obj.amvM_Status}}</td>
+                            <td>{{obj.amvM_Purpose}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" id="currentPage">
+                </dir-pagination-controls>
+
+    </div>
+
+    <!--print Export data starts-->
+    <div id="printSectionId" ng-show="table_flag">
+
+        <!--<center><h4>Visitors Report</h4></center>-->
+
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+
+        <!--<table class="table margin-top-10">
+        <tr>
+            <td colspan="4" class="text-right" style="font-size:large"><b>Visitors Report</b> </td>
+            <td></td>
+            <td></td>
+            <td> </td>
+        </tr>
+    </table>-->
+
+        <h3 class="text-center">VISITORS REPORT</h3>
+
+        <table class="table-bordered" id="table">
+            <thead>
+                <tr>
+                    <th>
+                        SL. No.
+                    </th>
+                    <th style="text-align:center;width:13%">
+                        <a href="" ng-click="sort('')">Visitor Name</a>
+                    </th>
+                    <th style="text-align:center">
+                        <a href="" ng-click="sort('')">Contact No</a>
+                    </th>
+                    <th style="text-align:center; width:16%">
+                        <a href="" ng-click="sort('')">Email Id</a>
+                    </th>
+                    <th style="text-align:center">
+                        <a href="" ng-click="sort('')">Date</a>
+                    </th>
+                    <th style="text-align:center">
+                        <a href="" ng-click="sort('')">In Time</a>
+                    </th>
+                    <th style="text-align:center">
+                        <a href="" ng-click="sort('')">Out Time</a>
+                    </th>
+                    <th style="text-align:center">
+                        <a href="" ng-click="sort('')">Status</a>
+                    </th>
+                    <th style="text-align:center">
+                        <a href="" ng-click="sort('')">Purpose</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in filterValue1">
+                    <td>{{$index+1}}</td>
+                    <td>{{user.amvM_Name}}</td>
+                    <td>{{user.amvM_Contact_No}}</td>
+                    <td>{{user.amvM_Emailid}}</td>
+                    <td>{{user.date_Visit | date:'dd/MM/yyyy'}}</td>
+                    <td>{{user.time_Visit}}</td>
+                    <td>{{user.amvM_Out_Time}}</td>
+                    <td>{{user.amvM_Status}}</td>
+                    <td>{{user.amvM_Purpose}}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="9" class="text-center">
+
+                        <label>
+
+                            Date:{{ddate|date:'dd/MM/yyyy'}} &nbsp;&nbsp; UserName: {{usrname}}  {{coptyright}}
+                        </label>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+</section>
+
+
+
+<!------------------///////////////////////////------------------------OLD CODE------------------------///////////////////////////////////////////-->
+
+<!--<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Visitors Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6" col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Search By:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="searchby" ng-change="change()" name="des" required>
+                                    <option value="">Select</option>
+                                    <option value="AMVM_Name">Name</option>
+                                    <option value="Date_Visit">Date</option>
+                                    <option value="AMVM_Contact_No">Contact No</option>
+                                    <option value="AMVM_To_Meet">Meet Person</option>
+                                    <option value="all">All</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.des)" ng-messages="myForm.des.$error">
+                                    <div ng-message="required" style="color:red">Select One Option</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6" ng-hide="columnall">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Enter {{column}} <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="meet" ng-model="txtbox" ng-required="columnall == false">
+                                <div class="error-messages" ng-if="interacted(myForm.meet)" ng-messages="myForm.meet.$error">
+                                    <div ng-message="required">Enter {{column}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6" ng-if="datevis">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Enter Date <span style="color:Red">*</span></label>
+                            <md-datepicker ng-model="qwe.Date_visit" onkeydown="return false" name="Date_visit1" md-max-date="maxDatemf" id="date1" md-placeholder="Enter date" ng-required="searchby == 'Date_Visit'"></md-datepicker>
+                            <div class="error-messages" ng-if="interacted(myForm.Date_visit1)" ng-messages="myForm.Date_visit1.$error">
+                                <div ng-message="required">Please Select date</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="report(qwe)" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-show="export" ng-click="exportToExcel('#datatable')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </md-button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+    <div id="printSectionId" class="box box-primary" ng-show="Cumureport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Visitors report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="StudentBook2" id="Baldwin">
+            <div style="padding-top:20px">
+
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                          
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                           
+                        </div>
+                    </div>
+                   
+                </div>
+                <table class="table table-bordered text-center" id="datatable">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">
+                                SL. No.
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Visitor Name</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Contact No</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Email Id</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Date</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">In Time</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Out Time</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Status</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Purpose</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="newuser1 in newuser" >
+                            <td>{{$index+1}}</td>
+                            <td>{{newuser1.amvM_Name}}</td>
+                            <td>{{newuser1.amvM_Contact_No}}</td>
+                            <td>{{newuser1.amvM_Emailid}}</td>
+                            <td>{{newuser1.date_Visit | date:'dd/MM/yyyy'}}</td>
+                            <td>{{newuser1.time_Visit}}</td>
+                            <td>{{newuser1.amvM_Out_Time}}</td>
+                            <td>{{newuser1.amvM_Status}}</td>
+                            <td>{{newuser1.amvM_Purpose}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            
+            </div>
+        </div>
+    </div>-->
+
+    <!--print Export data starts-->
+    <!--<div id="printSectionId" ng-show="table_flag">
+        <div class="baldwin text-center">
+            <center><h4>Visitors Report</h4></center>
+            <hr />
+        </div>
+
+        <table class="table-bordered" id="table">
+            <thead>
+                <tr>
+                    <th style="text-align:center">Name</th>
+                    <th style="text-align:center">Contact No</th>
+                    <th style="text-align:center">Email Id</th>
+                    <th style="text-align:center">Date</th>
+                    <th style="text-align:center">In time</th>
+                    <th style="text-align:center">Out Time</th>
+                    <th style="text-align:center">Status</th>
+                    <th style="text-align:center">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in newuser">
+                    <td>{{user.amvM_Name}}</td>
+                    <td>{{user.amvM_Contact_No}}</td>
+                    <td>{{user.amvM_Emailid}}</td>
+                    <td>{{user.date_Visit | date:'dd/MM/yyyy'}}</td>
+                    <td>{{user.time_Visit}}</td>
+                    <td>{{user.amvM_Out_Time}}</td>
+                    <td>{{user.amvM_Status}}</td>
+                    <td>{{user.amvM_Purpose}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>-->
+
+<!--</section>-->

@@ -1,0 +1,900 @@
+﻿<style>
+    .multiselect {
+        width: 22.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate ng-submit="saveRecord()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Events Student Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="asmaY_Id" name="acdYear" ng-change="acdyrChange()" ng-disabled="spccesT_Id > 0" required>
+                                        <option value="">--Select Academic Year --</option>
+                                        <option ng-repeat="val in academicYear" value="{{val.asmaY_Id}}" ng-selected="val.asmaY_Id==asmaY_Id">
+                                            {{val.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acdYear)" ng-messages="myForm.acdYear.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--ng-change="comcatwise_classAgefilter()"-->
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Competition Category:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="comcat_idcls" name="clscategory" ng-disabled="spccesT_Id > 0">
+                                        <option value="">--Select Competition Category--</option>
+                                        <option ng-repeat="val in categoryListttCls" value="{{val.comcat_idcls}}" ng-selected="val.comcat_idcls==comcat_idcls">
+                                            {{val.comptcatenamecls}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.clscategory)" ng-messages="myForm.clscategory.$error">
+                                        <div ng-message="required">Select Competition Category</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Venue :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="spccmeV_Id" name="event">
+                                        <option value="">--Select Venue--</option>
+                                        <option ng-repeat="val in eventsListVenue" value="{{val.spccmeV_Id}}" ng-selected="val.spccmeV_Id==spccmeV_Id">
+                                            {{val.spccmeV_EventVenue}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.event)" ng-messages="myForm.event.$error">
+                                        <div ng-message="required">Select Venue </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Main Event:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="spccmsccG_Id" name="GRP" required ng-change="get_SportsName()" ng-disabled="spccesT_Id > 0">
+                                        <option value="">--Select Main Event --</option>
+                                        <option ng-repeat="val in spcgrplist_new" value="{{val.spccmsccG_Id}}" ng-selected="val.spccmsccG_Id==spccmsccG_Id">
+                                            {{val.spccmsccG_SportsCCGroupName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.GRP)" ng-messages="myForm.GRP.$error">
+                                        <div ng-message="required">Select Group Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Sub sub Event:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="spccmsccG_Idsub" name="GRPPP" required ng-disabled="spccesT_Id > 0">
+                                        <option value="">--Select Sub sub Event --</option>
+                                        <option ng-repeat="val in spcgrplist_newsub" value="{{val.spccmsccG_Id}}" ng-selected="val.spccmsccG_Id==spccmsccG_Idsub">
+                                            {{val.spccmsccG_SportsCCGroupName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.GRPPP)" ng-messages="myForm.GRPPP.$error">
+                                        <div ng-message="required">Select Sub sub Event </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Class Name :<!--<span style="color:Red">*</span>--></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbxclass23" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="cls1123" value="1" ng-model="usercheckclass23" type="checkbox" data-ng-click="all_checkclass23()" ng-disabled="addbutton==false">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <!--ng-change="get_ComCatgrylist();"-->
+                                    <label ng-repeat="cls in listof_classtwo |filter:searchchkbx23" value="{{cls.class_id}}">
+                                        <input name="classss" value="1" ng-model="cls.classselect23" type="checkbox" ng-click="togchkbxclass23();" ng-disabled="addbutton==false">
+                                        <span class="lbl padding-8">
+                                            {{cls.classname}}
+                                        </span>
+                                    </label>
+                                    <!--<div class="error-messages" ng-if="interacted(myForm.cls1123)" ng-messages="myForm.cls1123.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>-->
+                                    <!--<label ng-repeat="mi in listof_classtwo">
+                                    <input ng-model="mi.classselect23" value="1" ng-click="togchkbxclass23();" type="checkbox">
+                                    <span class="lbl padding-8">
+                                    {{mi.classname}}
+                                    </span>
+                                    </label>-->
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Student Name :<!--<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong>--></label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="std11" value="1" ng-model="usercheck" type="checkbox" data-ng-click="all_check()" ng-disabled="addbutton==false">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="student in studentDropdown23 |filter:filterchkbx" value="{{student.amsT_Id}}">
+                                        <input name="std3434" data-ng-model="student.stud" type="checkbox" ng-click="togchkbx();" ng-required="isOptionsRequired()" ng-disabled="addbutton==false">
+                                        <span class="lbl padding-8">
+                                            {{student.studentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Competition Name:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="spccmE_Id" name="events" ng-disabled="spccesT_Id > 0" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="val in eventname" value="{{val.spccmE_Id}}" ng-selected="val.spccmE_Id==spccmE_Id">
+                                            {{val.spccmE_EventName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.events)" ng-messages="myForm.events.$error">
+                                        <div ng-message="required">Select Event</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Competition Level:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="spccmcL_Id" name="compition" ng-disabled="spccesT_Id > 0" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="val in compitionLevelList" value="{{val.spccmcL_Id}}" ng-selected="val.spccmcL_Id==spccmcL_Id">
+                                            {{val.spccmcL_CompitionLevel}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.compition)" ng-messages="myForm.compition.$error">
+                                        <div ng-message="required">Select Competition Level</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Sub Event :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="spccmscC_Id" name="sports" ng-disabled="spccesT_Id > 0" required ng-change="get_uom_Name()">
+                                        <option value="">--Select Sub Event --</option>
+                                        <option ng-repeat="val in sportsCCList" value="{{val.spccmscC_Id}}" ng-selected="val.spccmscC_Id==spccmscC_Id">
+                                            {{val.spccmscC_SportsCCName}}
+
+                                        </option>
+                                    </select>
+                                    <!--<select class="form-control" ng-model="spccmscC_Id" name="sports" ng-disabled="spccesT_Id > 0" required ng-change="get_uom_Name()">
+                                        <option value="">--Select Sub Event --</option>
+                                        <option ng-repeat="val in sportsCCList" value="{{val.spccmsccG_Id}}" ng-selected="val.spccmsccG_Id==spccmscC_Id">
+                                            {{val.spccmsccG_SportsCCGroupName}}
+
+                                        </option>
+                                    </select>-->
+
+                                    <div class="error-messages" ng-if="interacted(myForm.sports)" ng-messages="myForm.sports.$error">
+                                        <div ng-message="required">Select Sub Event</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Start Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8" style="padding-left:0px;">
+                                    <md-datepicker name="startdate" ng-model="spccE_StartDate" md-placeholder="Select date..." md-min-date="minDatef" md-max-date="maxDatef" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.startdate)" ng-messages="myForm.startdate.$error">
+                                        <div ng-message="required">Please Select Start Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">End Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8" style="padding-left:0px;">
+                                    <md-datepicker name="enddate" ng-model="spccE_EndDate" md-placeholder="Select date..." md-min-date="minDatef" md-max-date="maxDatef" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.enddate)" ng-messages="myForm.enddate.$error">
+                                        <div ng-message="required">Please Select Start Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">UOM:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" ng-model="spccmuoM_Id" name="uommm" ng-disabled="spccesT_Id > 0" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="val in uomList" value="{{val.spccmuoM_Id}}" ng-selected="val.spccmuoM_Id==spccmuoM_Id">
+                                            {{val.spccmuoM_UOMName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.uommm)" ng-messages="myForm.uommm.$error">
+                                        <div ng-message="required">Select UOM</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section Name :</label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx23" type="text" placeholder="search here...">
+                                    <label>
+                                        <input name="sec11" value="1" ng-model="usercheck23" type="checkbox" data-ng-click="all_check23()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="sec in sectionList |filter:searchchkbx23" value="{{sec.asmS_Id}}">
+                                        <input name="sect" value="1" data-ng-model="sec.sectionsecl" type="checkbox" ng-click="togchkbx23();" ng-change="sectionWiseCompStudentList()">
+                                        <span class="lbl padding-8">
+                                            {{sec.asmC_SectionName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Remarks:</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" id="comment" name="remarks" ng-model="spccesT_Remarks" placeholder="Enter Remarks..." maxlength="150"></textarea>
+                                    <div class="error-messages " ng-if="interacted(myForm.remarks)" ng-messages="myForm.remarks.$error">
+                                        <div ng-message="required">Enter Remarks</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="student_flag">
+                    <div class="col-sm-12">
+                        <div style="overflow-y:scroll; height:233px;width:100%;">
+                            <table class="table table-responsive table-bordered text-left" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <label>
+                                                <input name="tad11" ng-true-value="true" ng-false-value="false" ng-model="userselect" type="checkbox" ng-click="check_allbox()">
+                                                <span class="lbl padding-8">
+                                                </span>
+                                            </label>
+                                        </th>
+                                        <th>SL.No</th>
+                                        <th><a href="" ng-click="sortTableData('studentName')">Student Name</a></th>
+                                        <th><a href="" ng-click="sortTableData('amsT_AdmNo')">Adm No.</a></th>
+                                        <th><a href="" ng-click="sortTableData('asmcL_ClassName')">Class</a></th>
+                                        <th><a href="" ng-click="sortTableData('asmC_SectionName')">Section</a></th>
+                                        <th><a href="" ng-click="sortTableData('spccmH_HouseName')">House</a></th>
+                                        <th>Point</th>
+                                        <th>Place</th>
+                                        <th><a href="" ng-click="sortTableData('spccestR_Remarks')">Remark</a></th>
+                                        <th><a href="" ng-click="sortTableData('spccestR_RecordBrokenFlag')">RecordBroken</a></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="user in studentlsitdata">
+                                        <td>
+                                            <label style="margin-left:5px;">
+                                                <input type="checkbox" ng-model="user.selected" ng-true-value="true" ng-false-value="false" ng-change="get_studlistt(user)">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                        <td class="text-left">{{$index+1}}</td>
+                                        <td class="text-left">{{user.studentName}}</td>
+                                        <td class="text-left">{{user.amsT_AdmNo}} </td>
+                                        <td class="text-left">{{user.asmcL_ClassName}}</td>
+                                        <td class="text-left">{{user.asmC_SectionName}}</td>
+                                        <td class="text-left">{{user.spccmH_HouseName}}</td>
+                                        <td>
+                                            <span ng-if="user.ivrmgC_SportsPointsDropdownFlg==0">
+                                                <input type="text" ng-model="user.spccestR_Points" maxlength="2" allow-pattern="[0-9]" size="10" />
+                                            </span>
+                                            <span ng-if="user.ivrmgC_SportsPointsDropdownFlg==1">
+                                                <select class="form-control" ng-model="user.spccestR_Points" name="uom">
+                                                    <option value="">--Select--</option>
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                </select>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" ng-model="user.spccestR_Rank" name="uom">
+                                                <option value="">--Select--</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" ng-model="user.spccestR_Remarks" /></td>
+                                        <td>
+                                            <label style="margin-left:5px;">
+                                                <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="user.spccestR_RecordBrokenFlag" />
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <br />
+
+
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="spccesT_Id" value="{{spccesT_Id}}" />
+                    <input type="hidden" ng-model="spccestR_Id" value="{{spccestR_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-show="eventsStudentRecordList.length > 0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Events Student Mapping List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{eventsStudentRecordList.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="overflow-y:auto;width:100%">
+                    <table class="table table-hover table-responsive table-bordered text-center" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.NO.
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('asmaY_Year')">Year</a>
+                                </th>
+
+                                <th>
+                                    <a href="" ng-click="sort('categoryName')">Competition Category</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('compitionLevel')">Competition Level</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('eventName')">Competition Name </a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('spccmsccG_Id')">Main Event</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('sportsName')">Sub Event</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('spccmsccG_SportsCCGroupName')">Sub Sub Event</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('spccE_StartDate')">Start Date</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('spccE_EndDate')">End Date</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('spccmeV_EventVenue')">Venue Name</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort('uomName')">UOM</a>
+                                </th>
+
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="student in filterValue1 = (eventsStudentRecordList | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                <!--ng-class-odd="'odd'"-->
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                                <td>{{student.asmaY_Year}}</td>
+                                <td>{{student.categoryName}}</td>
+                                <td>{{student.compitionLevel}}</td>
+                                <td>{{student.eventName}}</td>
+                                <td>{{student.mainEvent}}</td>
+                                <td>{{student.sportsName}}</td>
+                                <td>{{student.spccmsccG_SportsCCGroupName}}</td>
+                                <td>{{student.StartDate | date:'dd/MM/yyyy'}}</td>
+                                <td>{{student.EndDate | date:'dd/MM/yyyy'}}</td>
+                                <td>{{student.SPCCMEV_EventVenue}}</td>
+                                <td>{{student.uomName}}</td>
+                                <td class="text-center">
+                                    <!--ng-if="student.SPCCESTR_Value!=0 || student.SPCCESTR__Rank!=0"-->
+                                    <span>
+                                        <a href="javascript:void(0)" ng-click="viewstudentBook(student)" data-placement="bottom" data-toggle="tooltip"
+                                           title="View Student">
+                                            <i class="fa fa-eye" style="color: black;" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+
+                                    <a href="javascript:void(0)" ng-click="editdata(student)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    </a>
+
+                                    <span ng-if="student.SPCCESTR_Value==0 && student.SPCCESTR__Rank==0">
+                                        <a href="javascript:void(0)" ng-click="Deletemastercastedata(student)" data-toggle="tooltip" title="Delete"><i class="fa fa-trash text-danger" aria-hidden="true"></i></a>
+
+                                    </span>
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+        <!---For Student Details  data-backdrop="false"  -->
+        <div id="myModalstudentd" class="modal fade" role="dialog" data-backdrop="false">
+            <div class="modal-dialog modal-lg" style="width: 80%;">
+                <div class="modal-content">
+                    <div class="model-header custom-header">
+                        <center><h4 class="modal-title custom">Student Details</h4></center>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{modlastudlist.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="search3!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue3.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" type="text" ng-model="search3" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+
+                            <table class="table table-bordered table-hover table-responsive text-center">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            SL.No.
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('studentName')">Student Name</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('amsT_AdmNo')">AdmNo</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('asmcL_ClassName')">Class Name</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('asmC_SectionName')">Section Name</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('spccestR_Points')">Points</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('spccestR_Rank')">Place</a>
+                                        </th>
+                                        <th>
+                                            <a href="" ng-click="sort('spccestR_Remarks')">Remarks</a>
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="user in filterValue3=(modlastudlist | filter : search3) | orderBy:sortKey:reverse3 |itemsPerPage:itemsPerPage3" current-page="currentPage3">
+                                        <!--<tr ng-repeat="user in modlastudlist">-->
+                                        <td>{{itemsPerPage3 *(currentPage3-1)+$index+1}}</td>
+
+                                        <!--<td>{{$index+1}}</td>-->
+                                        <td>{{user.studentName}}</td>
+                                        <td>{{user.amsT_AdmNo}}</td>
+                                        <td>{{user.asmcL_ClassName}}</td>
+                                        <td>{{user.asmC_SectionName }}</td>
+                                        <td>{{user.spccestR_Points}}</td>
+                                        <td>{{user.spccestR_Rank}}</td>
+                                        <td>{{user.spccestR_Remarks }}</td>
+                                        <td style="text-align:center">
+                                            <span ng-if="!user.spccestR_ActiveFlag">
+                                                <a href="" ng-click="Deactivatestud(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    Activate
+                                                </a>
+                                            </span>
+                                            <span ng-if="user.spccestR_ActiveFlag">
+                                                <a href="" ng-click="Deactivatestud(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    Deactivate
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="5"
+                                                     direction-links="true"
+                                                     boundary-links="true" id="currentPage3">
+                            </dir-pagination-controls>
+                        </div>
+                        <div class="modal-footer custom-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+<div id="myModalstudentList" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+                <h4 class="modal-title text-white"> Student Details </h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{studentlsitdataModalT.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" type="text" ng-model="search3" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12" style="overflow:auto !important">
+
+                        <table class="table table-responsive table-bordered" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label>
+                                            <input name="tad11" ng-true-value="true" ng-false-value="false" ng-model="obj.userselecttwo" type="checkbox" ng-click="check_allboxthree()">
+                                            <span class="lbl padding-8">
+                                            </span>
+                                        </label>
+                                    </th>
+                                    <th>SL.No</th>
+                                    <th><a href="" ng-click="sortTableData('studentName')">Student Name</a></th>
+                                    <th><a href="" ng-click="sortTableData('amsT_AdmNo')">Adm No.</a></th>
+                                    <th><a href="" ng-click="sortTableData('asmcL_ClassName')">Class</a></th>
+                                    <th><a href="" ng-click="sortTableData('asmC_SectionName')">Section</a></th>
+                                    <!--<th>Point</th>-->
+                                    <th>Place</th>
+                                    <th>Uom</th>
+                                    <th><a href="" ng-click="sortTableData('spccestR_Remarks')">Remark</a></th>
+                                    <th><a href="" ng-click="sortTableData('spccestR_RecordBrokenFlag')">RecordBroken</a></th>
+                                    <th>Ponit Value</th>
+                                </tr>
+                            </thead>
+
+                            <tbody ng-repeat="user in employeeid |filter:search">
+
+                                <tr>
+                                    <td rowspan="{{user.detailsstudent.length+1}}">
+                                        <label style="margin-left:5px;">
+                                            <input type="checkbox" ng-model="user.selected" ng-true-value="true" ng-false-value="false" ng-click="get_studlistt(user)">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center" rowspan="{{user.detailsstudent.length+1}}">{{$index+1}}</td>
+                                    <td class="text-left" rowspan="{{user.detailsstudent.length+1}}"><b>{{user.studentName}} </b></td>
+                                    <td class="text-left" rowspan="{{user.detailsstudent.length+1}}"><b>{{user.amsT_AdmNo}} </b></td>
+                                    <td class="text-left" rowspan="{{user.detailsstudent.length+1}}"><b>{{user.asmcL_ClassName}} </b></td>
+                                    <td class="text-left" rowspan="{{user.detailsstudent.length+1}}"><b>{{user.asmC_SectionName}} </b></td>
+                                    <!--<td rowspan="{{user.detailsstudent.length+1}}">
+
+                                        <span>
+                                            <input type="text" ng-model="user.spccestR_Points" maxlength="2" allow-pattern="[0-9]" size="10" placeholder="Points" />
+                                        </span>
+                                        <span ng-if="user.ivrmgC_SportsPointsDropdownFlg==1">
+                                            <select class="form-control" ng-model="user.spccestR_Points">
+                                                <option value="">--Select--</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                            </select>
+                                        </span>
+                                    </td>-->
+                                    <td rowspan="{{user.detailsstudent.length+1}}">
+                                        <select ng-model="user.spccestR_Rank" ng-change="Validations(user)">
+                                            <option value="">--Select--</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                        </select>
+                                    </td>
+                                    <td rowspan="{{user.detailsstudent.length+1}}">
+                                        <select ng-model="user.spccmuoM_Id">
+                                            <option value="">--Select Uom--</option>
+                                            <option ng-repeat="val in uomListtemp" value="{{val.spccmuoM_Id}}" ng-selected="val.spccmuoM_Id==user.spccmuoM_Id">
+                                                {{val.spccmuoM_UOMName}}
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td rowspan="{{user.detailsstudent.length+1}}"><input type="text" ng-model="user.spccestR_Remarks" placeholder="Remark" /></td>
+                                    <td rowspan="{{user.detailsstudent.length+1}}">
+                                        <label style="margin-left:5px;">
+                                            <input type="checkbox" ng-model="user.spccestR_RecordBrokenFlag" />
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td rowspan="{{user.detailsstudent.length+1}}">
+
+                                        <span ng-if="user.spccmscC_MultiAttemptFlg==false ">
+                                            <input type="text" ng-model="user.spccestR_Value" placeholder="Value" />
+                                        </span>
+                                        <span ng-if="user.spccmscC_MultiAttemptFlg==true">
+                                            <a href="javascript:void(0)" ng-click="ViewAllMultipLe(user)">
+                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                            </a>
+
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <!--<tr ng-repeat="user in studentlsitdataModalT |filter:search3">
+                                    <td>
+                                        <label style="margin-left:5px;">
+                                            <input type="checkbox" ng-model="user.selected" ng-true-value="true" ng-false-value="false" ng-change="get_studlistt(user)">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-left">{{$index+1}}</td>
+                                    <td class="text-left">{{user.studentName}}</td>
+                                    <td class="text-left">{{user.amsT_AdmNo}} </td>
+                                    <td class="text-left">{{user.asmcL_ClassName}}</td>
+                                    <td class="text-left">{{user.asmC_SectionName}}</td>
+
+                                    <td>
+
+                                        <span>
+                                            <input type="text" ng-model="user.spccestR_Points" maxlength="2" allow-pattern="[0-9]" size="10" placeholder="Points" />
+                                        </span>
+                                        <span ng-if="user.ivrmgC_SportsPointsDropdownFlg==1">
+                                            <select class="form-control" ng-model="user.spccestR_Points" name="uom">
+                                                <option value="">--Select--</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                            </select>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <select ng-model="user.spccestR_Rank" name="uom">
+                                            <option value="">--Select--</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select ng-model="user.spccmuoM_Id">
+                                            <option value="">--Select Uom--</option>
+                                            <option ng-repeat="val in uomListtemp" value="{{val.spccmuoM_Id}}" ng-selected="val.spccmuoM_Id==user.spccmuoM_Id">
+                                                {{val.spccmuoM_UOMName}}
+                                            </option>
+                                        </select>
+                                    </td>
+
+                                    <td><input type="text" ng-model="user.spccestR_Remarks" placeholder="Remark" /></td>
+                                    <td>
+                                        <label style="margin-left:5px;">
+                                            <input type="checkbox" ng-model="user.spccestR_RecordBrokenFlag" />
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <span ng-if="user.spccmscC_MultiAttemptFlg==false || user.spccmscC_MultiAttemptFlg=null">
+                                            <input type="text" ng-model="user.spccestR_Value" placeholder="Value" />
+                                        </span>
+                                        <span ng-if="user.spccmscC_MultiAttemptFlg==true">
+                                            <a href="javascript:void(0)" ng-click="ViewAllMultipLe(user)">
+                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                            </a>
+
+                                        </span>
+
+                                    </td>
+                                </tr>-->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-12 text-center">
+                        <input type="hidden" ng-model="spccesT_Idtwo" value="{{spccestR_Id}}" />
+                        <md-button class="md-raised md-primary" id="save-btn" ng-click="UpdateStudent()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Update
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<div id="myModalTax" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Multiple Details</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="col-sm-8 text-center col-sm-offset-1">
+                            <table class="table table-responsive table-bordered" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Attempt</th>
+                                        <th>Points Value</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="materal in materaldocuupload">
+                                        <td class="text-center">
+                                            {{$index+1}}
+                                        </td>
+
+                                        <td>
+                                            <input type="text" ng-model="materal.spccestR_Value" class="form-control" placeholder="Values" maxlength="10" />
+
+
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <a href="" ng-show="$last" ng-click="addgrnrows()">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="" id="remove" ng-hide="materaldocuupload.length ==1">
+                                                <a href="" ng-click="removegrnrows($index,objg)">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-primary" data-ng-click="addtocart()" data-dismiss="modal"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Add </md-button>
+            </div>
+        </div>
+    </div>
+</div>

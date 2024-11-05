@@ -1,0 +1,1036 @@
+﻿
+<div data-ng-init="loaddata()" class="HHChallan">
+    <section class="content">
+        <form class="form-horizontal" role="form" method="post" name="myForm">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Bank Challan</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="col-sm-6" ng-if="enableStudDrpdwn==true">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="obj.ASMAY_Id" ng-change="onselectacademic(obj)">
+                                        <option value="" label="Select Academic year"> </option>
+                                        <option ng-repeat="option in yearlst" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == ASMAY_Id}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Search Student:<span style="color:Red">*</span></label>
+
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="studentname" ng-model="$parent.obj.Amst_Id" ng-disabled="accchange" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="clearcheckbox($parent.obj.Amst_Id)" title="Select Student">
+
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.studentName}}:{{$select.selected.admNo}}</ui-select-match>
+
+                                        <ui-select-choices repeat="option in admsudentslist | filter: $select.search " value="{{option.amst_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.studentName+':'+option.admNo | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row" ng-if="FMC_GroupOrTermFlg=='G'">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Select Group :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong>
+                                </label>
+                                <div class="multiselect col-sm-7">
+                                    <label ng-repeat="grp in grouplist">
+                                        <input value="{{grp.fmG_Id}}" data-ng-model="grp.Selected1" type="checkbox" ng-required="isOptionsRequired1()" name="groupname">
+                                        <span class="lbl padding-8">{{grp.fmG_GroupName}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.groupname)" ng-messages="myForm.groupname.$error">
+                                <div ng-message="required">Select Group</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="FMC_GroupOrTermFlg=='T'">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Select Terms :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong>
+                                </label>
+                                <div class="multiselect col-sm-7">
+                                    <label ng-repeat="term in termList">
+                                        <input value="{{term.fmT_Id}}" data-ng-model="term.Selected2" type="checkbox" ng-required="isOptionsRequired2()" name="termname" ng-disabled="term.disablepaisterms" ng-click="Ischallangenerated(term,$index,obj.amst_Id)">
+                                        <span class="lbl padding-8">{{term.fmT_Name}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.termname)" ng-messages="myForm.termname.$error">
+                                <div ng-message="required">Select Terms</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-click="generateChallan(obj)" ng-disabled="form.$invalid" id="save-btn">
+                                <i class="fa fa-save" aria-hidden="true"></i>
+                                Download Challan
+                            </md-button>
+                            <!--<button type="submit" class="btn btn-info btn-md" data-toggle="modal" data-target="#myModal3" data-backdrop="static" ng-click="generateChallan()">Challan</button>-->
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="Cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="myModal3" role="dialog" data-backdrop="false">
+                        <!--ng-if="showChallan==true"-->
+                        <div class="modal-dialog modal-lg">
+                            <!-- Modal content-->
+                            <div class="modal-content">
+
+                                <div class="modal-footer">
+                                    <h4 class="modal-title text-white pull-left" style="color:blue;">Challan</h4>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="Cancel()">Close</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="HHChallan()">Print</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row margin-top-10" id="HHChallan">
+                                        <div class="col-sm-3 padding-left-right-none clearfix">
+                                            <div class="challan-box">
+
+                                                <h6 class="text-center">
+                                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                                </h6>
+                                                <hr />
+                                                <div class="row">
+                                                    <div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> BANK A/C NO</div>
+                                                                <div class="col-sm-8" ng-if="className=='Pre - Nursery'|| className=='Nursery'||className=='Preparatory'">: 050010110014055</div>
+
+                                                                <div class="col-sm-8" ng-if="className!='Pre - Nursery'&& className!='Nursery'&&className!='Preparatory'">: 050010100033100</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">A/C NAME</div>
+                                                                <div class="col-sm-8">: {{acc_Name}}</div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> IFSC CODE</div>
+                                                                <div class="col-sm-8">: {{ifsc_code}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> NAME</div>
+                                                                <div class="col-sm-8">: {{studName}}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-sm-12" ng-if="amsT_Sex=='Female'">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  D/O</div>
+                                                                <div class="col-sm-8">: {{fatherName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12" ng-if="amsT_Sex=='Male'">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  S/O</div>
+                                                                <div class="col-sm-8">: {{fatherName}}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  Mobile No.</div>
+                                                                <div class="col-sm-8">: {{mobNo}}</div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-4">Receipt No</div>
+                                                                <div class="col-sm-8">: {{receiptNo}}</div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">Admno</div>
+                                                        <div class="col-sm-8">: {{admNo}}</div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">Period</div>
+                                                        <div class="col-sm-8">: {{period}}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-sm-7">
+                                                        <div class="row">
+                                                            <div class="col-sm-2">Class</div>
+                                                            <div class="col-sm-10">: {{className}}-{{sectionName}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Date</div>
+                                                            <div class="col-sm-8">: {{tdyDate|date:'dd/MM/yyyy'}}</div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="margin-top-10">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th><b>Particular's</b></th>
+                                                                <th><b>Installment</b></th>
+                                                                <th><b>Amount</b></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="part in particularsList">
+
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.fmH_FeeName}}</td>
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.ftI_Name}}</td>
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.fsS_ToBePaid}}</td>
+
+
+                                                                <!--<td>{{part.fmH_FeeName}}</td>
+                    <td>{{part.ftI_Name}}</td>
+                    <td>{{part.fsS_ToBePaid}}</td>-->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                                <div class="row margin-top-10">
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Gross Amount</b></div>
+                                                            <div class="col-sm-8"><b>: {{totalamount}}</b></div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Net Amount</b></div>
+                                                            <div class="col-sm-8"><b>: {{totalamount}}</b></div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Amount in words</b></div>
+                                                            <div class="col-sm-8">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>:</td>
+                                                                        <td style="font-size:smaller;"><b>{{amtinwords}} Rupees Only.</b></td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">By Cash/DD No</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Bank Name</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Branch Name</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Date</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Depositor Signature</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <h6 class="text-center">Bank's Copy</h6>
+                                                    <div class="col-sm-12">
+                                                        <label>Remarks : Kindly Mention Name ,Class, Div, Contact No. behind the DD.</label>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        School Time:9:00 AM-11:00 AM and Bank Time 10:30 AM-2:30 PM
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3 padding-left-right-none clearfix">
+                                            <div class="challan-box">
+
+                                                <h6 class="text-center">
+                                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                                </h6>
+                                                <hr />
+                                                <div class="row">
+                                                    <div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> BANK A/C NO</div>
+                                                                <div class="col-sm-8" ng-if="className=='Pre - Nursery'|| className=='Nursery'||className=='Preparatory'">: 050010110014055</div>
+
+                                                                <div class="col-sm-8" ng-if="className!='Pre - Nursery'&& className!='Nursery'&&className!='Preparatory'">: 050010100033100</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">A/C NAME</div>
+                                                                <div class="col-sm-8">: {{acc_Name}}</div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> IFSC CODE</div>
+                                                                <div class="col-sm-8">: {{ifsc_code}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> NAME</div>
+                                                                <div class="col-sm-8">: {{studName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12" ng-if="amsT_Sex=='Female'">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  D/O</div>
+                                                                <div class="col-sm-8">: {{fatherName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12" ng-if="amsT_Sex=='Male'">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  S/O</div>
+                                                                <div class="col-sm-8">: {{fatherName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  Mobile No.</div>
+                                                                <div class="col-sm-8">: {{mobNo}}</div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-4">Receipt No</div>
+                                                                <div class="col-sm-8">: {{receiptNo}}</div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">Admno</div>
+                                                        <div class="col-sm-8">: {{admNo}}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">Period</div>
+                                                        <div class="col-sm-8">: {{period}}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-sm-7">
+                                                        <div class="row">
+                                                            <div class="col-sm-2">Class</div>
+                                                            <div class="col-sm-10">: {{className}}-{{sectionName}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Date</div>
+                                                            <div class="col-sm-8">: {{tdyDate|date:'dd/MM/yyyy'}}</div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="margin-top-10">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th><b>Particular's</b></th>
+                                                                <th><b>Installment</b></th>
+                                                                <th><b>Amount</b></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="part in particularsList">
+                                                                <!--<td>{{part.fmH_FeeName}}</td>
+                    <td>{{part.ftI_Name}}</td>
+                    <td>{{part.fsS_ToBePaid}}</td>-->
+
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.fmH_FeeName}}</td>
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.ftI_Name}}</td>
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.fsS_ToBePaid}}</td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                                <div class="row margin-top-10">
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Gross Amount</b></div>
+                                                            <div class="col-sm-8"><b>: {{totalamount}}</b></div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Net Amount</b></div>
+                                                            <div class="col-sm-8"><b>: {{totalamount}}</b></div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Amount in words</b></div>
+                                                            <div class="col-sm-8">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>:</td>
+                                                                        <td style="font-size:smaller;"><b>{{amtinwords}} Rupees Only.</b></td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">By Cash/DD No</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Bank Name</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Branch Name</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Date</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Depositor Signature</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <h6 class="text-center">School's Copy</h6>
+                                                    <div class="col-sm-12">
+                                                        <label>Remarks : Kindly Mention Name ,Class, Div, Contact No. behind the DD.</label>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        School Time:9:00 AM-11:00 AM and Bank Time 10:30 AM-2:30 PM
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3 padding-left-right-none clearfix">
+                                            <div class="challan-box">
+
+                                                <h6 class="text-center">
+                                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                                </h6>
+                                                <hr />
+                                                <div class="row">
+                                                    <div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> BANK A/C NO</div>
+                                                                <div class="col-sm-8" ng-if="className=='Pre - Nursery'|| className=='Nursery'||className=='Preparatory'">: 050010110014055</div>
+
+                                                                <div class="col-sm-8" ng-if="className!='Pre - Nursery'&& className!='Nursery'&&className!='Preparatory'">: 050010100033100</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">A/C NAME</div>
+                                                                <div class="col-sm-8">: {{acc_Name}}</div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> IFSC CODE</div>
+                                                                <div class="col-sm-8">: {{ifsc_code}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> NAME</div>
+                                                                <div class="col-sm-8">: {{studName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12" ng-if="amsT_Sex=='Male'">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  S/O</div>
+                                                                <div class="col-sm-8">: {{fatherName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12" ng-if="amsT_Sex=='Female'">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  D/O</div>
+                                                                <div class="col-sm-8">: {{fatherName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  Mobile No.</div>
+                                                                <div class="col-sm-8">: {{mobNo}}</div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-4">Receipt No</div>
+                                                                <div class="col-sm-8">: {{receiptNo}}</div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">Admno</div>
+                                                        <div class="col-sm-8">: {{admNo}}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">Period</div>
+                                                        <div class="col-sm-8">: {{period}}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-sm-7">
+                                                        <div class="row">
+                                                            <div class="col-sm-2">Class</div>
+                                                            <div class="col-sm-10">: {{className}}-{{sectionName}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Date</div>
+                                                            <div class="col-sm-8">: {{tdyDate|date:'dd/MM/yyyy'}}</div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="margin-top-10">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th><b>Particular's</b></th>
+                                                                <th><b>Installment</b></th>
+                                                                <th><b>Amount</b></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="part in particularsList">
+
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.fmH_FeeName}}</td>
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.ftI_Name}}</td>
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.fsS_ToBePaid}}</td>
+
+                                                                <!--<td>{{part.fmH_FeeName}}</td>
+                    <td>{{part.ftI_Name}}</td>
+                    <td>{{part.fsS_ToBePaid}}</td>-->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                                <div class="row margin-top-10">
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Gross Amount</b></div>
+                                                            <div class="col-sm-8"><b>: {{totalamount}}</b></div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Net Amount</b></div>
+                                                            <div class="col-sm-8"><b>: {{totalamount}}</b></div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Amount in words</b></div>
+                                                            <div class="col-sm-8">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>:</td>
+                                                                        <td style="font-size:smaller;"><b>{{amtinwords}} Rupees Only.</b></td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">By Cash/DD No</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Bank Name</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Branch Name</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Date</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Depositor Signature</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <h6 class="text-center">Parent's Copy</h6>
+                                                    <div class="col-sm-12">
+                                                        <label>Remarks : Kindly Mention Name ,Class, Div, Contact No. behind the DD.</label>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        School Time:9:00 AM-11:00 AM and Bank Time 10:30 AM-2:30 PM
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3 padding-left-right-none clearfix">
+                                            <div class="challan-box">
+
+                                                <h6 class="text-center">
+                                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                                </h6>
+                                                <hr />
+                                                <div class="row">
+                                                    <div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> BANK A/C NO</div>
+                                                                <div class="col-sm-8" ng-if="className=='Pre - Nursery'|| className=='Nursery'||className=='Preparatory'">: 050010110014055</div>
+
+                                                                <div class="col-sm-8" ng-if="className!='Pre - Nursery'&& className!='Nursery'&&className!='Preparatory'">: 050010100033100</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">A/C NAME</div>
+                                                                <div class="col-sm-8">: {{acc_Name}}</div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> IFSC CODE</div>
+                                                                <div class="col-sm-8">: {{ifsc_code}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4"> NAME</div>
+                                                                <div class="col-sm-8">: {{studName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12" ng-if="amsT_Sex=='Male'">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  S/O</div>
+                                                                <div class="col-sm-8">: {{fatherName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12" ng-if="amsT_Sex=='Female'">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  D/O</div>
+                                                                <div class="col-sm-8">: {{fatherName}}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">  Mobile No.</div>
+                                                                <div class="col-sm-8">: {{mobNo}}</div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-4">Receipt No</div>
+                                                                <div class="col-sm-8">: {{receiptNo}}</div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">Admno</div>
+                                                        <div class="col-sm-8">: {{admNo}}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">Period</div>
+                                                        <div class="col-sm-8">: {{period}}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-sm-7">
+                                                        <div class="row">
+                                                            <div class="col-sm-2">Class</div>
+                                                            <div class="col-sm-10">: {{className}}-{{sectionName}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Date</div>
+                                                            <div class="col-sm-8">: {{tdyDate|date:'dd/MM/yyyy'}}</div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="margin-top-10">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th><b>Particular's</b></th>
+                                                                <th><b>Installment</b></th>
+                                                                <th><b>Amount</b></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="part in particularsList">
+
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.fmH_FeeName}}</td>
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.ftI_Name}}</td>
+                                                                <td ng-if="part.fsS_ToBePaid!=0">{{part.fsS_ToBePaid}}</td>
+
+                                                                <!--<td>{{part.fmH_FeeName}}</td>
+                    <td>{{part.ftI_Name}}</td>
+                    <td>{{part.fsS_ToBePaid}}</td>-->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                                <div class="row margin-top-10">
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Gross Amount</b></div>
+                                                            <div class="col-sm-8"><b>: {{totalamount}}</b></div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Net Amount</b></div>
+                                                            <div class="col-sm-8"><b>: {{totalamount}}</b></div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4"><b>Amount in words</b></div>
+                                                            <div class="col-sm-8">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>:</td>
+                                                                        <td style="font-size:smaller;"><b>{{amtinwords}} Rupees Only.</b></td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">By Cash/DD No</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Bank Name</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Branch Name</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Date</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-4">Depositor Signature</div>
+                                                            <div class="col-sm-8">: {{}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <h6 class="text-center">Teacher's Copy</h6>
+                                                    <div class="col-sm-12">
+                                                        <label>Remarks : Kindly Mention Name ,Class, Div, Contact No. behind the DD.</label>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        School Time:9:00 AM-11:00 AM and Bank Time 10:30 AM-2:30 PM
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div><!--end row-->
+            </div>
+
+        </form>
+        <div class="box box-primary" ng-show="studentsavedlist">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Student Challan List </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <!--<div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="totcountsearch!=0">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{totcountsearch}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>-->
+                <div class="row" ng-show="enableStudDrpdwn==true">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" for="email"> Search For:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="search123" ng-change="onselectsearch()" name="search_for" required>
+                                    <option value="">--Select Field--</option>
+                                    <option value="0">Student Name</option>
+                                    <option value="1">Class Name</option>
+                                    <option value="6">Section Name</option>
+                                    <option value="2">Adm No.</option>
+                                    <option value="3">Challan No.</option>
+                                    <!--<option value="4">Paid Date</option>-->
+                                    <!--<option value="5">Paid Amount</option>-->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="search_flag">
+                        <div class="form-group" ng-show="txt">
+                            <label class="control-label col-sm-4" for="email"> Search Text:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchtxt" maxlength="30" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="numbr">
+                            <label class="control-label col-sm-4" for="email">Search Amount:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchnumbr" maxlength="20" allow-pattern="[0-9]" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="dat">
+                            <label class="control-label col-sm-4" for="email"> Search Date:</label>
+
+                            <div class="col-sm-8 input-group text-right" style="">
+                                <md-datepicker ng-model="searchdat" onkeydown="return false" name="search_date" id="date123" md-placeholder="Enter  date" required></md-datepicker>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="search_flag">
+                        <div class="">
+                            <button type="button" class="btn btn-primary" name="btn_search" ng-click="ShowSearch_Report()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                Search
+                            </button>
+                            <button type="button" class="btn btn-warning" data-ng-click="Cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </button>
+
+                        </div>
+
+
+
+                    </div>
+
+
+                </div>
+
+                <br />
+
+                <table class="table table-responsive table-bordered text-center">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th style="text-align:center">
+                                SLNO
+                            </th>
+                            <th style="text-align:center">
+                                Student Name
+                            </th>
+                            <th style="text-align:center">Class Name </th>
+                            <th style="text-align:center">Section Name </th>
+                            <th style="text-align:center">Adm No.</th>
+                            <th style="text-align:center">Challan No. </th>
+                            <th style="text-align:center">Download Date </th>
+                            <th style="text-align:center">Amount </th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--filterOnLocation-->
+                        <tr dir-paginate="user1 in receiptgrid |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+
+                            <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td> {{ user1.amsT_FirstName}} <span ng-if="user1.amsT_MiddleName !== null" class="lbl padding-8">  {{ user1.amsT_MiddleName}} {{ user1.amsT_LastName}}</span> </td>
+
+                            <!--<td>{{ user1.amsT_FirstName + ' ' + user1.amsT_MiddleName + ' ' +user1.amsT_LastName}}</td>-->
+                            <td>{{ user1.classname}}</td>
+                            <td>{{ user1.sectionname}}</td>
+                            <td>{{ user1.amsT_AdmNo}}</td>
+                            <td>{{ user1.fyP_Receipt_No}}</td>
+                            <td>{{ user1.fyP_Date |date:'dd-MM-yyyy'}}</td>
+                            <td>{{ user1.fyP_Tot_Amount}}</td>
+                            <td hidden="hidden">{{ user1.fyP_Id}}</td>
+                            <td hidden="hidden">{{ user1.amst_Id}}</td>
+
+                            <td class="text-center">
+                                <a href="javascript:void(0)" class="text-primary padding-right-5" data-placement="bottom" data-toggle="modal" title="Print Receipt" data-ng-model="receiptdetails" data-target="#myModal1" data-ng-click="showmodaldetails(user1.fyP_Id,user1.amst_Id)">
+
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+
+                                <a class="text-danger padding-right-5" href="" data-placement="bottom" data-toggle="tooltip" title="Delete" ng-if="rolenamelist=='COORDINATOR' || 'Fee End User' ">
+                                    <i class="fa fa-trash" aria-hidden="true" ng-click="DeletRecord(user1.fyP_Id,user1.amst_Id)"></i>
+                                </a>
+
+
+
+                            </td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="" pagination-id="page1"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+
+    </section>
+</div>

@@ -1,0 +1,235 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="StuAttRptDropdownList();" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Active Deactive Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="text-center well" ng-init="type23=1">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type23" ng-value="1" name="all" ng-change="getDataByType(type23);">
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type23" ng-value="2" name="all" ng-change="getDataByType(type23);">
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" ng-change="getclass()" name="acd_year" required>
+                                    <option value="">Select Year</option>
+                                    <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}" ng-selected="{{academic.Selected == true}}">{{academic.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmcL_Id" ng-change="getsection()" ng-disabled="type23==1" name="class" ng-required="type23==2">
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="class in classDropdown" value="{{class.asmcL_Id}}">{{class.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmC_Id" name="section" ng-disabled="type23==1" ng-required="type23==2">
+                                    <option value="">Select Section</option>
+                                    <option value="0">All</option>
+                                    <option ng-repeat="section in sectionDropdown" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.section)" ng-messages="myForm.section.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="getreport()">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()" ng-model="clr" value="cl">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#table')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Excel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-disabled="print_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <div class="box box-primary" ng-show="gridflag">
+        <div class="box-header with-border">
+            <h3 class="box-title">Active Deactive Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="searchValue!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+
+            <table class="table table-hover table-responsive table-bordered text-center" id="tabel1">
+                <thead>
+                    <tr>
+                        <th class="hdTH">
+                            <label>
+                                <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th>
+                            SL. No.
+                        </th>
+                        <th><a href="" ng-click="sortBy('studentname')">Student Name </a> </th>
+                        <th><a href="" ng-click="sortBy('admno')">Admission No. </a> </th>
+                        <th><a href="" ng-click="sortBy('regno')">Registration No. </a> </th>
+                        <th><a href="" ng-click="sortBy('classname')">Class Name </a> </th>
+                        <th><a href="" ng-click="sortBy('sectionname')">Section Name </a> </th>
+                        <th><a href="" ng-click="sortBy('deactivatdate')">Deactive Date </a> </th>
+                        <th><a href="" ng-click="sortBy('deactivatereason')">Deactive Reason </a> </th>
+                        <th><a href="" ng-click="sortBy('activatedate')">Activate Date </a> </th>
+                        <th><a href="" ng-click="sortBy('activatereason')">Activate Reason </a> </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    <tr dir-paginate="user in filterValue = (students | filter : searchValue)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center  hdTD">
+                            <label>
+                                <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{ user.studentname}}</td>
+                        <td>{{ user.admno}}</td>
+                        <td>{{ user.regno}}</td>
+                        <td>{{ user.classname}}</td>
+                        <td>{{ user.sectionname}}</td>
+                        <td>{{ user.deactivatdate}}</td>
+                        <td>{{ user.deactivatereason}}</td>
+                        <td>{{ user.activatedate}}</td>
+                        <td>{{ user.activatereason}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+
+
+        <div id="printSectionId" ng-show="table_flag">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <center><h4>Active Deactive Report For {{year}}</h4></center>
+            <br />
+            <table class="table-bordered" id="table">
+                <thead>
+                    <tr>
+                        <th class="text-center">SL. No.</th>
+                        <th class="text-center">Student Name</th>
+                        <th class="text-center">Admission No.</th>
+                        <th class="text-center">Registration No. </th>
+                        <th class="text-center">Class Name </th>
+                        <th class="text-center">Section Name </th>
+                        <th class="text-center">Deactive Date</th>
+                        <th class="text-center">Deactive Reasons</th>
+                        <th class="text-center">Activate Date</th>
+                        <th class="text-center">Activate Reasons</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in printdatatable | filter : searchValue">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td>{{ user.studentname}}</td>
+                        <td class="text-center">{{ user.admno}}</td>
+                        <td class="text-center">{{ user.regno}}</td>
+                        <td class="text-center">{{ user.classname}}</td">
+                        <td class="text-center">{{ user.sectionname}}</td>
+                        <td class="text-center">{{ user.deactivatdate}}</td>
+                        <td>{{ user.deactivatereason}}</td>
+                        <td class="text-center">{{ user.activatedate}}</td>
+                        <td>{{ user.activatereason}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="16" class="col-sm-12 text-center ">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>

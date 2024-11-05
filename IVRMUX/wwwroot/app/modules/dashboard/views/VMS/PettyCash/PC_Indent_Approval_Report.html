@@ -1,0 +1,255 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <di class="box-header with-border">
+                <h3 class="box-title">Indent Approved Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </di>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Organization : <strong class="text-red">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="MI_Id" id="id1" name="miname" required ng-change="OnChangeExpenditureInstitution()">
+                                    <option value="">-- Select Organization --</option>
+                                    <option ng-repeat="ins in getuserinstitution" value="{{ins.mI_Id}}" ng-selected="ins.mI_Id==MI_Id">
+                                        {{ins.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.miname)" ng-messages="myForm.miname.$error">
+                                    <div ng-message="required">Select Organization</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">From Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7 input-group">
+                                    <md-datepicker ng-model="PCINDENT_Date_From" id="sel2" name="appl_date1" onkeypress="return false"
+                                                   md-placeholder="Enter Date" md-max-date="maxdate" ng-change="onchangefromdate()">
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.appl_date1)" ng-messages="myForm.appl_date1.$error">
+                                        <div ng-message="required">Select Indent From Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">To Date:<span style="color:red;">*</span></label>
+                                <div class="col-sm-7 input-group">
+                                    <md-datepicker ng-model="PCINDENT_Date_To" id="sel2" name="appl_date1" onkeypress="return false"
+                                                   md-placeholder="Enter Date" md-min-date="PCINDENT_Date_From" md-max-date="maxdate"
+                                                   ng-disabled="PCINDENT_Date_From==null">
+                                    </md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.appl_date1)" ng-messages="myForm.appl_date1.$error">
+                                        <div ng-message="required">Select Indent To Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="getreport()" id="save-btn">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="indentapproveddetais.length==0" ng-click="Print()" id="save-btn">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="indentapproveddetais.length==0" ng-click="exportToExceldetails()" id="save-btn">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="indentapproveddetais.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Indent Approved Report DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th><a href="">Indent Details</a></th>
+                        <th><a href="">Particular</a></th>
+                        <th><a href="">Requested Amount</a></th>
+                        <th><a href="">Sanctioned Amount</a></th>
+                        <th><a href="">Amount Spent</a></th>
+                        <th><a href="">Balance Amount</a></th>
+                        <th><a href="">Remarks</a></th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in indentapproveddetais">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.particularsdetails.length+1}}">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.particularsdetails.length+1}}">
+                            Indent No. : {{user.PCINDENT_IndentNo}}<br />
+                            Requested By : {{user.EMPLOYEENAME}} : {{user.EMPCODE}}<br />
+                            Date : {{user.REQDATE}}<br />
+                            Requested Amount  : {{user.REQTOTALAMOUNT}}<br />
+                            Sanctioned Amount  : {{user.SANCAMT}}<br />
+                            Amount Spent  : {{user.PCINDENTAPT_AmountSpent}}<br />
+                            Balance Amount  : {{user.PCINDENTAPT_BalanceAmount}}
+                        </td>
+                        <td class="text-left">{{user.PCMPART_ParticularName}}</td>
+                        <td class="text-right">{{user.PARTREQUESTEDAMOUNT}}</td>
+                        <td class="text-right">{{user.PARTAPPROVEDAMT}}</td>
+                        <td class="text-right">{{user.PCINDENTAPDT_AmountSpent}}</td>
+                        <td class="text-right">{{user.PCINDENTAPDT_BalanceAmount}}</td>
+                        <td class="text-left">{{user.PCINDENTAPDT_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<div ng-show="sdfsdfdsfsd==true" id="printSectionId">
+    <div class="row" ng-if="imagenew!=null && imagenew!=''">
+        <div class="baldwin text-center">
+            <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <h4 class="text-center">
+                Indent Details From Date : {{fromdated | date :'dd/MM/yyyy'}} To Date : {{todated | date :'dd/MM/yyyy'}}
+            </h4>
+        </div>
+    </div>
+    <div class="row margin-top-20">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Indent Details</th>
+                        <th>Particular</th>
+                        <th>Requested Amount</th>
+                        <th>Sanctioned Amount</th>
+                        <th>Amount Spent</th>
+                        <th>Balance Amount</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in indentapproveddetais">
+                    <tr>
+                        <td class="text-center" rowspan="{{user.particularsdetails.length+1}}">{{$index+1}}</td>
+                        <td class="text-left" rowspan="{{user.particularsdetails.length+1}}">
+                            Indent No. : {{user.PCINDENT_IndentNo}}<br />
+                            Requested By : {{user.EMPLOYEENAME}} : {{user.EMPCODE}}<br />
+                            Date : {{user.REQDATE}}<br />
+                            Requested Amount  : {{user.REQTOTALAMOUNT}}<br />
+                            Sanctioned Amount : {{user.SANCAMT}}<br />
+                            Amount Spent  : {{user.PCINDENTAPT_AmountSpent}}<br />
+                            Balance Amount  : {{user.PCINDENTAPT_BalanceAmount}}
+                        </td>
+                        <td class="text-left">{{user.PCMPART_ParticularName}}</td>
+                        <td class="text-right">{{user.PARTREQUESTEDAMOUNT}}</td>
+                        <td class="text-right">{{user.PARTAPPROVEDAMT}}</td>
+                        <td class="text-right">{{user.PCINDENTAPDT_AmountSpent}}</td>
+                        <td class="text-right">{{user.PCINDENTAPDT_BalanceAmount}}</td>
+                        <td class="text-left">{{user.PCINDENTAPDT_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div ng-show="sdfsdfdsfsd==true" id="exceltopd">
+    <table>
+        <tr style="border:0.5px solid black">
+            <td colspan="8" style="text-align:center">
+                {{institutioname}}
+            </td>
+        </tr>
+        <tr style="border:0.5px solid black">
+            <td colspan="8" style="text-align:center">
+                Indent Details From Date : {{fromdated | date :'dd/MM/yyyy'}} To Date : {{todated | date :'dd/MM/yyyy'}}
+            </td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+            <tr style="border:0.5px solid black">
+                <th>SL.No.</th>
+                <th>Indent Details</th>
+                <th>Particular</th>
+                <th>Requested Amount</th>
+                <th>Sanctioned Amount</th>
+                <th>Amount Spent</th>
+                <th>Balance Amount</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody ng-repeat="user in indentapproveddetais">
+            <tr style="border:0.5px solid black">
+                <td class="text-center" rowspan="{{user.particularsdetails.length+1}}">{{$index+1}}</td>
+                <td class="text-left" rowspan="{{user.particularsdetails.length+1}}">
+                    Indent No. : {{user.PCINDENT_IndentNo}}<br />
+                    Requested By : {{user.EMPLOYEENAME}} : {{user.EMPCODE}}<br />
+                    Date : {{user.REQDATE}}<br />
+                    Requested Amount  : {{user.REQTOTALAMOUNT}}<br />
+                    Sanctioned Amount : {{user.SANCAMT}}<br />
+                    Amount Spent  : {{user.PCINDENTAPT_AmountSpent}}<br />
+                    Balance Amount  : {{user.PCINDENTAPT_BalanceAmount}}
+                </td>
+                <td class="text-left">{{user.PCMPART_ParticularName}}</td>
+                <td class="text-right">{{user.PARTREQUESTEDAMOUNT}}</td>
+                <td class="text-right">{{user.PARTAPPROVEDAMT}}</td>
+                <td class="text-right">{{user.PCINDENTAPDT_AmountSpent}}</td>
+                <td class="text-right">{{user.PCINDENTAPDT_BalanceAmount}}</td>
+                <td class="text-left">{{user.PCINDENTAPDT_Remarks}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>

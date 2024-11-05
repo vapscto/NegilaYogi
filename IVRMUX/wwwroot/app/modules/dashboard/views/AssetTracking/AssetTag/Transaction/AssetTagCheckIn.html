@@ -1,0 +1,305 @@
+﻿
+<section class="content twocoloumn">
+
+    <div ng-init="loaddata()">
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Check-In Asset Tag</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="invatcI_CheckInDate" name="cid" md-placeholder="Date"></md-datepicker>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Location/Room :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="location" ng-model="obj.invmlO_Id" theme="bootstrap" ng-disabled="edits" ng-keyup="searchfilter($select);" title="Select Location" ng-change="onlocationchange(objs.invmlO_Id,objs)" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or search location in the list...">{{$select.selected.invmlO_LocationRoomName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_locations | filter: $select.search " value="{{option.invmlO_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.invmlO_LocationRoomName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.location)" ng-messages="myForm.location.$error">
+                                        <div ng-message="required">Please Select Location </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Store :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="store" ng-model="obj.invmsT_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Store" ng-change="onstorechange(objs.invmsT_Id,objs)" ng-disabled="edits" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Store in the list...">
+                                            {{$select.selected.invmS_StoreName}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="option in get_store | filter: $select.search " value="{{option.invmsT_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.invmS_StoreName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.store)" ng-messages="myForm.store.$error">
+                                        <div ng-message="required">Please Select store </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Items :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="item" ng-model="obj.invmI_Id" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Item" ng-change="onitemchange(objs.invmI_Id,objs)" ng-disabled="edits" required>
+                                        <ui-select-match ng-trim="false" placeholder="Select or search item in the list...">{{$select.selected.invmI_ItemName}}</ui-select-match>
+                                        <ui-select-choices repeat="option in get_items | filter: $select.search " value="{{option.invmI_Id}}" ng-selected="{{option.Selected == true}}">
+                                            <div ng-bind-html="option.invmI_ItemName | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Item </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                    <div ng-show="get_itemtagdata.length>0">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="searchValue!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue1.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width:100%;overflow:auto;">
+                            <table class="table table-responsive table-bordered clearfix">
+                                <!--style="min-width:1200px;">-->
+                                <thead>
+                                    <tr>
+                                        <th><a href="" ng-click="sortBy('sno')">SL.No.</a></th>
+                                        <th>
+                                            <label><input type="checkbox" value="" ng-click="toggleAll()" ng-model="all"><span class="lbl padding-8"></span></label>
+                                        </th>
+                                        <th width="100"><a href="" ng-click="sort('INVMI_ItemName')">Item</a></th>
+                                        <th><a href="" ng-click="sort('invaaT_AssetId')">Asset Tag</a></th>
+                                        <th><a href="" ng-click="sort('INVAAT_AssetDescription')">Description</a></th>
+                                        <th><a href="" ng-click="sort('invaaT_ModelNo')">Model-No</a></th>
+                                        <th><a href="" ng-click="sort('invaaT_SerialNo')">Serial-No</a></th>
+                                        <th><a href="" ng-click="sort('hrmE_Id')">Received by</a></th>
+                                        <th><a href="" ng-click="sort('invatcO_CheckOutRemarks')">Remarks</a></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr dir-paginate="user in filterValue1 = (get_itemtagdata | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" ng-form="dataform1">
+                                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td>
+                                            <label>
+                                                <input type="checkbox" name="adcheckt" value="{{user.xyz}}" ng-change="optionToggled()" ng-model="user.xyz"><span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <b> {{user.invmI_ItemName}}</b>
+                                        </td>
+                                        <td>
+                                            {{user.invaaT_AssetId}}
+                                        </td>
+                                        <td>
+                                            {{user.invaaT_AssetDescription}}
+                                        </td>
+                                        <td>
+                                            {{user.invaaT_ModelNo}}
+                                        </td>
+
+                                        <td>
+                                            {{user.invaaT_SerialNo}}
+                                        </td>
+                                        <td width="250">
+                                            <div ng-if="contactflag=='E'">
+                                                <input type="text" class="form-control active" value="hrmE_Id" ng-disabled="true" name="refno" placeholder="Enter Employee Name"
+                                                       ng-model="employeename">
+                                            </div>
+                                            <div ng-if="contactflag=='O'">
+                                                <select class="form-control" ng-model="hrmE_Id" name="employee" ng-disabled="editS">
+                                                    <option value="">Select Employee </option>
+                                                    <option ng-repeat="option in get_employee" value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                                        {{option.employeename}}
+                                                    </option>
+                                                </select>
+                                                <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                                    <div ng-message="required">Please Select Contact Person</div>
+                                                </div>
+                                            </div>
+                                            <!--<ui-select id="sel1" name="employee" ng-model="user.hrmE_Id" ng-disabled="!user.xyz" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Employee" ng-required="user.xyz">
+                                                <ui-select-match ng-trim="false" placeholder="Select or search employee in the list...">
+                                                    {{$select.selected.employeename}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="option in get_employee | filter: $select.search " value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.employeename | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <div class="error-messages" ng-if="interacted(dataform1.employee)" ng-messages="dataform1.employee.$error">
+                                                <div ng-message="required">Select Employee</div>
+                                            </div>-->
+                                        </td>
+
+                                        <td>
+                                            <textarea class="form-control" type="text" ng-disabled="!user.xyz" data-ng-model="user.invatcI_CheckInRemarks" placeholder="Enter Remarks" name="remarks" rows="2"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls max-size="10"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center" ng-show="get_itemtagdata.length>0">
+                        <input type="hidden" ng-model="invatcI_Id" value="{{invatcI_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid">
+                            <i class="fa fa-save" aria-hidden="true"></i> Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()" ng-disabled="form.$invalid">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+
+        <div class="box box-primary" ng-show="get_ATcheckin.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Asset Tag Check-out Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid1}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue1!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue2.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue1" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('invmS_StoreName')">Store</a></th>
+                            <th><a href="" ng-click="sortBy('invmI_ItemName')">Item</a></th>
+                            <th><a href="" ng-click="sortBy('invaaT_AssetId')">Asset Tag</a> </th>
+                            <th><a href="" ng-click="sortBy('invaaT_AssetDescription')">Description</a></th>
+                            <th><a href="" ng-click="sortBy('invmlO_LocationRoomName')">Location</a></th>
+                            <th><a href="" ng-click="sortBy('invatcO_CheckoutDate')">Date</a> </th>
+                            <th><a href="" ng-click="sortBy('invatcO_ReceivedBy')">Received By</a></th>
+                            <th><a href="" ng-click="sortBy('invatcO_CheckOutRemarks')">Remarks</a> </th>
+
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in filterValue2 = (get_ATcheckout | filter : searchValue1)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                            <td>{{user.invmS_StoreName}}</td>
+                            <td>{{user.invmI_ItemName}}</td>
+                            <td>{{user.invaaT_AssetId}}</td>
+                            <td>{{user.invaaT_AssetDescription}}</td>
+                            <td>{{user.invmlO_LocationRoomName}}</td>
+                            <td>{{user.invatcO_CheckoutDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.invatcO_ReceivedBy}}</td>
+                            <td>{{user.invatcO_CheckOutRemarks}}</td>
+                            <td class="text-center">
+
+                                <span ng-if="user.invatcO_ActiveFlg === false">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.invatcO_ActiveFlg === true">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+
+
+
+    </div>
+</section>

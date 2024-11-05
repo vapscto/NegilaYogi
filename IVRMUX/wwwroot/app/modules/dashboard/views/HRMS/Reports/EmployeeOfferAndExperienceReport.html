@@ -1,0 +1,680 @@
+
+
+<style>
+    .article {
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        padding-left: 10px;
+    }
+</style>
+
+
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Employee Offer And Experience Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="type" ng-model="Employee.hrmgT_Id" name="hrmgT_Id" required ng-change="get_depts()">
+                                        <option value="">Select</option>
+                                        <option ng-repeat="emptype in emptypedropdown" value="{{emptype.hrmgT_Id}}" ng-selected="{{emptype.Selected===true}}">
+                                            {{emptype.hrmgT_EmployeeGroupType}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.hrmgT_Id)" ng-messages="myForm.hrmgT_Id.$error">
+                                        <div ng-message="required">Select Type</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="Department" ng-model="Employee.hrmD_Id" name="Department" required ng-change="get_desig()">
+                                        <option value="">Select</option>
+                                        <option ng-repeat="emptype in departmentdropdown" value="{{emptype.hrmD_Id}}" ng-selected="{{emptype.Selected===true}}">
+                                            {{emptype.hrmD_DepartmentName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Department)" ng-messages="myForm.Department.$error">
+                                        <div ng-message="required">Select Department</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control active" id="Designation" name="Designation" ng-model="Employee.HRMDES_Id" required ng-change="GetEmployeeListByFilterSelection()">
+                                        <option value="" ng-selected="true" label="Select">Select</option>
+                                        <option ng-repeat="emptype in designationdropdown" value="{{emptype.hrmdeS_Id}}" ng-selected="{{emptype.Selected == true}}">
+                                            {{emptype.hrmdeS_DesignationName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Designation)" ng-messages="myForm.Designation.$error">
+                                        <div ng-message="required">Select Designation</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <select class="form-control active" id="Employee" name="Employee" ng-model="Employee.hrmE_Id" required ng-change="setEmployeeDOJ(Employee.hrmE_Id)">
+                                        <option value="" ng-selected="true" label="Select">Select</option>
+                                        <option ng-repeat="emptype in employeedropdown" value="{{emptype.hrmE_Id}}" ng-selected="{{emptype.Selected == true}}">
+                                            {{emptype.hrmE_EmployeeFirstName}} {{emptype.hrmE_EmployeeMiddleName}} {{emptype.hrmE_EmployeeLastName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.Employee)" ng-messages="myForm.Employee.$error">
+                                        <div ng-message="required">Select Employee</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Current Date:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="currentdate" ng-model="Employee.hrmeR_Current_Date" onkeydown="return false" required></md-datepicker>
+                                    <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm.currentdate)" ng-messages="myForm.currentdate.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date Of Joining:<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="hrmE_DOJ" ng-model="Employee.hrmE_DOJ" onkeydown="return false"  md-placeholder="Select Date" required ng-change="setdoj(Employee.hrmE_DOJ)"></md-datepicker> <!--ng-disabled="Employee.hrmeR_DOI == null"-->
+                                    <div class="error-messages" ng-if="interacted(myForm.hrmE_DOJ)" ng-messages="myForm.hrmE_DOJ.$error">
+                                        <div ng-message="required">Select Date Of Joining</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date Of Returning :<span style="color:red;">*</span></label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="hrmeR_DOI" ng-model="Employee.hrmeR_DOI" onkeydown="return false"  md-placeholder="Select Date" ng-change="setdoj12(Employee.hrmeR_DOI)"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.hrmeR_DOI)" ng-messages="myForm.hrmeR_DOI.$error">
+                                        <div ng-message="required">Select Date Of Interview</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-if="Employee.hrmeR_Offer_letter == 'relievingLetter'">
+                                <label class="control-label col-sm-4">Date Of Resignation:</label>
+                                <div class="col-sm-6">
+                                    <md-datepicker name="hrmeR_DOI" ng-model="Employee.DoResignation" onkeydown="return false" md-min-date="minDatedoi" md-max-date="maxDatedoi" md-placeholder="Select Date"></md-datepicker>
+
+                                </div>
+                            </div>
+                            <div class="form-group" ng-if="Employee.hrmeR_Offer_letter == 'accountopening'">
+                                <label class="control-label col-sm-4">Enter Bank Address:</label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" name="address" ng-model="bankaddress" placeholder="Enter Bank Address" />
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <!--<label class="control-label col-sm-4"> <strong style="color:red;display:inline; font-weight: bolder;"> </strong></label>-->
+                                <div class="multiselect col-sm-6">
+                                    <div class="row">
+                                        <label class="radio-inline">
+                                            <input name="hrmeR_Offer_letter" type="radio" id="" value="offerletter" ng-model="Employee.hrmeR_Offer_letter" required>
+                                            <span class="lbl padding-8">Offer Letter</span>
+                                        </label>
+                                    </div>
+                                    <div class="row">
+                                        <label class="radio-inline">
+                                            <input name="hrmeR_Offer_letter" type="radio" id="experienceletter" value="experienceletter" ng-model="Employee.hrmeR_Offer_letter" required>
+                                            <span class="lbl padding-8">Experience Certificate</span>
+                                        </label>
+                                    </div>
+                                    <div class="row">
+                                        <label class="radio-inline">
+                                            <input name="hrmeR_Offer_letter" type="radio" id="servicecertificate" value="servicecertificate" ng-model="Employee.hrmeR_Offer_letter" required>
+                                            <span class="lbl padding-8">Service Certificate</span>
+                                        </label>
+                                    </div>
+                                    <div class="row">
+                                        <label class="radio-inline">
+                                            <input name="hrmeR_Offer_letter" type="radio" id="appontmentletter" value="appontmentletter" ng-model="Employee.hrmeR_Offer_letter" required>
+                                            <span class="lbl padding-8">Appointment Letter</span>
+                                        </label>
+                                    </div>
+                                    <div class="row">
+                                        <label class="radio-inline">
+                                            <input name="hrmeR_Offer_letter" type="radio" id="relievingLetter" value="relievingLetter" ng-model="Employee.hrmeR_Offer_letter" required>
+                                            <span class="lbl padding-8">Relieving Letter</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="row">
+                                        <label class="radio-inline">
+                                            <input name="hrmeR_Offer_letter" type="radio" id="accountopening" value="accountopening" ng-model="Employee.hrmeR_Offer_letter" required>
+                                            <span class="lbl padding-8">Account Opening</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.hrmeR_Offer_letter)" ng-messages="myForm.hrmeR_Offer_letter.$error">
+                                <div ng-message="required">Select any one</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="box box-primary" ng-show="empofferandexpletter">
+            <div class="box-header with-border">
+                <h3 class="box-title">EMPLOYEE OFFER AND EXPERIENCE REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="PFChallan" id="Baldwin">
+                    <div id="PFChallan">
+
+                        <!--/Offer Letter-->
+                        <div class="center" ng-if="Employee.hrmeR_Offer_letter == 'offerletter'">
+                            <!--letter Formats-->
+                            <div class="text-center">
+                                <h4>{{institutionDetails.mI_Name}}</h4>
+                                <h6> {{CurrentInstuteAddress}}</h6>
+                                <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                                <h5>OFFER LETTER</h5>
+                            </div> <br />
+
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td style="text-transform: uppercase !important"><label><b> {{FullName}} </b> </label></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-4">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td>  </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-3">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="width-100">Date :</td>
+                                                <td><label> <b>{{HRMER_Current_Date  | date:"dd-MM-yyyy"}} </b></label></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <p class="article">
+                                We would like to offer you a post	<b>{{DesignationName}}</b> on a consolidated salary of Per/Month You
+                                are asked to confirm your Willingness in person.
+                            </p>
+
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td>  Manager: </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-4">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td>   </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-3">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="width-100">Principal :</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+                        <!--/Experiecnce Certificate-->
+
+                        <div class="left-width: 25px;" ng-if="Employee.hrmeR_Offer_letter == 'experienceletter'" id="Table">
+                            <!--<div class="left-width: 25px;">-->
+                            <div class="text-center">
+                                <h4>{{institutionDetails.mI_Name}}</h4>
+                                <h6> {{CurrentInstuteAddress}}</h6>
+                                <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                                <h5>	EXPERIENCE CERTIFICATE</h5>
+                            </div> <br />
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    Date : <b>{{HRMER_Current_Date  | date:"dd-MM-yyyy"}}</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                            <p class="article">
+
+                                This is to certify   that   Mr/Ms.<b style="text-transform: uppercase !important">{{FullName}}</b>  has   worked   in   this   school   as <b>{{DesignationName}}</b>  with
+                                Effect From	<b>{{dateofjoin | date:"dd-MM-yyyy"}}</b> To <b>{{dateofleft | date:"dd-MM-yyyy"}}</b>
+                                His/Her Conduct  during  this   Service   found   Good . This Cerificate is  being  issued	on  request   from   the   staff.
+                            </p><br />
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <b>
+                                                        Principal
+                                                    </b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!--/Service Certificate-->
+
+                        <div class="left-width: 25px;" ng-if="Employee.hrmeR_Offer_letter == 'servicecertificate'" id="Table">
+                            <!--<div class="text-center">
+                                <h4>{{institutionDetails.mI_Name}}</h4>
+                                <h6> {{CurrentInstuteAddress}}</h6>
+                                <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                                <h5>SERVICE CERTIFICATE</h5>
+                            </div>-->
+                            <div class="text-center" style="margin-top:15px;padding-top:15px;">
+                                <img src="{{institutionDetails.mI_Logo}}" class="img-responsive" style="height:200px;width:700px;" />
+                                <!--<h5>SERVICE CERTIFICATE</h5>-->
+                            </div>
+                            <div>
+                                <table>
+                                    <tr>
+                                        <td style="border-bottom:1px solid black"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:50%;font-size:16px">
+                                                    Ref. No.:
+                                                </td>
+                                                <td style="width:50%;text-align:right;font-size:16px">
+                                                    Date : <b>{{HRMER_Current_Date  | date:"dd-MM-yyyy"}}</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top:80px;text-align:center">
+                                <div class="col-sm-12">
+                                    <h1>Service Certificate</h1>
+                                </div>
+                            </div>
+                            <p class="article" style="padding:20px;">
+
+                                <!--This is to certify that Mrs.<b style="text-transform: uppercase !important">{{FullName}}</b>
+                                worked in our institution from the <b>{{dateofjoin | date:"dd-MM-yyyy"}}</b>To <b>{{HRMER_Current_Date | date:"dd-MM-yyyy"}}</b>
+                                Lecturer in {{hrmD_DepartmentName}}.
+
+                                <br />
+                                <br />
+                                We found her responsible, enthusiastic and
+                                hardworking during her working tenure. We wish her success in her
+                                future endeavors.-->
+                                This is to certify that Mrs.<b style="text-transform: uppercase !important">{{FullName}}</b>
+                                worked in our institution {{institutionDetails.mI_Name}} from the <b>{{dateofjoin | date:"dd-MM-yyyy"}}</b> To <b>{{dateofjoin | date:"dd-MM-yyyy"}}</b>
+                                Lecturer in {{hrmD_DepartmentName}}.
+
+                                <br />
+                                <br />
+                                We wish him all success in his future endeavors.
+                            </p>
+                            <div class="row" style="margin-top:150px;">
+                                <div class="col-sm-4">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td style="text-align:center;font-size:20px;margin-right:50px;">
+                                                    <b>Principal</b>
+                                                    <h6>{{institutionDetails.mI_Name}}</h6>
+                                                    <h6> {{CurrentInstuteAddress}}</h6>
+                                                    <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/Appointment  Letter-->
+
+                        <div class="left-width: 25px; margin-top:50px;" ng-if="Employee.hrmeR_Offer_letter == 'appontmentletter'" id="Table">
+                            <!--<div class="left-width: 25px;">-->
+                            <div class="text-center">
+                                <div class="baldwin text-center">
+                                    <img src="https://dcampusstrg.blob.core.windows.net/files/20/LessonPlanner/3e3a9922-14d4-491f-a0e1-f1651c9c7f98.jpg" class="img-responsive">
+                                </div>
+                                <!--<h4>{{institutionDetails.mI_Name}}</h4>
+                                <h6> {{CurrentInstuteAddress}}</h6>
+                                <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>-->
+                                <h5>APPOINTMENT LETTER</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-4">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td>  </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-3">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="width-100">Date : <b>{{HRMER_Current_Date  | date:"dd-MM-yyyy"}} </b></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="text-left" style="margin-left:50px;">
+                                <h5>TO</h5>
+                                <h4 style="text-transform: uppercase !important">{{FullName}}</h4>
+                                <h6> {{street}},{{localarea}}</h6>
+                                <!--<h6>{{localcity}}-{{pincode}} </h6>-->
+                            </div>
+                            <div class="row" style="margin-left:100px;">
+                                <p><strong>Subject:</strong> Appointment Letter</p>
+                            </div>
+                            <!--letter Formats-->
+                            <div class="row" style="margin-left:50px;">
+
+                                <!--<p><strong>Subject:</strong> Appointment Letter</p>-->
+
+                                <p>Dear  {{FullName}},</p>
+
+                                <p>We are pleased to offer you the position of {{DesignationName}} at Vidya Vikasa Vidya Samsthe.</p>
+
+                                <p>Your joining date will be on {{doiDate | date:'dd-MM-yyyy'}}.</p>
+
+                                <p>
+                                    Your gross salary for this position will be {{applicablebasic}}/- per month  , with the possibility of performance-based incentives.
+                                </p>
+                                <p>Your employment with Vidya Vikasa Vidya Samsthe is contingent upon the successful completion of any background checks or screenings required for this position.</p>
+                                <p>
+                                    Please indicate your acceptance of this appointment by signing and returning this letter by {{doiDate12 | date:'dd-MM-yyyy'}}.
+                                </p>
+
+                                <p>We look forward to welcoming you to our team and are excited about the contributions you will make to our school.</p>
+                                <br />
+                                <p>
+                                    Sincerely,<br />
+                                    <br />
+                                    <br />
+                                    <b>Pruthvisha SM</b>
+                                    <b></b>Managing Director</h6>
+                                    <b>VVVS</b>
+                                    <!--<h6>{{CurrentInstuteAddress}}</h6>-->
+                                </p>
+                            </div>
+                            <!--<b>{{HRMER_DOI | date : "dd-MM-yyyy"}}</b></u> <br>-->
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+                    <!--/Relieving  Letter-->
+
+                    <div class="left-width: 25px;" ng-if="Employee.hrmeR_Offer_letter == 'relievingLetter'" id="Table">
+                        <div class="text-center" style="margin-top:15px;padding-top:15px;">
+                            <img src="{{institutionDetails.mI_Logo}}" class="img-responsive" style="height:200px;width:700px;" />
+                            <!--<h5>SERVICE CERTIFICATE</h5>-->
+                        </div>
+                        <div>
+                            <table>
+                                <tr>
+                                    <td style="border-bottom:1px solid black"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:50%;font-size:16px">
+                                                Ref. No.:
+                                                <!--<b>{{HRMER_Current_Date  | date:"dd-MM-yyyy"}}</b>-->
+                                            </td>
+                                            <td style="width:50%;text-align:right;font-size:16px">
+                                                Date : <b>{{HRMER_Current_Date  | date:"dd-MM-yyyy"}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="text-left">
+                            <span><b>TO</b></span><br />
+                            <span style="text-transform: uppercase !important">{{FullName}}</span>
+                            <span> {{street}},{{localarea}}</span>
+                            re
+                            >
+
+                            <!--<span>{{localcity}}-{{pincode}} </span>-->
+                        </div>
+
+                        <div class="row" style="margin-top:60px;text-align:center">
+                            <div class="col-sm-12">
+                                <h1>Relieving Letter</h1>
+                            </div>
+                        </div>
+
+                        <span class="article" style="line-height:2">
+                            Dear  <span style="text-transform: uppercase !important">{{FullName}}.</span> <br /><br />
+                            This has reference to your resignation letter received through email dated
+                            {{Employee.DoResignation | date:"dd-MM-yyyy"}}. This i to inform you that you resignation has been accepted and you
+                            are relieved fom the services of {{institutionDetails.mI_Name}},{{CurrentInstuteAddress}},{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}},<br />
+                            on the close of working hours on {{dateofleft| date:"dd-MM-yyyy"}}.
+
+                            <br />
+                            <br />
+
+                            We wish you all success in your future endeavors.
+
+
+                        </span>
+                        <div class="row" style="margin-top:150px;">
+                            <div class="col-sm-12">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:left;font-size:16px;margin-right:50px;">
+                                                <b>Principal</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!--/Account Opeining form-->
+
+                    <div class="left-width: 25px;" ng-if="Employee.hrmeR_Offer_letter == 'accountopening'" id="Table">
+                        <div class="text-center" style="margin-top:15px;padding-top:15px;">
+                            <img src="{{institutionDetails.mI_Logo}}" class="img-responsive" style="height:200px;width:700px;" />
+                            <!--<h5>SERVICE CERTIFICATE</h5>-->
+                        </div>
+                        <div>
+                            <table>
+                                <tr>
+                                    <td style="border-bottom:1px solid black"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:50%;font-size:16px">
+                                                Ref. No.:
+                                                <!--<b>{{HRMER_Current_Date  | date:"dd-MM-yyyy"}}</b>-->
+                                            </td>
+                                            <td style="width:50%;text-align:right;font-size:16px">
+                                                Date : <b>{{HRMER_Current_Date  | date:"dd-MM-yyyy"}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                        <div class="text-left">
+                            <span><b>TO</b></span><br />
+                            <span style="text-transform: uppercase !important">{{FullName}}</span><br />
+                            <span class="col-sm-3">{{street}},{{localarea}}</span>
+
+                            <!--<span>{{localcity}}-{{pincode}} </span>-->
+                        </div>
+
+                        <div class="row" style="margin-top:80px;text-align:center">
+                            <div class="col-sm-12">
+                                <h1>Account Opening Form</h1>
+                            </div>
+                        </div>
+                        <!--<div class="row" style="margin-top:30px;text-align:center">
+                            <div class="col-sm-12">
+
+                                <b>TO WHOMSO EVER IT MAY CONCERN </b><br />
+                            </div>
+                        </div>-->
+                        <span class="article" style="line-height:2">
+
+                            This is to certify that <span style="font-weight:600; text-transform: uppercase !important">{{FullName}}</span>  is as working Housekeeping staff in our college. Please open a salary account in your bank.
+                            As per our office record his residential address is as given below.
+                            {{institutionDetails.mI_Name}},{{CurrentInstuteAddress}},{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.
+
+                            <br />
+                            <br />
+
+
+
+
+                        </span>
+                        <div class="row" style="margin-top:150px;">
+                            <div class="col-sm-3 col-sm-offset-0">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:left;font-size:16px;margin-right:50px;width:100px">
+                                                <b>{{Employee.bankaddress}}</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+            <div class="text-center">
+                <md-button type="button" ng-click="printToCart('Baldwin')" class="md-raised md-primary">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    print
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+        </div>
+    </form>
+</section>

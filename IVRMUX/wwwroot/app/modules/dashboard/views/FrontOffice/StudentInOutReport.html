@@ -1,0 +1,282 @@
+﻿<section class="content" ng-init="Loaddata()">
+
+    <form class="form-horizontal" role="form" name="myForm" novalidate>
+
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student In Out Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="row">
+
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-8">Class Name : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                <label>
+                                    <input name="clsoption" ng-disabled="editflag==true" ng-model="obj.usercheckCC" type="checkbox" ng-click="al_checkclass(obj.usercheckCC, ASMCL_Id)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="role in classlist | filter:searchchkbx1">
+                                    <input type="checkbox" ng-disabled="editflag==true" value="{{role.asmcL_Id}}" ng-model="role.selected" ng-required="isOptionsRequired3()" ng-click="getsection(ASMCL_Id)" name="claname" required>
+
+                                    <span class="lbl padding-8">{{role.asmcL_ClassName}} </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.claname)" ng-messages="myForm.claname.$error">
+                            <div class="sectionerror" ng-message="required">Select Class</div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-8">Section Name: <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                <label>
+                                    <input name="clsoption" ng-disabled="editflag==true" value="all" ng-model="obj.usercheckC" type="checkbox" ng-click="all_checkC(obj.usercheckC, ASMCL_Id)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="role in sectionlist | filter:searchchkbx1">
+                                    <input type="checkbox" ng-disabled="editflag==true" value="{{role.asmS_Id}}" ng-model="role.selected" ng-required="isOptionsRequired1()" ng-click="getstudent(ASMCL_Id)" name="sec" required>
+                                    <span class="lbl padding-8">{{role.asmC_SectionName}}</span>
+
+                                </label>
+                            </div>
+
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                            <div class="sectionerror" ng-message="required">Select Section</div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="well" data-ng-init="allind ='All'">
+                            <input type="radio" value="All" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                            <span class="lbl padding-8">All</span>
+                            <input type="radio" value="individual" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                            <span class="lbl padding-8">Individual</span>
+                        </div>
+
+                        <div class="well">
+                            <label class="control-label" ng-init="rdopunch='I'">
+                                <input type="radio" name="vf31" value="I" ng-model="rdopunch">
+                                <span class="lbl padding-8">Time In</span>
+                            </label>
+                            <label class="control-label">
+                                <input type="radio" name="vf32" value="O" ng-model="rdopunch">
+                                <span class="lbl padding-8">Time Out</span>
+                            </label>
+                            <label class="control-label">
+                                <input type="radio" name="vf32" value="A" ng-model="rdopunch">
+                                <span class="lbl padding-8">In Out</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group"  ng-show="!disabledata">
+                            <label class="control-label col-sm-6">
+                                Student  : <strong style="color:red;" ng-show="!disabledata">*</strong>
+                            </label>
+                            <div class="col-sm-6">                                
+                                <ui-select id="sel1111" name="student" ng-model="$parent.AMST_Id" theme="bootstrap" title="Select student.">
+                                    <ui-select-match placeholder="Select or search student.">{{$select.selected.amsT_FirstName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in studentlist | filter: $select.search " value="{{option.amsT_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="option.amsT_FirstName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.student)" ng-messages="myForm.student.$error">
+                                    <div ng-message="required">Select Employee</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+
+                            <div class="col-sm-2 input-group text-right" style="">
+                                <md-datepicker ng-model="fromdate" onkeydown="return false" name="From_Date" md-max-date="maxDatemf" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required">Please Select From date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+
+                            <div class="col-sm-6 input-group text-right" style="">
+                                <md-datepicker ng-model="todate" onkeydown="return false" name="To_Date" md-min-date="minDatemf" md-max-date="maxDatemf" ng-click="gettodate()" id="date2" md-placeholder="Enter  date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required">Please Select To Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+
+            <div class="row text-center">
+                <md-button type="submit" ng-model="submitted" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="get_Report()" id="save-btn">
+                    <i class="fa fa-file" aria-hidden="true"></i>
+                    Report
+                </md-button>
+                <md-button type="button" class="md-raised md-primary" ng-disabled="viewlist.length==0" ng-show="viewlist.length>0" ng-click="printData()" id="save-btn">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button type="button" class="md-raised md-primary" ng-disabled="viewlist.length==0" ng-show="viewlist.length>0" ng-click="exportToExceldetails('#BankCash')" id="save-btn">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                    Excel
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+
+
+        </div>
+
+
+
+
+
+
+    </form>
+
+    <div class="box box-primary" ng-show="viewlist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student In Out Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{viewlist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 pull-right">
+                    <div class="">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model=" SearchHere" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="overflow-x:scroll;" id="printDeviation">
+                <div id="BankCash">
+                    <table class="table table-hover table-responsive table-bordered"  ng-if="rdopunch!='A'">
+                        <thead>
+                            <tr>
+                                <th>SL.No</th>
+                                <th>Student Name</th>                               
+                                <th>Class</th>                               
+                                <th>section</th>                               
+                                <th>Punch Date</th>
+                                <th>Manual Entry</th>
+                                <th>Punch Time</th>
+                                <th>InOUT</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in viewlist">
+                                <td>{{itemsPerPage*(currentPage-1)+$index+1}}</td>
+                                <td>{{x.AMST_FirstName +' '+ AMST_MiddleName}}</td>
+                                <td>{{x.ASMCL_ClassName}}</td>
+                                <td>{{x.ASMC_SectionName}}</td>
+                                <td>{{x.ASPU_PunchDate | date : "dd/MM/yyyy"}}</td>
+                                <!--<td>{{x.ASPU_ManualEntryFlg}}</td>-->
+                                <td>
+                                    <span ng-if="x.ASPU_ManualEntryFlg==1">
+                                        <i class="fa fa-check text-green"></i>
+                                    </span>
+                                    <span ng-if="x.ASPU_ManualEntryFlg==null">
+                                        <i class="fa fa-times text-red"></i>
+                                    </span>
+                                </td>
+                                <td>{{x.ASPUD_PunchTime}}</td>
+                                <td>{{x.ASPUD_InOutFlg}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-hover table-responsive table-bordered" ng-if="rdopunch=='A'">
+                        <thead>
+                            <tr>
+                                <th>SL.No</th>
+                                <th>Student Name</th>
+                                <th>Punch Date</th>
+                                <th>Manual Entry</th>                               
+                                <th>In Time</th>
+                                <th>Out Time</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!--<tr dir-paginate="x in filterValue = (viewlist| filter : SearchHere) ">-->
+                            <tr ng-repeat="x in viewlist">
+                                <td>{{itemsPerPage*(currentPage-1)+$index+1}}</td>
+                                <td>{{x.AMST_FirstName +' '+ AMST_MiddleName}}</td>
+                                <td>{{x.ASPU_PunchDate | date : "dd/MM/yyyy"}}</td>
+                                
+
+                                  <!--<td>{{x.ASPU_ManualEntryFlg}}</td>-->
+                                <td>
+                                    <span ng-if="x.ASPU_ManualEntryFlg==true">
+                                        <i class="fa fa-check text-green"></i>
+                                    </span>
+                                    <span ng-if="x.ASPU_ManualEntryFlg==null || x.ASPU_ManualEntryFlg==false">
+                                        <i class="fa fa-times text-red"></i>
+                                    </span>
+                                </td>
+                                <td>{{x.Intime}}</td>
+                                <td>{{x.Outtime}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</section>
+

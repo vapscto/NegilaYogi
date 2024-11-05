@@ -1,0 +1,822 @@
+﻿<style>
+    input[type="file"] {
+        display: none !important;
+    }
+
+    .file-blue:before {
+        content: 'Browse File';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .dlabel {
+        display: inline-block;
+        max-width: 100%;
+        margin-bottom: 30px;
+        font-weight: 500;
+        color: #000;
+        font-size: 14px;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+
+    <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">NOTICE BOARD</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+
+                    <div class="col-sm-4 col-lg-offset-4">
+                        <div class="well">
+                            <div class="text-center">
+
+                                <input type="checkbox" ng-model="check_student" ng-disabled="editflag==true" ng-change="checkteru()" />
+                                <span class="lbl"> &nbsp; &nbsp;Student</span>
+                                <input type="checkbox" ng-model="check_staff" ng-disabled="editflag==true" ng-change="checkteru()" />
+                                <span class="lbl"> &nbsp; &nbsp;Staff</span>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMAY" name="tslacdyr" ng-change="onyearchange()" required>
+                                    <option value="">Select Year</option>
+                                    <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}"
+                                            ng-selected="{{option.Selected == true}}">
+                                        {{options.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.tslacdyr)" ng-messages="myForm.tslacdyr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Notice Type<span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ntB_TTSylabusFlg" name="ntype" required>
+                                    <option value="">--Select-- </option>
+                                    <option value="TT" ng-selected="ntB_TTSylabusFlg=='TT'">TimeTable </option>
+                                    <option value="S" ng-selected="ntB_TTSylabusFlg=='S'">Syllabus </option>
+                                    <option value="O" ng-selected="ntB_TTSylabusFlg=='O'">Other</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.ntype)" ng-messages="myForm.ntype.$error">
+                                    <div ng-message="required">Select the Notice Type</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-4">Notice Title: <span style="color:red;">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" data-ng-model="intB_Title" name="noticeh" required />
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.noticeh)" style="margin-left: 200px;" ng-messages="myForm.noticeh.$error">
+                                <div ng-message="required">Enter Notice Title</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-4">Description: </label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" type="text" data-ng-model="intB_Description" name="remarks" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-inline col-sm-4">
+                                <input type="checkbox" data-ng-model="intB_DispalyDisableFlg">
+                                <span class="lbl">Display Date</span>
+                            </label>
+                            <div class="col-sm-8">
+                                <md-datepicker data-ng-model="intB_DisplayDate" id="dsplydate" name="dis_date" md-placeholder="Enter date"
+                                               ng-change="display_Date()" ng-disabled="!intB_DispalyDisableFlg" ng-required="intB_DispalyDisableFlg">
+                                </md-datepicker> <!--ng-required="intB_DispalyDisableFlg"-->
+                                <div class="error-messages" ng-if="interacted(myForm.dis_date)" ng-messages="myForm.dis_date.$error">
+                                    <div ng-message="required">Select Display Date from the Calendar</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="checkbox-inline col-sm-5" ng-if="check_student==true">
+                                <input type="checkbox" ng-disabled="editflag==true" data-ng-model="obj.select_student" ng-click="clearcls(obj.select_student)">
+                                <span class="lbl">&nbsp;&nbsp;&nbsp;&nbsp;Select Student</span>
+
+                            </label>
+                            <label class="checkbox-inline col-sm-5" ng-show="obj.select_student==true">
+
+                                <input type="checkbox" ng-disabled="editflag==true" data-ng-model="obj.fee_def" ng-click="clearcls(obj.fee_def)">
+                                <span class="lbl">&nbsp;&nbsp;&nbsp;&nbsp;Fee Defaulters</span>
+
+                            </label>
+
+
+                        </div>
+
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <th>Upload File</th>
+                                    <th>File Name</th>
+                                    <th>View</th>
+                                    <th>Action </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="other in documentListOtherDetails track by $index" ng-form="myForm13">
+                                    <td>{{$index+1}}</td>
+
+                                    <td>
+                                        <div class="col-sm-12" style="padding-bottom: 5px;">
+                                            <div class="form-group text-center">
+                                                <label class="custom-file-input file-bluenew" style="width:100%;margin:auto;margin-bottom: 13%;">
+                                                    <input type="file" name="doc1" accept="video/mp4,audio/*,video/x-ms-wmv,image/*, application/pdf, application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.wordprocessingml.document" data-ng-model="documentListOtherDetails[$index].INTBFL_FilePath" onchange="angular.element(this).scope().selectFileforUploadzdOtherDetail(this, angular.element(this).scope().other)">
+                                                </label>
+                                                <div class="error-messages" ng-if="interacted13(myForm13.doc1)" ng-messages="myForm13.doc1.$error">
+                                                    <div ng-message="required">Upload the file</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" ng-model="other.FileName" disabled />
+                                    </td>
+                                    <td>
+                                        <a ng-show="other.INTBFL_FilePath  !=null && other.INTBFL_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(other.INTBFL_FilePath)"> view</a>
+                                    </td>
+                                    <td>
+                                        <span class="input-group-addon" ng-hide="documentListOtherDetails.length > 30">
+                                            <a href="" ng-show="$last" ng-click="addNewDocumentOtherDetail()" style="color:#000;">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </span>
+                                        <span class="input-group-addon" id="remove" ng-hide="documentListOtherDetails.length ==1">
+                                            <a href="" ng-click="removeNewDocumentOtherDetail($index,other)" style="color:#000;">
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div><p style="color:#2e580e;margin-top: -4%"><b style="color:red">Accept File:</b> jpg, jpeg, png, doc, ppt, excel, mp3, mp4, wmv, pdf </p></div>
+                        <div id="myimagePreview" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img id="preview" src="" alt="Image Preview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--<div class="from-group">
+                            <label for="sel2" class="control-label col-sm-4">Attachment : </label>
+                            <div class="col-sm-4">
+                                <label class="dlabel custom-file-input file-blue" style="width:100%;">
+                                    <input type="file" data-ng-model="intB_FilePath" accept="image/*, application/pdf, application/vnd.ms-excel" name="docfile" onchange="angular.element(this).scope().uploadFile(this)" />
+                                </label>
+                            </div>
+
+                            <div class="col-sm-4 pull-left">
+                                <b>
+                                    <button type="button" ng-if="file_detail" class="close" style="color:red;float:right">
+                                        <b>
+                                            {{file_detail}}  <i class="fa fa-times" aria-hidden="true" ng-click="remove_file()"></i>
+                                        </b>
+                                    </button>
+                                </b>
+                            </div>
+                        </div>-->
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Start Date: <span style="color:Red">*</span> </label>
+                            <div class="col-sm-8">
+                                <md-datepicker data-ng-model="intB_StartDate" name="start_date" id="srtdate" md-placeholder="Enter date" ng-change="display_Date()" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.start_date)" ng-messages="myForm.start_date.$error">
+                                    <div ng-message="required">Select Start Date from the Calendar</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">End Date: <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <md-datepicker data-ng-model="intB_EndDate" ng-disabled="!intB_StartDate" id="enddate" name="end_date" md-placeholder="Enter date" md-min-date="intB_StartDate" md-max-date="maxDatemf" ng-change="display_Date()" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.end_date)" ng-messages="myForm.end_date.$error">
+                                    <div ng-message="required">Select End Date from the Calendar</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+                        <div class="form-group">
+
+                            <div class="chcklink" style="margin-top: 2%;">
+                                <input type="checkbox" ng-model="checklink" />
+                                <span class="lbl padding-8"> If URL</span>
+                            </div>
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th>URL</th>
+                                        <th>View</th>
+                                        <th>Action </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="urldoc in urldocumentlist track by $index" ng-form="myForm14">
+                                        <td>{{$index+1}}</td>
+                                        <td>
+                                            <input type="text" class="form-control" ng-model="urldoc.INTBFL_FilePath" ng-disabled="!checklink" />
+                                        </td>
+                                        <td>
+                                            <a ng-if="urldoc.INTBFL_FilePath  !=null && urldoc.INTBFL_FilePath !=''" style="color:red;display:inline; font-weight: bolder;" data-ng-click="previewimg_url(urldoc.INTBFL_FilePath)"> view</a>
+                                        </td>
+                                        <td>
+                                            <span class="input-group-addon" ng-hide="urldocumentlist.length > 30" ng-if="checklink">
+                                                <a href="" ng-show="$last" ng-click="addNewurl()" style="color:#000;">
+                                                    <i class="fa fa-plus"></i>
+                                                </a>
+                                            </span>
+                                            <span class="input-group-addon" id="remove" ng-hide="urldocumentlist.length ==1" ng-if="checklink">
+                                                <a href="" ng-click="removeNewurl($index,urldoc)" style="color:#000;">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+
+
+                        <!--<div class="form-group">
+                            <label class="control-label col-sm-4">Course : <span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="course" ng-model="amcO_Id" ng-change="oncoursechange()" required>
+                                    <option value="">--Select Course--</option>
+                                    <option ng-repeat="crs in course_list" value="{{crs.amcO_Id}}" ng-selected="{{Category.Selected == true}}">
+                                        {{crs.amcO_CourseName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.course)" ng-messages="myForm.course.$error">
+                                    <div ng-message="required">Please Select Course</div>
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!--<div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Branch :<span style="color:Red">*</span></label>
+                            <div class="multiselect col-sm-4">
+                                <label>
+                                    <input name="branchs" value="usercheckb" ng-model="allB" type="checkbox" data-ng-click="toggleAllB()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-model="branch" ng-repeat="option in branch_list" value="{{option.amB_Id}}" ng-click="onbranchchange(branch_list)">
+                                    <input name="branchs" value="branch" data-ng-model="option.branch" type="checkbox" ng-click="togchkbxb();" ng-required="isOptionsRequiredb();">
+                                    <span class="lbl padding-8">
+                                        {{option.amB_BranchName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.branchs)" ng-messages="myForm.branchs.$error" style="padding-left:188px">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Semester :<span style="color:Red">*</span></label>
+                            <div class="multiselect col-sm-4">
+                                <label>
+                                    <input name="sem" value="usercheckS" ng-model="allS" type="checkbox" data-ng-click="toggleAllS()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-model="sem" ng-repeat="option in sem_list" value="{{option.amsE_Id}}">
+                                    <input name="sem" value="sem" data-ng-model="option.sem" type="checkbox" ng-required="isOptionsRequiredS();">
+                                    <span class="lbl padding-8">
+                                        {{option.amsE_SEMName}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="col-sm-8 error-messages" ng-if="interacted(myForm.sem)" ng-messages="myForm.sem.$error" style="padding-left:188px">
+                                <div ng-message="required">Select Atleast one Checkbox</div>
+                            </div>
+                        </div>
+                    </div>-->
+
+
+                    <div class="row panel panel-default" ng-if="check_student">
+                        <div class="box-body">
+                            <div class="col-sm-12">
+                                <div class="col-sm-4" ng-show="obj.fee_def==true ||(obj.select_student==true && obj.fee_def==true)">
+                                    <div class="form-group">
+
+                                        <label for="sel2" class="control-label col-sm-8">Fee group : <span style="color:red;">*</span></label>
+                                        <div class="multiselect col-sm-8">
+
+                                            <input class="form-control" ng-model="searchchkbx5" type="text" placeholder="search here..." />
+                                            <label>
+                                                <input name="clsgrp" value="all" ng-model="usercheckG" type="checkbox" ng-click="all_checkG(usercheckG, FMG_Id)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-repeat="role in feegrplist | filter:searchchkbx5" value="{{fmG_Id}}">
+                                                <input type="checkbox" ng-model="role.selected" ng-click="togchkbxG()" name="clsgrp" ng-required="isOptionsRequiredgroup() && obj.fee_def==true" /><!--ng-required="isOptionsRequiredgrp()"-->
+                                                <span class="lbl padding-8">{{role.fmG_Name}}</span>
+                                            </label>
+                                        </div>
+
+                                        <!--FMG_Name-->
+
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.clsgrp)" ng-messages="myForm.clsgrp.$error">
+                                        <div class="sectionerror" ng-message="required">Select Group</div>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-4" ng-show="obj.fee_def==true ||(obj.select_student==true && obj.fee_def==true)">
+                                    <div class="form-group">
+
+                                        <label for="sel2" class="control-label col-sm-8">Fee Heads : <span style="color:red;">*</span></label>                                    <div class="multiselect col-sm-8">
+
+                                            <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                            <label>
+                                                <input name="clsoption" ng-disabled="editflag==true" value="all" ng-model="usercheckF" type="checkbox" ng-click="all_checkF(usercheckF, FMT_Id)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-repeat="role in feedeflist | filter:searchchkbx1" value="{{fmH_Id}}">
+                                                <input type="checkbox" ng-disabled="editflag==true" ng-model="role.selected" ng-click="togchkbxF()" name="clsoption" ng-required="isOptionsRequiredterms() && obj.fee_def==true" />
+                                                <span class="lbl padding-8">{{role.fmH_FeeName}}</span>
+                                            </label>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.clsoption)" ng-messages="myForm.clsoption.$error">
+                                        <div class="sectionerror" ng-message="required">Select Term</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!--<div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Course : <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" name="course" ng-model="obj.amcO_Id" ng-change="oncoursechange()" required>
+                                            <option value="">--Select Course--</option>
+                                            <option ng-repeat="crs in course_list" value="{{crs.amcO_Id}}" ng-selected="{{crs.Selected == true}}">
+                                                {{crs.amcO_CourseName}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.course)" ng-messages="myForm.course.$error">
+                                            <div ng-message="required">Please Select Course</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div class="col-sm-12">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Course :<span style="color:Red">*</span></label>
+                                        <div class="multiselect col-sm-8">
+                                            <label>
+                                                <input name="course" value="allB" ng-model="obj.allC" type="checkbox" data-ng-click="toggleAllC(obj.allC)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-model="obj.amcO_Id" ng-repeat="option in course_list" value="{{option.amcO_Id}}">
+                                                <input name="course" value="course" data-ng-model="option.course" type="checkbox" ng-click="oncoursechange();" ng-required="isOptionsRequiredc();">
+                                                <span class="lbl padding-8">
+                                                    {{option.amcO_CourseName}}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-8 error-messages" ng-if="interacted(myForm.courseS)" ng-messages="myForm.courseS.$error" style="padding-left:188px">
+                                            <div ng-message="required">Select Atleast one Checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Branch :<span style="color:Red">*</span></label>
+                                        <div class="multiselect col-sm-8">
+                                            <label>
+                                                <input name="branch" value="allB" ng-model="obj.allB" type="checkbox" data-ng-click="toggleAllB(obj.allB)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-model="branch" ng-repeat="option in branch_list" value="{{option.amB_Id}}" ng-click="onbranchchange(branch_list)">
+                                                <input name="branch" value="branch" data-ng-model="option.branch" type="checkbox" ng-click="togchkbxb();" ng-required="isOptionsRequiredb();">
+                                                <span class="lbl padding-8">
+                                                    {{option.amB_BranchName}}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-8 error-messages" ng-if="interacted(myForm.branchs)" ng-messages="myForm.branchs.$error" style="padding-left:188px">
+                                            <div ng-message="required">Select Atleast one Checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Semester :<span style="color:Red">*</span></label>
+                                        <div class="multiselect col-sm-8">
+                                            <label>
+                                                <input name="sem" value="allS" ng-model="obj.allS" type="checkbox" data-ng-click="toggleAllS(obj.allS)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-model="sem" ng-repeat="option in sem_list" value="{{option.amsE_Id}}">
+                                                <input name="sem" value="sem" data-ng-model="option.sem" ng-click="getstudent(ASMCL_Id)" type="checkbox" ng-required="isOptionsRequiredS();">
+                                                <span class="lbl padding-8">
+                                                    {{option.amsE_SEMName}}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-8 error-messages" ng-if="interacted(myForm.sem)" ng-messages="myForm.sem.$error" style="padding-left:188px">
+                                            <div ng-message="required">Select Atleast one Checkbox</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-4">
+                                    <!--ng-hide="getclass"-->
+                                    <div class="form-group" ng-show="obj.select_student==true">
+                                        <label for="sel2" class="control-label col-sm-5">Student Name : </label>
+                                        <div class="multiselect col-sm-8 ">
+                                            <input class="form-control" ng-model="searchchkbx2" type="text" placeholder="search here..." />
+                                            <label>
+                                                <input name="clstu" ng-disabled="editflag==true" value="all" ng-model="usercheckS" type="checkbox" ng-click="all_checkS(usercheckS)">
+                                                <span class="lbl padding-8">
+                                                    All
+                                                </span>
+                                            </label>
+                                            <label ng-repeat="stu in studentlist | filter:searchchkbx2" value="{{amcsT_Id}}">
+                                                <input type="checkbox" ng-disabled="editflag==true" ng-model="stu.selected" ng-click="togchkbxS()" name="clstu" ng-required="isOptionsRequiredstu() && obj.select_student==true" />
+                                                <span class="lbl padding-8">{{stu.studentname}}</span>
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                    <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.clstu)" ng-messages="myForm.clstu.$error">
+                                        <div ng-message="required">Select Student</div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AKASH -->
+                    <div class="row panel panel-default" ng-if="check_staff==true">
+                        <div class="box-body">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchValueDept" type="text" placeholder="Search Department here...">
+                                        <label>
+                                            <input name="all" value="1" ng-model="departmentselectedAll" type="checkbox" ng-disabled="roleflag==true" ng-click="all_checkdept(departmentselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Department</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="userd in departmentdropdown  | filter:searchValueDept ">
+                                            <input name="dept" ng-model="userd.selected" ng-disabled="roleflag==true" type="checkbox" ng-click="togchkbxdept(userd);" title="Select Employee" ng-required="isOptionsRequireddept()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{userd.HRMDC_Name}} <span ng-if="userd.HRMDC_Name.length<=19"> Department</span></b>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.dept)" ng-messages="myForm.dept.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchValueDesg" type="text" placeholder="Search Designation here...">
+                                        <label>
+                                            <input name="all" value="1" ng-model="designationselectedAll" type="checkbox" ng-click="all_checkdesg(designationselectedAll)">
+                                            <span class="lbl padding-8">
+                                                <b> All Designation</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="desc in designationdropdown | filter:searchValueDesg" value="{{asmS_Id}}">
+                                            <input type="checkbox" ng-model="desc.selected" ng-click="togchkbxdesg(desc)"
+                                                   ng-required="isOptionsRequireddesc()" name="desg" />
+                                            <span class="lbl padding-8">{{desc.HRMDES_DesignationName}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.desg)" ng-messages="myForm.desg.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchValueUEM" type="text" placeholder="Search Employee here...">
+                                        <label>
+                                            <input name="all" value="1" ng-model="checkall" ng-disabled="disableemp" type="checkbox" ng-click="all_check(checkall)">
+                                            <span class="lbl padding-8">
+                                                <b>  All Employees</b>
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="user in filterValue3=(get_userEmplist  | filter:searchValueUEM)" value="{{Activity.amA_Id}}">
+                                            <input name="emp" ng-model="user.empck" type="checkbox" ng-disabled="disableemp" ng-click="togchkbx();"
+                                                   title="Select Employee" ng-required="isOptionsRequiredemp()">
+                                            <span class="lbl padding-8">
+                                                <b>  {{user.userEmpName}}</b> : {{user.HRMD_DepartmentName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.emp)" ng-messages="myForm.emp.$error">
+                                        <div ng-message="required" class="col-sm-8">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AKASH -->
+
+                    <hr />
+                    <div class="text-center">
+                        <input type="hidden" ng-model="intB_Id" value="{{intB_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-click="savedata()" ng-disabled="form.$invalid">
+                            <i class="fa fa-save" aria-hidden="true"></i> Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()" ng-disabled="form.$invalid">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="box box-primary" ng-show="noticelist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Notice Board</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                        </th>
+                        <th><a href="" ng-click="sortBy('intB_Title')">Title</a></th>
+                        <th><a href="" ng-click="sortBy('intB_Description')">Description</a> </th>
+                        <th><a href="" ng-click="sortBy('intB_Attachment')">File Name</a></th>
+                        <th><a href="" ng-click="sortBy('intB_StartDate')">Start Date</a> </th>
+                        <th><a href="" ng-click="sortBy('intB_EndDate')">End Date</a></th>
+                        <th><a href="" ng-click="sortBy('intB_DisplayDate')">Display Date</a> </th>
+
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (noticelist | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.intB_Title}}</td>
+                        <td>{{user.intB_Description}}</td>
+                        <td>{{user.intB_Attachment}}</td>
+                        <td>{{user.intB_StartDate | date:'MM/dd/yyyy'}}</td>
+                        <td>{{user.intB_EndDate | date:'MM/dd/yyyy'}}</td>
+                        <td>
+                            <span ng-if="user.intB_DispalyDisableFlg === false">
+                                <i class="fa fa-close" style="color:red"></i>
+                            </span>
+                            <span ng-if="user.intB_DispalyDisableFlg === true">
+                                {{user.intB_DisplayDate | date:'MM/dd/yyyy'}}
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+                            <span ng-show="user.intB_ActiveFlag === false">
+                                <i class="fa fa-ban fa-1x" aria-hidden="true"></i>
+                            </span>
+                            <span ng-show="user.intB_ActiveFlag === true">
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Tax" data-ng-model="noticeOption" data-target="#myModal" data-ng-click="noticemodel(user.intB_Id)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">View</i>
+                                </a>
+                            </span>
+                            <!--<a class="text-aqua" href="" ng-click="edit(user.intB_Id)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>-->
+                            &nbsp;
+                            <span ng-if="user.intB_ActiveFlag === false">
+                                <a href="" ng-click="deactive(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    <i> Activate </i>
+                                </a>
+                            </span>
+                            <span ng-if="user.intB_ActiveFlag === true">
+                                <a href="" ng-click="deactive(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    <i> Deactivate</i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+        </div>
+    </div>
+
+
+    <div id="myModal" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                    <div class="box-body" ng-show="noticedetails.length>0">
+                        <div class="text-center">
+                            <table class="table">
+                                <tr>
+                                    <td style="font-size:15px;">{{notice}}</td>
+                                </tr>
+                            </table>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th><a href="" ng-click="sort('amcO_CourseName')">Course</a></th>
+                                        <th><a href="" ng-click="sort('amB_BranchName')">Branch </a></th>
+                                        <th><a href="" ng-click="sort('amsE_SEMName')">Semester </a></th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="user in noticedetails | orderBy:sortKey:reverse |filter:search">
+                                        <td>{{$index+1}}</td>
+                                        <td style="overflow-wrap:break-word">{{ user.amcO_CourseName}}</td>
+                                        <td style="overflow-wrap:break-word">{{ user.amB_BranchName}}</td>
+                                        <td style="overflow-wrap:break-word">{{ user.amsE_SEMName}}</td>
+                                        <td class="text-center">
+
+                                            <span ng-if="user.intbcB_ActiveFlag === false">
+                                                <a href="" ng-click="deactivedetails(user)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    <i> Activate </i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="user.intbcB_ActiveFlag === true">
+                                                <a href="" ng-click="deactivedetails(user)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    <i> Deactivate</i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box-body" ng-show="staffnoticedetails.length>0">
+                        <div class="text-center">
+                            <table class="table">
+                                <tr>
+                                    <td style="font-size:15px;">{{notice}}</td>
+                                </tr>
+                            </table>
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>SL NO</th>
+                                        <th><a href="" ng-click="sort('amcO_CourseName')">Employee Name</a></th>
+                                        <th><a href="" ng-click="sort('amB_BranchName')"> Department </a></th>
+                                        <th><a href="" ng-click="sort('amsE_SEMName')">Designation </a></th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="user in staffnoticedetails | orderBy:sortKey:reverse |filter:search">
+                                        <td>{{$index+1}}</td>
+                                        <td style="overflow-wrap:break-word">{{ user.hrmE_EmployeeFirstName}}</td>
+                                        <td style="overflow-wrap:break-word">{{ user.hrmD_DepartmentName}}</td>
+                                        <td style="overflow-wrap:break-word">{{ user.hrmdeS_DesignationName}}</td>
+                                        <td class="text-center">
+                                            <span ng-if="user.intbcstF_ActiveFlag === false">
+                                                <a href="" ng-click="staffdeactivedetail(user)"
+                                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                    <i> Activate </i>
+                                                </a>
+                                            </span>
+                                            <span ng-if="user.intbcstF_ActiveFlag === true">
+                                                <a href="" ng-click="staffdeactivedetail(user)"
+                                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                    <i> Deactivate</i>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+</section>

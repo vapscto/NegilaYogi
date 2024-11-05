@@ -1,0 +1,240 @@
+﻿<SCRIPT language=Javascript>
+            <!--
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    //-->
+</SCRIPT>
+<style>
+    .ccc {
+        margin-left: 10px;
+    }
+
+    .ccc1 {
+        margin-left: -11px;
+        width: 308px;
+    }
+
+    .form-control {
+        display: block;
+        width: 89%;
+        height: 30px;
+        padding: 3px 12px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #5cb7ff;
+        border-radius: 0px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        margin-left: 9%;
+    }
+
+    .error-messages.ng-active {
+        color: red;
+        margin-left: 9%;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary" data-ng-init="loaddata()">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Master Illness Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal ng-pristine ng-valid" name="myForm" method="post" role="form" novalidate>
+                        <div class="row">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Illness Name <span style="color:red">*</span>:</label>
+                                    <div class="col-sm-8" style="">
+                                        <input class="form-control active" placeholder="Enter Illness Name" name="bn" ng-model="hmmilL_IllnessName"
+                                               type="text" required>
+                                        <div class="error-messages" ng-if="interacted(myForm.bn)" ng-messages="myForm.bn.$error">
+                                            <div ng-message="required">Enter Illness Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Description :</label>
+                                    <div class="col-sm-8" style="">
+                                        <textarea class="form-control" rows="2" type="text" placeholder="Enter Description" ng-model="hmmilL_IllnessDesc"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="box-body">
+                                <hr />
+                                <div class="text-center">
+                                    <input type="hidden" ng-model="HMMILL_Id" />
+                                    <md-button type="button" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="savedata()">
+                                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                        Save
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-if="GetIllnessLoadDataList.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Master Illness List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <!--<div class="col-sm-5">
+                <label class="col-sm-5 control-label text-bold margin-top-10">Export To Report : </label>
+                <div class="col-sm-7">
+                    <md-button type="button" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="ExportToExcel()">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>               
+            </div>-->
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" style="margin-left: -1%;" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL No</th>
+                        <th>Illness Name</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in behave =(GetIllnessLoadDataList | filter : search) | orderBy :sortKey:reverse |itemsPerPage:itemsPerPage"
+                        current-page="currentPage">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-left">{{ user.hmmilL_IllnessName}}</td>
+                        <td class="text-left">{{ user.hmmilL_IllnessDesc}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="editdata(user)"
+                               data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o text-black" aria-hidden="true"></i>
+                            </a>
+                            |
+                            <span ng-if="user.hmmilL_ActiveFlg === true">
+                                <a href="" ng-click="ActiveDeactive(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Deactivate Record">
+                                    <i class="fa fa-toggle-on" title="Deactivate Record"></i>
+                                </a>
+                            </span>
+                            <span ng-if="user.hmmilL_ActiveFlg === false">
+                                <a href="" ng-click="ActiveDeactive(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Activate Record">
+                                    <i class="fa fa-toggle-off" title="Activate Record"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div ng-show="dsfsdsdfd" id="printSectionId">
+    <div class="row">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <br />
+    <div class="row text-center">
+        <h3>Master Illness Report</h3>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL No</th>
+                        <th>Illness Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in GetIllnessLoadDataList">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-left">{{ user.hmmilL_IllnessName}}</td>
+                        <td class="text-left">{{ user.hmmilL_IllnessDesc}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div ng-show="dsfsdsdfd" id="tableId">
+
+    <table>
+        <tr style="border:0.5px solid black !important">
+            <td colspan="3" style="text-align:center ;font-weight:bold">
+                {{instname}}
+            </td>
+        </tr>
+        <tr style="border:0.5px solid black !important">
+            <td colspan="3" style="text-align:center ;font-weight:bold">
+                Master Illness Report
+            </td>
+        </tr>
+        <tr style="border:0.5px solid black !important">
+            <td colspan="3">&nbsp;</td>
+        </tr>
+    </table>
+    <table>
+        <tr style="border:0.5px solid black !important">
+            <th>SL No</th>
+            <th>Illness Name</th>
+            <th>Description</th>
+        </tr>
+        <tr style="border:0.5px solid black !important" ng-repeat="user in GetIllnessLoadDataList">
+            <td class="text-center">{{$index+1}}</td>
+            <td class="text-left">{{ user.hmmilL_IllnessName}}</td>
+            <td class="text-left">{{ user.hmmilL_IllnessDesc}}</td>
+        </tr>
+    </table>
+</div>
+

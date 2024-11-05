@@ -1,0 +1,380 @@
+﻿<style>
+    input[type="file"] {
+        display: none !important;
+    }
+
+    .imgview img {
+        width: 160px;
+        height: 150px !important;
+        margin-bottom: 10px;
+    }
+
+    .middle {
+        transition: .5s ease;
+        opacity: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .col-sm-2:hover img {
+        opacity: 0.3;
+    }
+
+    .col-sm-2:hover .middle {
+        opacity: 1;
+    }
+
+    .text i {
+        padding: 10px 10px;
+    }
+
+    .text {
+        color: white;
+        font-size: 16px;
+        padding: 5px 5px;
+    }
+</style>
+
+<link href="../css/print/PortalInteraction/interaction.css" rel="stylesheet" />
+
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Gallery</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Gallery Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" name="gallery" ng-model="igA_GalleryName" maxlength="30" allow-pattern="([a-zA-Z0-9\s.])" required>
+                                <div class="error-messages text-center" ng-if="interacted(myForm.gallery)" ng-messages="myForm.gallery.$error">
+                                    <div ng-message="required">Please Enter Gallery Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-lg-offset-4">
+                                <div class="well">
+                                    <div class="text-center" ng-init="mediatype='I'">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="I" name="images" ng-model="mediatype" ng-change="mediachange();">
+                                            <span class="lbl padding-8">Images</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="V" name="videos" ng-model="mediatype" ng-change="mediachange();">
+                                            <span class="lbl padding-8">Videos</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <!-- ===============================================IMAGE Upload======================================== -->
+                            <div class="form-group" ng-show="mediatype=='I'">
+                                <div class="col-sm-8 col-sm-offset-7">
+                                    <label for="upload-I" class="btn btn-primary">Select Images</label>
+                                    <input id="upload-I" type="file" data-ng-model="Images" accept="image/png, image/jpeg" name="Images_name"
+                                           ng-disabled="files_flag" multiple onchange="angular.element(this).scope().imageUpload(this)" />
+                                    <md-tooltip ng-if="files_flag==false" md-direction="top" style="padding-right:40px">
+                                        Don't Select Already selected Images
+                                    </md-tooltip>
+                                </div>
+                            </div>
+
+                            <!-- ===============================================Videos Upload======================================== -->
+                            <div class="form-group" ng-show="mediatype=='V'">
+                                <div class="col-sm-8 col-sm-offset-7">
+                                    <label for="upload-V" class="btn btn-primary">Select Videos</label>
+                                    <input id="upload-V" type="file" data-ng-model="videos" accept="video/mp4,video/x-ms-wmv" name="videos_name" ng-disabled="files_flag" multiple onchange="angular.element(this).scope().videoUpload(this)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="g_date" ng-model="igA_Date" o md-placeholder="Enter date"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.g_date)" ng-messages="myForm.g_date.$error">
+                                    <div ng-message="required">Select Date</div>
+                                    <div ng-message="valid">The entered value is not a date!</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-lg-offset-3">
+                                <div class="well">
+                                    <div class="text-center" ng-init="typeflag='CO'">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="CO" name="co" ng-model="typeflag">
+                                            <span class="lbl padding-8">Common</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="CORS" name="cors" ng-model="typeflag">
+                                            <span class="lbl padding-8">Course</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="roleflg!='Student' && typeflag=='CORS'">
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-3">Course/Branch : <span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8" style="margin-left: 0;width: 100%;height:inherit;">
+                                        <select class="form-control" data-ng-model="amcO_Id" name="course" ng-change="coursechange();">
+                                            <option value="">--Select Course--</option>
+                                            <option ng-repeat="option in courselist" value="{{option.amcO_Id}}">{{option.amcO_CourseName}}</option>
+                                        </select>
+                                        <select class="form-control" data-ng-model="amB_Id" name="branch" ng-change="branchchange();">
+                                            <option value="">--Select Branch--</option>
+                                            <option ng-repeat="option in branchlist" value="{{option.amB_Id}}">{{option.amB_BranchName}}</option>
+                                        </select>
+                                        <select class="form-control" data-ng-model="amsE_Id" name="semester" ng-change="semesterchange();">
+                                            <option value="">--Select Semester--</option>
+                                            <option ng-repeat="option in semesterlist" value="{{option.amsE_Id}}">{{option.amsE_SEMName}}</option>
+                                        </select>
+                                        <span>
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search Section here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="" ng-model="usercheckCls" type="checkbox" ng-click="all_checkCls(usercheckCls)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="cls in sectionlist | filter : searchValue">
+                                            <input name="class" ng-model="cls.clsck" type="checkbox" data-ng-click="onselect()"
+                                                   ng-required="isOptionsRequiredCls()">
+                                            <span class="lbl padding-8">
+                                                {{cls.acmS_SectionName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="roleflg=='Student' && typeflag=='CO'">
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-3 padding-right-none">
+                                    <input type="text" class="form-control active" name="cls" ng-disabled="true" value="asmcL_Id" ng-model="coursename" maxlength="30" allow-pattern="([a-zA-Z0-9\s.])">
+                                </div>
+                                <div class="col-sm-4 padding-left-none">
+                                    <input type="text" class="form-control active" name="sec" ng-disabled="true" value="asmS_Id" ng-model="branchname" maxlength="30" allow-pattern="([a-zA-Z0-9\s.])">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div ng-if="mediatype=='I'">
+                            <div class="imgview" ng-show="stepsModel.length>0">
+                                <div class="row">
+                                    <div class="col-sm-2" ng-repeat="step in stepsModel track by $index">
+                                        <img class="img-responsive img-bordered" ng-src="{{step}}" />
+                                        <div class="middle">
+                                            <div class="text">
+                                                <i class="fa fa-eye" style="font-size:30px;color:#3a5999;" title="Preview" ng-click="previewimg(step);"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-if="mediatype=='V'">
+                            <div class="row">
+                                <div class="col-sm-6 col-sm-offset-3" ng-if="fileflg">
+                                    <b style="font-size: 20px; padding: 10px;">{{filenames}}</b>
+                                    <i class="fa fa-play" style="font-size:25px;color:#3a5999;" title="Preview"
+                                       data-toggle="modal" data-target="#myModalPreviewVideo" ng-click="previewVideo();"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer text-center">
+                    <div class="form-group">
+                        <input type="hidden" ng-model="igA_Id" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="uploaddata()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Upload
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Clear
+                        </md-button>
+                    </div>
+                </div>
+                <!--=============================== Gallery Grid  ==================================-->
+                <div class="box box-primary" ng-show="get_galleryimg.length>0">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Gallery Details</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-4 pull-right">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-hover table-responsive table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('IGA_GalleryName')">Gallery Name</a></th>
+                                    <th><a href="" ng-click="sortBy('IGA_Date')"> Date</a></th>
+                                    <th><a href="" ng-click="sortBy('IGA_Time')">Time</a> </th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in get_galleryimg">
+                                    <td>{{$index+1}}</td>
+                                    <td class="text-left">{{user.IGA_GalleryName}}</td>
+                                    <td class="text-left">{{user.IGA_Date | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-left">{{user.IGA_Time}}</td>
+                                    <td class="text-center">
+                                        <span ng-if="user.IGA_ActiveFlag === false">
+                                            <a href="" ng-click="deactive(user)"
+                                               class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                <i> Activate </i>
+                                            </a>
+                                        </span>
+                                        <span ng-if="user.IGA_ActiveFlag === true">
+                                            <a href="" ng-click="deactive(user)"
+                                               class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                <i> Deactivate</i>
+                                            </a>
+                                        </span>
+
+                                        &nbsp;&nbsp;
+                                        <span>
+                                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="item" data-ng-model="itemOption" data-target="#myModalCover" data-ng-click="getmodeldetails(user.IGA_Id)">
+                                                <i class="fa fa-med-o fa-1x" aria-hidden="true">View</i>
+                                                <!--<span ng-if="user.IGAP_Id!=null"><i class="fa fa-picture-o fa-1x" aria-hidden="true">View Photos</i></span>
+                                                <span ng-if="user.IGAV_Id!=null"><i class="fa fa-play fa-1x" aria-hidden="true">View Videos</i></span>-->
+                                            </a>
+                                        </span>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!--==================== Image Preview Model ===========================-->
+    <div id="myModalPreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:80%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h3>{{filenames}}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--==================== Video Preview Model ===========================-->
+    <div class="modal fade modal-small" id="myModalPreviewVideo" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            </div>
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div ng-repeat="vi in view_videos" style="padding-bottom:20px; padding-left:175px;">
+                        <video width="320" height="240" controls="controls" oncontextmenu="return false;">
+                            <source ng-src="{{vi.video_path | trustUrl}}" type="video/mp4">
+                            Your browser does not support HTML5 video.
+                        </video>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--==================== Image Cover Model ===========================-->
+    <div id="myModalCover" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:60%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h4 class="modal-title text-white">Gallery Images/Videos </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="imgview">
+                        <div class="row">
+                            <div ng-repeat="ig in covermodel">
+                                <div ng-if="ig.IGAP_Id!=null">
+                                    <div class="col-sm-3">
+                                        <div ng-if="!ig.IGAP_CoverPhotoFlag">
+                                            <img class="img-responsive img-bordered" ng-src="{{ig.IGAP_Photos}}" />
+                                        </div>
+                                        <div ng-if="ig.IGAP_CoverPhotoFlag">
+                                            <img class="img-responsive img-bordered" ng-src="{{ig.IGAP_Photos}}" />
+                                            <div class="text-center" style="position: absolute; top: 150px; font-weight: bold; left: 25px;">
+                                                <i class="fa fa-check" style="font-size: 17px;color: #066f14;font-weight: bold;">&nbsp;&nbsp;Cover Image</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-if="ig.IGAV_Id!=null">
+                                    <div class="col-sm-6 col-sm-offset-2">
+                                        <video width="520" height="240" controls="controls" oncontextmenu="return false;">
+                                            <source ng-src="{{ig.IGAV_Videos | trustUrl}}" type="video/mp4">
+                                            Your browser does not support HTML5 video.
+                                        </video>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

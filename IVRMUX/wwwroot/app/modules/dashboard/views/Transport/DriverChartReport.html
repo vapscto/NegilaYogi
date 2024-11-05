@@ -1,0 +1,345 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary" data-ng-init="BindData()">
+            <div class="box-header with-border">
+                <h3 class="box-title">Vehicle Fuel Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> Vehicle Type<span style="color:Red">*</span></label>
+                                <div class="col-sm-6">
+                                    <select name="rhg" ng-model="trmvT_Id" class="form-control" required ng-change="vehicletypechange();">
+                                        <option value="">--Select--</option>
+                                        <option value="0">ALL</option>
+                                        <option ng-repeat="vh1 in fillvahicletype" value="{{vh1.trmvT_Id}}">
+                                            {{vh1.trmvT_VehicleType}}
+                                    </select><div class="error-messages" ng-if="interacted(myForm.rhg)" ng-messages="myForm.rhg.$error">
+                                        <div ng-message="required">Select Vehicle Type</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> From Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8 ol-sm-offset-4">
+                                    <md-datepicker name="insto" ng-model="frmdate" onkeydown="return false" id="frmdate" md-max-date="maxDateFrom" md-min-date="minDateFrom" md-placeholder="Select date" ng-change="setToDate(frmdate)" ng-required="FormatType =='Format1'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.insto)" ng-messages="myForm.insto.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">  To Date:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">    
+                                    <md-datepicker name="insto1" ng-model="todate" onkeydown="return false" id="todate" md-max-date="maxDateTo" md-min-date="minDateTo" ng-change="OnchageToDate()" md-placeholder="Select date" ng-required="FormatType =='Format1'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.insto1)" ng-messages="myForm.insto1.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-sm-6">
+                            <div class="error-messages" ng-if="interacted(myForm.selcolchbx1)" ng-messages="myForm.selcolchbx1.$error">
+                                <div ng-message="required">Select At Least One Checkbox</div>
+                            </div>
+                            <md-subheader> VEHICLE NUMBER </md-subheader>
+                            <div class="form-group">
+                                <div class="multiselect col-sm-10" style="margin-left: 4.2%;height:250px;">
+                                    <input type="checkbox" style="float:left;" name="allchbx1" data-ng-model="allstdcheck" ng-click="allstudentcheck();">
+                                    <span class="lbl padding-8">ALL</span>
+                                    <hr />
+                                    <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                    <ul class="padding-left-none">
+
+                                        <li ng-repeat="usr1 in fillvahicleno |filter:searchchkbx1" value="{{usr1.trmV_Id}}">
+                                            <div class="col-sm-12">
+
+                                                <input type="checkbox" style="float:left;" name="selcolchbx1" data-ng-model="usr1.checkedgrplst1" ng-click="firstfnc1(usr1);"><!--ng-required="isOptionsRequired1()"-->
+                                                <!--<input hidden="hidden" data-ng-model="usr.fmG_Id" />-->
+                                                <span class="lbl padding-8">{{ usr1.trmV_VehicleNo }}</span>
+                                            </div>
+
+
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-3">
+                          
+                        </div>
+                        <div class="col-sm-6 col-sm-offset-3">
+                         
+                        </div>
+
+                    </div>
+                    <br />
+                    <hr />
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="getreport()">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                            </md-button>
+                            <md-button type="button" ng-click="printData()" class="md-raised md-primary" ng-disabled="getloaddata.length==0">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                print
+                            </md-button>
+                            <md-button type="button" ng-click="exportToExcel('#table1')" target="_blank" class="md-raised md-primary" ng-disabled="getloaddata.length==0">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<GRID VIEW>-->
+            <!--< Table>-->
+            <div class="box box-primary" ng-show="griddeatails">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Vehicle Fuel Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body" style="overflow:scroll">
+                    <div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{getloaddata.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="searchValue!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue1.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-hover table-responsive table-bordered text-center" border="1" id="tabel11" style="border-collapse:collapse">
+
+                            <thead>
+                                <tr>
+                                    <th>
+                                        SL.No.
+                                    </th>
+
+                                    <th>
+                                        <a href="" ng-click="sortBy('trdC_Date')">
+                                            Date
+                                        </a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('trdC_Indent_BillNo')">Bill No</a> </th>
+                                    <th>
+                                        <a href="" ng-click="sortBy('trmD_DriverName')">
+                                           Driver Name
+                                        </a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('trmfT_FuelType')">Fuel</a> </th>
+                                    <th><a href="" ng-click="sortBy('trmV_VehicleNo')">Vehicle No</a> </th>
+                                  
+                                    <th><a href="" ng-click="sortBy('trdC_FromKM')">OP.KM</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_ToKM')">CL.KM</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_TotalKM')">TOTAL K.M</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_NoofLtr')">Liters</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_TotalMileage')">Mileage</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_RateKm')">Rate/Km</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_TotalAmount')">Total Amt</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_Emission')">Emission</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_AddtAmt')">Extra Amt</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_GrossAmount')">Gross Amt</a> </th>
+                                    <th><a href="" ng-click="sortBy('trdC_Remarks')">Remarks</a> </th>
+
+
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+                                <tr dir-paginate="user in filterValue1=(getloaddata | filter : searchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td>{{ user.trdC_Date|date:'dd/MM/yyyy'}}</td>
+                                    <td>{{ user.trdC_Indent_BillNo}}</td>
+                                    <td>{{ user.trmD_DriverName }}</td>
+                                    <td>{{ user.trmfT_FuelType}}</td>
+                                    <td>{{ user.trmV_VehicleNo}}</td>
+                                    <td>{{ user.trdC_FromKM}}</td>
+                                    <td>{{ user.trdC_ToKM}}</td>
+                                    <td>{{ user.trdC_TotalKM}}</td>
+                                    <td>{{ user.trdC_NoofLtr}}</td>
+                                    <td>{{ user.trdC_TotalMileage |number:2}}</td>
+
+                                    <td>{{ user.trdC_RateKm}}</td>
+                                    <td>{{ user.trdC_TotalAmount}}</td>
+                                    <td>{{ user.trdC_Emission}}</td>
+                                    <td>{{ user.trdC_AddtAmt }}</td>
+                                    <td>{{ user.trdC_GrossAmount}}</td>
+                                    <td>{{ user.trdC_Remarks}}</td>
+                                    <!--<td>{{ user.trdC_GrossAmount}}</td>-->
+
+
+                                </tr>
+                                <tr>
+                                    
+                                    <td colspan="6"><b>TOTAL</b></td>
+                                    <td><b>{{opentt }}</b></td>
+                                    <td><b>{{closett }}</b></td>
+                                    <td><b>{{totaltt }}</b></td>
+                                    <td><b>{{literstt |number:2}}</b></td>
+                                    <td><b>{{millagett |number:2}}</b></td>
+                                    <td><b>{{ratett |number:2}}</b></td>
+                                    <td><b>{{totalamttt |number:2}}</b></td>
+                                    <td><b>{{emstt |number:2}}</b></td>
+                                    <td><b>{{extratt |number:2}}</b></td>
+                                    <td><b>{{grsstt |number:2}}</b></td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </tbody>
+
+
+
+
+                        </table>
+                        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>
+                    </div>
+
+
+                <div id="printareaId" ng-show="tadprint">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center> <h4>Vehicle Fuel Report</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.No.
+                                </th>
+
+                                <th>
+                                    
+                                        Date
+                                   
+                                </th>
+                                <th>Bill No</th>
+                                <th >
+                                   
+                                        Driver Name
+                                    
+                                </th>
+                                <th>Fuel </th>
+                                <th>Vehicle No </th>
+
+                                <th >OP.KM </th>
+                                <th>CL.KM</th>
+                                <th>TOTAL K.M</th>
+                                <th>Liters </th>
+                                <th>Mileage </th>
+                                <th>Rate/Km </th>
+                                <th>Total Amt </th>
+                                <th>Emission</th>
+                                <th>Extra Amt </th>
+                                <th style="width:100px !important">Gross Amt</th>
+                                <th>Remarks </th>
+
+
+
+                            </tr>
+
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="rt in getloaddata">
+                                <td>{{$index+1}}</td>
+                                <td class="text-center" style="word-break:break-all !important">{{ rt.trdC_Date|date:'dd/MM/yyyy'}}</td>
+                                <td class="text-center" style="word-break:break-all !important">{{ rt.trdC_Indent_BillNo}}</td>
+                                <td class="text-center" style="word-break:break-all !important">{{ rt.trmD_DriverName }}</td>
+                                <td class="text-center">{{ rt.trmfT_FuelType}}</td>
+                                <td class="text-center" style="width:100px !important">{{ rt.trmV_VehicleNo}}</td>
+                                <td class="text-center">{{ rt.trdC_FromKM}}</td>
+                                <td class="text-center">{{ rt.trdC_ToKM}}</td>
+                                <td class="text-center">{{ rt.trdC_TotalKM}}</td>
+                                <td class="text-center">{{ rt.trdC_NoofLtr}}</td>
+                                <td class="text-center">{{ rt.trdC_TotalMileage}}</td>
+                                <td class="text-center">{{ rt.trdC_RateKm}}</td>
+                                <td class="text-center">{{ rt.trdC_TotalAmount}}</td>
+                                <td class="text-center">{{ rt.trdC_Emission}}</td>
+                                <td class="text-center">{{ rt.trdC_AddtAmt }}</td>
+                                <td class="text-center">{{ rt.trdC_GrossAmount}}</td>
+                                <td class="text-center" style="width:150px !important;word-break:break-all !important" >{{ rt.trdC_Remarks}}</td>
+                            </tr>
+
+                            <tr>
+
+                                <td colspan="6" class="text-center"><b>TOTAL</b></td>
+                                <td><b>{{opentt }}</b></td>
+                                <td><b>{{closett }}</b></td>
+                                <td><b>{{totaltt }}</b></td>
+                                <td><b>{{literstt |number:2}}</b></td>
+                                <td><b>{{millagett |number:2}}</b></td>
+                                <td><b>{{ratett |number:2}}</b></td>
+                                <td><b>{{totalamttt |number:2}}</b></td>
+                                <td><b>{{emstt |number:2}}</b></td>
+                                <td><b>{{extratt |number:2}}</b></td>
+                                <td><b>{{grsstt |number:2}}</b></td>
+                                <td>&nbsp;</td>
+                            </tr>
+
+
+                        </tbody>     
+                        <tfoot>
+                            <tr>
+                                <td colspan="17" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+            </div>
+    </form>
+</section>

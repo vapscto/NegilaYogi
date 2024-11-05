@@ -1,0 +1,482 @@
+﻿<section class="content">
+    <style>
+
+        .k-icon, .k-tool-icon {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            width: 0em !important;
+            height: 0em !important;
+            text-align: center;
+            vertical-align: middle;
+            background-image: none;
+            font: 16px/1 WebComponentsIcons;
+            speak: none;
+            font-variant: normal;
+            text-transform: none;
+            text-indent: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: inherit;
+        }
+
+        .k-filter-row th, .k-grid-header th.k-header {
+            overflow: hidden;
+            border-style: solid;
+            border-width: 0 0 1px 1px;
+            /*padding: 18.5em 12.6em 0.4em 0.6em;*/
+            font-weight: 400;
+            white-space: normal !important;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+    </style>
+
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="loadbasicdata()" method="post" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Group Wise Students Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row text-center">
+                    <div class="col-sm-10 col-sm-offset-1" ng-init="radio_val=='all'">
+                        <div class="well">
+                            <label class="radio-inline">
+                                <input type="radio" name="all" ng-model="radio_val" value="all" ng-checked="true" ng-click="getVal()">
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="individual" ng-model="radio_val" value="individual" ng-click="getVal()">
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="student_wise" ng-model="radio_val" value="student_wise" ng-click="getVal()">
+                                <span class="lbl padding-8">Student Wise</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="admCat" value="admCat" ng-model="radio_val" ng-click="getVal()">
+                                <span class="lbl padding-8">Admission Category</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="unmapped" value="unmapped" ng-model="radio_val" ng-click="getVal()">
+                                <span class="lbl padding-8">Unmapped</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="Termwise" value="Termwise" ng-model="radio_val" ng-click="getVal()">
+                                <span class="lbl padding-8">Termwise Paid Details</span>
+                            </label>
+
+                            <label class="radio-inline" ng-show="radio_val=='all' || radio_val=='individual' || radio_val=='student_wise' || radio_val=='admCat'">
+                                <input type="checkbox" ng-init="checked=true" ng-model="checked" value="group_wise" ng-disabled="radio_val=='student_wise' || radio_val=='admCat'">
+                                <span class="lbl padding-4">Group Wise</span>
+                            </label>
+                            <label class="radio-inline" ng-show="radio_val=='all' || radio_val=='individual' || radio_val=='student_wise' || radio_val=='admCat'">
+                                <input type="checkbox" ng-model="amntchecked" value="amount" ng-disabled="radio_val=='student_wise' || radio_val=='admCat'">
+                                <span class="lbl padding-4">Amount</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="checkbox" ng-model="bulkdownload" ng-click="Clickblk()">
+                                <span class="lbl padding-4">Bulk Download</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group" ng-show="radio_val=='all' || radio_val=='individual' || radio_val=='student_wise' || radio_val=='Termwise' || radio_val=='admCat' || radio_val=='unmapped'">
+                        <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="acdYr" ng-model="asmaY_Id" name="year"
+                                    ng-change="onselectyrdrpdwn(asmaY_Id)" ng-required="radio_val=='all' || radio_val=='individual' || radio_val=='student_wise' || radio_val=='Termwise' || radio_val=='admCat'">
+                                <option value="">Select</option>
+                                <option ng-repeat="year in yearlist" value="{{year.asmaY_Id}}"> {{year.asmaY_Year}} </option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.year)" ng-messages="myForm.year.$error">
+                                <div ng-message="required">Please Select Academic Year</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group" ng-show="radio_val=='all' || radio_val=='individual' || radio_val=='unmapped'" ng-if=" radio_val=='all' || radio_val=='individual' || radio_val=='unmapped'">
+                        <label class="control-label col-sm-4">Fee Group:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                        <div class="multiselect col-sm-7">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <label>
+                                <input name="all" value="1" ng-model="obj.feegroupselected" type="checkbox" ng-click="all_checktype()">
+                                <span class="lbl padding-8">
+                                    <b> All</b>
+                                </span>
+                            </label>
+                            <label ng-repeat="feegroup in fee_group_list | filter:searchValue ">
+                                <input name="feegrp" data-ng-model="feegroup.selected" type="checkbox" ng-click="togchkbxtype()" title="Select Academic Year" ng-required="isOptionsRequiredtype()">
+                                <span class="lbl padding-8">
+                                    <b>   {{feegroup.fee_Group}} </b>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.feegrp)" ng-required="radio_val=='all' || radio_val=='individual' || radio_val=='unmapped'" ng-messages="myForm.feegrp.$error">
+                            <div ng-message="required">Please Select Fee Group</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-sm-6">
+                    <div class="form-group" ng-show="radio_val=='individual' || radio_val=='student_wise'  || radio_val=='Termwise' || radio_val=='admCat'">
+                        <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="cls" ng-model="asmcL_Id" name="class" ng-change="onselectclsdrpdwn(asmcL_Id)" ng-required="radio_val=='individual' || radio_val=='student_wise' || radio_val=='admCat'">
+                                <option value="">Select</option>
+                                <option ng-repeat="class in class_list" value="{{class.asmcL_Id}}"> {{class.asmcL_ClassName}} </option>
+                                <option value="0">--All--</option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                <div ng-message="required">Please Select Class</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group" ng-show="radio_val=='individual' || radio_val=='student_wise' || radio_val=='Termwise' || radio_val=='admCat'">
+                        <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="sec" ng-model="asmS_Id" ng-change="onselectsectiondrpdwn(asmS_Id)" name="section" ng-required="radio_val=='individual' || radio_val=='student_wise' || radio_val=='admCat'">
+                                <option value="">Select</option>
+                                <option ng-repeat="section in section_list" value="{{section.asmS_Id}}"> {{section.asmC_SectionName}} </option>
+                                <option value="0">All</option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.section)" ng-messages="myForm.section.$error">
+                                <div ng-message="required">Please Select Section</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group" ng-show="radio_val=='student_wise' || radio_val=='Termwise'">
+                        <label class="control-label col-sm-4">Student:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="stud" ng-model="stuD_Id" name="student" ng-required="radio_val=='student_wise' || radio_val=='Termwise'">
+                                <option value="">Select</option>
+                                <option ng-repeat="option in student_name_list" value="{{option.amsT_Id}}">
+                                    {{option.amaY_RollNo==null?'':option.amaY_RollNo+' :'}}
+                                    {{option.amsT_FirstName==null?'':option.amsT_FirstName}}
+                                    {{option.amsT_MiddleName==null?'':' '+option.amsT_MiddleName}}
+                                    {{option.amsT_LastName==null?'':' '+option.amsT_LastName}}
+                                </option>
+
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.student)" ng-messages="myForm.student.$error">
+                                <div ng-message="required">Please Select Student</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group" ng-show="radio_val=='admCat'">
+                        <label class="control-label col-sm-4">Category:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="catgry" ng-model="fmcC_Id" name="category" ng-required="radio_val=='admCat'">
+                                <option value="">Select</option>
+                                <option ng-repeat="class in class_category_list" value="{{class.imcC_Id}}"> {{class.imcC_CategoryName}} </option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.category)" ng-messages="myForm.category.$error">
+                                <div ng-message="required">Please Select Category</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div ng-show="radio_val=='individual'">
+                        <md-subheader>Student Selection Options</md-subheader>
+                        <div class="well">
+                            <label class="radio-inline" ng-init="stud_sel = 'S'">
+                                <input type="radio" name="study" value="S" ng-model="stud_sel">
+                                <span class="lbl padding-8">Studying</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="left" value="L" ng-model="stud_sel">
+                                <span class="lbl padding-8">TC Students</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="deactivated" value="D" ng-model="stud_sel">
+                                <span class="lbl padding-8">Deactivated</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="new" value="N" ng-model="stud_sel">
+                                <span class="lbl padding-8">New Admission</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <hr />
+                    <div class="col-sm-6 col-lg-offset-3">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="showreport()">
+                                Show Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-primary" data-ng-click="Clearid()">
+                                Clear
+                            </md-button>
+                            <md-button type="submit" class="md-raised md-primary" ng-click="printData();" ng-show="print">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                print
+                            </md-button>
+
+
+                            <md-button type="submit" class="md-raised md-primary" ng-click="printDataterm();" ng-show="radio_val=='Termwise'">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                print
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box box-primary" ng-show="bulkdownload==true">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Report </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="gridall"></div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="box box-primary" ng-show="showgrid" ng-hide="bulkdownload==true">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Group Wise Students Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{totcountfirst}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchString!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchString" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                    <thead>
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>SLNO</th>
+                            <th><a href="" ng-click="sortBy('AMST_AdmNo')">Adm. NO.</a></th>
+                            <th><a href="" ng-click="sortBy('AMST_FirstName')">Student Name</a></th>
+                            <th><a href="" ng-click="sortBy('ASMCL_ClassName')">Class</a> </th>
+                            <th><a href="" ng-click="sortBy('ASMC_SectionName')">Section</a> </th>
+                            <th><a href="" ng-click="sortBy('AMAY_RollNo')">Roll No.</a></th>
+                            <th ng-show="feeGrp"><a href="" ng-click="sortBy('FMG_GroupName')">Fee Group</a></th>
+                            <th ng-show="amtFlag"><a href="" ng-click="sortBy('Amount')">Amount</a> </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr dir-paginate="user in filterValue=(searchdatalist  | filter : searchString) |orderBy:sortKey:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page">
+
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{ user.AMST_AdmNo}}</td>
+                            <td> {{ user.AMST_FirstName}}</td>
+                            <td>{{ user.ASMCL_ClassName}}</td>
+                            <td>{{ user.ASMC_SectionName}}</td>
+                            <td>{{ user.AMAY_RollNo}}</td>
+                            <td ng-show="feeGrp">{{ user.FMG_GroupName}}</td>
+                            <td ng-show="amtFlag">{{ user.Amount}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5" pagination-id="page"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+
+
+
+
+            <div id="printSectionId" ng-show="print_data" style="overflow:scroll">
+
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center> <h4><u> FEE GROUP WISE STUDENTS REPORT </u></h4></center>
+                <table ng-show="tadprint" class="table table-hover table-responsive table-bordered text-center" id="table">
+                    <thead>
+                        <tr style="text-align:center">
+
+                            <th><center>SLNO</center></th>
+                            <th><center>Adm. NO.</center></th>
+                            <th><center>Student Name</center></th>
+                            <th><center>Class</center> </th>
+                            <th><center>Section</center></th>
+                            <th><center>Roll No.</center></th>
+                            <th ng-if="checked == true"><center>Fee Group</center></th>
+                            <th ng-if="amntchecked == true"><center>Amount</center> </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in printdatatable">
+                            <!--<tr ng-repeat="user in reportdetails">-->
+
+                            <td>{{ $index+1}}</td>
+                            <td>{{ user.AMST_AdmNo}}</td>
+                            <td> {{ user.AMST_FirstName}}</td>
+                            <td>{{ user.ASMCL_ClassName}}</td>
+                            <td>{{ user.ASMC_SectionName}}</td>
+                            <td>{{ user.AMAY_RollNo}}</td>
+                            <td ng-if="checked == true">{{ user.FMG_GroupName}}</td>
+                            <td ng-if="amntchecked == true">{{ user.Amount}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="16" class="col-sm-12 text-center ">
+                                <label>
+                                    Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                </label>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-if="radio_val=='Termwise' && termwisedetails.length>0">
+
+            <div class="box-header with-border">
+                <h3 class="box-title">FEE TERMWISE REPORT</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body" id="printdatatable1">
+                <label>Student Name :{{Studename}}</label>
+    <label>Class :{{classname}}   Section :{{sectionname}}</label>
+                <!--<div id="gridind">
+
+    </div>-->
+
+
+                <table class="table table-bordered table-condensed">
+                    <thead>
+                        <tr>
+                            <th>SL No</th>
+                            <th>
+                                Head Name
+                            </th>
+                           
+                            <th ng-repeat="user in termlist">
+                                <span>{{user.fmT_Name}}</span>
+                            </th>
+
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="opt in termwisedetails">
+                            <td>{{$index+1}}</td>
+                            <td>
+                                {{opt.FMH_FeeName}}
+                            </td>
+                            
+
+
+                            <td ng-repeat="user in termlist">
+                                <span>
+                                    {{opt[user.fmT_Name]}}
+
+                                </span>
+                            </td>
+
+                           
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr ng-repeat="opt in paiddatelist">
+                            <td colspan="2">SUM</td>
+                           
+
+
+                            <td ng-repeat="user in termlist">
+                                <span>
+                                    {{opt[user.fmT_Name]}}
+
+                                </span>
+                            </td>
+
+
+                        </tr>
+                    </tfoot>
+
+                </table>
+
+
+            </div>
+        </div>
+    </form>
+</section>

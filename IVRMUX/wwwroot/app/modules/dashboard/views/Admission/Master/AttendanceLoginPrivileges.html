@@ -1,0 +1,362 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary" ng-init="isExpanded = false">
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Login Privileges</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="text-center well" ng-show="labeldisable">
+                            <label class="text-danger">Please Select Radio Button to Proceed</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="well">
+                            <div class="text-center">
+                                <label class="radio-inline">
+                                    <input name="optradio" type="radio" data-ng-model="type" value="1" ng-click="getDataByType(1);" required ng-disabled="disable==2 ||disable==3 || selectedcls_sec_subs.length>0">
+                                    <span class="lbl padding-8">Subject Teacher</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input name="optradio" type="radio" data-ng-model="type" value="2" ng-click="getDataByType(2);" required ng-disabled="disable==1 ||disable==3 || selectedcls_sec_subs.length>0">
+                                    <span class="lbl padding-8">Class Teacher</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input name="optradio" type="radio" data-ng-model="type" value="3" ng-click="getDataByType(3);" required ng-disabled="disable==1 ||disable==2 || selectedcls_sec_subs.length>0">
+                                    <span class="lbl padding-8">Others</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                                <div ng-message="required">Select any one of the radio button</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel11" data-ng-model="ASMAY_Id" name="yr" ng-change="getyear()" ng-disabled="selectedcls_sec_subs.length>0" required>
+                                    <option value="">Please Select</option>
+                                    <option ng-repeat="year in accyear" value="{{year.asmaY_Id}}" ng-selected="{{year.Selected == true}}">{{year.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.yr)" ng-messages="myForm.yr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">User/ Staff:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="stf" ng-model="obj.IVRMUL_Id" theme="bootstrap" ng-change="tchetslist(obj)"
+                                           ng-keyup="searchfilter($select,user.status);" title="Select User" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Staff">{{$select.selected.userName}}</ui-select-match>
+                                    <ui-select-choices repeat="tchers in teachers | filter: $select.search" value="{{tchers.userId}}"
+                                                       ng-selected="{{tchers.Selected == true}}">
+                                        <div ng-bind-html="tchers.userName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.stf)" ng-messages="myForm.stf.$error">
+                                    <div ng-message="required">Select User/Staff</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="type == 2 || type == 3">
+            <div class="box-header with-border">
+                <h3 class="box-title">Class-Section Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <md-subheader class="col-sm-12">Class-Section<strong style="color:red;">*</strong></md-subheader>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="sctn2 in classsectionList">
+                                        <input value="{{sctn2.classsection}}" data-ng-model="sctn2.Selectedcsm" type="checkbox" ng-change="test3(sctn2,classsectionList)">
+                                        <span class="lbl padding-8">{{sctn2.name}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <md-subheader class="col-sm-12">Class-Section </md-subheader>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="r12 in resultclasssectionData">
+                                        <input value="{{r12.classsection}}" data-ng-model="r12.Selectedcsm1" type="checkbox" ng-change="revtest3(r12);">
+                                        <span class="lbl padding-8">{{r12.name}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" value="{{asalU_Id}}" data-ng-model="asalU_Id" />
+                    <input type="hidden" value="{{asaluC_Id}}" data--ng-model="asaluC_Id" />
+                    <md-button type="submit" class="md-raised md-primary" ng-click="SaveLoginPriviledges(obj)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+        <div class="box box-primary" ng-show="type == 2 && count > 0 || type == 3 && count > 0">
+            <!--<div ng-show="count > 0">-->
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Login Privileges List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th><a href="" ng-click="sort('')">SL.No</a></th>
+                            <th><a href="" ng-click="sort('asmaY_Year')">Year </a></th>
+                            <th><a href="" ng-click="sort('userName')">Staff Name</a></th>
+                            <th><a href="" ng-click="sort('asmcL_ClassName')">Class</a></th>
+                            <th><a href="" ng-click="sort('asmC_SectionName')">Section</a></th>
+                            <!--<th><a href="" ng-click="sort('pamS_SubjectName')">Subject</a></th>-->
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in loginPData |orderBy:sortKey:reverse|filter:search|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.asmaY_Year}}</td>
+                            <td>{{ user.userName}}</td>
+                            <td>{{ user.asmcL_ClassName}}</td>
+                            <td>{{ user.asmC_SectionName}}</td>
+                            <td>
+                                <a ng-click="edit(user.asalU_Id,user.asaluC_Id);" title="Edit">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </a>
+                                <a ng-click="DeleteAttPrivileges(user);" title="Delete">
+                                    <i class="fa fa-trash text-danger" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+            <!--</div>-->
+        </div>
+
+        <!--Class-Section & Subject Mapping-->
+
+        <div class="box box-primary" ng-show="type == 1">
+            <div class="box-header with-border">
+                <h3 class="box-title">Class-Section & Subject Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <md-subheader class="col-sm-12">Class-Section:<strong style="color:red;">*</strong></md-subheader>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="sctn in classsectionList">
+                                        <input value="{{sctn.classsection}}" data-ng-model="sctn.Selected" type="checkbox" ng-change="test(sctn,classsectionList)" name="cls_sec_option" ng-required="is_cls_sec_required() && selectedcls_sec_subs.length<0">
+                                        <span class="lbl padding-8">{{sctn.name}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.cls_sec_option)" ng-messages="myForm.cls_sec_option.$error">
+                                <div ng-message="required">Please Select Class-Section</div>
+                            </div>
+                        </div>
+                        <!--<div class="col-sm-6">
+                            <div class="form-group">
+                                <md-subheader class="col-sm-12">Class-Section:</md-subheader>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="r1 in resultData">
+                                        <input value="{{r1.classsection}}" data-ng-model="r1.Selected1" type="checkbox" ng-change="revtest(r1);">
+                                        <span class="lbl padding-8">{{r1.name}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>-->
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <md-subheader class="col-sm-12">Subject: <strong style="color:red;">*</strong></md-subheader>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="sbjts in subjects">
+                                        <input value="{{sbjts.ismS_Id}}" data-ng-model="sbjts.Selectedsub" type="checkbox" ng-change="testsub2(sbjts,subjects)" name="sub_option" ng-required="is_sub_required() && selectedcls_sec_subs.length<0">
+                                        <span class="lbl padding-8">{{sbjts.ismS_SubjectName}}</span>
+                                    </label>
+                                </div>
+
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.sub_option)" ng-messages="myForm.sub_option.$error">
+                                <div ng-message="required">Please Select Subject</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="ivrmstauL_Id" value="{{ivrmstauL_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" ng-click="Mapsubject(obj)">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                        Add
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="clearpush_data()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                </div>
+                <table class="table table-hover table-responsive table-bordered" ng-show="selectedcls_sec_subs.length>0">
+                    <thead>
+                        <tr>
+                            <th>SL NO</th>
+                            <th><a href="" ng-click="sort('emp_name')">Employee Name</a></th>
+                            <th><a href="" ng-click="sort('asmcL_ClassName')">Class-Section</a></th>
+                            <th><a href="" ng-click="sort('ismS_SubjectName')">Subjects</a></th>
+                            <th colspan="2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-sortable="configA">
+                        <tr ng-repeat="cls in selectedcls_sec_subs |orderBy:sortKey:reverse">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left">{{cls.username}}</td>
+                            <td class="text-left">{{cls.cls_sec}}</td>
+                            <td class="text-left">
+                                <table>
+                                    <tr ng-repeat="sub in cls.subs">
+                                        <td class="text-left">{{sub.ISMS_SubjectName}}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="text-center">
+                                <span class="">
+                                    <a href="javascript:void(0)" ng-click="delete(cls,$index);">
+                                        <i class="fa fa-trash text-danger"></i><md-tooltip md-direction="down">Delete</md-tooltip>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" value="{{asalU_Id}}" data-ng-model="asalU_Id" />
+                    <input type="hidden" value="{{asaluC_Id}}" data--ng-model="asaluC_Id" />
+                    <input type="hidden" value="{{asalucS_Id}}" data--ng-model="asalucS_Id" />
+                    <md-button type="submit" class="md-raised md-primary" ng-click="SaveLoginPriviledges(obj)">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="type == 1 && count > 0">
+            <!--<div ng-show="count > 0">-->
+            <div class="box-header with-border">
+                <h3 class="box-title">Attendance Login Privileges List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SL.No</th>
+                            <th><a href="" ng-click="sort('asmaY_Year')">Year</a> </th>
+                            <th><a href="" ng-click="sort('userName')">Staff Name</a></th>
+                            <th><a href="" ng-click="sort('asmcL_ClassName')">Class</a></th>
+                            <th><a href="" ng-click="sort('asmC_SectionName')">Section</a></th>
+                            <th><a href="" ng-click="sort('pamS_SubjectName')">Subject</a></th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in loginPData |orderBy:sortKey:reverse|filter:search|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+
+                            <td class="text-center" ng-if="user.asalucS_Id > 0">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td class="text-center" ng-if="user.asalucS_Id > 0">{{user.asmaY_Year}}</td>
+                            <td class="text-left" ng-if="user.asalucS_Id > 0">{{ user.userName}}</td>
+                            <td class="text-left" ng-if="user.asalucS_Id > 0">{{ user.asmcL_ClassName}}</td>
+                            <td class="text-left" ng-if="user.asalucS_Id > 0">{{ user.asmC_SectionName}}</td>
+                            <td class="text-left" ng-if="user.asalucS_Id > 0">{{ user.pamS_SubjectName}}</td>
+                            <td class="text-center" ng-if="user.asalucS_Id > 0">
+                                <a ng-click="edit(user.asalU_Id,user.asaluC_Id,user.asalucS_Id,classsectionList,subjects);" title="Edit">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </a>
+                                <a ng-click="DeleteAttPrivileges(user);" title="Delete">
+                                    <i class="fa fa-trash text-danger" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+            <!--</div>-->
+        </div>
+    </form>
+
+</section>

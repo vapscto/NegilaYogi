@@ -1,0 +1,250 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary" data-ng-init="BindData()">
+            <div class="box-header with-border">
+                <h3 class="box-title">consolidated Bus Route Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="">
+                    <div class="row">
+
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year: <span style="color:red;">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="asmaY_Id" name="acd_year" required>
+                                        <option value="">Select</option>
+                                        <option ng-repeat="year in YearList" value="{{year.asmaY_Id}}"> {{year.asmaY_Year}} </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                        <div ng-message="required">Please Select the Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <br />
+                    <hr />
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="getreport(obj)">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                            </md-button>
+                            <md-button type="button" ng-click="printData()" class="md-raised md-primary" ng-disabled="griddata.length==0">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                print
+                            </md-button>
+                            <md-button type="button" ng-click="exportToExcel('#tabel1')" target="_blank" class="md-raised md-primary" ng-disabled="griddata.length==0">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+        <!--<GRID VIEW>-->
+        <!--< Table>-->
+        <div class="box box-primary" ng-show="grid">
+            <div class="box-header with-border">
+                <h3 class="box-title"> consolidated Bus Route Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{griddata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <table class="table table-hover table-responsive table-bordered" border="1" id="tabel1" style="border-collapse:collapse">
+                    <thead style="font-weight: bold;">
+                        <tr>
+                            <th class="text-center" rowspan="2"> SL.No. </th>
+                            <th class="text-center" rowspan="2"> <a href="" ng-click="sort('RouteName')">Route Name </a></th>
+                            <th class="text-center" colspan="3"><a href="" ng-click="sort('TwoWayNewCount')">TWOWAY(PICKUP AND DROP)</a></th>
+
+                            <th class="text-center" colspan="3"><a href="" ng-click="sort('OneWayNewCount')">ONEWAY(PICKUP)</a></th>
+                            <th class="text-center" colspan="3"><a href="" ng-click="sort('OneWayNewCount')">ONEWAY(DROP)</a></th>
+                            <th class="text-center" rowspan="2">TOTAL</th>
+                        </tr>
+                        <tr>
+                            <th>NEW</th>
+                            <th>REGULAR</th>
+                            <th>TOTAL</th>
+                            <th>NEW</th>
+                            <th>REGULAR</th>
+                            <th>TOTAL</th>
+                            <th>NEW</th>
+                            <th>REGULAR</th>
+                            <th>TOTAL</th>
+                        </tr>
+                    </thead>
+                    <!--<tr ng-repeat="rt in griddata">-->
+                    <tr ng-repeat="rt in filterValue1 = (griddata | filter : searchValue)  |orderBy:sortKey:sortReverse">
+                        <!--|itemsPerPage:itemsPerPage" current-page="currentPage"-->
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-center">{{rt.RouteName}}</td>
+
+                        <td class="text-center">{{rt.twonewcount}}</td>
+                        <td class="text-center">{{rt.tworegcount}}</td>
+                        <td class="text-center">{{rt.twototalcount}}</td>
+
+                        <td class="text-center">{{rt.Onepicknewcount}}</td>
+                        <td class="text-center">{{rt.Onepickregcount}}</td>
+                        <td class="text-center">{{rt.onepicktotalcount}}</td>
+
+                        <td class="text-center">{{rt.Onedropnewcount}}</td>
+                        <td class="text-center">{{rt.Onedropregcount}}</td>
+                        <td class="text-center">{{rt.onedroptotalcount}}</td>
+
+                        <td class="text-center"><b>{{rt.onedroptotalcount + rt.onepicktotalcount + rt.twototalcount}}</b></td>
+
+
+
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>TOTAL</td>
+                        <td>{{TwoWayNewCounttotal}}</td>
+                        <td>{{TwoWayregCounttotal}}</td>
+                        <td>{{TwoWaytotalCounttotal}}</td>
+                        <td>{{onePWayNewCounttotal}}</td>
+                        <td>{{onePWayregCounttotal}}</td>
+                        <td>{{onePWaytotalCounttotal}}</td>
+                        <td>{{oneDWayNewCounttotal}}</td>
+                        <td>{{oneDWayregCounttotal}}</td>
+                        <td>{{oneDWaytotalCounttotal}}</td>
+                        <td>{{ TwoWaytotalCounttotal + onePWaytotalCounttotal  + oneDWaytotalCounttotal}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="12">
+                            <label>TOTAL TRANSPORT SELECTED STUDENT COUNT FOR THE ACADEMIC YEAR <b>{{yearname}}</b> IS <b>{{totalstudent}}</b></label>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+
+
+                <div id="printareaId" ng-show="tadprint" style="overflow:scroll">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center><h4>Consolidated Route  Details Report</h4></center>
+                    <br /><table class="table table-hover table-responsive table-bordered" border="1" id="tabel1" style="border-collapse:collapse">
+                        <thead style="font-weight: bold;">
+                            <tr>
+                                <th class="text-center" rowspan="2"> SL.No. </th>
+                                <th class="text-center" rowspan="2"> ROUTE NAME </th>
+                                <th class="text-center" colspan="3">TWOWAY(PICKUP AND DROP)</th>
+
+                                <th class="text-center" colspan="3">ONEWAY(PICKUP)</th>
+                                <th class="text-center" colspan="3">ONEWAY(DROP)</th>
+                                <th class="text-center" rowspan="2">TOTAL</th>
+                            </tr>
+                            <tr>
+                                <th>NEW</th>
+                                <th>REGULAR</th>
+                                <th>TOTAL</th>
+                                <th>NEW</th>
+                                <th>REGULAR</th>
+                                <th>TOTAL</th>
+                                <th>NEW</th>
+                                <th>REGULAR</th>
+                                <th>TOTAL</th>
+                            </tr>
+                        </thead>
+                        <!--<tr ng-repeat="rt in griddata">-->
+                        <tr ng-repeat="rt in filterValue1 = (griddata | filter : searchValue)  |orderBy:sortKey:sortReverse">
+                            <!--|itemsPerPage:itemsPerPage" current-page="currentPage"-->
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-center" style="word-break:break-word !important">{{rt.RouteName}}</td>
+
+                            <td class="text-center">{{rt.twonewcount}}</td>
+                            <td class="text-center">{{rt.tworegcount}}</td>
+                            <td class="text-center">{{rt.twototalcount}}</td>
+
+                            <td class="text-center">{{rt.Onepicknewcount}}</td>
+                            <td class="text-center">{{rt.Onepickregcount}}</td>
+                            <td class="text-center">{{rt.onepicktotalcount}}</td>
+
+                            <td class="text-center">{{rt.Onedropnewcount}}</td>
+                            <td class="text-center">{{rt.Onedropregcount}}</td>
+                            <td class="text-center">{{rt.onedroptotalcount}}</td>
+
+                            <td class="text-center"><b>{{rt.onedroptotalcount + rt.onepicktotalcount + rt.twototalcount}}</b></td>
+
+
+
+
+                        </tr>
+                        <tr>
+                            <td colspan="12">
+                                <label>TOTAL TRANSPORT SELECTED STUDENT COUNT FOR THE ACADEMIC YEAR <b>{{yearname}}</b> IS <b>{{totalstudent}}</b></label>
+
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+                <!--<dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>-->
+            </div>
+
+
+
+
+
+        </div>
+    </form>
+</section>

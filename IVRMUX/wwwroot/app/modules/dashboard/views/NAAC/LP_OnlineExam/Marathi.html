@@ -1,0 +1,217 @@
+﻿<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--<script type="text/javascript" src="google_jsapi.js"></script>-->
+<style>
+    textarea {
+        font-size: 17px !important;
+    }
+
+    .btn1 {
+        margin-bottom: 6px;
+        background-color: #3a5999;
+        width: 50px;
+        color: white;
+        font-size: 17px;
+    }
+
+    .btn2 {
+        margin-top: -5px;
+        background-color: #3a5999;
+        width: auto;
+        color: white;
+        font-size: 17px;
+    }
+
+    .menu1 {
+        color: white;
+        font-size: 16px;
+        margin-left: 7px;
+        padding: 3px 14px 3px 14px;
+    }
+</style>
+<body class="background">
+    <div>
+        <div>
+            <div>
+                <table style="border-collapse: collapse; width: 99%;">
+                    <tbody>
+                        <tr style="font-size: 16px;"> </tr>
+                        <tr style="height:10px;">
+                            <td colspan="6"></td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: #3a5999; text-align: center; color: #ffffff; font-weight: bold; " colspan="5" height="30px">
+                                Enter in English to Convert in Marathi
+                            </td>
+                            <td style="text-align:right">
+                                <span>
+                                    <input class="btn2" type="button" onclick="resetdata()" value="Data Reset">
+                                    <button class="btn2" name="Print" onclick="printdata()" type="button" value="Print">Print Data</button>
+                                    <button id="tds" onclick="downloadasTextFile()" class="fa fa-download btn2" style="height: 30px;"  onclick()="">Download As TextFile</button>
+                                    <button class="js-textareacopybtn btn2" onclick="copytext()">Copy</button>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <form id="myform">
+                                    <textarea id="data"  class="js-copytextarea" style="width: 100%; height: 120px; border: solid 1px #3a5999;resize: none;" name="data" autofocus="" placeholder="Type Here in small letters!!"></textarea>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="app/modules/dashboard/views/NAAC/LP_OnlineExam/kannadatyping.js"></script>
+
+<script type="text/javascript">
+    function printdata() {
+        childWindow = window.open('', 'childWindow', 'location=yes, menubar=yes, toolbar=yes');
+        childWindow.document.open();
+        childWindow.document.write('<html><head></head><body>');
+        childWindow.document.write(document.getElementById('data').value.replace(/\n/gi, '<br>'));
+        childWindow.document.write('</body></html>');
+        childWindow.print();
+        childWindow.document.close();
+        childWindow.close();
+    }
+    function go(converter) {
+        var a = document.createElement('a');
+        a.target = "_top";
+        a.href = converter;
+        a.click();
+    }
+</script>
+<script type="text/javascript">
+    google.load("elements", "1", {
+        packages: "transliteration"
+    });
+
+    var options = {
+        sourceLanguage:
+            google.elements.transliteration.LanguageCode.ENGLISH,
+        destinationLanguage:
+            [google.elements.transliteration.LanguageCode.MARATHI],
+        shortcutKey: 'ctrl+g',
+        transliterationEnabled: true
+    };
+
+    let input3 = document.getElementById("data");
+    enableTransliteration(input3, "mr");
+    var control = new google.elements.transliteration.TransliterationControl(options);
+    control.makeTransliteratable(['data']);
+    control.c.qc.t13n.c[3].c.d.keyup[0].ia.F.p = 'https://www.google.com';
+</script>
+
+<script type="text/javascript">
+    //rescuefieldvalues(['data'])
+    function resetdata() {
+        document.getElementById("myform").reset();
+        document.getElementById("data").focus();
+        document.getElementById('Noofspaces').innerHTML = 0;
+        document.getElementById('Noofword').innerHTML = 0;
+        document.getElementById('Noofcharecters').innerHTML = 0;
+        document.getElementById('charCount').innerHTML = 0;
+    }
+    function downloadasTextFile() {
+        var textToSave = document.getElementById("data").value;
+
+        var textToSaveAsBlob = new Blob([textToSave], { type: "text/plain" });
+        var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
+
+        var fileNameToSaveAs = "Languagetype.txt";
+
+        var downloadLink = document.createElement("a");
+        downloadLink.download = fileNameToSaveAs;
+        downloadLink.innerHTML = "Download File";
+        downloadLink.href = textToSaveAsURL;
+        downloadLink.onclick = destroyClickedElement;
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+
+        downloadLink.click();
+    }
+    function destroyClickedElement(event) {
+        document.body.removeChild(event.target);
+    }
+
+    function copytext() {
+        var copyTextareaBtn = document.getElementById('data').value;
+        localStorage.setItem("languageedit", copyTextareaBtn);
+    }
+
+    var copyTextareaBtn = document.querySelector('.js-textareacopybtn');
+
+    copyTextareaBtn.addEventListener('click', function (event) {
+        var copyTextarea = document.querySelector('.js-copytextarea');
+        copyTextarea.select();
+
+        try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Copying text command was ' + msg);
+        } catch (err) {
+            console.log('Oops, unable to copy');
+        }
+    });
+
+    counter = function () {
+        var value = document.getElementById('data').value;
+        if (value.length == 0) {
+            document.getElementById('Noofword').innerHTML = 0;
+            document.getElementById('Noofcharecters').innerHTML = 0;
+            document.getElementById('charCount').innerHTML = 0;
+            document.getElementById('Noofspaces').innerHTML = 0;
+            return;
+        }
+
+        var regex = /\s+/gi;
+        var Noofword = value.trim().replace(regex, ' ').split(' ').length;
+        var Noofcharecters = value.length;
+        var charCount = value.trim().length;
+        var Noofspaces = value.replace(regex, '').length;
+        document.getElementById('Noofspaces').innerHTML = Noofspaces;
+        document.getElementById('Noofword').innerHTML = Noofword;
+        document.getElementById('Noofcharecters').innerHTML = Noofcharecters;
+        document.getElementById('charCount').innerHTML = charCount;
+    };
+
+    function dataLoaded() {
+        function init() {
+            if (localStorage["data"]) {
+                document.getElementById('data').value = localStorage["data"];
+            }
+        }
+        init();
+        data.addEventListener('keypress', counter);
+    }
+    data.addEventListener('keyup', sendCode);
+    function sendCode() {
+        localStorage[document.getElementById('data').getAttribute('name')] = document.getElementById('data').value;
+    }
+    function rescuefieldvalues(idarray) {
+        for (var i = 0; i < idarray.length; i++) {
+            var el = document.getElementById(idarray[i])
+            if (!/(text)/.test(el.type))
+                continue
+            if (el.addBehavior && !window.sessionStorage) {
+                el.style.behavior = 'url(#default#userData)'
+                el.load("userentereddata")
+            }
+            var persisteddata = (window.sessionStorage) ? sessionStorage[idarray[i] + 'data'] : (el.addBehavior) ? el.getAttribute('dataattr') : null
+            if (persisteddata)
+                el.value = persisteddata
+            el.onkeyup = function () {
+                if (window.sessionStorage)
+                    sessionStorage[this.id + 'data'] = this.value
+                else if (this.addBehavior) {
+                    this.setAttribute("dataattr", this.value)
+                    this.save("userentereddata")
+                }
+            }
+        }
+    }
+</script>

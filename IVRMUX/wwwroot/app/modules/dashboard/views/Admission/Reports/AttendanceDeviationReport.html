@@ -1,0 +1,303 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="StuAttRptDropdownList();" novalidate name="myForm">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Attendance Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="text-center well" ng-init="type=1">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type" ng-value="1" name="all" ng-change="getDataByType(1);">
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="type" ng-value="2" name="all" ng-change="getDataByType(2);">
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" ng-change="onchangeyear(1,asmaY_Id);" name="acd_year" required>
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="academic in yearDropdown" ng-selected="{{academic.Selected == true}}" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required" style="color:red">Select Academic Year</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!--</div>-->
+                        <div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="obj.asmcL_Id" name="cls" ng-disabled="type=='1'" ng-required="type=='2'" ng-change="onclasschange(obj)">
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="class in classDropdown" value="{{class.asmcL_Id}}">{{class.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                        <div ng-message="required" style="color:red">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="obj.asmS_Id" name="sec" ng-disabled="type=='1'" ng-required="type=='2'" ng-change="onsectionchange(obj)">
+                                        <option value="">Select Section</option>
+                                        <option ng-repeat="section in sectionDropdown" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                        <div ng-message="required" style="color:red">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="obj.fromdate" onkeydown="return false" name="from_date" id="FromDate" ng-change='setTodate(obj)' md-min-date="minDatef" md-max-date="maxDatef" md-placeholder="Enter date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.from_date)" ng-messages="myForm.from_date.$error">
+                                        <div ng-message="required" style="color:red">Select From Date</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="obj.todate" onkeydown="return false" ng-change='setTodate1(obj)' ng-disabled="todatef" md-max-date="obj.maxDatet" md-min-date="obj.fromdate" name="to_date" id="todate" md-placeholder="Enter date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.to_date)" ng-messages="myForm.to_date.$error">
+                                        <div ng-message="required" style="color:red">Select To Date</div>
+                                    </div>
+                                </div>
+                                <span style="color:red;">{{errMessage}}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Staff / User :<span style="color:Red">*</span></label>
+                                <div class="col-sm-4">
+                                    <label>
+                                        <input type="checkbox" ng-model="detail_checked_subject">
+                                        <span class="lbl padding-8">Select</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="sub" ng-model="obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select,user.status);" title="Select Subject" ng-required="detail_checked_subject==true" ng-disabled="detail_checked_subject==false">
+                                        <ui-select-match ng-trim="false" placeholder="Select Saff / User">{{$select.selected.employeename}}</ui-select-match>
+                                        <ui-select-choices repeat="option7 in stafflist | filter: $select.search" value="{{option7.hrmE_Id}}"
+                                                           ng-selected="{{option7.Selected == true}}">
+                                            <div ng-bind-html="option7.employeename | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.sub)" ng-messages="myForm.sub.$error">
+                                    <div ng-message="required">Please Select Staff / User</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="getreportdiv(obj);">
+                        <!--ng-disabled="report_btn"-->
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#table')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-warn" ng-disabled="print_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="grid_flag">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Attendance Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" style="margin-top:9px;" ng-show="datewisen">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="searchValue!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue1.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="input-group pull-right" style="margin-top:-14px;">
+                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here..." style="margin-left:-1px;">
+
+            </div>-->
+            <table class="table table-hover table-responsive table-bordered text-center" id="tabel1">
+                <thead>
+                    <tr>
+                        <th class="hdTH">
+                            <label>
+                                <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('$index+1')">SL. No.</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('staff')">Employee Name</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('classname')">Class </a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('sectionname')">Section.</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('attendancedate')">Attendance Date</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('attendanceentrydate')">Attendance Entry Date</a>
+                        </th>
+
+                        <th>
+                            <a href="" ng-click="sortBy('diff')">Deviation Days</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in filterValue1 = (students | filter : searchValue)| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center  hdTD">
+                            <label>
+                                <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+
+                        <td>{{ itemsPerPage*(currentPage-1)+$index+1}}</td>
+                        <td>{{ user.staff}}</td>
+                        <td>{{ user.classname}}</td>
+                        <td>{{ user.sectionname}}</td>
+                        <td>{{ user.attendancedate}}</td>
+                        <td>{{ user.attendanceentrydate}}</td>
+                        <td>{{ user.diff}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true" on-page-change="pageChanged(newPageNumber)" ng-show="datewisen">
+            </dir-pagination-controls>
+        </div>
+
+
+
+
+
+        <div id="printSectionId" ng-show="table_flag" style="overflow:scroll">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <center><h4>Attendance Entry Deviation Report </h4></center>
+            <center><h5>{{details}}</h5></center>
+            <br />
+
+            <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <a ng-click="sortBy('$index+1')">SL. No.</a>
+                        </th>
+                        <th>
+                            <a ng-click="sortBy('staff')">Employee Name</a>
+                        </th>
+                        <th>
+                            <a ng-click="sortBy('classname')">Class </a>
+                        </th>
+                        <th>
+                            <a ng-click="sortBy('sectionname')">Section.</a>
+                        </th>
+                        <th>
+                            <a ng-click="sortBy('attendancedate')">Attendance Date</a>
+                        </th>
+                        <th>
+                            <a ng-click="sortBy('attendanceentrydate')">Attendance Entry Date</a>
+                        </th>
+
+                        <th>
+                            <a ng-click="sortBy('diff')">Deviation Days</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="text-align:center" ng-repeat="user in printdatatable|filter:searchValue">
+                        <td>{{$index+1}}</td>
+                        <td>{{ user.staff}}</td>
+                        <td>{{ user.classname}}</td>
+                        <td>{{ user.sectionname}}</td>
+                        <td>{{ user.attendancedate}}</td>
+                        <td>{{ user.attendanceentrydate}}</td>
+                        <td>{{ user.diff}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="16" class="col-sm-12 text-center ">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+
+    </div>
+
+</section>

@@ -1,0 +1,365 @@
+﻿<style>
+    div.scrollTable {
+        overflow: auto;
+        /*white-space: nowrap;*/
+    }
+
+        div.scrollTable a {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px;
+            text-decoration: none;
+        }
+
+            div.scrollTable a:hover {
+                background-color: #777;
+            }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Cumulative Salary Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="groupType in groupTypedropdown">
+                                        <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType)">
+                                        <span class="lbl padding-8">
+                                            {{groupType.hrmgT_EmployeeGroupType}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-right-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="department in departmentdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)" ng-click="addColumn(department, $index,departmentdropdown)">
+                                        <span class="lbl padding-8">
+                                            {{department.hrmD_DepartmentName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 padding-left-none">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                    </label>
+                                    <input name="option[]" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </div>
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="designation in designationdropdown">
+                                        <input type="checkbox" name="selclass" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                        <span class="lbl padding-8">
+                                            {{designation.hrmdeS_DesignationName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <div class="col-sm-8 col-sm-offset-2">
+                            <!--Month,year-->
+                            <div class="form-group well">
+                                <div class="text-center">
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            Month :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" data-ng-model="Employee.hreS_Month" name="hreS_Month" required ng-change="SetFromDateAndToDateByMonth(Employee.hreS_Month,Employee.hreS_Year)">
+                                                <option value="">Select</option>
+                                                <option ng-repeat="month in monthdropdown" value="{{month.ivrM_Month_Name}}" ng-selected="{{month.Selected===true}}">
+                                                    {{month.ivrM_Month_Name}}
+                                                </option>
+                                            </select>
+                                            <span class="error-messages" ng-if="interacted(myForm.hreS_Month)" ng-messages="myForm.hreS_Month.$error">
+                                                <span ng-message="required">Select Month</span>
+                                            </span>
+                                        </span>
+                                    </label>
+
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            Year :<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                        </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <span class="lbl padding-3">
+                                            <select class="form-control" id="sel1" data-ng-model="Employee.hreS_Year" name="hreS_Year" required ng-change="SetMonthByYear(Employee.hreS_Year)">
+                                                <option value="">Select</option>
+                                                <option ng-repeat="leaveyear in leaveyeardropdown" value="{{leaveyear.hrmlY_LeaveYear}}" ng-selected="{{leaveyear.Selected===true}}">
+                                                    {{leaveyear.hrmlY_LeaveYear}}
+                                                </option>
+                                            </select>
+                                            <span class="error-messages" ng-if="interacted(myForm.hreS_Year)" ng-messages="myForm.hreS_Year.$error">
+                                                <span ng-message="required">Select Year</span>
+                                            </span>
+                                        </span>
+                                    </label>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="SearchEmployee()" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Search
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="EmployeeDis">
+            <div class="box-header with-border">
+                <h3 class="box-title">Cumulative Salary Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+
+
+
+
+
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="PFChallan" id="Baldwin">
+                    <div id="PFChallan">
+                        <div class="margin-top-20 margin-bottom-10">
+
+                            <div class="text-center">
+                                <h4>{{institutionDetails.mI_Name}}</h4>
+                                <h6> {{CurrentInstuteAddress}}</h6>
+                                <h6>{{institutionDetails.ivrmmcT_Name}} - {{institutionDetails.mI_Pincode}}.</h6>
+                                <h5>Cumulative Salary Report For the Month of {{HRES_Month}} - {{HRES_Year}}</h5>
+                            </div>
+
+                        </div>
+                        <div class="scrollTable">
+                            <div class="margin-top-20 margin-bottom-10">
+                                <table class="table-bordered text-center margin-bottom-10">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Sl.No</th>
+                                            <th rowspan="2">Employee Code</th>
+                                            <th rowspan="2">Employee Name</th>
+                                            <th rowspan="2">Date of Joining</th>
+                                            <th rowspan="2">Worked Days</th>
+                                            <th rowspan="2">Days (LOP)</th>
+                                            <th rowspan="2">LOP Amount</th>
+                                            <th rowspan="2">Basic</th>
+                                            <th colspan="{{earnlen}}">Earnings</th><!-- Earning heads-->
+                                            <th rowspan="2">Gross Earning</th>
+                                            <th colspan="{{dedlen}}">Deductions</th><!--deduction heads -->
+                                            <th rowspan="2">Gross Deduction</th>
+                                            <th rowspan="2">Net Salary</th>
+                                        </tr>
+                                        <tr>
+                                            <th ng-repeat="earncolumn in earningheadlist">{{earncolumn.hrmeD_Name}}</th>
+                                            <th ng-repeat="dedcolumn in deductionheadlist">{{dedcolumn.hrmeD_Name}}</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr ng-repeat="employee in employeeSalaryslipDetails">
+                                            <td style="text-align:right">{{$index +1}}</td>
+                                            <td class="text-left">{{employee.hrmE_EmployeeCode}}</td>
+                                            <td class="text-left">{{employee.hrmE_EmployeeFirstName}} {{employee.hrmE_EmployeeMiddleName}} {{employee.hrmE_EmployeeLastName}}</td>
+                                            <td class="text-center">{{employee.hrmE_DOJ  | date: 'dd/MM/yyyy'}}</td>
+                                            <td class="text-center">{{employee.hreS_WorkingDays}}</td>
+                                            <td class="text-center"><span ng-if="employee.lopDays==0"> </span><span ng-if="employee.lopDays!=0">{{employee.lopDays}}</span></td>
+                                            <!--<td style='text-align:right;' ng-repeat="earn in employee.earningresult" ng-if="earn.hrmeD_Name=='Earned Basic'">{{earn.empGrossSal}}</td>-->
+                                            <td style='text-align:right;'>{{employee.lopamount}}</td>
+                                            <td style='text-align:right;'>{{employee.empGrossSal}}</td>
+                                            <td style='text-align:right;' ng-repeat="earn in employee.earningresult"><span ng-if="earn.hresD_Amount==0">  </span><span ng-if="earn.hresD_Amount!=0">{{earn.hresD_Amount}}</span></td>
+                                            <td style='text-align:right;'><span ng-if="employee.grossEarning==0"> </span><span ng-if="employee.grossEarning!=0">{{employee.grossEarning}}</span></td>
+                                            <td style='text-align:right;' ng-repeat="dedrow in employee.deductionresult"><span ng-if="dedrow.hresD_Amount==0"> </span><span ng-if="dedrow.hresD_Amount!=0">{{dedrow.hresD_Amount}}</span></td>
+                                            <td style='text-align:right;'><span ng-if="employee.grossDeduction==0"> </span><span ng-if="employee.grossDeduction!=0">{{employee.grossDeduction}}</span></td>
+                                            <td style='text-align:right;'><span ng-if="employee.netSalary==0"> </span><span ng-if="employee.netSalary!=0">{{employee.netSalary}}</span></td>
+
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="7" style='font-weight: bold;'> Total</td>
+                                            <td><b>{{getVolumeSumgirls(employeeSalaryslipDetails)}}</b></td>
+                                            <td style='font-weight: bold;text-align:right;' ng-repeat="earncolumns in deductiongrosslist">{{earncolumns.grossamount | number : 0}}</td>
+                                            <td style='font-weight: bold;text-align:right;' ng-repeat="earncolumn in earningheadlist">{{earncolumn.netamount | number : 0}}</td>
+                                            <td style='font-weight: bold;text-align:right;'>{{TotalgrossEarning() | number : 0}}</td>
+                                            <td style='font-weight: bold;text-align:right;' ng-repeat="dedcolumn in deductionheadlist">{{dedcolumn.netamount | number : 0}}</td>
+                                            <td style='font-weight: bold;text-align:right;'>{{TotalgrossDeduction() | number : 0}}</td>
+                                            <td style='font-weight: bold;text-align:right;'>{{TotalnetSalary() | number : 0}}</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <md-button type="button" ng-click="printToCart('Baldwin')" class="md-raised md-primary">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#PFChallan')">
+                        <i class="fa fa-file-excel-o"></i>
+                        Export to Excel
+                    </md-button>
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </form>
+</section>
+
+
+
+<div id="feedback" class="modal fade" role="dialog" data-backdrop="false">
+    <form class="form-horizontal" role="form" name="myForm1" novalidate>
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>Feedback</h4>
+                    <div class="box-body" style="border:1px solid #333;box-sizing:border-box;margin:1%;">
+                        <div ng-repeat="user1 in feedbackquestion" style="padding:0.5% 2% 0.5% 3%;">
+
+                            <h4 class="text-left Question text-capitalize">
+                                {{$index+1}} . {{user1.fmqE_FeedbackQuestions}}
+                                <input type="hidden" value="{{user1.fmtY_Id}}" />
+                                <input type="hidden" value="{{user1.fmqE_Id}}" />
+                            </h4>
+                            <div>
+                                <label class="radio-inline" ng-repeat="user5 in user1.feedbackoptiondata">
+
+                                    <input type="radio" ng-model="user1.name" name="t1_quesoption_{{user1.fmqE_Id}}" value="{{user5.fmoP_Id}}" required />
+                                    <span class="lbl padding-8" style="color:black;font-size:medium">{{user5.fmoP_FeedbackOptions}}</span>
+                                    <!--{{user5.fmoP_OptionsValue}}-->
+                                    <!--<input ng-model="user1.fmoP_OptionsValue" value="" />
+                                    <input type="hidden" ng-model="user1.fmoP_FeedbackOptions" value="" />-->
+                                </label>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1['t1_quesoption_'+user1.fmqE_Id])" ng-messages="myForm1['t1_quesoption_'+user1.fmqE_Id].$error">
+                                    <div ng-message="required">Select Your Answer</div>
+
+                                </div>
+                            </div>
+                            <br /><br />
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-1" style="color:black;font-size:medium">Remark:</label>
+                                <div>
+                                    <textarea class="form-control" id="usr" type="text" ng-model="user1.fsttR_FeedBack" rows="5" style="width:500px;"
+                                              name="t1_quesremarks_{{user1.fmqE_Id}}"
+                                              allow-pattern="(\s|[a-zA-Z0-9])" maxlength="500"></textarea>
+                                </div>
+                                <!--<div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1['t1_quesremarks_'+user1.fmqE_Id])" ng-messages="myForm1['t1_quesremarks_'+user1.fmqE_Id].$error">
+
+                                    <div ng-message="required">Enter The Remarks </div>
+                                </div>-->
+                            </div>
+
+                            <!--<div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted1(myForm1['t1_quesoption_'+user1.fmqE_Id])" ng-messages="myForm1['t1_quesoption_'+user1.fmqE_Id].$error">
+                                <div ng-message="required">Select Your Answer</div>
+                                <div ng-message="required" ng-if="user4.ratmqE_ManualEntryFlg">Enter The Remarks / Feedback Answer</div>
+                            </div>-->
+                            <!--<hr style="height:2px;border-width:0;color:black;background-color:gray">-->
+
+                        </div>
+
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="Savefeedback(user)">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="submit" class="md-raised md-warn" ng-click="clear_first_tab()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer custom-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+
+
+

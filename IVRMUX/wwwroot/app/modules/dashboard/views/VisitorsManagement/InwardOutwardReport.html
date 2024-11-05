@@ -1,0 +1,760 @@
+﻿
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Inward Outward Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-offset-4 col-sm-4 text-center">
+                    <div class="well" data-ng-init="dailybtedates ='daily'">
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="radiotype" value="inward" name="scldbet" ng-click="onselectradio()" required>
+                            <span class="lbl padding-8">Inward</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="radiotype" value="outward" name="scldbet" ng-click="onselectradio()" required>
+                            <span class="lbl padding-8">Outward</span>
+                        </label>
+                    </div>
+                    <div class="error-messages" ng-if="interacted(myForm.scldbet)" ng-messages="myForm.scldbet.$error">
+                        <div ng-message="required">Select Inward or Outward</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-sm-offset-4 col-sm-4 text-center">
+                    <div class="">
+                        <div class="well text-center" data-ng-init="all1 ='1'">
+                            <div class="form-group">
+
+                                <label class="radio-inline">
+                                    <input type="radio" value="1" name="all1" data-ng-model="all1">
+                                    <span class="lbl padding-8"> Between Days</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="0" name="all1" data-ng-model="all1">
+                                    <span class="lbl padding-8"> Month Wise</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.all1)" ng-messages="myForm.all1.$error">
+                            <div ng-message="required">Select any one of the radio button</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row" ng-show="all1 =='0'">
+
+                <div class="col-sm-12">
+                    <div class="col-sm-6 col-sm-offset-4">
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Month:<strong style="color:red;">*</strong></label>
+
+                            <div class="col-sm-6">
+                                <select class="form-control" name="mnth" ng-model="month" ng-required="all1=='0'">
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in month_list" value="{{option.monthid}}" ng-selected="option.Selected==true">
+                                        {{option.monthname}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.mnth)" ng-messages="myForm.mnth.$error">
+                                    <div ng-message="required">Please Select the month</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row" ng-show="all1=='1'">
+
+
+                <div class="col-sm-6">
+                    <label class="control-label col-sm-4">From Date:<strong style="color:red;">*</strong></label>
+                    <md-datepicker name="sch_date" onkeydown="return false" ng-model="startfromdate" md-max-date="maxDatemf" md-placeholder="Enter From date" ng-required="all1==1"></md-datepicker>
+
+                    <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                        <div ng-message="required">Select Date</div>
+                        <div ng-message="valid">The entered value is not a date!</div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <label class="control-label col-sm-4">To Date:<strong style="color:red;">*</strong></label>
+                    <md-datepicker name="sch_date2" onkeydown="return false" ng-model="startenddate" md-placeholder="Enter To date" ng-required="all1==1" md-min-date="minDatemf" md-max-date="maxDatemf" ng-click="gettodate()"></md-datepicker>
+                    <div class="error-messages" ng-if="interacted(myForm.sch_date2) " ng-messages="myForm.sch_date2.$error">
+                        <div ng-message="required">Select Date</div>
+                        <div ng-message="valid">The entered value is not a date!</div>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+            <div class="box-body">
+
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="report()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-show="export" ng-click="exportToExcel('#PrintInwardData,#PrintOutwardData')">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </md-button>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <div id="printSectionId" class="box box-primary" ng-show="Cumureport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Inward report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="StudentBook2" id="Baldwin">
+            <div style="padding-top:20px">
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{newuser.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue2!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue12.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue2" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-bordered text-center" id="datatable">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.NO.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_Discription')">Description </a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_ContactPerson')">Contact Person</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_InwardNo')">InWard No</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_From')">From</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_PhoneNo')">Phone No.</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_EmailId')">Email</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_DateTime')">Date</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_To')">Person To</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_HandedOverTo')">HandedOver To</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foiN_ReceivedBy')">Dispatached By</a>
+                            </th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr ng-repeat="obj in newuser">
+                        <td>{{$index+1}}</td>-->
+
+                        <tr dir-paginate="obj in filterValue12 = (newuser | filter : searchValue2) |orderBy:sortKey2:sortReverse  |itemsPerPage:itemsPerPage2" current-page="currentPage2" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+
+                            <td>{{obj.foiN_Discription}}</td>
+                            <td>{{obj.foiN_ContactPerson}}</td>
+                            <td>{{obj.foiN_InwardNo}}</td>
+                            <td>{{obj.foiN_From}}</td>
+                            <td>{{obj.foiN_PhoneNo}}</td>
+                            <td>{{obj.foiN_EmailId}}</td>
+                            <td>{{obj.foiN_DateTime | date:'dd/MM/yyyy'}}</td>
+                            <td>{{obj.foiN_To}}</td>
+                            <td>{{obj.foiN_ReceivedBy}}</td>
+                            <td>{{obj.foiN_HandedOverTo}}</td>
+                            <!--<td>{{obj.foiN_ReceivedBy}}</td>-->
+
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" id="currentPage2">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="printSectionId" class="box box-primary" ng-show="Cumureport1">
+      
+        <div class="box-header with-border">
+            <h3 class="box-title">Outward report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="StudentBook2" id="Baldwin">
+            <div style="padding-top:20px">
+
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{newuser1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <table class="table table-bordered text-center" id="datatable1">
+                    <thead>
+                        <tr>
+                            <th>
+                                SL.NO.
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_Discription')">Description </a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_From')">From</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_To')">To</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_Address')">Address</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_DateTime')">Date</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_OutwardNo')">Outward No</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_PhoneNo')">Phone No</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_EmailId')">Email Id</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('hrmE_EmployeeFirstName')">Dispatached By</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_DispatchedThrough')">Dispatched Through</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('foouT_DispatchedDeatils')">Dispatched Deatils</a>
+                            </th>
+                            <!--<th>
+                                <a href="" ng-click="sort('foouT_DispatchedPhNo')">Dispatched PhNo</a>
+                            </th>-->
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr ng-repeat="obj in newuser1">
+                        <td>{{$index+1}}</td>-->
+
+                        <tr dir-paginate="obj in filterValue1 = (newuser1 | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{obj.foouT_Discription}}</td>
+                            <td>{{obj.foouT_From}}</td>
+                            <td>{{obj.foouT_To}}</td>
+                            <td>{{obj.foouT_Address}}</td>
+                            <td>{{obj.foouT_DateTime | date:'dd/MM/yyyy'}}</td>
+                            <td>{{obj.foouT_OutwardNo}}</td>
+                            <td>{{obj.foouT_PhoneNo}}</td>
+                            <td>{{obj.foouT_EmailId}}</td>
+                            <td>{{obj.hrmE_EmployeeFirstName}}</td>
+                            <td>{{obj.foouT_DispatchedThrough}}</td>
+                            <td>{{obj.foouT_DispatchedDeatils}}</td>
+
+                            <!--<td>{{obj.foouT_DispatchedPhNo}}</td>-->
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" id="currentPage">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="PrintInwardData" ng-show="table_flag2">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <!--<h4 style="text-align:center">BMI Report</h4>-->
+
+        <!--<table class="table margin-top-10">
+            <tr>
+                <td colspan="4" class="text-right" style="font-size:large"><b>Inward Report</b> </td>
+                <td></td>
+                <td></td>
+                <td> </td>
+            </tr>
+        </table>-->
+        
+        <h3 class="text-center">INWARD REPORT</h3>
+
+        <table class="table-bordered" id="table">
+            <thead>
+                <tr>
+                    <th>
+                        SL.NO.
+                    </th>
+                    <th style="width:10%">
+                        <a href="" ng-click="sort('foiN_Discription')">Description </a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_ContactPerson')">Contact Person</a>
+                    </th>
+                    <th style="width:10%">
+                        <a href="" ng-click="sort('foiN_InwardNo')">InWard No</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_From')">From</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_PhoneNo')">Phone No.</a>
+                    </th>
+                    <th style="width:12%">
+                        <a href="" ng-click="sort('foiN_EmailId')">Email</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_DateTime')">Date</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foiN_To')">Person To</a>
+                    </th>
+                    <th style="width:11%">
+                        <a href="" ng-click="sort('foiN_HandedOverTo')">HandedOver To</a>
+                    </th>
+                    <th style="width:10%">
+                        <a href="" ng-click="sort('foiN_ReceivedBy')">Dispatached By</a>
+                    </th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="obj in filterValue12">
+                    <td>{{$index+1}}</td>
+                    <td>{{obj.foiN_Discription}}</td>
+                    <td>{{obj.foiN_ContactPerson}}</td>
+                    <td>{{obj.foiN_InwardNo}}</td>
+                    <td>{{obj.foiN_From}}</td>
+                    <td>{{obj.foiN_PhoneNo}}</td>
+                    <td>{{obj.foiN_EmailId}}</td>
+                    <td>{{obj.foiN_DateTime | date:'dd/MM/yyyy'}}</td>
+                    <td>{{obj.foiN_To}}</td>
+                    <td>{{obj.foiN_HandedOverTo}}</td>
+                    <td>{{obj.foiN_ReceivedBy}}</td>
+
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="11" class="text-center">
+                        <label>
+
+                            Date:{{ddate|date:'dd/MM/yyyy'}} &nbsp;&nbsp; UserName: {{usrname}}  {{coptyright}}
+                        </label>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+
+    <div id="PrintOutwardData" ng-show="table_flag">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <!--<h4 style="text-align:center">BMI Report</h4>-->
+        <!--<table class="table margin-top-10">
+        <tr>
+            <td colspan="4" class="text-right" style="font-size:large"><b>OutWard Report</b> </td>
+            <td></td>
+            <td></td>
+            <td> </td>
+        </tr>
+    </table>-->
+
+        <h3 class="text-center">OUTWARD REPORT</h3>
+
+        <table class="table-bordered" id="table">
+            <thead>
+                <tr>
+                    <th>
+                        SL.NO.
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foouT_Discription')">Description </a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foouT_From')">From</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foouT_To')">To</a>
+                    </th>
+                    <!--<th>
+                    <a href="" ng-click="sort('foouT_Address')">Address</a>
+                </th>-->
+                    <th>
+                        <a href="" ng-click="sort('foouT_DateTime')">Date</a>
+                    </th>
+                    <th style="width:12%">
+                        <a href="" ng-click="sort('foouT_OutwardNo')">Outward No</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foouT_PhoneNo')">Phone No</a>
+                    </th>
+                    <th style="width:12%">
+                        <a href="" ng-click="sort('foouT_EmailId')">Email Id</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('hrmE_EmployeeFirstName')">Dispatached By</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foouT_DispatchedThrough')">Dispatched Through</a>
+                    </th>
+                    <th>
+                        <a href="" ng-click="sort('foouT_DispatchedDeatils')">Dispatched Deatils</a>
+                    </th>
+                    <!--<th>
+                    <a href="" ng-click="sort('foouT_DispatchedPhNo')">Dispatched PhNo</a>
+                </th>-->
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="obj in filterValue1">
+                    <td>{{$index+1}}</td>
+                    <td>{{obj.foouT_Discription}}</td>
+                    <td>{{obj.foouT_From}}</td>
+                    <td>{{obj.foouT_To}}</td>
+                    <!--<td>{{obj.foouT_Address}}</td>-->
+                    <td>{{obj.foouT_DateTime | date:'dd/MM/yyyy'}}</td>
+                    <td>{{obj.foouT_OutwardNo}}</td>
+                    <td>{{obj.foouT_PhoneNo}}</td>
+                    <td>{{obj.foouT_EmailId}}</td>
+                    <td>{{obj.hrmE_EmployeeFirstName}}</td>
+                    <td>{{obj.foouT_DispatchedThrough}}</td>
+                    <td>{{obj.foouT_DispatchedDeatils}}</td>
+
+                    <!--<td>{{obj.foouT_DispatchedPhNo}}</td>-->
+
+                </tr>
+             
+                
+
+            </tbody>
+           
+            
+
+            <tfoot>
+                <tr>
+                    <td colspan="11" class="text-center">
+                        <label>
+
+                            Date:{{ddate|date:'dd/MM/yyyy'}} &nbsp;&nbsp; UserName: {{usrname}}  {{coptyright}}
+                        </label>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+
+</section>
+
+
+<!--///////////////////////////////////////////////////////////////////////////-----------------Old Code-->
+
+
+<!--<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Inward Outward Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-offset-4 col-sm-4 text-center">
+                    <div class="well" data-ng-init="dailybtedates ='daily'">
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="radiotype" value="inward" name="scldbet" ng-click="onselectradio()" required>
+                            <span class="lbl padding-8">Inward</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="radiotype" value="outward" name="scldbet" ng-click="onselectradio()" required>
+                            <span class="lbl padding-8">Outward</span>
+                        </label>
+                    </div>
+                    <div class="error-messages" ng-if="interacted(myForm.scldbet)" ng-messages="myForm.scldbet.$error">
+                        <div ng-message="required">Select Inward or Outward</div>
+                    </div>
+                </div>
+                </div>
+
+                
+                <div class="box-body">
+
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="report()" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="screport" ng-click="Print()">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-primary" ng-show="export" ng-click="exportToExcel('#datatable')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                        </md-button>
+
+                    </div>
+                </div>
+            </div>
+
+</form>
+    <div id="printSectionId" class="box box-primary" ng-show="Cumureport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Inward report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="StudentBook2" id="Baldwin">
+            <div style="padding-top:20px">
+
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+
+                        </div>
+                    </div>
+
+                </div>
+                <table class="table table-bordered text-center" id="datatable">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">
+                                SL. No.
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Description</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">From</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">To</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Assigned To</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Inward No.</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Date</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Remark</a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="newuser1 in newuser">
+                            <td>{{$index+1}}</td>
+                            <td>{{newuser1.iW_Discription}}</td>
+                            <td>{{newuser1.iW_From}}</td>
+                            <td>{{newuser1.iW_To}}</td>
+                            <td>{{newuser1.ass_To}}</td>
+                            <td>{{newuser1.iW_No}}</td>
+                            <td>{{newuser1.iW_Date | date:'dd/MM/yyyy'}}</td>
+                            <td>{{newuser1.iW_Remarks}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="printSectionId1" class="box box-primary" ng-show="Cumureport1">
+        <div class="box-header with-border">
+            <h3 class="box-title">Outward report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="StudentBook2" id="Baldwin">
+            <div style="padding-top:20px">
+
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+
+                        </div>
+                    </div>
+
+                </div>
+                <table class="table table-bordered text-center" id="datatable1">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">
+                                SL. No.
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Description</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">From</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">To</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Address</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Date</a>
+                            </th>
+                            <th style="text-align:center">
+                                <a href="" ng-click="sort('')">Remark</a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user1 in newuser1">
+                            <td>{{$index+1}}</td>
+                            <td>{{user1.oW_Discription}}</td>
+                            <td>{{user1.oW_From}}</td>
+                            <td>{{user1.oW_To}}</td>
+                            <td>{{user1.oW_add}}</td>
+                            <td>{{user1.oW_Date | date:'dd/MM/yyyy'}}</td>
+                            <td>{{user1.oW_Remarks}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+
+</section>-->

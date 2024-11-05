@@ -1,0 +1,574 @@
+
+<section class="content">
+    <div class="box box-primary" data-ng-init="BindData()">
+        <div class="box-header with-border">
+            <h3 class="box-title">Deputation</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" ng-click="ShowHide1()" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal" role="form" name="myForm" novalidate>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel" name="acd" ng-model="asmaY_Id" ng-change="getStudentBYYear(asmaY_Id)" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="year in year_list" value="{{year.asmaY_Id}}" ng-selected="{{year.Selected == true}}">
+                                        {{year.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd)" ng-messages="myForm.acd.$error">
+                                    <div ng-message="required">Please Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--<div class="well">
+        <label class="">Select By :</label>
+        <label class="radio-inline">
+            <input type="radio" value="Name" ng-model="rpttyp" name="optradio" data-ng-click="onclickloaddata()">
+            <span class="lbl padding-8">Name</span>
+        </label>
+        <label class="radio-inline">
+            <input type="radio" value="Stf_code" ng-model="rpttyp" name="optradio" data-ng-click="onclickloaddata()">
+            <span class="lbl padding-8">Staff code</span>
+        </label>
+        <label class="radio-inline">
+            <input value="Stf_code:Name" ng-model="rpttyp" type="radio" name="optradio" data-ng-click="onclickloaddata()">
+            <span class="lbl padding-8">Staff code:Name</span>
+        </label>
+    </div>-->
+
+                        <div class="form-group">
+                            <label class="checkbox-inline text-center">
+                                <input type="checkbox" ng-model="abs" name="withtc" ng-click="changesbs()">
+                                <span class="lbl padding-8"><b>ABSENT STAFF ON : {{myDate|date:'dd/MM/yyyy'}}</b></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Staff Name:<span style="color:Red">*</span></label>
+
+                            <div class="col-sm-8">
+                                <ui-select id="sel1" name="bookname" ng-model="$parent.HRME_Id" theme="bootstrap" title="Select Staff" ng-change="get_period_alloted()">
+                                    <ui-select-match ng-trim="false" placeholder="Select or search Staff...">{{$select.selected.staffName}}</ui-select-match>
+
+                                    <ui-select-choices repeat="option in staff_list | filter: $select.search " value="{{option.HRME_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.staffName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+                            </div>
+
+
+                        </div>
+                        <!--<div class="form-group">
+        <label class="control-label col-sm-4">Staff Name:<span style="color:Red">*</span></label>
+        <div class="col-sm-8">
+            <select class="form-control" id="sel1" name="staff" ng-model="hrmE_Id" ng-change="get_period_alloted()" required>
+                <option value="">--Select--</option>
+                <option ng-if="rpttyp == 'Name'" ng-repeat="staff in staff_list" value="{{staff.hrmE_Id}}" ng-selected="{{staff.Selected == true}}">
+                    {{staff.stf_name}}
+                </option>
+                <option ng-if="rpttyp == 'Stf_code'" ng-repeat="staff in staff_list" value="{{staff.hrmE_Id}}" ng-selected="{{staff.Selected == true}}">
+                    {{staff.stf_code}}
+                </option>
+                <option ng-if="rpttyp == 'Stf_code:Name'" ng-repeat="staff in staff_list" value="{{staff.hrmE_Id}}" ng-selected="{{staff.Selected == true}}">
+                    {{staff.stf_code_name}}
+                </option>
+            </select>
+            <div class="error-messages" ng-if="interacted(myForm.staff)" ng-messages="myForm.staff.$error">
+                <div ng-message="required">Please Select Staff</div>
+            </div>
+        </div>
+    </div>-->
+                        <div class="">
+                            <label for="comment">Remarks:</label>
+                            <textarea class="form-control" rows="2" id="comment" data-ng-model="remarks" name="remks" required></textarea>
+
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.remks)" ng-messages="myForm.remks.$error">
+                            <div ng-message="required">Please Enter Remarks</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4 col-sm-12">Date :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8 col-xs-12">
+                                <md-datepicker ng-model="myDate" id="dat" name="date" md-placeholder="Enter date" md-min-date="" md-max-date="maxDatemf" md-date-filter="validateDate" ng-change="get(myDate)" onkeydown="return false" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.date)" ng-messages="myForm.date.$error">
+                                    <div ng-message="required">Please Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Day :<!--<span style="color:Red">*</span>--></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel" name="day" ng-model="ttmD_Id" ng-disabled="true" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="day in day_list" value="{{day.ttmD_Id}}" ng-selected="{{day.Selected == true}}">
+                                        {{day.ttmD_DayName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.day)" ng-messages="myForm.day.$error">
+                                    <div ng-message="required">Please Select Day</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="">
+                            <div class="col-sm-3">
+                                <label class="checkbox">
+                                    <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="SMS_Flag" />
+                                    <span class="lbl padding-8">SEND SMS</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="checkbox">
+                                    <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="EMAIL_Flag" />
+                                    <span class="lbl padding-8">SEND EMAIL</span>
+                                </label>
+                            </div>
+                            <div class="col-sm-5">
+                                <label class="checkbox">
+                                    <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="NOT_Flag" />
+                                    <span class="lbl padding-8">MOBILE NOTIFICATION</span>
+                                </label>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <br />
+                <div class="box box-primary" ng-show="loaddefault">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Absent Staff Time Table</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <!--<div ui-grid="gridOptions" ui-grid-pagination  class="grid text-center" style="height: 270px;"></div>-->
+                        <table class="table table-hover table-responsive table-bordered text-center" ng-show="stf_dy_pds">
+                            <tr>
+                                <td style="background-color:blue;color:white"><b>Periods</b></td>
+                                <td ng-repeat="period in staff_day_periods">{{period.ttmP_PeriodName}}</td>
+                            </tr>
+                            <tr>
+                                <td style="background-color:blue;color:white"><b>Class-Section/Subject</b></td>
+                                <td ng-repeat="all in staff_day_periods" style="background-color:{{all.clr}}" ng-click="cell_click(all.ttmD_Id,all.ttmP_Id,all.ttmD_DayName,all.ttmP_PeriodName,all.hrmE_Id,all.asmaY_Id,all.asmcL_Id,all.asmS_Id,all.ttfgD_Id)">{{all.asmcL_ClassName}}-{{all.asmC_SectionName}}/{{all.ismS_SubjectName}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="box box-primary" ng-show="loaddefault">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Absent DETAILS</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <!--<div ui-grid="gridOptions" ui-grid-pagination  class="grid text-center" style="height: 270px;"></div>-->
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                           <thead>
+                               <tr>
+                                   <th>
+                                       STAFF NEME
+                                   </th>
+                                   <th>
+                                       ABSENT  ON: &nbsp;   {{myDate|date:'dd/MM/yyyy'}}
+                                   </th>
+                                   <th>
+                                       WEEKLY ABSENT COUNT
+                                   </th>
+                                   <th>
+                                       MONTHLY ABSENT COUNT
+                                   </th>
+                                   <th>
+                                       YEARLY ABSENT COUNT
+                                   </th>
+                               </tr>
+                           </thead>
+                            <tbody>
+                                <tr ng-repeat="user in absentdpcount">
+                                    <td>
+                                        {{user.stfname}}
+
+                                    </td>
+                                    <td> <a ng-if="user.TodayStaffcount!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup4" data-backdrop="static" ng-click="viewrecordspopup4(user.HRME_Id,'D',user.stfname);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.TodayStaffcount}}</p> </a>
+                                    <lable ng-if="user.TodayStaffcount==0">0
+                                        </lable></td>
+                                    <td>
+                                        <a ng-if="user.WeekStaffcount!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup4" data-backdrop="static" ng-click="viewrecordspopup4(user.HRME_Id,'W',user.stfname);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.WeekStaffcount}}</p> </a>
+                                        <lable ng-if="user.WeekStaffcount==0">
+                                            0
+                                        </lable>
+                                    </td>
+
+                                    <td>
+                                        <a ng-if="user.MonthStaffcount!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup4" data-backdrop="static" ng-click="viewrecordspopup4(user.HRME_Id,'M',user.stfname);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.MonthStaffcount}}</p> </a>
+                                        <lable ng-if="user.MonthStaffcount==0">
+                                            0
+                                        </lable>
+                                    </td>
+
+                                    <td>
+                                        <a ng-if="user.YearStaffcount!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup4" data-backdrop="static" ng-click="viewrecordspopup4(user.HRME_Id,'Y',user.stfname);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.YearStaffcount}}</p> </a>
+                                        <lable ng-if="user.YearStaffcount==0">
+                                            0
+                                        </lable>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="box box-primary" ng-show="loaddefault1">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Available Staff Details</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body" style="overflow:scroll">
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-hover table-responsive table-bordered text-center" ng-show="stf_fr_pds">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="order('sno')">SLNO</a>
+                                    </th>
+                                    <th>
+                                        Select
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('Name')">Staff Name (Emp Code)</a>
+                                    </th>
+                                    <!--<th>
+                                        <a href="" ng-click="order('Name')"></a>
+                                    </th>-->
+
+                                    <th>
+                                        <a href="" ng-click="order('StudentDue')">Class & Section</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('ismS_SubjectName')">Subject</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('ttmP_PeriodName')">Period Name</a>
+                                    </th> 
+                                    <th style="overflow-wrap:break-word">
+                                        <a href="" ng-click="order('ttmP_PeriodName')">Deputation Limits</a>
+                                    </th> 
+                                    <th style="overflow-wrap:break-word">
+                                        <a href="" ng-click="order('ttmP_PeriodName')">Total Day Periods</a>
+                                    </th>
+                                    <th style="overflow-wrap:break-word">
+                                        <a href="" ng-click="order('ttmP_PeriodName')">Total Weekly Periods</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('weekcnt')">Deputed on {{myDate|date:'dd/MM/yyyy'}}</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('weekcnt')">Weekly Deputed</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('mntcnt')">Monthly Deputed</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('totalcnt')">Total Deputed</a>
+                                    </th>
+
+
+                                    <!--<th>
+                                        <a href="" ng-click="order('weekcnt')">Absent on {{myDate|date:'dd/MM/yyyy'}}</a>
+                                    </th>-->
+                                    <th>
+                                        <a href="" ng-click="order('weekcnt')"> Weekly Absent count</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('mntcnt')">Monthly Absent count</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('totalcnt')">Total Absent count</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('StudentDue')">View</a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody dir-paginate="user in  filterValue=(mainstafflist | filter : search)| orderBy:sortKey:reverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+                                <tr>
+                                    <td rowspan="{{user.list.length+1}}">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+
+                                    <td class="text-center" rowspan="{{user.list.length+1}}">
+                                        <label>
+                                            <input type="checkbox" name="adcheckt" value="{{user.HRME_Id}}" ng-model="user.checkedvalue" ng-change="optionToggled(user)">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+
+                                    </td>
+                                    <td style="overflow-wrap:break-word" rowspan="{{user.list.length+1}}">{{user.STAFF}}({{user.EMPCODE}})</td>
+                                    <!--<td rowspan="{{user.list.length+1}}">{{user.EMPCODE}}</td>-->
+
+                                    <td>{{user.CLS}}</td>
+                                    <td>{{user.SUB}}</td>
+                                    <td>{{user.PR}}</td>
+                                    <td rowspan="{{user.list.length+1}}" style="overflow-wrap:break-word">
+                                        <p>
+                                            <span ng-if="user.DCNT !=null && user.DCNT !=undefined && user.DCNT !=''">
+                                                Max. Daily Limits:<b style="color:red">{{user.DCNT}}</b>
+                                            </span>
+                                        </p>
+
+                                        <p>
+                                            <span ng-if="user.WCNT !=null && user.WCNT !=undefined && user.WCNT !=''">
+                                                Max. Weekly Limits:<b style="color:red">{{user.WCNT}}</b>
+                                            </span>
+                                        </p>
+                                        <p>
+                                            <span ng-if="user.MCNT !=null && user.MCNT !=undefined && user.MCNT !=''">
+                                                Max. Monthly Limits:<b style="color:red">{{user.MCNT}}</b>
+                                            </span>
+                                        </p>
+                                        <p>
+                                            <span ng-if="user.YCNT !=null && user.YCNT !=undefined && user.YCNT !=''">
+                                                Max. Yearly Limits:<b style="color:red">{{user.YCNT}}</b>
+                                            </span>
+                                        </p>
+
+                                    </td>
+                                    <td rowspan="{{user.list.length+1}}"> <a href="javascript:void(0)" data-toggle="modal" data-target="#popup2" data-backdrop="static" ng-click="viewrecordspopup9(user.HRME_Id,user.asmaY_Id,'D',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.DAYTL}}</p> </a></td>
+
+                                    <td rowspan="{{user.list.length+1}}"> <a href="javascript:void(0)" data-toggle="modal" data-target="#popup2" data-backdrop="static" ng-click="viewrecordspopup2(user.HRME_Id,user.asmaY_Id);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.WWCNT}}</p> </a></td>
+
+
+                                    <td rowspan="{{user.list.length+1}}"> <a ng-if="user.daycnt!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup3" data-backdrop="static" ng-click="viewrecordspopup3(user.HRME_Id,user.asmaY_Id,'D',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.daycnt}}</p> </a></td>
+
+                                    <td rowspan="{{user.list.length+1}}"> <a ng-if="user.weekcnt!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup3" data-backdrop="static" ng-click="viewrecordspopup3(user.HRME_Id,user.asmaY_Id,'W',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.weekcnt}}</p> </a></td>
+
+                                    <td rowspan="{{user.list.length+1}}"><a ng-if="user.mntcnt!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup3" data-backdrop="static" ng-click="viewrecordspopup3(user.HRME_Id,user.asmaY_Id,'M',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.mntcnt}}</p> </a></td>
+
+                                    <td rowspan="{{user.list.length+1}}"> <a ng-if="user.totalcnt!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup3" data-backdrop="static" ng-click="viewrecordspopup3(user.HRME_Id,user.asmaY_Id,'Y',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.totalcnt}}</p> </a></td>
+
+
+                                    <!--<td rowspan="{{user.list.length+1}}"> <a ng-if="user.daycnt1!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup4" data-backdrop="static" ng-click="viewrecordspopup5(user.HRME_Id,user.asmaY_Id,'D',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.daycnt1}}</p> </a></td>-->
+
+                                    <td rowspan="{{user.list.length+1}}"> <a ng-if="user.weekcnt1!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup4" data-backdrop="static" ng-click="viewrecordspopup5(user.HRME_Id,user.asmaY_Id,'W',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.weekcnt1}}</p> </a></td>
+
+                                    <td rowspan="{{user.list.length+1}}"><a ng-if="user.mntcnt1!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup4" data-backdrop="static" ng-click="viewrecordspopup5(user.HRME_Id,user.asmaY_Id,'M',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.mntcnt1}}</p> </a></td>
+
+                                    <td rowspan="{{user.list.length+1}}"> <a ng-if="user.totalcnt1!=0" href="javascript:void(0)" data-toggle="modal" data-target="#popup4" data-backdrop="static" ng-click="viewrecordspopup5(user.HRME_Id,user.asmaY_Id,'Y',user.STAFF);"><p style="color:red;font-size:18px;text-decoration:underline;font-family:bold">{{user.totalcnt1}}</p> </a></td>
+
+                                    <td rowspan="{{user.list.length+1}}"><a href="javascript:void(0)" data-toggle="modal" data-target="#popup2" data-backdrop="static" ng-click="viewrecordspopup2(user.HRME_Id,user.asmaY_Id);"> <i class="fa fa-eye text-purple"></i></a></td>
+                                </tr>
+                                <tr ng-repeat="aa in user.list">
+                                    <td>{{aa.CLS}}</td>
+                                    <td>{{aa.SUB}}</td>
+                                    <td>{{aa.PR}}</td>
+                                    
+                                </tr>
+
+                                <tr>
+       
+                                </tr>
+                            </tbody>
+
+
+
+                        </table>
+                        <dir-pagination-controls max-size="5" pagination-id="page1"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls> <!--pagination-id="page1"-->
+                    </div>
+                </div>
+
+
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="TTSD_Id" value="{{TTSD_Id}}" />
+                    <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-show="loaddefault1" data-ng-click="saveddata(staff_day_periods)">
+                        <i class="fa fa-save" aria-hidden="true"></i> Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+</section>
+
+<div class="modal fade" id="popup2" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            <h4 class="modal-title text-white">{{staff_Name}} -Periods Details</h4>
+        </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body" style="overflow:scroll">
+                <!--  <div ui-grid="gridOptionspopup" ui-grid-pagination class="grid text-center" style="height: 270px;"></div>-->
+                <table class="table table-hover table-responsive table-bordered text-center" id="table" >
+                    <thead style="font-weight: bold;">
+                        <tr>
+                            <th><a href="" ng-click="sort('Name')">Day / Period</a></th>
+                            <th ng-repeat="period in period_list"><a href="" ng-click="sort('period.ttmP_PeriodName')">Period {{period.ttmP_PeriodName}}</a><input type="hidden" value="{{period.ttmP_Id}}" /></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr ng-repeat="table in table_list |orderBy:sortKey:reverse | filter:paginate | filter:search" ng-class-odd="'odd'">
+
+                            <td style="color:blue">{{table[0].dayname}}</td>
+                            <td ng-repeat="i in table" style="color:{{i.color}}; " width="120px">
+                                <div >
+                                    <!--allow-drag="true" allow-drop="true" drag-drop="onDragDrop(e)" draggable="true"-->
+                                    <input type="hidden" value="{{i.pedid}}" /><input type="hidden" value="{{i.dayid}}" /> {{i.value}}
+                                </div>
+                            </td>
+
+
+                        </tr>
+
+                   
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="clearpopupgrid2()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="popup3" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            <h4 class="modal-title text-white">{{staff_Name1}} -Deputation Details</h4>
+        </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body" style="overflow:scroll">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th><a href="">SL.No.</a></th>
+                            <th><a href="" ng-click="sort('TTSD_Date')">DATE</a></th>
+                            <th><a href="" ng-click="sort('ASMCL_ClassName')">CLASS</a> </th>
+                            <th><a href="" ng-click="sort('ASMC_SectionName')">SECTION</a> </th>
+                            <th><a href="" ng-click="sort('TTMD_DayName')">DAY</a> </th>
+                            <th><a href="" ng-click="sort('TTMP_PeriodName')">PERIOD</a> </th>
+                            <th><a href="" ng-click="sort('EMPNAME')">ABSENT STAFF</a> </th>
+                            <th><a href="" ng-click="sort('TTSD_Remarks')">REMARKS</a> </th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in dptdetails  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage1" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage1 *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.TTSD_Date| date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.TTMD_DayName}}</td> 
+                            <td>{{user.TTMP_PeriodName}}</td>
+                            <td>{{user.EMPNAME}}</td>
+                            <td>{{user.TTSD_Remarks}}</td>
+                           
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"  data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="popup4" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            <h4 class="modal-title text-white">{{staff_Name2}} -Absent Details</h4>
+        </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body" style="overflow:scroll">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th><a href="">SL.No.</a></th>
+                            <th><a href="" ng-click="sort('TTSD_Date')">DATE</a></th>
+                            <th><a href="" ng-click="sort('ASMCL_ClassName')">CLASS</a> </th>
+                            <th><a href="" ng-click="sort('ASMC_SectionName')">SECTION</a> </th>
+                            <th><a href="" ng-click="sort('TTMD_DayName')">DAY</a> </th>
+                            <th><a href="" ng-click="sort('TTMP_PeriodName')">PERIOD</a> </th>
+                            <th><a href="" ng-click="sort('EMPNAME')">DEPUTED STAFF</a> </th>
+                            <th><a href="" ng-click="sort('TTSD_Remarks')">REMARKS</a> </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in dptdetails1  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage1" current-page="currentPage" ng-class-odd="'odd'">
+                            <td>{{itemsPerPage1 *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.TTSD_Date| date:'dd/MM/yyyy'}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.TTMD_DayName}}</td>
+                            <td>{{user.TTMP_PeriodName}}</td>
+                            <td>{{user.EMPNAME}}</td>
+                            <td>{{user.TTSD_Remarks}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>

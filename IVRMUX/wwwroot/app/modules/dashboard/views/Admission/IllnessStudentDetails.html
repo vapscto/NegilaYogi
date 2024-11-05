@@ -1,0 +1,336 @@
+﻿
+<style>
+    .border-col-sm-4 {
+        border: 1px solid black !important;
+        border-style: solid !important;
+        border-radius: 20px !important;
+    }
+
+    .textareaclass {
+        resize: none !important;
+    }
+</style>
+
+<div data-ng-init="OnLoadVaccineStudentDetails()">
+    <section class="content">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Vaccine Student Entry Details </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6 col-sm-offset-3">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Academic Year :<strong class="text-red">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" name="stuayear" data-ng-model="ASMAY_Id" required ng-change="OnChangeYear()">
+                                            <option value="">--Select Academic Year--</option>
+                                            <option ng-repeat="acedmicYear in GetAccademicYear" value="{{acedmicYear.asmaY_Id}}"
+                                                    ng-selected="{{acedmicYear.asmaY_Id == ASMAY_Id}}">
+                                                {{acedmicYear.asmaY_Year}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted1(myform.agestart)" ng-messages="myform.agestart.$error">
+                                            <div ng-message="required">Select Academic Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Student Name :<strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel2" name="stdname" ng-model="$parent.AMST_Id" ng-change="OnChangeStudent()" theme="bootstrap"
+                                                   ng-keyup="searchfilter($select);" title="Select Student" required>
+                                            <ui-select-match ng-trim="false" placeholder="Select or Search Student List">
+                                                {{$select.selected.studentName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="catgry in GetStudentSearchList | filter: $select.search" value="{{catgry.amsT_Id}}" ng-selected="{{catgry.Selected == true}}">
+                                                <div ng-bind-html="catgry.studentName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+
+                                        <div class="error-messages" ng-if="interacted1(myform.stdname)" ng-messages="myform.stdname.$error">
+                                            <div ng-message="required">Select Student</div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">
+                                        Age Criteria (In Years) :<strong class="text-red">*</strong>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel2" name="stuaage" ng-model="ASVAC_Id" required ng-change="OnChangeAgeCriteria()">
+                                            <option value="">--Select Age Criteria--</option>
+                                            <option ng-repeat="agec in GetAgeCriteriaStudentDetails" value="{{agec.asvaC_Id}}"
+                                                    ng-selected="{{agec.asvaC_Id == ASVAC_Id}}">
+                                                {{agec.asvaC_AgeStartNo}} To {{agec.asvaC_AgeEndNo}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted1(myform.stuaage)" ng-messages="myform.stuaage.$error">
+                                            <div ng-message="required">Select Age Criteria</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group text-center" ng-if="GetAgeCriteriaVaccineDetails.length==0">
+                                    <md-button type="button" class="md-raised md-primary" ng-click="SearchVaccineStudentDetails()">
+                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                        Search
+                                    </md-button>
+                                    <md-button type="button" class="md-raised md-warn" ng-click="cleardata()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+        <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform1" novalidate>
+            <div class="box box-primary" ng-if="GetAgeCriteriaVaccineDetails.length>0">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Student Details </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered" id="table1">
+                                <thead>
+                                    <tr>
+                                        <td></td>
+                                        <td>Sl.No</td>
+                                        <td>Vaccine Name</td>
+                                        <td>Vaccine Date <strong class="text-red">*</strong> </td>
+                                        <td>Vaccine Given Date</td>
+                                        <td>Vaccine Given By</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="dd in GetAgeCriteriaVaccineDetails">
+                                        <td>
+                                            <label>
+                                                <input type="checkbox" name="adcheckt" ng-model="dd.Selected" ng-required="isOptionsRequired1()">
+                                                <span class="lbl padding-8"></span>
+                                            </label>
+                                        </td>
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left">
+                                            {{dd.asvacD_VaccineName}}
+                                        </td>
+                                        <td class="text-center">
+                                            <md-datepicker ng-model="dd.ASWVD_NextDoseDate" onkeydown="return false" name="t2_{{$index}}"
+                                                           ng-required="dd.Selected"></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted2(myform1['t2_'+$index])" ng-messages="myform1['t2_'+$index].$error">
+                                                <div ng-message="required">Enter Vaccine Date</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <md-datepicker ng-model="dd.ASWVD_DateGiven" onkeydown="return false" name="t3_{{$index}}"
+                                                           md-max-date="maxdate" ng-disabled="dd.ASWVD_NextDoseDate ==null" md-min-date="dd.ASWVD_NextDoseDate">
+                                            </md-datepicker>
+                                            <div class="error-messages" ng-if="interacted2(myform1['t3_'+$index])" ng-messages="myform1['t3_'+$index].$error">
+                                                <div ng-message="required">Enter Vaccine Given Date</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="text" class="form-control" ng-model="dd.ASWVD_AdministeredBy" ng-required="dd.ASWVD_DateGiven !=null"
+                                                   name="t4_{{$index}}" />
+                                            <div class="error-messages" ng-if="interacted2(myform1['t4_'+$index])" ng-messages="myform1['t4_'+$index].$error">
+                                                <div ng-message="required">Enter Vaccine Given By</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row margin-top-10">
+                        <div class="error-messages text-center" ng-if="interacted2(myform1.adcheckt)" ng-messages="myform1.adcheckt.$error">
+                            <div ng-message="required" style="text-align:center;font-family:'Times New Roman';font-size:medium;"><strong>Select Check Box &amp; Then Enter Dates</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-click="SaveStudentVaccineDetails()">
+                                <i class="fa fa-save" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cleardata()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+        <div class="box box-primary" ng-if="Getstudentvaccinedetails.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Vaccine Student Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4 pull-right">
+                            <input type="text" ng-model="search" class="form-control" placeholder="Search Here" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <td>Sl.No</td>
+                                    <td>Student Name</td>
+                                    <td>Admission No.</td>
+                                    <td>Age Criteria</td>
+                                    <td>Action</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="Student in filterValue1=(Getstudentvaccinedetails |filter:search) |orderBy:sortKey:sortReverse
+                                    |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">{{Student.studentName }}</td>
+                                    <td class="text-left">{{Student.amsT_AdmNo }}</td>
+                                    <td class="text-left">{{Student.vaccineagecriteria }}</td>
+                                    <td class="text-center">
+                                        <span>
+                                            <a class="text-center" title="View" ng-click="OnClickViewStudentVaccineDetails(Student)">
+                                                <i class="fa fa-eye text-black" title="View"></i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">Student Vaccine Details</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <label class="col-sm-12 control-label">Student Name / Admno : {{studentname}}</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="col-sm-12 control-label">Age Criteria : {{agecriteria}}</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row margin-top-10">
+                        <div class="col-sm-12">
+                            <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Vaccine Name</th>
+                                        <th>Vaccine Date</th>
+                                        <th>Vaccine Given Date</th>
+                                        <th>Vaccine Given By</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="documents in GetViewstudentvaccinedetails">
+                                        <td class="text-center">{{ $index + 1 }}</td>
+                                        <td class="text-left">{{documents.asvacD_VaccineName}}</td>
+                                        <td class="text-center">{{documents.aswvD_NextDoseDate | date :'dd/MM/yyyy'}}</td>
+                                        <td class="text-center">{{documents.aswvD_DateGiven | date :'dd/MM/yyyy'}}</td>
+                                        <td class="text-left">{{documents.aswvD_AdministeredBy}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Close
+                </md-button>
+                <md-button type="submit" class="md-raised md-primary" id="print-btn" aria-disabled="false" ng-click="OnClickPrint();">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="printSectionId" ng-show="table_flag">
+    <div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>
+    <center><h4>Student Vaccine Details </h4></center>
+
+    <div class="row margin-top-10">
+        <div class="col-sm-12">
+            <div class="col-sm-6">
+                <label class="col-sm-12 control-label text-bold">Student Name / Admno : {{studentname}}</label>
+            </div>
+            <div class="col-sm-6">
+                <label class="col-sm-12 control-label text-bold">Age Criteria : {{agecriteria}}</label>
+            </div>
+        </div>
+    </div>
+
+
+    <table class="table-bordered margin-top-10" id="table">
+        <thead>
+            <tr>
+                <th>Sl.No</th>
+                <th>Vaccine Name</th>
+                <th>Vaccine Date</th>
+                <th>Vaccine Given Date</th>
+                <th>Vaccine Given By</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="documents in GetViewstudentvaccinedetails">
+                <td class="text-center">{{ $index + 1 }}</td>
+                <td class="text-left">{{documents.asvacD_VaccineName}}</td>
+                <td class="text-center">{{documents.aswvD_NextDoseDate | date :'dd/MM/yyyy'}}</td>
+                <td class="text-center">{{documents.aswvD_DateGiven | date :'dd/MM/yyyy'}}</td>
+                <td class="text-left">{{documents.aswvD_AdministeredBy}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

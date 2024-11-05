@@ -1,0 +1,1229 @@
+﻿<style>
+    .file-blue:before {
+        content: 'Browse';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+
+    .multiselect {
+        width: 22.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 10.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .imgpfgdownload {
+        width: 30px;
+        height: 30px;
+    }
+</style>
+<section class="content" data-ng-init="loaddata();">
+    <form class="form-horizontal ng-pristiline ng-valid" name="myForm" role="form" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Naac Committee</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i> </button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row" ng-show="institutionlist.length > 1">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Institution:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="mI_Id" name="msint" required ng-change="loaddata();" ng-disabled="instit">
+                                    <option ng-repeat="val in institutionlist" value="{{val.mI_Id}}" ng-selected="val.mI_Id==mI_Id">
+                                        {{val.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.msint)" ng-messages="myForm.msint.$error">
+                                    <div ng-message="required">Select Institution</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmaY_Id" name="acdYear" required>
+                                    <option value="">--Select Year--</option>
+                                    <option ng-repeat="val in yeardata" value="{{val.asmaY_Id}}" ng-selected="val.Selected==true">
+                                        {{val.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdYear)" ng-messages="myForm.acdYear.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Committee Name<strong style="color:red">*</strong> </label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="comm" ng-model="NCACCOMM_CommitteeName" required />
+                                <div class="error-messages" ng-if="interacted(myForm.comm)" ng-messages="myForm.comm.$error">
+                                    <div ng-message="required">Enter Committee Name</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Member Role<strong style="color:red">*</strong> </label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="role" ng-model="NCACCOMMM_Role" required />
+                                <div class="error-messages" ng-if="interacted(myForm.role)" ng-messages="myForm.role.$error">
+                                    <div ng-message="required">Enter Member Role</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-center">
+                            <div class="well" ng-init="NCACCOMM_Flg='Committee'">
+                                <label class="radio-inline">
+                                    <input type="radio" id="1" value="Committee" name="radioption" ng-model="NCACCOMM_Flg" required />
+                                    <span class="lbl padding-8">Committee</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" id="2" value="cell" name="radioption" ng-model="NCACCOMM_Flg" required />
+                                    <span class="lbl padding-8">Cell</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" id="3" value="clubs" name="radioption" ng-model="NCACCOMM_Flg" required />
+                                    <span class="lbl padding-8">Clubs</span>
+                                </label>
+                                <div class="error-messages" ng-if="interacted(myForm.radioption)" ng-messages="myForm.radioption.$error">
+                                    <div ng-message="required">Please Select Radio Button</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="well" ng-init="all1='11'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="11" ng-disabled="instit" name="all1" data-ng-model="all1" ng-change="clear1()" ng-click="onradiobuttonSelect(all1)" required>
+                                    <span class="lbl padding-8">Existing</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-disabled="instit" value="12" name="all1" data-ng-model="all1" ng-change="clear2()" ng-click="onradiobuttonSelect(all1)" required>
+                                    <span class="lbl padding-8">New</span>
+                                </label>
+                                <div class="error-messages" ng-if="interacted(myForm.all1)" ng-messages="myForm.all1.$error">
+                                    <div ng-message="required">Select Radio Button</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="all1==12">
+                            <label class="control-label col-sm-4">Member Name</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="mem" ng-disabled="instit" ng-model="NCACCOMMM_MemberName" ng-required="all1==12" />
+                                <div class="error-messages" ng-if="interacted(myForm.mem)" ng-messages="myForm.mem.$error">
+                                    <div ng-message="required">Enter Member Name </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="all1==12">
+                            <label class="control-label col-sm-4">Member Details</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" ng-disabled="instit" ng-model="NCACCOMMM_MemberDetails" name="details" ng-required="all1==12" />
+                                <div class="error-messages" ng-if="interacted(myForm.details)" ng-messages="myForm.details.$error">
+                                    <div ng-message="required">Enter Member Details</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="all1==12">
+                            <label class="control-label col-sm-4">Mobile Number</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" ng-disabled="instit" ng-model="NCACCOMMM_MemberPhoneNo" name="number" allow-pattern="\d" maxlength="10" ng-required="all1==12" />
+                                <div class="error-messages" ng-if="interacted(myForm.number)" ng-messages="myForm.number.$error">
+                                    <div ng-message="required">
+                                        Enter Mobile number
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="all1==12">
+                            <label class="control-label col-sm-4">Email ID</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="email" ng-disabled="instit" ng-model="NCACCOMMM_MemberEmailId" ng-required="all1==12" />
+                                <div class="error-messages" ng-if="interacted(myForm.email)" ng-messages="myForm.email.$error">
+                                    <div ng-message="required">Enter Email ID</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="all1==11">
+                            <label class="control-label col-sm-4">Department Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-disabled="instit" name="stafdep" ng-model="HRMD_Id" ng-change="get_Designation()" ng-required="all1==11">
+                                    <option value="">--Select Dept--</option>
+                                    <option ng-repeat="user in filldepartment" value="{{user.hrmD_Id}}" ng-selected="{{user.Selected == true}}">
+                                        {{user.hrmD_DepartmentName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.stafdep)" ng-messages="myForm.stafdep.$error">
+                                    <div ng-message="required">Please Select Department</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="all1==11">
+                            <label class="control-label col-sm-4">Designation Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-disabled="instit" name="stafdep11" ng-model="HRMDES_Id" data-ng-change="get_Employee()" ng-required="all1==11">
+                                    <option value="">--Select Desg--</option>
+                                    <option ng-repeat="user in filldesignation" value="{{user.hrmdeS_Id}}" ng-selected="{{user.hrmdeS_Id == HRMDES_Id}}">
+                                        {{user.hrmdeS_DesignationName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.stafdep11)" ng-messages="myForm.stafdep11.$error">
+                                    <div ng-message="required">Please Select Designation</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="all1==11">
+                            <label for="sel2" class="control-label col-sm-3">Staff Name : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-disabled="instit" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                <label>
+                                    <input name="clsoption" ng-disabled="instit" value="all" ng-model="usercheckC" type="checkbox" ng-click="all_checkC()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="role in stafftlist | filter:searchchkbx1" value="{{hrmE_Id}}">
+                                    <input type="checkbox" ng-disabled="instit" ng-model="role.selected" ng-click="togchkbxC()" ng-required="isOptionsRequired12()" name="clweres" />
+                                    <span class="lbl padding-8">
+                                        {{role.empname}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.clweres)" ng-messages="myForm.clweres.$error">
+                                <div ng-message="required">Please Select any one Employee Name</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"> Commitee Files Upload </h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body margin-top-10">
+                                <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+
+                                    <thead>
+                                        <tr>
+                                            <th>SL.NO.</th>
+                                            <th>FILE</th>
+                                            <th>DESCRIPTION</th>
+                                            <th>VIEW</th>
+                                            <th>ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="materal in materaldocuupload" ng-class-odd="'odd'">
+                                            <td class="text-center">{{ $index + 1 }}</td>
+                                            <td class="text-center lessonplanner">
+                                                <input class="custom-file-input file-blue text-center" ng-disabled="materal.ncaccommF_StatusFlg=='approved'" id="{{materal.cfilepath}}"
+                                                       data-ng-model="materal.cfilepath" type="file"
+                                                       accept="image/*, application/pdf,application/msword,video/mp4,application/vnd.ms-powerpoint,
+                                                               application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                                               application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                                               application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                               application/vnd.ms-excel"
+                                                       name="filetypematerial{{$index}}"
+                                                       onchange="angular.element(this).scope().uploadmateraldocuments(this, angular.element(this).scope().materal)">
+                                                <div class="error-messages" ng-if="interacted(myForm['filetypematerial'+$index])"
+                                                     ng-messages="myForm['filetypematerial'+$index].$error">
+                                                    <div ng-message="required">Upload File</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <textarea class="form-control" ng-disabled="materal.ncaccommF_StatusFlg=='approved'" data-ng-model="materal.cfiledesc"></textarea>
+                                            </td>
+                                            <td>
+                                                <span ng-if="materal.cfilepath !=null && materal.cfilepath !=''">
+                                                    <a ng-if="materal.filetype=='jpg' || materal.filetype=='png' ||
+                                                               materal.filetype=='svg'|| materal.filetype=='jpeg'
+                                                               || materal.filetype=='gif'"
+                                                       style="color:red;display:inline; font-weight: bolder;"
+                                                       data-ng-click="showmothersign(materal.cfilepath,materal.cfilename)">
+                                                        Image
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='mp4' || materal.filetype=='mp4'"
+                                                       style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                                       ng-click="showGuardianPhotonew(materal)" src="/images/Naac/play-button.png">
+                                                        Video
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='pdf'" style="color:blue;display:inline;"
+                                                       ng-click="onview(materal.cfilepath,materal.cfilename)">
+                                                        <b style="color:orangered;display:inline;" src="/images/Naac/pdf.png">Pdf</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='doc'|| materal.filetype=='docx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;" src="/images/Naac/filedoc.png">Document</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='ppt'|| materal.filetype=='pptx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;" src="/images/Naac/ppt.png">PPT</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='xls'|| materal.filetype=='xlsx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;" src="/images/Naac/excel.png">Excel</b>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span ng-if="materal.ncaccommF_StatusFlg=='approved'" class="">
+                                                    <label style="color:blue"> Approved&nbsp;&nbsp;&nbsp;&nbsp; </label>
+                                                </span>
+                                                <span class="" ng-hide="materaldocuupload.length > 9">
+                                                    <a href="" ng-show="$last" ng-click="addmateral()">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="" ng-if="materal.ncaccommF_StatusFlg!='approved'" id="remove" ng-hide="materaldocuupload.length ==1">
+                                                    <a href="" ng-click="removemateral($index)">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Employee Files Upload </h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body margin-top-10">
+                                <table class="table table-responsive table-bordered clearfix" style="width:100%;">
+                                    <!--style="width:100%;">-->
+                                    <thead>
+                                        <tr>
+                                            <th>SL.NO.</th>
+                                            <th>FILE</th>
+                                            <th>DESCRIPTION</th>
+                                            <th>VIEW</th>
+                                            <th>ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="materal in materaldocuuploadStaff" ng-class-odd="'odd'">
+                                            <td class="text-center">{{ $index + 1 }}</td>
+                                            <td class="text-center lessonplanner">
+                                                <input class="custom-file-input file-blue text-center" ng-disabled="materal.ncaccommmF_StatusFlg=='approved'" id="{{materal.cfilepath}}"
+                                                       data-ng-model="materal.cfilepath" type="file"
+                                                       accept="image/*, application/pdf,application/msword,video/mp4,application/vnd.ms-powerpoint,
+                                               application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                               application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                               application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                               application/vnd.ms-excel"
+                                                       name="filetypematerial{{$index}}"
+                                                       onchange="angular.element(this).scope().uploadmateraldocuments(this, angular.element(this).scope().materal)">
+                                                <div class="error-messages" ng-if="interacted(myForm['filetypematerial'+$index])"
+                                                     ng-messages="myForm['filetypematerial'+$index].$error">
+                                                    <div ng-message="required">Upload File</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <textarea class="form-control" ng-disabled="materal.ncaccommmF_StatusFlg=='approved'" data-ng-model="materal.cfiledesc"></textarea>
+                                            </td>
+                                            <td>
+                                                <span ng-if="materal.cfilepath !=null && materal.cfilepath !=''">
+                                                    <a ng-if="materal.filetype=='jpg' || materal.filetype=='png' ||
+                                               materal.filetype=='svg'|| materal.filetype=='jpeg'
+                                               || materal.filetype=='gif'"
+                                                       style="color:red;display:inline; font-weight: bolder;"
+                                                       data-ng-click="showmothersignstaff(materal.cfilepath,materal.cfilename)">
+                                                        Image
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='mp4' || materal.filetype=='mp4'"
+                                                       style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#myModalimgstaff"
+                                                       ng-click="showGuardianPhotonewstaff(materal)" src="/images/Naac/play-button.png">
+                                                        Video
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='pdf'" style="color:blue;display:inline;"
+                                                       ng-click="onviewstaff(materal.cfilepath,materal.cfilename)">
+                                                        <b style="color:orangered;display:inline;" src="/images/Naac/pdf.png">Pdf</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='doc'|| materal.filetype=='docx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;" src="/images/Naac/filedoc.png">Document</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='ppt'|| materal.filetype=='pptx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;" src="/images/Naac/ppt.png">PPT</b>
+                                                    </a>
+                                                    <a ng-if="materal.filetype=='xls'|| materal.filetype=='xlsx'"
+                                                       style="color:blue;display:inline;"
+                                                       href="{{materal.document_Pathnew}}" target="_blank">
+                                                        <b style="color:orangered;display:inline;" src="/images/Naac/excel.png">Excel</b>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span ng-if="materal.ncaccommmF_StatusFlg=='approved'" class="">
+                                                    <label style="color:blue"> Approved&nbsp;&nbsp;&nbsp;&nbsp; </label>
+                                                </span>
+                                                <span class="" ng-hide="materaldocuuploadStaff.length > 9">
+                                                    <a href="" ng-show="$last" ng-click="addmateralstaff()">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </span>
+                                                <span class="" ng-if="materal.ncaccommmF_StatusFlg!='approved'" id="remove" ng-hide="materaldocuuploadStaff.length ==1">
+                                                    <a href="" ng-click="removemateralstaff($index)">
+                                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" value="{{ncaccomM_Id}}" ng-model="ncaccomM_Id" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="saverecord()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="alldata1.length > 0">
+        <div class="box box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{alldata1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="search!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th> <a href="" ng-click="sort('asmaY_Year')">Year</a></th>
+                        <th> <a href="" ng-click="sort('ncaccomM_CommitteeName')">Committee Name</a></th>
+                        <th> <a href="" ng-click="sort('ncaccomM_Flg')">Committee Flag</a></th>
+                        <th> View Exist Staff</th>
+                        <th> View New Staff</th>
+                        <th>View Commitee Upload Files </th>
+                        <th>COMMENTS</th>
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (alldata1 | filter : search)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.asmaY_Year}}</td>
+                        <td>{{user.ncaccomM_CommitteeName}}</td>
+                        <td>{{user.ncaccomM_Flg}}</td>
+                        <td>
+                            <span ng-if="user.ncaccomM_StaffFlg=='EXStaf'">
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Staff details" data-target="#modalStaff" ng-click="get_MappedStaff(user)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">View Staff</i>
+                                </a>
+                            </span>
+                        </td>
+                        <td>
+                            <span ng-if="user.ncaccomM_StaffFlg=='NEWStaf'">
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Staff details" data-target="#modalStaff" ng-click="get_MappedStaff(user)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">View Staff</i>
+                                </a>
+                            </span>
+                        </td>
+                        <td>
+                            <span>
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View Upload details" data-target="#popup11" ng-click="viewdocument_MainActUploadFiles(user)">
+                                    <i class="fa fa-eye fa-1x" aria-hidden="true">Files</i>
+                                </a>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#mymodalviewuploaddocument" title="VIEW COMMENT" data-backdrop="static" ng-click="getorganizationdata(user);"> <i class="fa fa-eye text-blue"></i></a>
+                            <span></span>
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#mymodaladdcomments" title="ADD COMMENT" data-backdrop="static" ng-click="addcomments(user);"> <i class="fa fa-comments-o text-blue"></i></a>
+                        </td>
+                        <td>
+                            <a class="text-aqua" href="" ng-if="user.ncaccomM_StatusFlg!='approved'" ng-click="EditData(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            <span ng-if="user.ncaccomM_StatusFlg=='approved'">
+                                <label style="color:blue"> Approved</label>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+    <!-----------staff modal------------>
+    <div id="modalStaff" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom">Member Details</h4></center>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{mappedstafflist.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <table class="table table-bordered table-hover table-responsive text-center">
+                            <thead>
+                                <tr>
+                                    <th>SL.No.</th>
+                                    <th ng-show="ExistStaffflag"><a href="" ng-click="sort('EmpName')">Staff Name</a></th>
+                                    <th ng-show="ExistStaffflag"><a href="" ng-click="sort('HRMD_DepartmentName')">Department</a></th>
+                                    <th ng-show="ExistStaffflag"><a href="" ng-click="sort('HRMDES_DesignationName')">Designation</a></th>
+
+
+                                    <th ng-show="newstaffflag"><a href="" ng-click="sort('NCACCOMMM_MemberName')">Member Name</a></th>
+                                    <th ng-show="newstaffflag"><a href="" ng-click="sort('NCACCOMMM_MemberDetails')">Member Details</a></th>
+                                    <th ng-show="newstaffflag"><a href="" ng-click="sort('NCACCOMMM_MemberEmailId')">Member EmailID</a></th>
+                                    <th ng-show="newstaffflag"><a href="" ng-click="sort('NCACCOMMM_MemberPhoneNo')">Member Phone No</a></th>
+                                    <th><a href="" ng-click="sort('NCACCOMMM_Role')">Role Type</a></th>
+                                    <th>View Staff Upload Files</th>
+                                    <th>Comment</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in mappedstafflist">
+                                    <td>{{$index+1}}</td>
+                                    <td ng-show="ExistStaffflag">{{user.EmpName}}</td>
+                                    <td ng-show="ExistStaffflag">{{user.HRMD_DepartmentName}}</td>
+                                    <td ng-show="ExistStaffflag">{{user.HRMDES_DesignationName}}</td>
+
+                                    <td ng-show="newstaffflag">{{user.NCACCOMMM_MemberName}}</td>
+                                    <td ng-show="newstaffflag">{{user.NCACCOMMM_MemberDetails}}</td>
+                                    <td ng-show="newstaffflag">{{user.NCACCOMMM_MemberEmailId}}</td>
+                                    <td ng-show="newstaffflag">{{user.NCACCOMMM_MemberPhoneNo}}</td>
+                                    <td>{{user.NCACCOMMM_Role}}</td>
+                                    <td>
+                                        <span>
+                                            <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View Upload details" data-target="#popup20" ng-click="viewdocument_StaffActUploadFiles(user)">
+                                                <i class="fa fa-eye fa-1x" aria-hidden="true">Files</i>
+                                            </a>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#mymodalviewuploaddocumentmember" title="VIEW COMMENT" data-backdrop="static" ng-click="getorganizationdatamember(user);"> <i class="fa fa-eye text-blue"></i></a>
+                                        <span></span>
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#mymodaladdcommentsmember" title="ADD COMMENT" data-backdrop="static" ng-click="addcommentsmember(user);"> <i class="fa fa-comments-o text-blue"></i></a>
+                                    </td>
+
+                                    <td style="text-align:center">
+                                        <input type="hidden" ng-model="NCACCOMMM_Id" value="{{NCACCOMMM_Id}}" />
+                                        <span ng-if="user.NCACCOMMM_ActiveFlg==false">
+                                            <a href="" ng-click="deactive_staff(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                                Activate
+                                            </a>
+                                        </span>
+                                        <span ng-if="user.NCACCOMMM_ActiveFlg==true">
+                                            <a href="" ng-click="deactive_staff(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                                De-Activate
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer custom-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!------main  modal-->
+<!--for comment-->
+<div class="modal fade modal-medium" id="mymodalviewuploaddocument" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" ng-click="onclosedata()" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Comments </h4>
+            </div>
+            <div class="modal-body">
+                <div id="reports">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+                                        <th>Remarks</th>
+                                        <th>Remarks By</th>
+                                        <th>Created Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in commentlist">
+                                        <td>{{$index+1}}</td>
+                                        <td class="text-left">{{user.ncaccommC_Remarks}} </td>
+                                        <td class="text-left">{{user.userName}}</td>
+                                        <td class="text-left">{{user.ncaccommC_CreatedDate | date:'dd/MM/yyyy'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal" ng-click="onclosedata()"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--// for member-->
+<!--for comment-->
+<div class="modal fade modal-medium" id="mymodalviewuploaddocumentmember" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" ng-click="onclosedata()" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Comments </h4>
+            </div>
+            <div class="modal-body">
+                <div id="reports">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+                                        <th>Remarks</th>
+                                        <th>Remarks By</th>
+                                        <th>Created Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in commentlistmember">
+                                        <td>{{$index+1}}</td>
+                                        <td class="text-left">{{user.ncaccommmC_Remarks}} </td>
+                                        <td class="text-left">{{user.userName}}</td>
+                                        <td class="text-left">{{user.ncaccommmC_CreatedDate | date:'dd/MM/yyyy'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal" ng-click="onclosedata()"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD COMMENTS FOR DATA WISE -->
+<div class="modal fade modal-medium" id="mymodaladdcommentsmember" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Add Comments</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label"> Comments :</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <div class="">
+                                    <textarea class="form-control" name="othach" rows="10" ng-model="obj.generalcomments" id="comment"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-primary" ng-click="savedatawisecommentsmember(obj);"><i class="fa fa-save"></i> Save</md-button>
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ADD COMMENTS FOR DATA WISE -->
+<div class="modal fade modal-medium" id="mymodaladdcomments" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Add Comments</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label"> Comments :</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <div class="">
+                                    <textarea class="form-control" name="othach" rows="10" ng-model="obj.generalcomments" id="comment"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-primary" ng-click="savedatawisecomments(obj);"><i class="fa fa-save"></i> Save</md-button>
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="popup11" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">VIEW UPLOADED FILE</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>SL.NO</th>
+                                <th>File Name</th>
+                                <th>View</th>
+                                <th>Action</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="documents in uploaddocfiles">
+                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td class="text-left">{{documents.cfilename}}</td>
+                                <td class="text-center imageheight">
+                                    <span ng-if="documents.cfilepath !=null && documents.cfilepath !=''">
+                                        <a ng-if="documents.filetype=='jpg' || documents.filetype=='png' || documents.filetype=='svg'||                                                 documents.filetype=='jpeg' || documents.filetype=='gif'"
+                                           style="color:red;display:inline; font-weight: bolder;"
+                                           data-ng-click="showmothersign(documents.cfilepath,documents.cfilename)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pictures.png" title="Image" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='mp4' || documents.filetype=='mp4'"
+                                           style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                           ng-click="showGuardianPhotonew(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/play-button.png" title="Video" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='pdf'" style="color:blue;display:inline;"
+                                           ng-click="onview(documents.cfilepath,documents.cfilename)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pdf.png" title="View Pdf" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='doc'|| documents.filetype=='docx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/filedoc.png" title="View Document" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='ppt'|| documents.filetype=='pptx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/ppt.png" title="View PPT" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='xls'|| documents.filetype=='xlsx'"
+                                           style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/excel.png" title="View Excel" />
+                                        </a>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span ng-if="documents.ncaccommF_StatusFlg=='approved'">
+                                        <label style="color:blue"> Approved</label>
+                                    </span>
+                                    <span ng-if="documents.ncaccommF_StatusFlg!='approved'">
+                                        <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal"
+                                           ng-click="delete_MainActUploadFiles(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/delete.png" title="Delete" />
+                                        </a>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" data-toggle="modal" title="VIEW COMMENT" data-target="#mymodalviewuploaddocument1" data-backdrop="static" ng-click="getorganizationdata1(documents);"> <i class="fa fa-eye text-blue"></i></a>
+                                    <span></span>
+                                    <a href="javascript:void(0)" data-toggle="modal" title="ADD COMMENT" data-target="#mymodaladdcomments1" data-backdrop="static" ng-click="addcomments1(documents);"> <i class="fa fa-comments-o text-blue"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--// paste-->
+<!--for view file comments -->
+<div class="modal fade modal-medium" id="mymodalviewuploaddocument1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" ng-click="onclosedata()" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Comments For File </h4>
+            </div>
+            <div class="modal-body">
+                <div id="reports">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+                                        <th>Remarks</th>
+                                        <th>Remarks By</th>
+                                        <th>Created Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in commentlist1">
+                                        <td>{{$index+1}}</td>
+                                        <td class="text-left">{{user.ncaccommfC_Remarks}} </td>
+                                        <td class="text-left">{{user.userName}}</td>
+                                        <td class="text-left">{{user.ncaccommfC_CreatedDate |date:'dd/MM/yyyy'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal" ng-click="onclosedata()"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--for add file comment -->
+<div class="modal fade modal-medium" id="mymodaladdcomments1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Add Comments</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label"> Comments :</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <div class="">
+                                    <textarea class="form-control" name="othach" rows="10" ng-model="obj.generalcomments" id="comment"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-primary" ng-click="savedatawisecomments1(obj);"><i class="fa fa-save"></i> Save</md-button>
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModalimg" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="preview" class="img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-small" id="popup15" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+        </div>
+
+        <div class="modal-content">
+            <div class="modal-body">
+                <div ng-repeat="vi1 in view_videos" style="padding-bottom:20px">
+                    <video width="320" height="240" controls="controls" crossorigin="anonymous" controlsList="nodownload" oncontextmenu="return false;">
+                        <source ng-src="{{vi1.coeeV_Videos | trustUrl}}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="clearpopupgrid15()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--// change 1-->
+
+<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!--<div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <object oncontextmenu="return false" width="860" id="pdf" height="1000" data="{{pdfurl}}#toolbar=0&navpanes=0"></object>
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>-->
+
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div id="pdfIdzz">
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!--<div id="showpdf" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+
+
+            <embed ng-src="{{content}}" style="width: 100%;" height="1000" />
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>
+    </div>
+</div>-->
+<!------sfatt  modal-->
+
+<div id="popup20" class="modal fade modal-medium" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="BindData()"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">VIEW MEMBER UPLOADED FILE</h4>
+            </div>
+            <div class="modal-body">
+                <div class="box-body margin-top-10">
+                    <table class="table table-responsive table-bordered clearfix" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>SL.NO</th>
+                                <th>File Name</th>
+                                <th>View</th>
+
+                                <th>Comment</th>
+                                <th>Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="documents in uploaddocfiles">
+                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td class="text-left">{{documents.cfilename}}</td>
+                                <td class="text-center imageheight">
+                                    <span ng-if="documents.cfilepath !=null && documents.cfilepath !=''">
+                                        <a ng-if="documents.filetype=='jpg' || documents.filetype=='png' || documents.filetype=='svg'||                                                 documents.filetype=='jpeg' || documents.filetype=='gif'"
+                                           style="color:red;display:inline; font-weight: bolder;"
+                                           data-ng-click="showmothersignstaff(documents.cfilepath,documents.cfilename)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pictures.png" title="Image" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='mp4' || documents.filetype=='mp4'"
+                                           style="color:red;display:inline; font-weight: bolder;" data-toggle="modal" data-target="#popup15"
+                                           ng-click="showGuardianPhotonew(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/play-button.png" title="Video" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='pdf'" style="color:blue;display:inline;"
+                                           ng-click="onview(documents.cfilepath,documents.cfilename)">
+                                            <img class="imgpfgdownload" src="/images/Naac/pdf.png" title="View Pdf" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='doc'|| documents.filetype=='docx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/filedoc.png" title="View Document" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='ppt'|| documents.filetype=='pptx'" style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/ppt.png" title="View PPT" />
+                                        </a>
+                                        <a ng-if="documents.filetype=='xls'|| documents.filetype=='xlsx'"
+                                           style="color:blue;display:inline;"
+                                           href="{{documents.document_Pathnew}}" target="_blank">
+                                            <img class="imgpfgdownload" src="/images/Naac/excel.png" title="View Excel" />
+                                        </a>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" data-toggle="modal" title="VIEW COMMENT" data-target="#mymodalviewuploaddocument1member" data-backdrop="static" ng-click="getorganizationdata1member(documents);"> <i class="fa fa-eye text-blue"></i></a>
+                                    <span></span>
+                                    <a href="javascript:void(0)" data-toggle="modal" title="ADD COMMENT" data-target="#mymodaladdcomments1member" data-backdrop="static" ng-click="addcomments1member(documents);"> <i class="fa fa-comments-o text-blue"></i></a>
+                                </td>
+
+                                <td class="text-center">
+                                    <span ng-if="documents.ncaccommmF_StatusFlg=='approved'" class="">
+                                        <label style="color:blue"> Approved</label>
+                                    </span>
+                                    <span ng-if="documents.ncaccommmF_StatusFlg!='approved'">
+                                        <a style="color:red;display:inline; font-weight: bolder;" data-toggle="modal"
+                                           ng-click="delete_StaffActUploadFiles(documents)">
+                                            <img class="imgpfgdownload" src="/images/Naac/delete.png" title="Delete" />
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--// member file-->
+<!--for view file comments -->
+<div class="modal fade modal-medium" id="mymodalviewuploaddocument1member" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md" style="width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" ng-click="onclosedata()" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Comments For File </h4>
+            </div>
+            <div class="modal-body">
+                <div id="reports">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No.</th>
+                                        <th>Remarks</th>
+                                        <th>Remarks By</th>
+                                        <th>Created Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user in commentlist1member">
+                                        <td>{{$index+1}}</td>
+                                        <td class="text-left">{{user.ncaccommmfC_Remarks}} </td>
+                                        <td class="text-left">{{user.userName}}</td>
+                                        <td class="text-left">{{user.ncaccommmfC_CreatedDate |date:'dd/MM/yyyy'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal" ng-click="onclosedata()"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--for add file comment -->
+<div class="modal fade modal-medium" id="mymodaladdcomments1member" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Add Comments</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label"> Comments :</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <div class="">
+                                    <textarea class="form-control" name="othach" rows="10" ng-model="obj.generalcomments" id="comment"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <md-button type="button" class="md-raised md-primary" ng-click="savedatawisecomments1member(obj);"><i class="fa fa-save"></i> Save</md-button>
+                <md-button type="button" class="md-raised md-warn" data-dismiss="modal"><i class="fa fa-close"></i> Close</md-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<div id="myModalimgstaff" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="previewstaff" class="img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>-->
+<div id="myModalimgstaff" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!--<div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <object oncontextmenu="return false" width="860" id="pdf" height="1000" data="{{pdfurl}}#toolbar=0&navpanes=0"></object>
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>-->
+
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <div id="pdfIdzz2">
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal fade modal-small" id="popup17" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+        </div>
+
+        <div class="modal-content">
+            <div class="modal-body">
+                <div ng-repeat="vi1 in view_staff_videos" style="padding-bottom:20px">
+                    <video width="320" height="240" controls="controls" crossorigin="anonymous" controlsList="nodownload" oncontextmenu="return false;">
+                        <source ng-src="{{vi1.coeeV_Videos | trustUrl}}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="clearpopupgrid15()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="showpdfstaff" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            <!--<object oncontextmenu="return false" width="860" id="pdf" height="1000" data="{{pdfurl}}#toolbar=0&navpanes=0"></object>-->
+
+            <embed ng-src="{{contentstaff}}" style="width: 100%;" height="1000" />
+            <div class="modal-body" oncontextmenu="return false"></div>
+        </div>
+    </div>
+</div>

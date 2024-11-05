@@ -1,0 +1,562 @@
+﻿
+<section class="content">
+    <!--<form class="form-horizontal ng-pristine ng-valid" role="form" ng-init="getpagedetails()">-->
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Total Strength Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row text-center">
+                    <div class="col-sm-6">
+                        <div class="well text-center" data-ng-init="ts.optradio ='all'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optradio" value="all" name="amst_SOL" ng-click="radio_btn_function()">
+                                <!--<input name="optradio" type="radio" ng-checked="true" ng-value="all" data-ng-model="optradio.amst_SOL">-->
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optradio" value="indi" name="amst_SOL" ng-click="radio_btn_function()">
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                        </div>
+                        <div class="well text-center" data-ng-init="ts.optstatus ='S'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optstatus" value="S" name="status" ng-click="radio_btn_function()">
+                                <span class="lbl padding-8">Present</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optstatus" value="L" name="status" ng-click="radio_btn_function()">
+                                <span class="lbl padding-8">Left</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optstatus" value="D" name="status" ng-click="radio_btn_function()">
+                                <span class="lbl padding-8">Deactive</span>
+                            </label>
+
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm.amst_SOL)" ng-messages="myForm.amst_SOL.$error">
+                            <div ng-message="required">Select Type</div>
+                        </div>
+                        <div class="well text-center" ng-if="ts.optstatus =='S'">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" ng-model="ts.withtc" name="withtc" ng-click="">
+                                <span class="lbl padding-8">With TC</span>
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" ng-model="ts.withdeactive" name="withDeactive" ng-click="">
+                                <span class="lbl padding-8">With Deactive</span>
+                            </label>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="ts.asmaY_Id" name="tslacdyr" ng-change="getelective()" required>
+                                        <option value="" label="Select Academic Year"> </option>
+                                        <option ng-repeat="option in yearlist" value="{{option.asmaY_Id}}"
+                                                ng-selected="{{option.Selected == true}}">
+                                            <!--ng-change="onacademicyearchange(yearlist)"-->
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.tslacdyr)" ng-messages="myForm.tslacdyr.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-if="categoryflag==true">
+                                <label class="control-label col-sm-4">Category:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="objj.amC_Id" ng-change="getclass()" name="catg" required>
+                                        <option value="">Select Category</option>
+                                        <option value="0">All</option>
+                                        <option ng-repeat="cat in categoryDropdown" value="{{cat.amC_Id}}">{{cat.amC_Name}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.catg)" ng-messages="myForm.catg.$error">
+                                        <div ng-message="required">Select Category</div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group" ng-show="cls_div">
+                                <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="ts.asmcL_Id" ng-change="getsection()" name="tslclss"
+                                            ng-required="ts.optradio=='indi'">
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="class in classList" value="{{class.asmcL_Id}}" ng-selected="{{class.Selected == true}}">{{class.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.tslclss)" ng-messages="myForm.tslclss.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="sec_div">
+                                <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="ts.asmC_Id" name="tslsec" ng-required="ts.optradio=='indi'">
+                                        <option value="">Select Section</option>
+                                        <option value="0">All</option>
+                                        <option ng-repeat="section in sectionList" value="{{section.asmS_Id}}" ng-selected="{{section.Selected == true}}">{{section.asmC_SectionName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.tslsec)" ng-messages="myForm.tslsec.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<div class="form-group" ng-show="sec_div">
+                                <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="ts.asmC_Id" name="tslsec" ng-required="ts.optradio=='indi'">
+                                        <option value="">Select Section</option>
+                                        <option value="0">All</option>
+                                        <option ng-repeat="section in sectionList" value="{{section.asmS_Id}}" ng-selected="{{section.Selected == true}}">{{section.asmC_SectionName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.tslsec)" ng-messages="myForm.tslsec.$error">
+                                        <div ng-message="required">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="sel2" class="control-label col-sm-8">Elective : <span style="color:red;">*</span></label>
+                                    <div class="multiselect col-sm-8">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." />
+                                        <label>
+                                            <input name="clsoption" ng-model="obj.usercheckCC" type="checkbox" ng-click="al_checkelective(obj.usercheckCC, ISMS_Id)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+                                        <label ng-repeat="ele in electiveList | filter:searchchkbx" value="{{ISMS_Id}}">
+                                            <input type="checkbox" ng-model="ele.selected" ng-click="getelectiveSele(ISMS_Id)" ng-required="isOptionsRequiredclass()" name="claname" />
+                                            <span class="lbl padding-8">{{ele.ISMS_SubjectName}} </span>
+                                        </label>
+                                    </div>
+
+
+
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.claname)" ng-messages="myForm.claname.$error">
+                                    <div class="sectionerror" ng-message="required">Select Elective</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" data-ng-click="Report(ts)">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" ng-click="exportToExcel()" target="_blank" class="md-raised md-primary">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-warn" ng-disabled="print_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div style="overflow:scroll;">
+            <div class="box box-primary" ng-show="totstr">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Total Strength Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <div class="box-body" style="overflow:scroll;height:600px;">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="searchValue!=''">
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                            <thead>
+                                <tr>
+                                    <th>SL. No. </th>
+                                    <th><a href="">Class</a></th>
+                                    <th><a href="">Section</a></th>
+                                    <th ng-if="boys1"><a href="">Boys</a></th>
+                                    <th ng-if="girls1"><a href="">Girls</a></th>
+                                    <th><a href="">Total</a></th>
+                                    <th ng-if="ts.optstatus!='L''D'"><a href="">New Admission</a></th>
+                                    <th ng-if="ts.optstatus=='S'"><a href="">New Admission</a></th>
+                                    <th ng-repeat="subject in Electivearray" ng-if="Electivearray.length > 0">
+                                        {{subject.ISMS_SubjectName}}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="(key, value) in students |filter:searchValue | groupBy: 'ASMCL_Order' | toArray:true | orderBy:min">
+                                <tr ng-repeat="user in value">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{ user.class }}</td>
+                                    <td>{{ user.section}}</td>
+                                    <td ng-if="boys1">{{ user.boys }}</td>
+                                    <td ng-if="girls1">{{ user.girls}}</td>
+                                    <td>{{user.total}}</td>
+                                    <td ng-if="ts.optstatus!='L''D'">{{user.New_admission}}</td>
+                                    <td ng-if="ts.optstatus=='S'">{{user.New_admission}}</td>
+                                    <td ng-repeat="sub in Electivearray" ng-if="Electivearray.length > 0">
+                                        <span ng-repeat="report in  studentElectivelist" ng-if="user.ASMCL_Id==report.ASMCL_Id && report.ASMC_SectionName==user.section ">
+
+                                            <span ng-if="report[sub.ISMS_SubjectName]>=0"> {{report[sub.ISMS_SubjectName]}} </span>
+
+                                        </span>
+
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"><b>Total</b></td>
+                                    <td ng-if="boys1"><b>{{getVolumeSumboys(value) }}</b></td>
+                                    <td ng-if="girls1"><b>{{getVolumeSumgirls(value)}}</b></td>
+                                    <td><b>{{getVolumeSumtotal(value)}}</b></td>
+                                    <td ng-if="ts.optstatus!='L''D'"><b>{{getVolumeNewadmission(value)}}</b></td>
+                                    <td ng-if="ts.optstatus=='S'"><b>{{getVolumeNewadmission(value)}}</b></td>
+                                    <td ng-repeat="sub in Electivearray" ng-if="Electivearray.length > 0">
+                                        <span>
+                                            {{getVolumeSumtotalsubjects(value)}}
+                                            <span ng-repeat="report in  ElectiveSum" ng-if="ASMCL_Id==report.ASMCL_Id">
+                                                <span><b>{{report[sub.ISMS_SubjectName]}} </b> </span>
+                                            </span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3"><b>Final Total</b></td>
+                                    <td ng-if="boys1"><b>{{total}}</b></td>
+                                    <td ng-if="girls1"><b>{{total1}}</b></td>
+                                    <td><b>{{total2}}</b></td>
+                                    <td><b>{{totalnewadm}}</b></td>
+                                    <td>
+                                        <!--<td ng-repeat="sub in Electivearray" ng-if="Electivearray.length > 0">-->
+                                        <span>
+                                            {{sumelectivetotal}}
+                                            <span ng-repeat="report in  sumelectivetotal" ng-if="ASMCL_Id==report.ASMCL_Id">
+                                                <span><b>{{report[sub.ISMS_SubjectName]}} </b> </span>
+                                            </span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="overflow:scroll;">
+            <div class="box box-primary" ng-show="totstr1">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Total Strength Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body" style="overflow:scroll;height:600px;">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="searchValue!=''">
+                                <!--<label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue.length}}
+                                    </label>
+                                </label>-->
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-hover table-responsive table-bordered text-center" id="Table1">
+                            <thead>
+                                <tr>
+                                    <!--<th>
+                                        <label>
+                                            <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </th>-->
+                                    <th>SL. No. </th>
+                                    <th><a href="">Class</a></th>
+                                    <th><a href="">Section</a></th>
+                                    <th><a href="">Present</a></th>
+                                    <th><a href="">Tc Taken</a></th>
+                                    <th><a href="">New Admission</a></th>
+                                    <th><a href="">Total</a></th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="(key, value) in students |filter:searchValue | groupBy: 'ASMCL_Order' | toArray:true | orderBy:min">
+
+                                <tr ng-repeat="user in value">
+                                    <!--<td class="text-center  hdTD">
+                                        <label>
+                                            <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>-->
+
+                                    <td>{{$index+1}}</td>
+                                    <td>{{ user.class }}</td>
+                                    <td>{{ user.section}}</td>
+                                    <td>{{ user.present }}</td>
+                                    <td>{{ user.tctaken}}</td>
+                                    <td>{{ user.newadm}}</td>
+                                    <td>{{ user.total}}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"><b>Total</b></td>
+                                    <td><b>{{getVolumeSumpresent(value) }}</b></td>
+                                    <td><b>{{getVolumeSumtctaken(value)}}</b></td>
+                                    <td><b>{{getVolumeSumnewadm(value)}}</b></td>
+                                    <td><b>{{getVolumeSumntotal(value)}}</b></td>
+                                </tr>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <!--<td colspan="10"><b>Total</b></td>-->
+                                    <td colspan="3"><b>Final Total</b></td>
+                                    <td><b>{{totalpresent}}</b></td>
+                                    <td><b>{{totaltctaken}}</b></td>
+                                    <td><b>{{totalnewadm}}</b></td>
+                                    <td><b>{{overalltotal}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!--<dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>-->
+                    </div>
+
+
+
+
+                    <!--<table ng-show="tadprint" class="table table-hover table-responsive table-bordered text-center" id="table1">
+                        <thead>
+                            <tr>
+                                <th>SL. No. </th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Present</th>
+                                <th>Tc Taken</th>
+                                <th>New Admission</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printstudents|filter :searchValue">
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.class }}</td>
+                                <td>{{ user.section}}</td>
+                                <td>{{ user.present }}</td>
+                                <td>{{ user.tctaken}}</td>
+                                <td>{{ user.newadm}}</td>
+                                <td>{{ user.total}}</td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="3"><b>Total</b></td>
+                                <td><b>{{total_print_boy}}</b></td>
+                                <td><b>{{total_print_girl}}</b></td>
+                                <td><b>{{sumtotoalboysandgirls_export}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>-->
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="totstrprint" id="printSectionId">
+            <div class="box-body">
+                <div class="box-body">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center><h4>Total Strength Report For Year {{yearname}}</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                        <thead>
+                            <tr>
+                                <th>SL. No. </th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th ng-if="boys1">Boys</th>
+                                <th ng-if="girls1">Girls</th>
+                                <th>Total</th>
+                                <th>New Admission</th>
+                                <th ng-repeat="subject in Electivearray" ng-if="Electivearray.length > 0">
+                                    {{subject.ISMS_SubjectName}}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="(key, value) in students |filter:searchValue | groupBy: 'ASMCL_Order' | toArray:true | orderBy:min">
+                            <tr ng-repeat="user in value">
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.class }}</td>
+                                <td>{{ user.section}}</td>
+                                <td ng-if="boys1">{{ user.boys }}</td>
+                                <td ng-if="girls1">{{ user.girls}}</td>
+                                <td>{{ user.total}}</td>
+                                <td>{{user.New_admission}}</td>
+                                <td ng-repeat="sub in Electivearray" ng-if="Electivearray.length > 0">
+                                    <span ng-repeat="report in  studentElectivelist" ng-if="user.ASMCL_Id==report.ASMCL_Id && report.ASMC_SectionName==user.section ">
+
+                                        <span ng-if="report[sub.ISMS_SubjectName]>=0"> {{report[sub.ISMS_SubjectName]}} </span>
+
+                                    </span>
+
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"><b>Total</b></td>
+                                <td ng-if="boys1"><b>{{getVolumeSumboys(value) }}</b></td>
+                                <td ng-if="girls1"><b>{{getVolumeSumgirls(value)}}</b></td>
+                                <td><b>{{getVolumeSumtotal(value)}}</b></td>
+                                <td><b>{{getVolumeNewadmission(value)}}</b></td>
+
+                                <td ng-repeat="sub in Electivearray" ng-if="Electivearray.length > 0">
+                                    <span>
+                                        {{getVolumeSumtotalsubjects(value)}}
+                                        <span ng-repeat="report in  ElectiveSum" ng-if="ASMCL_Id==report.ASMCL_Id">
+                                            <span><b>{{report[sub.ISMS_SubjectName]}} </b> </span>
+                                        </span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td colspan="3"><b>Final Total</b></td>
+                                <td ng-if="boys1"><b>{{total}}</b></td>
+                                <td ng-if="girls1"><b>{{total1}}</b></td>
+                                <td><b>{{total2}}</b></td>
+                                <td><b>{{totalnewadm}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="totstr1print">
+            <div class="box-body" id="Table1print">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center><h4>Over All Total Strength Report {{yearname}}</h4></center>
+                    <br />
+
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>SL. No. </th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Present</th>
+                                <th>Tc Taken</th>
+                                <th>New Admission</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="(key, value) in students |filter:searchValue | groupBy: 'ASMCL_Order' | toArray:true | orderBy:min">
+
+                            <tr ng-repeat="user in value">
+                                <td>{{$index+1}}</td>
+                                <td>{{ user.class }}</td>
+                                <td>{{ user.section}}</td>
+                                <td>{{ user.present }}</td>
+                                <td>{{ user.tctaken}}</td>
+                                <td>{{ user.newadm}}</td>
+                                <td>{{ user.total}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"><b>Total</b></td>
+                                <td><b>{{getVolumeSumpresent(value) }}</b></td>
+                                <td><b>{{getVolumeSumtctaken(value)}}</b></td>
+                                <td><b>{{getVolumeSumnewadm(value)}}</b></td>
+                                <td><b>{{getVolumeSumntotal(value)}}</b></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td colspan="3"><b>Final Total</b></td>
+                                <td><b>{{totalpresent}}</b></td>
+                                <td><b>{{totaltctaken}}</b></td>
+                                <td><b>{{totalnewadm}}</b></td>
+                                <td><b>{{overalltotal}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</section>

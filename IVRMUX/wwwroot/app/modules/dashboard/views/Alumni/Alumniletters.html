@@ -1,0 +1,931 @@
+﻿<style>
+    .divob {
+        padding-left: 35px;
+        padding-right: 35px;
+    }
+</style>
+<link href="css/print/SRKVSStudentAddressBook/SRKVSStudentAddressBook.css" rel="stylesheet" />
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform" data-ng-init="BindData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Alumni Letters </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="text-center well" ng-init="reporttype='Alumni'">
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="reporttype" value="Alumni" ng-change="onchangetype()">
+                                        <span class="lbl padding-8">Alumni Students</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input name="optradio" type="radio" ng-model="reporttype" value="Regular" ng-change="onchangetype()">
+                                        <span class="lbl padding-8">Regular Students</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Letter Type<span style="color:red">*</span> </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="myList" data-ng-model="letter_list" name="let" required>
+                                        <option value="">--Select--</option>
+                                        <option value="OBA">OBA Games Meet</option>
+                                        <option value="ENR">Enrolling As Member-10th</option>
+                                        <option value="ENR3">Enrolling As Member-PUC II</option>
+                                        <option value="ADR">Change of Address</option>
+                                        <option value="PTRN">Enrolling as Patron</option>
+                                        <option value="LFMB">Enrolling as Life Member</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.let)" ng-messages="myform.let.$error">
+                                        <div ng-message="required">Select Letter Type</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date and Time:</label>
+                                <div class="col-sm-8" style="">
+                                    <input class="form-control active" placeholder="Enter Date and Time" name="d_date" ng-model="display_DateandTime" type="text">
+                                    <div class="error-messages" ng-if="interacted(myForm.d_date)" ng-messages="myForm.d_date.$error">
+                                        <div ng-message="required">Enter Date</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Academic Year:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-7">
+                                    <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="cat" ng-change="onchangeyear()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in newuser1" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected===true}}">{{option.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.cat)" ng-messages="myform.cat.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">Time:<span style="color:red;">*</span></label>
+                                <div class="col-sm-8" allow-pattern="\d">
+
+                                    <div uib-timepicker name="sch_time1" ng-model="display_time" min="min" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" required></div>
+                                    <div class="error-messages" ng-if="interacted(myForm.sch_time1)"
+                                         ng-messages="myForm.sch_time1.$error">
+                                        <div ng-message="required"> Time </div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <md-button type="button" ng-click="letterReport();" class="md-raised md-primary" ng-disabled="export_flag" ng-if="rep">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                        Report
+                                    </md-button>
+                                    <md-button type="button" ng-click="printData(letter_list)" target="_blank" class="md-raised md-primary" ng-disabled="export_flag">
+                                        <i class="fa fa-print" aria-hidden="true"></i>
+                                        Print
+                                    </md-button>
+                                    <!--<md-button type="button" ng-click="printDataadd();" class="md-raised md-warn" ng-disabled="export_flag">
+                <i class="fa fa-print" aria-hidden="true"></i> Address Book
+            </md-button>-->
+                                    <md-button type="button" class="md-raised md-warn" data-ng-click="clear()">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                        Cancel
+                                    </md-button>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmcL_Id" name="cat1" required ng-change="ShowReport()">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in newuser2" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected===true}}">{{option.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.cat1)" ng-messages="myform.cat1.$error">
+                                        <div ng-message="required">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                       
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+
+                </div>
+
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="searchResult.length>0 && showreportd==true">
+            <div class="box-header with-border">
+                <h3 class="box-title">Search Result</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-12">
+                    <div class="row clearfix">
+                        <div class="col-sm-4 text-left">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{presentCountgrid}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="searchValue!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="overflow:auto;" class="clearfix" id="style-4">
+                        <table class="table table-hover table-responsive table-bordered text-center" id="tbl">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label>
+                                            <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </th>
+                                    <th><a href="" ng-click="sort('sno')">SLNO</a></th>
+                                    <th><a href="" ng-click="sort('amsT_RegistrationNo')">Regno</a></th>
+                                    <th><a href="" ng-click="sort('amsT_AdmNo')">Adm No</a></th>
+                                    <th><a href="" ng-click="sort('amsT_FirstName')">Student Name</a> </th>
+                                    <th><a href="" ng-click="sort('amsT_Date')">Admission Date</a></th>
+                                    <th><a href="" ng-click="sort('amsT_DOB')">DOB</a></th>
+                                    <th><a href="" ng-click="sort('asmcL_ClassName')">Class</a></th>
+                                    <th><a href="" ng-click="sort('amsT_MobileNo')">Mobile No</a></th>
+                                    <th><a href="" ng-click="sort('amsT_emailId')">Email</a></th>
+                                    <th><a href="" ng-click="sort('amsT_Sex')">Gender</a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user in filterValue = (searchResult | filter : searchValue)| orderBy:sortKey:reverse|itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                    <td class="text-center  hdTD">
+                                        <label>
+                                            <input type="checkbox" ng-model="user.selected" value="{{user.AMST_Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </td>
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td style="text-align:left;">{{ user.amsT_RegistrationNo}}</td>
+                                    <td style="text-align:left;">{{ user.amsT_AdmNo}}</td>
+                                    <td style="text-align:left;">{{ user.amsT_FirstName}}</td>
+                                    <td style="text-align:left;">{{ user.amsT_Date|date:'dd/MM/yyyy'}}</td>
+                                    <td style="text-align:left;">{{ user.amsT_DOB |date:'dd/MM/yyyy'}}</td>
+                                    <td style="text-align:left;">{{ user.asmcL_ClassName}}</td>
+                                    <td style="text-align:left;">{{ user.amsT_MobileNo}}</td>
+                                    <td style="text-align:left;">{{ user.amsT_emailId}}</td>
+                                    <td style="text-align:left;">{{ user.amsT_Sex}}</td>
+
+                                    <!--<td>{{ user.amsT_BloodGroup}}</td>
+                                    <td>{{ user.amsT_FatherName}}</td>
+                                    <td>{{ user.amsT_MotherName}}</td>-->
+                                    <!--<td>{{ user.amsT_AadharNo}}</td>-->
+                                    <!--<td>{{ user.amsT_BirthCertNO}}</td>-->
+                                    <!--<td>{{ user.amsT_FatherAadharNo}}</td>
+                                    <td>{{ user.amsT_FatherBankAccNo}}</td>-->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                    <hr />
+                </div>
+            </div>
+        </div>
+        <div ng-show="rep">
+            <div class="box box-primary" ng-show="studlistdata.length>0&&letter_list=='OBA'">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Alumni Letter Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="printSectionIdl" class="BCHARCERT box-body">
+                    <div class="row" ng-repeat="use in searchstudentDetails2" style="page-break-after:always;font-size:11px;">
+                        <div class="col-sm-12 divob" >
+                            <div class="margin-top-10" style="margin:90px;">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="baldwin text-center">
+                                            <img src="/images/SRKVSLOGO.png" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8" style="text-align:center">
+                                        <h2>SRI RAMAKRISHNA VIDYASHALA</h2>
+                                        <h3>OLD BOYS' ASSOCIATION</h3>
+                                        <div style="font-size:25px"> Yadavagiri, Mysuru 570 020, Karnataka </div>
+                                    </div>
+
+
+                                  
+                                    <div class="col-sm-2">
+                                    </div>
+                                </div>
+                                <hr style="border-top:1px solid black;width: 1040px;" />
+                                <div style="text-align:center;font-size:23px;">Phone : (0821) 2514000, 2417555  * e-mail : alumnisrkvs@gmail.com * www.srkvs.org</div>
+                                <br />
+                                <div class="margin-top-10">
+                                    <div class="">
+                                        <div class="pull-right">
+                                            <label class="date2">Date : {{CurrentDate|date:'dd/MM/yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <div class="col-sm-12">
+                                        <p style="text-align:justify" class="hhh">
+                                            <div class="row" style="font-size:22px;">To</div>
+                                            <div class="row" style="font-size:22px;">Dear {{use.amsT_FirstName}},</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerStreet}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerArea}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerCity}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerPincode}}</div>
+                                            <br />
+
+                                            <br />
+                                            <div class="row" style="font-size:22px;">Sub : OBA Games Meet on {{display_DateandTime}}</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px;">Ref :</div>
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;We are planning, as in the previous years, a Games Meet for the Old Boys' Of
+                                            Vidyashala residing in Mysore and nearby places. It is proposed to play
+                                            matches between the alumni and the present students in Cricket, Volleyball,
+                                            Basketball Shuttle badminton, Table Tennis,Handball,Football and Kho-kho, provided
+                                            there are sufficient number of players for each game from the OBA side.
+                                        </p>
+                                        <!--In this connection, the cricket match between the alumni and the present
+                                        students of Vidyashala will be played at 9.45 AM on Sunday 13th November
+                                        2016 at Vidyashala. Other matches will also be played on the
+                                        same day if sufficient number of players from the OBA side turn up and if time permits.-->
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp; &nbsp;&nbsp; In this connection, the cricket match between the alumni and the present
+                                            students of Vidyashala will be played on {{display_DateandTime}} at Vidyashala. Other matches will also be played on the
+                                            same day if sufficient number of players from the OBA side turn up and if time permits.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp;&nbsp;&nbsp; We are happy that your name is proposed to be included in the alumni team. We hope you will make yourself free to participate in the match/ matches on that day.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp; KINDLY CONFIRM YOUR PARTICIPATION BY PHONE (2514000, 2417555) OR BY E-MAIL (alumnisrkvs@gmail.com) MENTIONING THE GAME IN WHICH YOU ARE WILLING TO PARTICIPATE.
+                                        </p><br />
+                                        <!--<p style="text-align:justify; font-size:22px;"  class="hhh">Dress Code: Preferably whites with full pants and shoes.</p>-->
+                                        <br /><br /><div class="row">
+                                            <div class="col-sm-4 text-center date1">
+                                                With best wishes,
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <br />
+                                        <div class="pull-right">
+                                            <div class="row text-center date1" style="font-size:22px;">Yours affectionately</div>
+                                            <br />
+                                            <br />
+                                            <br />
+                                            <div class="row date1" style="font-size:22px;">Correspondent, SRKVS</div>
+                                            <div class="row date1" style="font-size:22px;">Treasurer, SRKVS OBA</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary" ng-show="studlistdata.length>0&&letter_list=='ENR'">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Alumni Letter Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="printSectionId2" class="BCHARCERT box-body">
+                    <div class="row" ng-repeat="use in searchstudentDetails2" style="page-break-after:always;">
+                        <div class="col-sm-12 divob">
+                            <div class="margin-top-10" style="margin:90px;">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="baldwin text-center">
+                                            <img src="/images/SRKVSLOGO.png" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8" style="text-align:center">
+                                        <h2>SRI RAMAKRISHNA VIDYASHALA</h2>
+                                        <h3>OLD BOYS' ASSOCIATION</h3>
+                                        <div style="font-size:25px"> Yadavagiri, Mysuru 570 020, Karnataka </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                    </div>
+                                </div>
+                                <hr style="border-top:1px solid black;width: 1040px;" />
+                                <div style="text-align:center;font-size:23px;">Phone : (0821) 2514000, 2417555 * e-mail : alumnisrkvs@gmail.com * www.srkvs.org</div>
+                                <br />
+                                <div class="margin-top-10">
+                                    <div class="">
+                                        <div class="pull-right">
+                                            <label class="date2">Date : {{CurrentDate|date:'dd/MM/yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <div class="col-sm-12">
+                                        <p style="text-align:justify" class="hhh">
+                                            <!--<div class="row" style="font-size:22px;">To</div>-->
+                                            <!--<br />
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerStreet}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerArea}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerCity}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerPincode}}</div>-->
+                                            <br />
+                                            <div class="row" style="font-size:22px;">Dear {{use.amsT_FatherName}}</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px;">Sub : Enrolling your boy as a member of the Old Boys' Association</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px;text-align:justify">Ref : Your ward studying in {{use.asmcL_ClassName}} - {{use.amsT_FirstName}} ({{use.amsT_AdmNo}}).</div>
+                                        </p>
+
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp; &nbsp; We are glad that your boy is preparing well for the ensuing public examination. We hope he will do well in it. He has studied in our institution for three years. We trust you desire to continue his association with us in future also. Hence we request you to enroll him as a member of the Old Boys' Association which aims at bringing our alumni together by strengthening their network. Please find enclosed a copy of the Rules & Regulations of the Old Boys' Association.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp;The Association organizes programmes like Spiritual Retreats, Regional Meets, Sports and Games Meets etc. exclusively for our old Boys'. It brings out a bi-annual newsletter - Voice of Vidyashala Alumni (VOVA) with latest updates about Vidyashala and OBA. The Association has been conducting a city level Inter High School Competition in General Knowledge since 1973.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp; The Association offers two types of membership - Patron (Rs.3000/-) and Life Member (RS.1OOO/-) - both being
+                                            one-time payments only.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp;Your boy will be enrolled as a Life Member by adjusting your caution deposit of Rs.1000/- towards the above membership fees.  You need not send any amount for this.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp;In case, you desire your boy to be enrolled as a patron, you will please send an additional amount of Rs.2000/- in the
+                                            form of a crossed DD drawn in favour of Sri Ramakrishna Vidyashala, Mysore, with a request letter to enroll him as a patron of the Old Boys' Association.
+                                        </p>
+                                        <br /><br />
+                                        <div class="row">
+                                            <div class="col-sm-4 text-center date1" style="font-size:22px;">
+                                                With best wishes,
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <br />
+                                        <div class="pull-right">
+                                            <div class="row text-center date1" style="font-size:22px;">Yours in the Lord,</div>
+                                            <div>
+                                                <img style="width:200px;height:auto;margin-left:10px" src="/images/clients/SRKVS/swami Yukteshananda.jpg" class="img-responsive">
+                                            </div>
+                                            <div class="row date1" style="font-size:22px;">Correspondent, SRKVS</div>
+                                            <div class="row date1" style="font-size:22px;">
+                                                Treasurer, SRKVS OBA
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary" ng-show="studlistdata.length>0&&letter_list=='ENR3'">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Alumni Letter Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="printSectionId3" class="BCHARCERT box-body">
+                    <div class="row" ng-repeat="use in searchstudentDetails2" style="page-break-after:always;">
+                        <div class="col-sm-12 divob">
+                            <div class="margin-top-10" style="margin:90px;">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="baldwin text-center">
+                                            <img src="/images/SRKVSLOGO.png" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8" style="text-align:center">
+                                        <h2>SRI RAMAKRISHNA VIDYASHALA</h2>
+                                        <h3>OLD BOYS' ASSOCIATION</h3>
+                                        <div style="font-size:25px"> Yadavagiri, Mysuru 570 020, Karnataka </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                    </div>
+                                </div>
+                                <hr style="border-top:1px solid black;width: 1040px;" />
+                                <div style="text-align:center;font-size:23px;">Phone : (0821) 2514000, 2417555 * e-mail : alumnisrkvs@gmail.com * www.srkvs.org</div>
+                                <br />
+                                <div class="margin-top-10">
+                                    <div class="">
+                                        <div class="pull-right">
+                                            <label class="date2">Date : {{CurrentDate|date:'dd/MM/yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <div class="col-sm-12">
+                                        <p style="text-align:justify" class="hhh">
+                                            <!--<div class="row" style="font-size:22px;">To</div>-->
+                                            <!--<br />
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerStreet}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerArea}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerCity}}</div>
+                                            <div class="row" style="font-size:22px;">{{use.AMST_PerPincode}}</div>-->
+                                            <br />
+                                            <div class="row" style="font-size:22px;">Dear {{use.amsT_FatherName}}</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px;">Sub : Enrolling your boy as a member of the Old Boys' Association</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px;text-align:justify">Ref : Your ward studying in {{use.asmcL_ClassName}} - {{use.amsT_FirstName}} ({{use.amsT_AdmNo}}).</div>
+                                        </p>
+
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp; &nbsp; We are glad that your boy is preparing well for the ensuing public examination. We hope he will do well in it. He has studied in our institution for two years. We trust you desire to continue his association with us in future also. Hence we request you to enroll him as a member of the Old Boys' Association which aims at bringing our alumni together by strengthening their network. Please find enclosed a copy of the Rules & Regulations of the Old Boys' Association.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp;The Association organizes programmes like Spiritual Retreats, Regional Meets, Sports and Games Meets etc. exclusively for our old Boys'. It brings out a bi-annual newsletter - Voice of Vidyashala Alumni (VOVA) with latest updates about Vidyashala and OBA. The Association has been conducting a city level Inter High School Competition in General Knowledge since 1973.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp; The Association offers two types of membership - Patron (Rs.3000/-) and Life Member (RS.1OOO/-) - both being
+                                            one-time payments only.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp;Your boy will be enrolled as a Life Member by adjusting your caution deposit of Rs.1000/- towards the above membership fees.  You need not send any amount for this.
+                                        </p>
+                                        <p style="text-align:justify" class="hhh">
+                                            &nbsp;&nbsp;In case, you desire your boy to be enrolled as a patron, you will please send an additional amount of Rs.2000/- in the
+                                            form of a crossed DD drawn in favour of Sri Ramakrishna Vidyashala, Mysore, with a request letter to enroll him as a patron of the Old Boys' Association.
+                                        </p>
+                                        <br /><br />
+                                        <div class="row">
+                                            <div class="col-sm-4 text-center date1" style="font-size:22px;">
+                                                With best wishes,
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <br />
+                                        <div class="pull-right">
+                                            <div class="row text-center date1" style="font-size:22px;">Yours in the Lord,</div>
+                                            <div>
+                                                <img style="width:200px;height:auto;margin-left:10px" src="/images/clients/SRKVS/swami Yukteshananda.jpg" class="img-responsive">
+                                            </div>
+                                            <div class="row date1" style="font-size:22px;">Correspondent, SRKVS</div>
+                                            <div class="row date1" style="font-size:22px;">
+                                                Treasurer, SRKVS OBA
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary" ng-show="studlistdata.length>0&&letter_list=='ADR'">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Alumni Letter Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="printSectionId4" class="BCHARCERT box-body">
+                    <div class="row" ng-repeat="use in searchstudentDetails2" style="page-break-after:always;">
+                        <div class="col-sm-12 divob">
+                            <div class="margin-top-10" style="margin:90px;">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="baldwin text-center">
+                                            <img src="/images/SRKVSLOGO.png" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8" style="text-align:center">
+                                        <h2>SRI RAMAKRISHNA VIDYASHALA</h2>
+                                        <h3>OLD BOYS' ASSOCIATION</h3>
+                                        <div style="font-size:25px"> Yadavagiri, Mysuru 570 020, Karnataka </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+
+                                    </div>
+
+                                </div>
+                                <hr style="border-top:1px solid black;width: 1040px;" />
+                                <div style="text-align:center;font-size:23px;">Phone : (0821) 2514000, 2417555  * e-mail : alumnisrkvs@gmail.com * www.srkvs.org</div>
+                                <br />
+                                <div class="margin-top-10">
+                                    <div class="">
+                                        <div class="pull-right">
+                                            <label class="date2">Date : {{CurrentDate|date:'dd/MM/yyyy'}}</label>
+
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <div class="col-sm-12">
+                                        <p style="text-align:justify" class="hhh">
+                                            <div class="row" style="font-size:22px;">To</div>
+                                           
+                                            <div class="row" style="font-size:22px">{{use.amsT_FirstName}}</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px">Kind Attention : {{use.amsT_FirstName}} </div>
+                                            <br />
+                                            <div class="row" style="font-size:22px">Dear {{use.amsT_FirstName}}</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px;">Sub : Change of address</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px">Ref :</div>
+
+                                        </p>
+                                        <div class="row">
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="date1" style="text-align:justify;font-size:22px">Hope you are doing well.</td>
+                                                    </tr>
+                                                    <tr></tr>
+                                                    <tr>
+                                                        <td class="date1" style="text-align:justify;font-size:22px">It is very nice of you to have intimated the change in your address. It has been incorporated in our records.</td>
+                                                    </tr>
+                                                    <tr></tr>
+                                                    <tr>
+                                                        <td class="date1" style="text-align:justify;font-size:22px">Kindly visit the institution whenever you come to Mysore.</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <br /><br />
+                                            <div class="row">
+                                                <div class="col-sm-4 text-center date1">
+                                                    With best wishes,
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <br />
+                                            <div class="pull-right">
+                                                <div class="row text-center date1">Yours affectionately</div>
+                                                <br />
+                                                <br />
+                                                <br />
+                                                <div class="row date1">Correspondent, SRKVS</div>
+                                                <div class="row date1">Treasurer, SRKVS OBA</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary" ng-show="studlistdata.length>0&&letter_list=='PTRN'">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Alumni Letter Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="printSectionId5" class="BCHARCERT box-body">
+                    <div class="row" ng-repeat="use in searchstudentDetails2" style="page-break-after:always;">
+                        <div class="col-sm-12 divob">
+                            <div class="margin-top-10" style="margin:90px;">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="baldwin text-center">
+                                            <img src="/images/SRKVSLOGO.png" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8" style="text-align:center">
+                                        <h2>SRI RAMAKRISHNA VIDYASHALA</h2>
+                                        <h3>OLD BOYS' ASSOCIATION</h3>
+                                        <div style="font-size:25px"> Yadavagiri, Mysuru 570 020, Karnataka </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                    </div>
+                                </div>
+                                <hr style="border-top:1px solid black;width: 1040px;" />
+                                <div style="text-align:center;font-size:23px;">Phone : (0821) 2514000, 2417555  * e-mail : alumnisrkvs@gmail.com * www.srkvs.org</div>
+                                <br />
+                                <div class="margin-top-10">
+                                    <div class="">
+                                        <div class="pull-right">
+                                            <label class="date2">Date : {{CurrentDate|date:'dd/MM/yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <div class="col-sm-12">
+                                        <p style="text-align:justify" class="hhh">
+                                            <div class="row" style="font-size:22px;">To</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px">Dear {{use.amsT_FirstName}}</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px">{{use.AMST_PerStreet}}</div>
+                                            <div class="row" style="font-size:22px">{{use.AMST_PerArea}}</div>
+                                            <div class="row" style="font-size:22px">{{use.AMST_PerCity}}</div>
+                                            <div class="row" style="font-size:22px">{{use.AMST_PerPincode}}</div>
+
+
+                                            <br />
+                                            <div class="row" style="font-size:22px;">Sub : Your boy is enrolled as Patron</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px">Ref :</div>
+                                        </p>
+                                        <div class="row">
+                                            <table>
+                                                <tr>
+                                                    <td class="date1" style="text-align:justify;font-size:22px"> We are thankful to you for sending an additional membership subscription of Rs.2000/-. Please find the receipt enclosed.</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="date1" style="text-align:justify;font-size:22px">The Life Membership of your boy has been upgraded and he is enrolled as a Patron of the Old Boys' Association.</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="date1" style="text-align:justify;font-size:22px">We wish him all the best.</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <br /><br />
+                                        <div class="row">
+                                            <div class="col-sm-4 text-center date1">
+                                                With best wishes,
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <br />
+                                        <div class="pull-right">
+                                            <div class="row text-center date1">Yours in the Lord,</div>
+                                            <br />
+                                            <br />
+                                            <br />
+                                            <div class="row date1">Correspondent, SRKVS</div>
+                                            <div class="row date1">Treasurer, SRKVS OBA</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-primary" ng-show="studlistdata.length>0&&letter_list=='LFMB'">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Alumni Letter Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="printSectionId6" class="BCHARCERT box-body">
+                    <div class="row" ng-repeat="use in searchstudentDetails2" style="page-break-after:always;">
+                        <div class="col-sm-12 divob">
+                            <div class="margin-top-10" style="margin:90px;">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="baldwin text-center">
+                                            <img src="/images/SRKVSLOGO.png" class="img-responsive" alt="baldwin">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8" style="text-align:center">
+                                        <h2>SRI RAMAKRISHNA VIDYASHALA</h2>
+                                        <h3>OLD BOYS' ASSOCIATION</h3>
+                                        <div style="font-size:25px"> Yadavagiri, Mysuru 570 020, Karnataka </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                    </div>
+                                </div>
+                                <hr style="border-top:1px solid black;width: 1040px;" />
+                                <div style="text-align:center;font-size:23px;">Phone : (0821) 2514000, 2417555  * e-mail : alumnisrkvs@gmail.com * www.srkvs.org</div>
+                                <br />
+                                <div class="margin-top-10">
+                                    <div class="">
+                                        <div class="pull-right">
+                                            <label class="date2">Date : {{CurrentDate|date:'dd/MM/yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                    <br /> <br />
+                                    <div class="col-sm-12">
+                                        <p style="text-align:justify" class="hhh">
+                                            <!--<div class="row" style="font-size:22px;">To</div>
+                                            <br />
+                                            <div class="row" style="font-size:22px">{{use.AMST_PerStreet}}</div>
+                                            <div class="row" style="font-size:22px">{{use.AMST_PerArea}}</div>
+                                            <div class="row" style="font-size:22px">{{use.AMST_PerCity}}</div>
+                                            <div class="row" style="font-size:22px">{{use.AMST_PerPincode}}</div>
+                                            <br />-->
+                                            <div class="row" style="font-size:22px">Dear Sri {{use.amsT_FatherName}}</div>
+                                            <br /><br />
+                                            <div class="row" style="font-size:22px;">Sub : Your boy is enrolled as Life Member</div>
+                                            <br /><br />
+                                            <div class="row" style="font-size:22px">Ref :</div>
+                                            <div class="row" style="font-size:22px; padding-left:40px;">Your ward: {{use.amsT_FirstName}}</div>
+
+                                        </p>
+                                        <div class="row">
+                                            <table>
+                                                <tr>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="date1" style="text-align:justify;font-size:22px"> We are glad that you have enrolled your boy as a Life Member of the Old Boys' association. Please find the receipt enclosed for Rs.1000/- being the membership subscription. <br /></td>
+                                                </tr>
+                                            </table>
+                                            <table style="margin-top:10px">
+
+                                                <tr>
+                                                    <td class="date1" style="text-align:justify;font-size:22px">Kindly see that he keeps in touch with the institution in future also. He is welcome to visit the institution whenever convenient to him. <br /></td>
+                                                </tr>
+                                            </table>
+                                            <table style="margin-top:10px">
+                                                <tr>
+                                                    <td class="date1" style="text-align:justify;font-size:22px">Whenever there is any change in his contact particulars, kindly instruct him to intimate the same to us. <br /></td>
+                                                </tr>
+                                            </table>
+                                            <table style="margin-top:10px">
+                                                <tr>
+                                                    <td class="date1" style="text-align:justify;font-size:22px">We wish him all the best in his future endeavours.</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <br /><br /><br />
+                                        <div class="row">
+                                            <div class="col-sm-4 text-center date1">
+                                                With best wishes,
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="pull-right">
+                                            <div class="row text-center date1">Yours in the Lord,</div>
+                                            <div>
+                                                <img style="width:200px;height:auto;margin-left:10px" src="/images/clients/SRKVS/swami Yukteshananda.jpg" class="img-responsive">
+                                            </div>
+                                            <div class="row date1">Correspondent, SRKVS</div>
+                                            <div class="row date1">Treasurer, SRKVS OBA</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" hidden>
+            <div class="box-header with-border">
+                <h3 class="box-title">Alumni Address</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box box-body">
+                <div id="SRKVSStudentAddressBook" class="">
+                    <div class="row SRKVSStudentAddressBook">
+                        <div class="col-sm-6" ng-repeat="user in printstudents" style="page-break-after:always;">
+                            <table>
+                                <tr>
+                                    <td>
+                                        {{ user.amsT_FirstName}} ( {{user.asmcL_ClassName}}) ( {{ user.amsT_AdmNo}} )
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        S/O {{ user.amsT_FatherName}}
+                                    </td>
+                                </tr>
+                                <tr ng-if="dob == true">
+                                    <td>
+                                        DOB: {{ user.amsT_DOB | date:'dd/MM/yyyy'}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="width:200px;word-break:break-word;">{{user.AMST_PerStreet+','}}<br /></div>
+                                        <div style="width:200px;word-break:break-word;"> {{user.AMST_PerArea+','}}<br /></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="width:300px;word-break:break-word;"> {{user.AMST_PerCity}},{{user.State}},{{user.Country}}{{'-'+user.AMST_PerPincode}}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Mobile No : {{user.amsT_MobileNo}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="printSectionId" ng-show="print_data" style="overflow:scroll">
+            <div class="">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" style="height:100px;width:auto" alt="baldwin">
+                </div>
+            </div>
+            <center> <h4><u> ALUMNI LETTERS </u></h4></center>
+            <table class="table-bordered" id="table">
+                <thead>
+                    <tr>
+                        <th style="width:30px">SLNO</th>
+                        <th style="width:50px">Regno</th>
+                        <th style="width:50px">Adm No</th>
+                        <th style="width:250px">Student Name </th>
+                        <th style="width:60px">Admission Date</th>
+                        <th style="width:60px">DOB</th>
+                        <th style="width:50px">Class</th>
+                        <th style="width:80px">Mobile No</th>
+                        <th style="width:80px">Email</th>
+                        <th style="width:50px">Blood group</th>
+                        <th style="width:50px">Gender</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in printstudents | filter:searchValue | orderBy:sortKey:reverse">
+                        <td style="text-align:center">{{$index+1}}</td>
+                        <td>{{ row.amsT_RegistrationNo}}</td>
+                        <td>{{ row.amsT_AdmNo}}</td>
+                        <td>{{ row.amsT_FirstName}}</td>
+                        <td>{{ row.amsT_Date|date:'dd/MM/yyyy'}}</td>
+                        <td>{{ row.amsT_DOB |date:'dd/MM/yyyy'}}</td>
+                        <td>{{ row.asmcL_ClassName}}</td>
+                        <td>{{ row.amsT_MobileNo}}</td>
+                        <td>{{ row.amsT_emailId}}</td>
+                        <td>{{ row.amsT_BloodGroup}}</td>
+                        <td>{{ row.amsT_Sex}}</td>
+
+                        <!--<td>{{ row.amsT_FatherName}}</td>
+                        <td>{{ row.amsT_MotherName}}</td>-->
+                    </tr>
+                </tbody>
+                <tfoot class="margin-top-10">
+                    <tr>
+                        <td colspan="16" class="col-sm-12 text-center margin-top-2">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </form>
+</section>

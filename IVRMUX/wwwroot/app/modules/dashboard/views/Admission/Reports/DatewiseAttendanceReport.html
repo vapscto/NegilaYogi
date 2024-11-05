@@ -1,0 +1,353 @@
+﻿
+<section class="content">
+    <!--<form class="form-horizontal ng-pristine ng-valid" role="form" ng-init="getpagedetails()">-->
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loadInitialData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Date Wise Attendance Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row text-center">
+                    <div class="col-sm-6">
+                        <div class="well text-center" data-ng-init="ts.optradio ='all'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optradio" value="all" name="amst_SOL" ng-click="radio_btn_function()">
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optradio" value="indi" name="amst_SOL" ng-click="radio_btn_function()">
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="well text-center" data-ng-init="ts.optradiof1 ='f1'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optradiof1" value="f1" name="type" ng-click="radiof1_btn_function()">
+                                <span class="lbl padding-8">Format 1</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="ts.optradiof1" value="f2" name="type" ng-click="radiof1_btn_function()">
+                                <span class="lbl padding-8">Format 2</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ts.asmaY_Id" name="tslacdyr" ng-change="onchangeyear(ts)" required>
+                                    <option value="" label="Select Academic Year"> </option>
+                                    <option ng-repeat="option in newuser1" value="{{option.asmaY_Id}}"
+                                            ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.tslacdyr)" ng-messages="myForm.tslacdyr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ts.asmcL_Id" ng-change="onchangeclass(ts)" ng-disabled="ts.optradio=='all'" name="tslclss"
+                                        ng-required="ts.optradio=='indi'">
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="class in classList" value="{{class.asmcL_Id}}" ng-selected="{{class.Selected == true}}">{{class.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.tslclss)" ng-messages="myForm.tslclss.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ts.asmS_Id" name="tslsec" ng-disabled="ts.optradio=='all'" ng-required="ts.optradio=='indi'">
+                                    <option value="">Select Section</option>
+                                    <option value="0">All</option>
+                                    <option ng-repeat="section in sectionList" value="{{section.asmS_Id}}" ng-selected="{{section.Selected == true}}">{{section.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.tslsec)" ng-messages="myForm.tslsec.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="FromDate" ng-model="ts.FromDate" onkeydown="return false" md-placeholder="Enter date" md-min-date="minDatedof" md-max-date="maxDatedof" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myform.FromDate)" ng-messages="myform.FromDate.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false"
+                                       data-ng-click="Report(ts)">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                            <md-button type="button" ng-click="print(ts)" ng-show="class" class="md-raised md-primary">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                Print
+                            </md-button>
+                            <md-button type="button" ng-click="exportToExcel(ts)" target="_blank" ng-show="class" class="md-raised md-primary">
+                                <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                Export to Excel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="class">
+            <div class="box-header with-border">
+                <h3 class="box-title">Date Wise Attendance Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div ng-if="ts.optradiof1=='f1'">
+                <div class="box-body">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <!--<div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue1.length}}
+                                </label>
+                            </label>
+                        </div>-->
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <!--<th>
+                                    <label>
+                                        <input type="checkbox" ng-model="ts.all2" ng-click="toggleAll(ts)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>-->
+                                <th><a href="">SL.No</a></th>
+                                <th><a href="" ng-click="sortBy('studentname')">Student Name</a></th>
+                                <th><a href="" ng-click="sortBy('classname')">Class</a></th>
+                                <th><a href="" ng-click="sortBy('sectionname')">Section</a></th>
+                                <th><a href="" ng-click="sortBy('classteacher')">Class Teacher Name</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1=(loginPData |filter:searchValue )| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage " current-page="currentPage" ng-class-odd="'odd'">
+                                <!--<td class="text-center">
+                                    <label>
+                                        <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>-->
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td>{{ user.studentname}}</td>
+                                <td>{{ user.classname}}</td>
+                                <td>{{ user.sectionname}}</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+
+                <div id="printSectionId" ng-show="table_flag">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center><h4>Over All Absent Report &nbsp;&nbsp;&nbsp; Year : {{yearname}} &nbsp;&nbsp;&nbsp; Date : {{attdate | date :'dd/MM/yyy'}}</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                        <thead>
+                            <tr>
+                                <th width="50" class="text-center"> SL. No.</th>
+                                <th width="250" class="text-center">Student Name</th>
+                                <th width="50" class="text-center">Class</th>
+                                <th width="50" class="text-center">Section</th>
+                                <th width="100" class="text-center">Class Teacher Sign</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in loginPData|filter :searchValue">
+                                <td>{{$index+1}}</td>
+                                <td class="text-left padding-left-5">{{ user.studentname}}</td>
+                                <td>{{ user.classname}}</td>
+                                <td>{{ user.sectionname}}</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div ng-if="ts.optradiof1=='f2'">
+                <div class="box-body">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgridd}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <!--<div class="form-group" ng-if="searchValue21!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue21.length}}
+                                </label>
+                            </label>
+                        </div>-->
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue21" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <!--<th>
+                                    <label>
+                                        <input type="checkbox" ng-model="all23" ng-click="toggleAll3()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>-->
+                                <th><a href="">SL.No</a></th>
+                                <th><a href="" ng-click="sortBy('classname')">Class Name</a></th>
+                                <th><a href="" ng-click="sortBy('absent')">Total Absent</a></th>
+                                <th><a href="" ng-click="sortBy('present')">Total Present</a></th>
+                                <th><a href="" ng-click="sortBy('classteacher')">HM Sign </a></th>
+                                <th><a href="" ng-click="sortBy('classteacher')">Principal Sign </a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user1 in filterValue21=(loginPData22 |filter:searchValue21 )| orderBy:propertyName:reverse|itemsPerPage:itemsPerPage " current-page="currentPage" ng-class-odd="'odd'">
+                                <!--<td class="text-center">
+                                    <label>
+                                        <input type="checkbox" ng-model="user1.selected2" value="{{user1.Id}}" ng-change="optionToggled3(user,itemsPerPage *(currentPage-1)+$index)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>-->
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td>{{ user1.classname}}</td>
+                                <td>{{ user1.absent}}</td>
+                                <td>{{ user1.present}}</td>
+                                <td>&nbsp;&nbsp;&nbsp;</td>
+                                <td>&nbsp;&nbsp;&nbsp;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+
+                <div id="printSectionId1" ng-show="table_flag1">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                    <center><h4>Class Wise Absent Report &nbsp;&nbsp;&nbsp; Year : {{yearname}} &nbsp;&nbsp;&nbsp; Date : {{attdate | date :'dd/MM/yyy'}}</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                        <thead>
+                            <tr>
+                                <th class="text-center"> SL. No.</th>
+                                <th class="text-center">Class Name</th>
+                                <th class="text-center">Total Absent</th>
+                                <th class="text-center">Total Present</th>
+                                <th class="text-center">HM Sign</th>
+                                <th class="text-center">Principal Sign</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user1 in loginPData22|filter :searchValue">
+                                <td>{{$index+1}}</td>
+                                <td>{{ user1.classname}}</td>
+                                <td>{{ user1.absent}}</td>
+                                <td>{{ user1.present}}</td>
+                                <td>&nbsp;&nbsp;&nbsp;</td>
+                                <td>&nbsp;&nbsp;&nbsp;</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="16" class="col-sm-12 text-center ">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</section>

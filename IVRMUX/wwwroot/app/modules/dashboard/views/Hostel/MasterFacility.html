@@ -1,0 +1,190 @@
+﻿
+<style>
+
+    .file-blue:before {
+        content: 'Upload File';
+        background: #2757a6;
+        border-color: #2757a6;
+        color: #FFF;
+        text-shadow: 1px 1px rgba(000,000,000,0.5);
+    }
+</style>
+
+<section class="content" ng-init="loaddata()">
+
+    <div class="box box-primary">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">Master Facility</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Facility Name  :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" name="MOUN" type="text" ng-model="hlmftY_FacilityName" placeholder="Enter Facility Name" required>
+                                <div class="error-messages" ng-if="interacted(myForm.MOUN)" ng-messages="myForm.MOUN.$error">
+                                    <div ng-message="required">Enter the Facility Name</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Description:</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" name="cbc" ng-model="hlmftY_FacilityDesc" placeholder="Enter Description"> </textarea>
+                                <div class="error-messages" ng-if="interacted(myForm.cbc)" ng-messages="myForm.cbc.$error">
+                                    <div ng-message="required">Enter the Description</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row" hidden>
+                    <div class="col-sm-6">
+                        <div class="from-group">
+                            <h5 class="box-title">upload File:</h5>
+                            <div>
+                                <h4 class="control-label col-sm-5" style="text-align:left;margin-left: 182px;">
+                                    {{file_detail}}
+                                    <button type="button" ng-if="file_detail" class="close" style="color:red;float:right">
+                                        <b>
+                                            <i class="fa fa-times" aria-hidden="true" ng-click="remove_file()"></i>
+                                        </b>
+                                    </button>
+                                </h4>
+                            </div>
+                            <label class="custom-file-input file-blue" style="width:200px;margin-left: 195px;margin-top: 15px;">
+                                <input type="file" data-ng-model="intB_FilePath" accept="image/*, application/pdf,application/msword, application/vnd.ms-excel" name="docfile" onchange="angular.element(this).scope().uploadFile(this)" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="">
+                    <div class="text-center">
+                        <input type="hidden" ng-model="hlmftY_Id" value="{{hlmftY_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" data-ng-click="savedatatab1()" ng-disabled="form.$invalid" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="get_facilitylist.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Facility DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{get_facilitylist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th> <a href="" ng-click="sort('')">SL.No.</a></th>
+                        <th> <a href="" ng-click="sortBy('hlmftY_FacilityName')">Facility</a></th>
+                        <th width="25%"><a href="" ng-click="sortBy('hlmftY_FacilityDesc')">Description</a></th>
+                        <!--<th>View</th>-->                        
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (get_facilitylist | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.hlmftY_FacilityName;}}</td>
+                        <td>{{user.hlmftY_FacilityDesc}}</td>
+                        <!--<td>
+                            <span ng-if="user.hlmftY_FacilityFilePath!=null">
+                                <a href="{{user.hlmftY_FacilityFilePath}}" class="text-blue" data-placement="bottom" data-toggle="tooltip" title="Download File">
+                                    {{user.hlmftY_FacilityFileName}}
+                                </a>
+                            </span>
+                            <span ng-if="user.hlmftY_FacilityFilePath==null">
+
+                            </span>
+                            
+                        </td>-->                       
+                        <td class="text-center" style="width:15%">
+                            <a class="text-aqua" href="" ng-click="edit_facilitydata(user)" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            |
+                            <span ng-if="!user.hlmftY_ActiveFlag">
+                                <a href="" ng-click="deactiv_facilitydata(user)" class="text-green" data-placement="bottom" data-toggle="tooltip" title="activate">
+                                    Activate
+                                </a>
+                            </span>
+                            <span ng-if="user.hlmftY_ActiveFlag">
+                                <a href="" ng-click="deactiv_facilitydata(user)" class="text-danger" data-placement="bottom" data-toggle="tooltip" title="deactivate">
+                                    De-activate
+                                </a>
+                            </span>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+</section>
+
+
+
+
+

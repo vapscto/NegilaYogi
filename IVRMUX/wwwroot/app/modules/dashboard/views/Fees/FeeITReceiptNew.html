@@ -1,0 +1,144 @@
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-submit="ShowReportdata()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee IT Receipt Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-left:50px;">Academic Year:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="seludsfsfsdse" data-ng-model="asmaY_Id" ng-disabled="acyeardisable" ng-change="selectacademicyear()">
+                                    <option value="" label="Select Year"> </option>
+                                    <option ng-repeat="option4 in acayyearbind" value="{{option4.asmaY_Id}}" ng-selected="{{option4.Selected == true}}">
+                                        {{option4.asmaY_Year}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-left:50px;">Student Name:</label>
+                            <div class="col-sm-8">
+                                <!--<select class="form-control" id="sel1" ng-model="Amst_Id" ng-disabled="rbnsNameforall" name="student">
+                                    <option value="" label="Select Student"> </option>
+                                    <option ng-repeat="optionstu in studentlst" value="{{optionstu.amst_Id}}" ng-selected="{{optionstu.Selected == true}}">
+                                        {{optionstu.amsT_FirstName + ' ' + optionstu.amsT_MiddleName + ' ' + optionstu.amsT_LastName}}
+                                    </option>
+                                </select>-->
+
+                                <ui-select id="sel1" name="student" ng-model="$parent.Amst_Id" theme="bootstrap" title="Select Student" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Student">{{$select.selected.amsT_FirstName + ' ' + $select.selected.amsT_MiddleName + ' ' + $select.selected.amsT_LastName}}</ui-select-match>
+                                    <ui-select-choices repeat="optionstu in studentlst | filter: $select.search" value="{{optionstu.amst_Id}}">
+                                        <div ng-bind-html="optionstu.amsT_FirstName + ' ' + optionstu.amsT_MiddleName + ' ' + optionstu.amsT_LastName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" style="padding-left:50px;">Date:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="date" data-ng-model="date">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />            
+            <div class="well text-center">
+                <button type="submit" class="btn btn-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="ShowReportdata()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Show
+                </button>
+                <button class="btn btn-primary" ng-click="printData()">Print</button>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="getclientsnames.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Report Grid View</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+            <div class="col-sm-12">
+                <div class="text-center">
+                    <label class="radio-inline">
+                        <input type="radio" ng-model="FormatType" value="Format1" name="Format">
+                        <span class="lbl padding-8" style="font-size:20px"><b>Format 1</b></span>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" ng-model="FormatType" value="Format2" name="Format">
+                        <span class="lbl padding-8" style="font-size:20px"><b>Format 2</b></span>
+                    </label>
+                </div>
+            </div>
+        </div>       
+        <div id="test" ng-if="FormatType =='Format1'">
+            <div class="box-body">
+                <section class="content" id="printmodal">
+                    <div class="box-body">
+                        <div style="margin:50px !important">
+                            <div class="row margin-top-30">
+                                <h3 class="text-center" style="font-family:Georgia Bold; font-size:30px">TO WHOMSOEVER IT MAY CONCERN</h3>
+                            </div>
+                            <div class="row margin-top-30" style="margin:55px !important">
+                                <p style="font-family:Georgia Regular; font-size:25px !important; line-height: 50px;  word-spacing: 15px;">
+                                    This is to certify that <b>{{stuname}}</b>  D/o <b>{{stufather}}</b>
+                                    Admission No. <b>{{AMST_AdmNo}}</b>  is studying in <b>{{stucls}}-{{stusec}}</b> during the Academic
+                                    Year <b>{{ASMAY_Year}}</b>. Her estimated Tuition fee for the academic year <b>{{ASMAY_Year}}</b> is
+                                    <b>Rs.{{TotalDisplay}}</b>/- ({{words}})
+                                    approximately.
+                                </p>
+                                <div class="row margin-top-100">
+                                    <div class="col-sm-6">
+                                        <p style="font-family:Georgia, Regular;margin: 0;line-height: normal;font-size:24px;"><b>Principal</b></p>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <p style="font-family: Georgia, Regular; font-size: 24px; line-height: 30px; margin-bottom: 0;"><b>{{ date | date:"dd" }} {{ date | date:"MMMM" }} {{ date | date:"yyyy" }}</b></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div id="test2" ng-if="FormatType =='Format2'">
+            <div class="box-body">
+                <section class="content" id="printmodal">
+                    <div class="box-body">
+                        <div style="margin:50px !important">
+                            <div class="row margin-top-30">
+                                <h3 class="text-center" style="font-family:Georgia Bold; font-size:30px">TO WHOMSOEVER IT MAY CONCERN</h3>
+                            </div>
+                            <div class="row margin-top-30" style="margin:55px !important">
+                                <p style="font-family:Georgia Regular; font-size:25px !important; line-height: 50px;  word-spacing: 15px;">
+                                    This is to certify that <b>{{stuname}}</b>  S/o <b>{{stufather}}</b>
+                                    Admission No. <b>{{AMST_AdmNo}}</b>  of class <b>{{stucls}}-{{stusec}}</b> has paid
+                                    <b>Rs.{{TotalDisplay}}</b>/- ({{words}}) as Tuition Fees during the academic year <b>{{ASMAY_Year}}</b>
+                                    <br />
+                                    <br />
+                                    This certificate is issued for the purpose of IT Returns.
+                                </p>
+                                <div class="row margin-top-100">
+                                    <div class="col-sm-6">
+                                        <p style="font-family:Georgia, Regular;margin: 0;line-height: normal;font-size:24px;"><b>Principal</b></p>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <p style="font-family: Georgia, Regular; font-size: 24px; line-height: 30px; margin-bottom: 0;"><b>{{ date | date:"MMMM" }} {{ date | date:"dd" }} {{ date | date:"yyyy" }}</b></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,266 @@
+﻿<section class="content">
+    <div data-ng-init="BindData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">SMS MAIL COUNT REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="LoadData()" novalidate>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="text-center">
+                                <div class="well" ng-init="setCheked()">
+                                    <label>Please Select Check Box:<span style="color:red;">*</span></label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="1" name="chk" ng-model="obj.check1" ng-change="checkedStatus()" ng-required="obj.check2==false" />
+                                        <span class="lbl padding-8">Student</span>
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="2" name="chk" ng-model="obj.check2" ng-change="checkedStatus()" ng-required="obj.check1==false" />
+                                        <span class="lbl padding-8">EMPLOYEE/STAFF</span>
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="3" name="chk" ng-model="obj.check3" ng-change="checkedStatus()" ng-required="obj.check1==false" />
+                                        <span class="lbl padding-8">Alumini</span>
+                                    </label>
+                                    <div class="error-messages" ng-if="interacted(myForm.chk)" ng-messages="myForm.chk.$error">
+                                        <div ng-message="required">Please select at least one check box</div>
+                                    </div>
+                                </div>
+
+                                <div class="well">
+                                    <label>Please Select Radio Button:<span style="color:red;">*</span></label>
+                                    <label class="radio-inline">
+                                        <input type="radio" id="1" value="smscount" name="radioption" ng-model="radioption" ng-change="rdochange()" required />
+                                        <span class="lbl padding-8">SMS</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" id="2" value="emailcount" name="radioption" ng-model="radioption" ng-change="rdochange()" required />
+                                        <span class="lbl padding-8">EMAIL</span>
+                                    </label>
+                                   
+                                    <div class="error-messages" ng-if="interacted(myForm.radioption)" ng-messages="myForm.radioption.$error">
+                                        <div ng-message="required">Please Select Radio Button</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="sel2" class="control-label col-sm-4">From Date: <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker data-ng-model="Start_Date" name="start_date" md-placeholder="Select Date" ng-change="validatetodate(Start_Date)" onkeydown="return false" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.start_date)" ng-messages="myForm.start_date.$error">
+                                            <div ng-message="required">Select From Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sel2" class="control-label col-sm-4">To Date: <span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker data-ng-model="End_Date" name="End_Date" md-min-date="minDatet" md-max-date="maxDatet" md-placeholder="Select Date" onkeydown="return false" ng-disabled="!Start_Date" required></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.End_Date)" ng-messages="myForm.End_Date.$error">
+                                            <div ng-message="required">Select To Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="sel2" class="control-label col-sm-3">Module Name : </label>
+                                <div class="multiselect col-sm-8">
+                                    <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                    <label ng-hide="searchchkbx1.length > 0">
+                                        <input name="clsoption" value="all" ng-model="all" type="checkbox" ng-click="toggleAlltwo()">
+                                        <span class="lbl padding-8">
+                                            All
+                                        </span>
+                                    </label>
+                                    <label ng-repeat="cls in Modulelist | filter:searchchkbx1" value="{{IVRMM_ModuleName}}">
+                                        <input type="checkbox" ng-model="cls.selected" ng-change="optionToggledtwo(cls)" name="sec" />
+                                        <span class="lbl padding-8">{{cls.IVRMM_ModuleName}}</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                    <div ng-message="required">Please Select any one </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="text-center">
+                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="getReport()">
+                            <i class="fa fa-save" aria-hidden="true"></i> Report
+                        </md-button>
+                        <md-button type="button" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="ExportToExcel('#table')" ng-show="sms_mail_count.length > 0">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export To Excel
+                        </md-button>
+                        <!--<md-button type="button" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="ExportToExcel('#table1')" ng-show="staffList.length > 0 ">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export To Excel
+                        </md-button>-->
+                        <md-button type="button" ng-disabled="form.$invalid" class="md-raised md-primary" ng-click="Print()" ng-show="sms_mail_count.length > 0 ">
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.box-body -->
+        </div>
+
+    </div>
+
+    <div class="box box-primary" ng-show="sms_mail_count.length > 0">
+        <div class="box-header with-border">
+            <h3 class="box-title">SMS MAIL Count REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge" style="background-color:#0463C2;">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="search!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge" style="background-color:#0463C2;">
+                            {{filterValue.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group searchbox">
+                    <div class="input-group">
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                        <span class="input-group-addon">
+                            <button class="btn" type="submit" ng-click="searchByColumn(search,searchColumn)"><i class="fa fa-search"></i></button>
+                        </span>
+                        <select class="form-control" id="sel1" ng-model="searchColumn" ng-change="getcolumnId(searchColumn)">
+                            <option value="" ng-selected="true">Module Name</option>
+                            <option value="1" ng-show="radioption=='emailcount'">Email ID</option>
+                            <option value="2"> Message</option>
+                            <option value="3">Date</option>
+                            <option value="4" ng-show="radioption=='smscount'">Mobile Number </option>
+                            <option value="5" ng-show="radioption=='smscount'">Status </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" id="tabel1">
+                <thead>
+                    <tr>
+                        <th>
+                            SL.NO.
+                        </th>
+                        <th ng-show="radioption=='emailcount'" ng-click="sort('email_Id')">
+                            Email ID
+                        </th>
+                        <th ng-click="sort('module_Name')">
+                            Module Name
+                        </th>
+                        <th ng-click="sort('message')">
+                            Message
+                        </th>
+                        <th ng-click="sort('datetime')">
+                            Date
+                        </th>
+                        <th ng-show="radioption=='smscount'" ng-click="sort('mobile_no')">
+                            Mobile Number
+                        </th>
+                        <th ng-show="radioption=='smscount'" ng-click="sort('statusofmessage')">
+                            Status
+                        </th>
+
+                        <th ng-click="sort('to_FLag')">
+                            Sent To
+                        </th>
+
+                        <th>
+                            <label>
+                                <input type="checkbox" data-ng-model="details" ng-click="toggleAll()">
+                                <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                            </label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue = (sms_mail_count | filter:search) | orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td>{{itemsPerPage*(currentPage-1)+$index+1}}</td>
+                        <td ng-show="radioption=='emailcount'">{{user.email_Id}}</td>
+                        <td>{{user.module_Name}}</td>
+                        <td>{{user.message}}</td>
+                        <td>{{user.datetime|date:'dd-MM-yyyy'}}</td>
+                        <td ng-show="radioption=='smscount'">{{user.mobile_no}}</td>
+                        <td ng-show="radioption=='smscount'">{{user.statusofmessage}}</td>
+
+                        <td>{{user.to_FLag}}</td>
+
+                        <td>
+                            <input type="checkbox" class="messageCheckbox" ng-model="user.Selected" ng-checked="details" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                            <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="10"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+            <div id="printSectionId" ng-show="table_flag">
+                <div class="col-sm-12">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="image">
+                    </div>
+                    <div class="form-group">
+                        <h4 class="text-center">Email SMS Count  Report</h4>
+                    </div>
+                    <table class="table-bordered" id="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">SL.NO.</th>
+                                <th class="text-center" ng-if="radioption=='emailcount'"> Email ID </th>
+                                <th class="text-center"> Module Name </th>
+                                <th class="text-center">  Message </th>
+                                <th class="text-center">Date</th>
+                                <th class="text-center" ng-if="radioption=='smscount'"> Mobile Number  </th>
+                                <th class="text-center" ng-if="radioption=='smscount'"> Status  </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in printdatatable">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-center" ng-if="radioption=='emailcount'">{{user.email_Id}}</td>
+                                <td class="text-center">{{user.module_Name}}</td>
+                                <td class="text-center">{{user.message}}</td>
+                                <td class="text-center">{{ user.datetime|date:'dd-MM-yyyy'}}</td>
+                                <td class="text-center" ng-if="radioption=='smscount'">{{ user.mobile_no}}</td>
+                                <td class="text-center" ng-if="radioption=='smscount'">{{ user.statusofmessage}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>          
+            </div>          
+        </div>
+    </div>
+
+</section>

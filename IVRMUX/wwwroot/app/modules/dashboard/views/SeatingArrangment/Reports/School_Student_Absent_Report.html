@@ -1,0 +1,325 @@
+﻿<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary" data-ng-init="GetExamDateloaddata()">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Student Absent Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal ng-pristine ng-valid" name="myForm" method="post" role="form" novalidate>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Academic Year <span style="color:red">*</span>:</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="id1" ng-model="ASMAY_Id" name="academic_year" ng-change="OnChangeYear()" required>
+                                            <option value="">--Select Academic Year--</option>
+                                            <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == ASMAY_Id}}">{{options.asmaY_Year}}</option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.academic_year)" ng-messages="myForm.academic_year.$error">
+                                            <div ng-message="required">Select Academic Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Class <span style="color:red">*</span>:</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="id2" ng-model="ASMCL_Id" name="cls" ng-change="OnChangeClass()" required>
+                                            <option value="">--Select Class--</option>
+                                            <option ng-repeat="options in classlist" value="{{options.asmcL_Id}}" ng-selected="{{options.asmcL_Id == ASMCL_Id}}">{{options.asmcL_ClassName}}</option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                            <div ng-message="required">Select Class</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                    
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Section<span style="color:red">*</span>:</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="id3" ng-model="ASMS_Id" name="sec" ng-change="OnChangeSection()" required>
+                                            <option value="">--Select Section --</option>
+                                            <option ng-repeat="options in sectionlist" value="{{options.asmS_Id}}" ng-selected="{{options.asmS_Id == ASMS_Id}}">{{options.asmC_SectionName}}</option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                            <div ng-message="required">Select Section</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Exam <span style="color:red">*</span>:</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="id5" ng-model="EME_Id" name="exm" ng-change="GetCourse()" required>
+                                            <option value="">--Select Exam--</option>
+                                            <option ng-repeat="options in examlist" value="{{options.emE_Id}}" ng-selected="{{options.emE_Id == EME_Id}}">{{options.emE_ExamName}}</option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.exm)" ng-messages="myForm.exm.$error">
+                                            <div ng-message="required">Select Exam</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="text-center">
+                                <input type="hidden" ng-model="ESAABSTU_Id" />
+                                <md-button type="button" class="md-raised md-primary" id="save-btn" aria-disabled="false"
+                                           ng-click="GetAbsentStudentReport()">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                    Search
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" id="save-btn" aria-disabled="false"
+                                           ng-click="Print()" ng-disabled="GetReportList.length==0">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" id="save-btn" aria-disabled="false"
+                                           ng-click="Excel('#exceldata')" ng-disabled="GetReportList.length==0">
+                                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                    Excel
+                                </md-button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box box-primary" ng-if="GetReportList.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Absent Report Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">            
+            <div ng-repeat="dd in  tempsubjectlist">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4>Absent Student Report List</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <label class="col-sm-12 text-bold">
+                                Academic Year : {{yearname}}
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="col-sm-12 text-bold">
+                                Class : {{classname}}
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="col-sm-12 text-bold">
+                                Section : {{sectioname}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <label class="col-sm-12 text-bold">
+                                Exam Name : {{examname}}
+                            </label>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="col-sm-12 text-bold">
+                                Subject Name : {{dd.ISMS_SubjectName}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <table class="table table-hover table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.No</th>
+                                        <th>Student Details</th>
+                                        <th>Admno</th>
+                                        <th>Room Name</th>
+                                        <th>Exam Slot</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="sub in dd.studentdetails">
+                                        <td class="text-center">{{$index+1}}</td>
+                                        <td class="text-left"><b>{{sub.STUDENTNAME}}</b></td>
+                                        <td class="text-left">{{ sub.AMST_AdmNo}}</td>
+                                        <td class="text-left">{{sub.ESAROOM_RoomName}}</td>
+                                        <td class="text-left">{{sub.ESAESLOT_SlotName}}</td>
+                                        <td class="text-center">{{sub.ESAABSTUSCH_ExamDate}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>
+    </div>
+</section>
+
+<div ng-show="fsdfdsfdsfds" id="printdata">
+    <div class="row" ng-if="imgname!=null && imgname!=''">
+        <div class="baldwin col-sm-12 text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <div ng-repeat="dd in  tempsubjectlist">
+        <div class="row">
+            <div class="col-sm-12 text-center">
+                <h4>Absent Student Report List</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-sm-4">
+                    <label class="col-sm-12 text-bold">
+                        Academic Year : {{yearname}}
+                    </label>
+                </div>
+                <div class="col-sm-4">
+                    <label class="col-sm-12 text-bold">
+                        Class : {{classname}}
+                    </label>
+                </div>
+                <div class="col-sm-4">
+                    <label class="col-sm-12 text-bold">
+                        Section : {{sectioname}}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-sm-6">
+                    <label class="col-sm-12 text-bold">
+                        Exam Name : {{examname}}
+                    </label>
+                </div>
+                <div class="col-sm-6">
+                    <label class="col-sm-12 text-bold">
+                        Subject Name : {{dd.ISMS_SubjectName}}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No</th>
+                                <th>Student Details</th>
+                                <th>Admno</th>
+                                <th>Room Name</th>
+                                <th>Exam Slot</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="sub in dd.studentdetails">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left"><b>{{sub.STUDENTNAME}}</b></td>
+                                <td class="text-left">{{ sub.AMST_AdmNo}}</td>
+                                <td class="text-left">{{sub.ESAROOM_RoomName}}</td>
+                                <td class="text-left">{{sub.ESAESLOT_SlotName}}</td>
+                                <td class="text-center">{{sub.ESAABSTUSCH_ExamDate}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-show="sdfdfdf" id="exceldata">
+    <div ng-repeat="dd in  tempsubjectlist">
+        <table>
+            <tr style="border: 0.5px solid black">
+                <td colspan="6" style="color:black ; text-align:center">
+                    <h4>Absent Student Report List</h4>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr style="border: 0.5px solid black">
+                <td colspan="2" style="color:black ; text-align:left">
+                    Academic Year : {{yearname}}
+                </td>
+                <td colspan="2" style="color:black ; text-align:left">
+                    Class : {{classname}}
+                </td>
+                <td colspan="2" style="color:black ; text-align:left">
+                    Section : {{sectioname}}
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr style="border: 0.5px solid black">
+                <td colspan="3" style="color:black ; text-align:left">
+                    Exam Name : {{examname}}
+                </td>
+                <td colspan="3" style="color:black ; text-align:left">
+                    Subject Name : {{dd.ISMS_SubjectName}}
+                </td>               
+            </tr>
+            <tr>
+                <td colspan="6"> &nbsp;</td>
+            </tr>
+        </table>        
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr style="border: 0.5px solid black">
+                                <th>Sl.No</th>
+                                <th>Student Details</th>
+                                <th>Admno</th>
+                                <th>Room Name</th>
+                                <th>Exam Slot</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border: 0.5px solid black" ng-repeat="sub in dd.studentdetails">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left"><b>{{sub.STUDENTNAME}}</b></td>
+                                <td class="text-left">{{ sub.AMST_AdmNo}}</td>
+                                <td class="text-left">{{sub.ESAROOM_RoomName}}</td>
+                                <td class="text-left">{{sub.ESAESLOT_SlotName}}</td>
+                                <td class="text-center">{{sub.ESAABSTUSCH_ExamDate}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>   
+</div>

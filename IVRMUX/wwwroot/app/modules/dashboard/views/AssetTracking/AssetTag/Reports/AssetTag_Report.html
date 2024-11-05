@@ -1,0 +1,300 @@
+﻿
+
+<section class="content">
+    <div class="" ng-init="loaddata()">
+
+        <form class="form-horizontal" role="form" name="myForm" enctype="multipart/form-data" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Asset Tag Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="well">
+                                <div class="text-center" ng-init="optionflag='All'">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="All" name="All" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8"> All </span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Item" name="item" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Item-wise</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="Store" name="Store" ng-model="optionflag" ng-change="onrdochange(optionflag)">
+                                        <span class="lbl padding-8">Store</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 col-lg-offset-2">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="BD" name="bwdates" data-ng-model="bw_dates">
+                                        <span class="lbl padding-4">Between Dates </span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-9" ng-show="bw_dates">
+                                    <div class="col-sm-5">
+                                        <md-datepicker ng-model="startdate" name="sdate" md-placeholder="Start Date" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.sdate)" ng-messages="myForm.sdate.$error">
+                                            <div ng-message="required">Select Start Date</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <md-datepicker ng-model="enddate" name="ddate" md-placeholder="End Date" md-min-date="startdate" ng-required="bw_dates"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.ddate)" ng-messages="myForm.ddate.$error">
+                                            <div ng-message="required">Select End Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ===========================ITEMS========================== -->
+                            <div class="form-group" ng-if="optionflag=='Item'">
+                                <label class="control-label col-sm-4">Select or Search Item :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_tagdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Item here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="itemall" type="checkbox" ng-click="all_checkI(itemall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMI_Id" ng-repeat="itm in get_tagdetails | filter : searchValue">
+                                            <input name="item" ng-model="itm.itemck" type="checkbox" ng-click="togchkbxI();" ng-required="isOptionsRequiredI()">
+                                            <span class="lbl padding-8">
+                                                {{itm.INVMI_ItemName}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.item)" ng-messages="myForm.item.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ======================= Store ============================ -->
+                            <div class="form-group" ng-if="optionflag=='Store'">
+                                <label class="control-label col-sm-4">Select or Search Store Name:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8">
+                                        <span ng-show="get_tagdetails.length>0">
+                                            <input class="form-control" ng-model="searchValue" type="text" placeholder="Search Store No. here...">
+                                        </span>
+                                        <label>
+                                            <input name="classes" value="1" ng-model="stall" type="checkbox" ng-click="all_checkST(stall)">
+                                            <span class="lbl padding-8">
+                                                All
+                                            </span>
+                                        </label>
+
+                                        <label ng-model="INVMST_Id" ng-repeat="st in get_tagdetails | filter : searchValue">
+                                            <input name="stor" ng-model="st.stck" type="checkbox" ng-click="togchkbxST();" ng-required="isOptionsRequiredst()">
+                                            <span class="lbl padding-8">
+                                                {{st.INVMS_StoreName}}
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.stor)" ng-messages="myForm.stor.$error">
+                                        <div ng-message="required">Please Select Atleast One checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="onreport()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button ng-show="get_tagreport.length>0" type="submit" class="md-raised md-primary" id="save-btn" ng-click="printData()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button ng-show="get_tagreport.length>0" type="button" class="md-raised md-primary" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#printtag')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export To Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div><!--end offset-->
+        </form>
+
+        <div class="box box-primary" ng-show="get_tagreport.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Asset Tag REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                                </th>
+                                <th ng-if="optionflag!='Item"><a href="" ng-click="sortBy('INVMS_StoreName')">Store</a></th>
+                                <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item</a></th>
+                                <th><a href="" ng-click="sortBy('INVAAT_AssetId')">Tag</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_AssetDescription')">Description</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_PurchaseDate')">Purchase Date</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_ManufacturerName')">Manufacturer</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_ManufacturedDate')">Manufactured Date</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_ModelNo')">Model No.</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_SerialNo')">Serial No.</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_SKU')">SKU</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_WarantyPeriod')">Warranty Period</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_WarantyExpiryDate')">_Waranty Expiry</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_UnderAMCFlg')">AMC</a> </th>
+                                <th><a href="" ng-click="sortBy('INVAAT_AMCExpiryDate')">AMC Expiry</a> </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue1 = (get_tagreport | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td ng-if="optionflag!='Item">{{user.INVMS_StoreName}}</td>
+                                <td>{{user.INVMI_ItemName}}</td>
+                                <td>{{user.INVAAT_AssetId}}</td>
+                                <td>{{user.INVAAT_AssetDescription}}</td>
+                                <td>{{user.INVAAT_PurchaseDate | date:'dd-MM-yyyy'}}</td>
+                                <td>{{user.INVAAT_ManufacturerName}}</td>
+                                <td>{{user.INVAAT_ManufacturedDate | date:'dd-MM-yyyy'}}</td>
+                                <td>{{user.INVAAT_ModelNo}}</td>
+                                <td>{{user.INVAAT_SerialNo}}</td>
+                                <td>{{user.INVAAT_SKU}}</td>
+                                <td>{{user.INVAAT_WarantyPeriod}}</td>
+                                <td>{{user.INVAAT_WarantyExpiryDate | date:'dd-MM-yyyy'}}</td>
+                                <td>
+                                    <span ng-if="user.INVAAT_UnderAMCFlg === true">
+                                        Applied
+                                    </span>
+                                    <span ng-if="user.INVAAT_UnderAMCFlg === false">
+                                        Not-Applied
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span ng-if="user.INVAAT_UnderAMCFlg === true">
+                                        {{user.INVAAT_AMCExpiryDate | date:'dd/MM/yyyy'}}
+                                    </span>
+                                    <span ng-if="user.INVAAT_AMCExpiryDate === false">
+                                        --
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <dir-pagination-controls max-size="10"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+
+            </div>
+        </div>
+        <div ng-hide="true">
+            <div id="printtag">
+
+                <div class="text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="checkout" width="100%">
+                </div>
+                <h4 class="text-center">ASSET TAG REPORT</h4>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="sortBy('sno')">SL.No.</a>
+                            </th>
+                            <th><a href="" ng-click="sortBy('INVMS_StoreName')">Store</a></th>
+                            <th><a href="" ng-click="sortBy('INVMI_ItemName')">Item</a></th>
+                            <th><a href="" ng-click="sortBy('INVAAT_AssetId')">Tag</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_AssetDescription')">Description</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_PurchaseDate')">Purchase Date</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_ManufacturerName')">Manufacturer</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_ManufacturedDate')">Manufactured Date</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_ModelNo')">Model No.</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_SerialNo')">Serial No.</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_SKU')">SKU</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_WarantyPeriod')">Warranty Period</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_WarantyExpiryDate')">_Waranty Expiry</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_UnderAMCFlg')">AMC</a> </th>
+                            <th><a href="" ng-click="sortBy('INVAAT_AMCExpiryDate')">AMC Expiry</a> </th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in get_tagreport">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.INVMS_StoreName}}</td>
+                            <td>{{user.INVMI_ItemName}}</td>
+                            <td>{{user.INVAAT_AssetId}}</td>
+                            <td>{{user.INVAAT_AssetDescription}}</td>
+                            <td>{{user.INVAAT_PurchaseDate | date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.INVAAT_ManufacturerName}}</td>
+                            <td>{{user.INVAAT_ManufacturedDate | date:'dd-MM-yyyy'}}</td>
+                            <td>{{user.INVAAT_ModelNo}}</td>
+                            <td>{{user.INVAAT_SerialNo}}</td>
+                            <td>{{user.INVAAT_SKU}}</td>
+                            <td>{{user.INVAAT_WarantyPeriod}}</td>
+                            <td>{{user.INVAAT_WarantyExpiryDate | date:'dd-MM-yyyy'}}</td>
+                            <td>
+                                <span ng-if="user.INVAAT_UnderAMCFlg === true">
+                                    Applied
+                                </span>
+                                <span ng-if="user.INVAAT_UnderAMCFlg === false">
+                                    Not-Applied
+                                </span>
+                            </td>
+
+                            <td>
+                                <span ng-if="user.INVAAT_UnderAMCFlg === true">
+                                    {{user.INVAAT_AMCExpiryDate | date:'dd/MM/yyyy'}}
+                                </span>
+                                <span ng-if="user.INVAAT_UnderAMCFlg === false">
+                                    --
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>

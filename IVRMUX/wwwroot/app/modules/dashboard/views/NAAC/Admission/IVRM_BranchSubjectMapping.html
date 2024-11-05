@@ -1,0 +1,157 @@
+﻿
+<section class="content">
+    <div data-ng-init="loaddata()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Course Branch Subject Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" ng-click="ShowHide()" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <form class="form-horizontal" role="form" method="post" name="myForm" novalidate>
+                <div class="row" style="padding-top:10px">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Course :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="crse" ng-model="AMCO_Id" ng-change="get_branch()" required>
+                                        <option value="">Select Course</option>
+                                        <option ng-repeat="course in cousrselist" value="{{course.amcO_Id}}" ng-selected="course.Selected == true">{{course.amcO_CourseName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.crse)" ng-messages="myForm.crse.$error">
+                                        <div ng-message="required">Please Select Course</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Branch :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="brnh" ng-model="AMB_Id" ng-change="getsemisters()" required>
+                                        <option value="">Select Branch</option>
+                                        <option ng-repeat="branch in branchlist" value="{{branch.amB_Id}}" ng-selected="branch.amB_Id == AMB_Id">{{branch.amB_BranchName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.brnh)" ng-messages="myForm.brnh.$error">
+                                        <div ng-message="required">Please Select Branch</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Subject :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="subject" ng-model="ISMS_Id" ng-change="getsemisters()" required>
+                                        <option value="">Select Subject</option>
+                                        <option ng-repeat="sub in subjectlist" value="{{sub.ismS_Id}}" ng-selected="sub.ismS_Id == ISMS_Id">
+                                            {{sub.ismS_SubjectName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.subject)" ng-messages="myForm.subject.$error">
+                                        <div ng-message="required">Please Select Subject</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="imsbR_Id" value="{{imsbR_Id}}" />
+                    <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="savedata()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="box box-primary" ng-show="alldata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Details</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{alldata.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table text-center table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL. No.</th>
+                        <th><a href="" ng-click="sort('amcO_CourseName')">Course</a> </th>
+                        <th><a href="" ng-click="sort('amB_BranchName')">Branch</a> </th>
+                        <th><a href="" ng-click="sort('amB_BranchName')">Subject</a> </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (alldata | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <!--<tr ng-repeat="user in alldata">-->
+                        <!--<td>{{$index+1}}</td>-->
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{user.amcO_CourseName}}</td>
+                        <td>{{user.amB_BranchName}}</td>
+                        <td>{{user.ismS_SubjectName}}</td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" ng-click="editdata(user.imsbR_Id)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                            |
+                            <span ng-if="user.imsbR_ActiveFlg">
+                                <a href="" ng-click="deactiveY(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>
+                            <span ng-if="!user.imsbR_ActiveFlg">
+                                <a href="" ng-click="deactiveY(user)"
+                                   class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                    Activate
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>
+        </div>
+    </div>
+</section>

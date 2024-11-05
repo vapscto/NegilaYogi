@@ -1,0 +1,595 @@
+﻿<link href="css/print/Vikasa/ProgressCardReport/ProgressCardReport.css" rel="stylesheet" />
+<style>
+    .border {
+        border: 1px solid #000;
+        border-radius: 27px;
+        padding: 10px;
+    }
+
+    .watermark {
+        width: 100%;
+        height: auto;
+        background: url('/images/clients/vikasa/images/vikasa water11.png') no-repeat center 45%;
+        background-size: 40%;
+    }
+
+    .thead {
+        background: white !important;
+        color: black !important;
+        text-align: center !important;
+    }
+    .tdcolor {
+        background: #0463c2;
+        color: #fff !important;        
+    }
+    .bordernew {
+        border: 1px solid black;
+        padding: 1%;
+        border-radius: 30px !important;
+        padding-top: 11px;
+    }
+    .multiselect {
+        width: 24.1em;
+        height: 13em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" data-ng-submit="saveddata()" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">CBSE Exam Report Details</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="well text-center" ng-init="radiotype='S'">
+                                <label class="radio-inline">
+                                    <input name="Cumulative" value="S" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                    <span class="lbl padding-8">Active</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input name="Cumulative" value="L" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                    <span class="lbl padding-8">Left</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input name="Cumulative" value="D" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                    <span class="lbl padding-8">Deactive</span>
+                                </label>
+                                <div class="error-messages" ng-if="interacted(myForm.Cumulative)" ng-messages="myForm.Cumulative.$error">
+                                    <div ng-message="required">Select Alteast One Radio Button</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="yeardd" ng-model="asmaY_Id" ng-change="get_class()" required>
+                                        <option value="">Select Academic Year</option>
+                                        <option ng-repeat="year in yearlt" value="{{year.asmaY_Id}}" ng-selected="year.Selected == true">{{year.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yeardd)" ng-messages="myForm.yeardd.$error">
+                                        <div ng-message="required">Please Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmcL_Id" ng-change="get_section()" name="cls" required>
+                                        <option value="">Select Class:</option>
+                                        <option ng-repeat="class in classDropdown" value="{{class.asmcL_Id}}">{{class.asmcL_ClassName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                        <div ng-message="required" style="color:red">Select Class</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" value="asmS_Id" data-ng-model="asmS_Id" data-ng-change="get_Exam()" name="sec" required>
+                                        <option value="">Select Section:</option>
+                                        <option ng-repeat="class in sectionDropdown" value="{{class.asmS_Id}}">{{class.asmC_SectionName}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                        <div ng-message="required" style="color:red">Select Section</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Exam Name :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="exmnae" ng-model="emE_Id" required>
+                                        <option value="" label="Select Exam Name"> </option>
+                                        <option ng-repeat="option in exsplt" value="{{option.emE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.emE_ExamName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.exmnae)" ng-messages="myForm.exmnae.$error">
+                                    <div ng-message="required">Select Exam Name</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Issue Date:<strong style="color:red;"></strong></label>
+                                <md-datepicker name="sch_date" ng-model="amsT_Date" onkeydown="return false"></md-datepicker>
+                                <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    <input name="allcheck" value="" ng-model="all" type="checkbox" ng-click="OnClickAll()">
+                                    <span class="lbl padding-8">
+                                        Student :
+                                    </span><span style="color:Red">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect">
+                                        <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                        <label data-ng-model="AMST_Id" ng-repeat="sub in studentlist | filter:filterchkbx" value="{{sub.amsT_Id}}">
+                                            <input name="Subjectoption" value="" ng-click="individual()" ng-model="sub.checkedsub" type="checkbox" ng-required="isOptionsRequired3()">
+                                            <span class="lbl padding-8">
+                                                {{sub.amsT_FirstName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.Subjectoption)" ng-messages="myForm.Subjectoption.$error">
+                                        <div ng-message="required">Select Student</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="">
+                        <div class="">
+                            <div class="text-center">
+                                <input type="hidden" ng-model="EME_ID" />
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn">
+                                    <i class="fa fa-list-alt " aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button type="submit" class="md-raised md-warn" ng-click="cancel()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="submit" class="md-raised md-warn" ng-click="VIKASAProgressCardReport();" ng-show="temp.length>0">
+                                    Print
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="temp.length>0">
+        <!---->
+        <div class="box-header with-border">
+            <h3 class="box-title">Reports</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div id="VIKASAProgressCard">
+                <div class="VIKASAProgressCardReport watermark" id="VIKASAProgressCardReport" ng-repeat="report in cbsestudentlist" style="page-break-after:always;">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <!--<img src="/images/clients/Vikasa/images/vikasa_Progress_Card_Logonew.png" class="img-responsive" style="width:100%;" />-->
+                            <img src="/images/clients/Vikasa/HeaderSawyerpuram.jpg" class="img-responsive" style="width:100%;" />
+                        </div>
+                    </div>
+                    <div class="padding-left-250">
+                        <div class="header text-center">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label style="font-size:16px;"><b>PROGRESS REPORT FOR EXAM : </b> </label>
+                                        <label style="font-size:14px;"><b>{{exam}}&nbsp; &nbsp; &nbsp;{{yearname}} </b></label>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <table class="table">
+                                <tr>
+                                    <td width="120" style="color:blue;">Student Name</td>
+                                    <td>:<b>{{report.studentname}}</b> </td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="120" style="color:blue;">Father Name</td>
+                                    <td>:<b>{{report.fathername}}</b> </td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="120" style="color:blue;">Mother Name</td>
+                                    <td>:<b>{{report.mothername}}</b> </td>
+                                </tr>
+                            </table>                           
+                        </div>
+                        <div class="col-sm-4">
+                            <table class="table">
+                                <tr>
+                                    <td width="120" class="text-right" style="color:blue;">Class :</td>
+                                    <td class=""><b> {{report.classsectionname}}</b></td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="120" class="text-right" style="color:blue;">Admission No :</td>
+                                    <td class=""> <b>{{report.admno}}</b></td>
+                                </tr>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td width="120" style="color:blue;">Date of Issue</td>
+                                    <td>:<b>{{issuedate|date:'dd-MM-yyyy'}}</b> </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="margin-top-10 bordernew">
+
+                        <table class="table-bordered text-bold">
+                            <thead>
+                                <tr>
+                                    <td rowspan="2" width="200"><b>SUBJECT</b></td>
+                                    <td width="100" ng-repeat="subsubject in cbsesubexamlist">
+                                        <b>{{subsubject.EMSS_SubSubjectName}} </b>
+                                    </td>
+                                    <td width="100"><b>MARKS OBTAINED</b></td>
+                                    <td rowspan="2" width="100"><b>GRADE</b></td>
+                                    <td rowspan="2" width="100"><b>SECTION AVERAGE</b></td>
+                                </tr>
+                                <tr>
+                                    <td ng-repeat="subsubject in cbsesubexamlist">
+                                        <b>Out Of ({{subsubject.EYCESSS_MaxMarks}})</b>
+                                    </td>
+                                    <td><b>Out Of(100)</b>  </td>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="subjectlist in cbsesubjectlist" ng-if="subjectlist.flag==1">
+                                <tr>
+                                    <td>
+                                        <b>{{subjectlist.subjectname}}</b>
+                                    </td>
+                                    <td class="text-center" ng-repeat="subsubject in cbsesubexamlist">
+
+                                        <span ng-repeat="mrk in cbsesavelist" ng-if="report.amst_id==mrk.amst_id && subjectlist.subid==mrk.subid && subsubject.ssubj==mrk.ssubj">
+
+                                            <label ng-if="mrk.PassFailFlg=='AB'||mrk.PassFailFlg=='M'||mrk.PassFailFlg=='L' || mrk.PassFailFlg=='OD'">
+                                                <b>{{mrk.PassFailFlg}} </b>
+
+                                            </label>
+                                            <label ng-if="mrk.PassFailFlg!='AB' && mrk.PassFailFlg!='M' && mrk.PassFailFlg !='L'&& mrk.PassFailFlg !='OD'">
+                                                <b ng-if="mrk.PassFailFlg=='Fail'" style="color:red">
+                                                    {{mrk.obtainmarks}}
+                                                </b>
+                                                <b ng-if="mrk.PassFailFlg=='Pass'">
+                                                    {{mrk.obtainmarks}}
+                                                </b>
+                                            </label>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-repeat="mrk in cbsesavelist" ng-if="report.amst_id==mrk.amst_id && subjectlist.subid==mrk.subid && mrk.SubsubjectName=='Total'">
+                                            <b ng-if="mrk.PassFailFlg=='Fail'" style="color:red">
+                                                {{mrk.obtainmarks}}
+                                            </b>
+                                            <b ng-if="mrk.PassFailFlg=='Pass'">
+                                                {{mrk.obtainmarks}}
+                                            </b>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-repeat="mrk in cbsesavelist" ng-if="report.amst_id==mrk.amst_id && subjectlist.subid==mrk.subid && mrk.SubsubjectName=='Total'" style="text-align:center;color :{{mrk.color}};">
+                                            <b>{{mrk.ObtainedGrade}} </b>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-repeat="mrk in cbsesavelist" ng-if="report.amst_id==mrk.amst_id && subjectlist.subid==mrk.subid && mrk.SubsubjectName=='Total'">
+                                            <b>{{mrk.Sectionaverage}}</b>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table-bordered text-bold">
+                            <tr>
+                                <td class="tdcolor" colspan="2">
+                                    <b>Co-Scholastic Areas [on 3 Point(A-C) Grading scale]</b>
+                                </td>
+                            </tr>
+                            <tr ng-repeat="subjectlist in cbsesubjectlist" ng-if="subjectlist.flag==0">
+                                <td width="200">
+                                    <b>{{subjectlist.subjectname}}</b>
+                                </td>
+                                <td width="200" class="text-center">
+                                    <span ng-repeat="mrk in cbsesavelist" ng-if="report.amst_id==mrk.amst_id && subjectlist.subid==mrk.subid">
+
+                                        <label ng-if="mrk.PassFailFlg=='AB'||mrk.PassFailFlg=='M'||mrk.PassFailFlg=='L' || mrk.PassFailFlg=='OD'">
+                                            <b>{{mrk.PassFailFlg}} </b>
+
+                                        </label>
+                                        <label ng-if="mrk.PassFailFlg!='AB' && mrk.PassFailFlg!='M' && mrk.PassFailFlg !='L'&& mrk.PassFailFlg !='OD'">
+                                            <b ng-if="mrk.PassFailFlg=='Fail'" style="color:red">
+                                                {{mrk.ObtainedGrade}}
+                                            </b>
+                                            <b ng-if="mrk.PassFailFlg=='Pass'">
+                                                {{mrk.ObtainedGrade}}
+                                            </b>
+                                        </label>
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>                        
+                        <div class="margin-top-10">
+                            <div class="col-sm-12 text-bold">
+                                REMARKS :
+                                <label ng-repeat="remarkslist in remarks">
+                                    <span style="font-size: 14px !important" ng-if="report.amst_id==remarkslist.amsT_Id"><b>{{remarkslist.eprD_Remarks}}</b></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="margin-top-50">
+                            <div class="row">
+                                <div class="col-sm-12 text-bold">Class Teacher : {{clastechname}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <hr />
+                    <div class="row margin-top-10">
+                        <div class="col-sm-10">
+                            <table class="table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" colspan="3"><b>MONTH</b></th>
+                                        <th class="text-center"><b>JUN</b></th>
+                                        <th class="text-center"><b>JUL</b></th>
+                                        <th class="text-center"><b>AUG</b></th>
+                                        <th class="text-center"><b>SEP</b></th>
+                                        <th class="text-center"><b>OCT</b></th>
+                                        <th class="text-center"><b>NOV</b></th>
+                                        <th class="text-center"><b>DEC</b></th>
+                                        <th class="text-center"><b>JAN</b></th>
+                                        <th class="text-center"><b>FEB</b></th>
+                                        <th class="text-center"><b>MAR</b></th>
+                                        <th class="text-center"><b>APR</b></th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-left" colspan="3" style="color:blue"><b>Total Working Days</b></td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.June != 0">
+                                                <b>{{att.June}}</b>
+                                            </span>
+                                            <span ng-if="att.June == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.July != 0">
+                                                <b>{{att.July}}</b>
+                                            </span><span ng-if="att.July == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.August != 0">
+                                                <b>{{att.August}}</b>
+                                            </span><span ng-if="att.August == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.September != 0">
+                                                <b>
+                                                    {{att.September}}
+                                                </b>
+                                            </span><span ng-if="att.September == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.October != 0">
+                                                <b>
+                                                    {{att.October}}
+                                                </b>
+                                            </span><span ng-if="att.October == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.November != 0">
+                                                <b> {{att.November}}</b>
+                                            </span>
+                                            <span ng-if="att.November == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.December != 0">
+                                                <b>
+                                                    {{att.December}}
+                                                </b>
+                                            </span><span ng-if="att.December == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.January != 0">
+                                                <b>
+                                                    {{att.January}}
+                                                </b>
+                                            </span>
+                                            <span ng-if="att.January == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.Febrauary != 0">
+                                                <b>
+                                                    {{att.Febrauary}}
+                                                </b>
+                                            </span>
+                                            <span ng-if="att.Febrauary == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.March != 0">
+                                                <b>
+                                                    {{att.March}}
+                                                </b>
+
+                                            </span><span ng-if="att.March == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_work_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.April != 0">
+                                                <b>
+                                                    {{att.April}}
+                                                </b>
+                                            </span><span ng-if="att.April == 0"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left" colspan="3" style="color:blue"><b>No of Days Attended</b></td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.June != 0">
+                                                <b>
+                                                    {{att.June}}
+                                                </b>
+
+                                            </span><span ng-if="att.June == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.July != 0">
+                                                <b>
+                                                    {{att.July}}
+                                                </b>
+
+                                            </span><span ng-if="att.July == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.August != 0">
+                                                <b>
+                                                    {{att.August}}
+                                                </b>
+                                            </span><span ng-if="att.August == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.September != 0">
+                                                <b>
+                                                    {{att.September}}
+                                                </b>
+                                            </span><span ng-if="att.September == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.October != 0">
+                                                <b>
+                                                    {{att.October}}
+                                                </b>
+                                            </span><span ng-if="att.October == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.November != 0">
+                                                <b>
+                                                    {{att.November}}
+                                                </b>
+
+
+                                            </span><span ng-if="att.November == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.December != 0">
+                                                <b>
+                                                    {{att.December}}
+                                                </b>
+
+                                            </span><span ng-if="att.December == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.January != 0">
+                                                <b>
+                                                    {{att.January}}
+                                                </b>
+
+                                            </span><span ng-if="att.January == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.Febrauary != 0">
+
+                                                <b>
+                                                    {{att.Febrauary}}
+                                                </b>
+                                            </span><span ng-if="att.Febrauary == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.March != 0">
+                                                <b>
+                                                    {{att.March}}
+                                                </b>
+
+
+                                            </span><span ng-if="att.March == 0"></span>
+                                        </td>
+                                        <td ng-repeat="att in stud_present_attendence" ng-if="report.amst_id==att.AMST_Id">
+                                            <span ng-if="att.April != 0">
+                                                <b>
+                                                    {{att.April}}
+                                                </b>
+
+                                            </span><span ng-if="att.April == 0"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-2 margin-top-10">
+                            <div class="text-center">
+                                <!--<img src="/images/clients/Vikasa/images/sign-Principal.png" class="img-responsive" style="width: 85%;padding-left: 0px;margin-left: 10%;" />-->
+                                Principal <br />
+                                <!--Dr.N.K.Charles-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row margin-top-5">
+                        <div class="col-sm-12">
+                            <img src="/images/clients/Vikasa/grade.png" class="img-responsive" style="width:60%;" />
+                        </div>
+                    </div>
+                    <div class="row margin-top-20 ">
+                        <div class="col-sm-12" style="color:blue;">
+                            Phone :  04630-273427,273042/43/44/45.<br />
+                            Address : Sawyerpuram Campus, Tuticorin-628 008.<br />
+                            <!--Affiliated to Cambridge International Examinations U.K.-->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <b class="margin-top-50 col-sm-12">
+                            Parent (Signature)
+                        </b>
+                    </div>
+                    <div class="margin-top-50 my-footer" style="z-index:-1;">
+                        <img src="images/clients/Vikasa/images/pencils.png" class="img-responsive" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,400 @@
+﻿
+<style>
+    .btn-default {
+        background-color: white;
+        color: black;
+        /*border-color: #0463c2;*/
+    }
+</style>
+
+<div data-ng-init="loaddata()" class="feetransaction">
+    <section class="content">
+        <form class="form-horizontal" role="form" name="myForm" ng-submit="savedata()" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">PDA Refund</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="well" ng-init="filterdata='NameAdmno'">
+                                <label class="radio-inline col-sm-6">
+                                    <input type="radio" name="optradio" value="regno" data-ng-model="filterdata" ng-click="reloaddata()">
+                                    <span class="lbl padding-8">Reg No.</span>
+                                </label>
+
+                                <label class="radio-inline">
+                                    <input type="radio" name="AdmNo" value="AdmNo" data-ng-model="filterdata" ng-click="reloaddata()">
+                                    <span class="lbl padding-8">Adm No.</span>
+                                </label>
+                            </div>
+
+                            <div class="well">
+                                <label class="radio-inline col-sm-6">
+                                    <input type="radio" value="NameAdmno" data-ng-model="filterdata" ng-click="reloaddata()">
+                                    <span class="lbl padding-8">Name:Adm.No.</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="Admnoname" data-ng-model="filterdata" ng-click="reloaddata()">
+                                    <span class="lbl padding-8">Adm.No.:Name</span>
+                                </label>
+                            </div>
+
+                            <div class="well">
+                                <label class="radio-inline col-sm-6">
+                                    <input type="radio" name="Nameregno" value="NameRegNo" data-ng-model="filterdata" ng-click="reloaddata()">
+                                    <span class="lbl padding-8">Name:Reg.No.</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="RegNoName" data-ng-model="filterdata" ng-click="reloaddata()">
+                                    <span class="lbl padding-8">Reg.No.:Name</span>
+                                </label>
+                            </div>
+                            <div class="well">
+                                <label class="radio-inline col-sm-6">
+                                    <input type="checkbox" name="leftstu" value="left" data-ng-model="filterdata1" ng-click="reloaddataleft()">
+                                    <span class="lbl padding-8">Left</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="checkbox" value="inactive" data-ng-model="filterdata2" ng-click="reloaddatadeactive()">
+                                    <span class="lbl padding-8">Deactivate</span>
+                                </label>
+                            </div>
+                            <div class="well">
+                                <label class="control-label col-sm-4">Date :</label>
+                                <div class="col-sm-8 input-group text-center" style="">
+                                    <md-datepicker ng-model="FYP_Date" name="from_date" id="reservation" md-min-date="minDatemf" md-max-date="today" md-placeholder="Enter date"></md-datepicker>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.FYP_Date)" ng-messages="myForm.FYP_Date.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Date</div>
+                                </div>
+
+                            </div>
+
+                            <div class="well" ng-show="studentviewdetails.length>0">
+                                <label class="checkbox-inline" style="color:darkgreen; font-size:larger;" data-ng-model="details" data-toggle="modal" data-target="#myModaldetails">
+                                    <span class="lbl padding-8">View Fee Details</span>
+                                </label>
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-5">
+                            <div class="well">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="academicyear" id="sel1" data-ng-model="cfg.ASMAY_Id" ng-change="onselectacademic(yearlst)" required>
+                                            <option ng-repeat="option in yearlst" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == cfg.ASMAY_Id}}">
+                                                {{option.asmaY_Year}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.academicyear)" ng-messages="myForm.academicyear.$error">
+                                            <div ng-message="required">Select Academic Year </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label ng-if="filterdata == 'regular'||  filterdata == 'Challan_No' " class="control-label col-sm-4">Student Name :<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata == 'YearLoss'" class="control-label col-sm-4">Year Loss :<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata == 'AdmNo'" class="control-label col-sm-4">Adm No. :<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata == 'regno'" class="control-label col-sm-4">Reg No.:<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata == 'NameAdmno'" class="control-label col-sm-4">Name:Adm.No. :<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata == 'Admnoname'" class="control-label col-sm-4">Adm.No.:Name:<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata == 'NameRegNo'" class="control-label col-sm-4">Name:Reg.No. :<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata == 'RegNoName'" class="control-label col-sm-4">Reg.No.:Name:<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata1 == 'left'" class="control-label col-sm-4">Left Student:<span style="color:Red">*</span></label>
+                                    <label ng-if="filterdata2 == 'inactive'" class="control-label col-sm-4">Deactivated Student:<span style="color:Red">*</span></label>
+
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel1" name="studentname" ng-model="$parent.Amst_Id" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" ng-change="onselectstudent($parent.Amst_Id)" title="Select Student" ng-show="showstudentname">
+                                            <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.amsT_FirstName}}</ui-select-match>
+                                            <ui-select-choices repeat="option in studentlst | filter: $select.search " value="{{option.amst_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.amsT_FirstName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+
+                                        <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.studentname)" ng-messages="myForm.studentname.$error">
+                                        <div ng-message="required">select the Select Student</div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group" ng-show="showreceiptno">
+                                    <label class="control-label col-sm-4">Receipt No. :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" id="reservation" name="receiptno" type="text" data-ng-model="transactionno" allow-pattern="[0-9A-Za-z]" ng-disabled="recchkbox" ng-required="showreceiptno==true">  <!--ng-disabled="disablecheckbox"--> <!--ng-blur="checkforduplicates(FYP_Receipt_No)"-->
+
+                                        <div class="error-messages" ng-if="interacted(myForm.receiptno)" ng-messages="myForm.receiptno.$error">
+                                            <div ng-message="required">Enter Receipt No. </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">PDA head :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" ng-model="pdamH_Id" name="feehead" required>
+                                            <option value="" label="Select Head"> </option>
+                                            <option ng-repeat="option1 in head" value="{{option1.pdamH_Id}}">
+                                                {{option1.pdamH_HeadName}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.class)" ng-messages="myForm.class.$error">
+                                            <div ng-message="required">Please Select Head</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            
+
+                            <div class="well" ng-show="rfdamt">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Refundable Amount:<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" id="reservation" name="receiptno" type="text" data-ng-model="totalamount" allow-pattern="[0-9]" ng-disabled="totalamount">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Amount :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" id="reservation" type="text" data-ng-model="amtadjustment" allow-pattern="[0-9]" name="amount">
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.amount)" ng-messages="myForm.amount.$error">
+                                        <div ng-message="required">Please Select Head</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Transaction Details</h3>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="well">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3">Narration:</label>
+                                            <div class="col-sm-9">
+                                                <textarea class="form-control" rows="1" id="Narration" data-ng-model="FYP_Remarks"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="text-center padding-rignt-10">
+                                            <div class="well" ng-init="FYP_Bank_Or_Cash='C'">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="FYP_Bank_Or_Cash" data-ng-model="FYP_Bank_Or_Cash" value="C" data-ng-click="onselectmodeofpayment()" ng-disabled="diablemodeofpayment">
+                                                    <span class="lbl padding-8">Cash</span>
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="optradio" data-ng-model="FYP_Bank_Or_Cash" value="B" data-ng-click="onselectmodeofpayment()" ng-disabled="diablemodeofpayment">
+                                                    <span class="lbl padding-8">Bank</span>
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="optradio" data-ng-model="FYP_Bank_Or_Cash" value="R" data-ng-click="onselectmodeofpayment()" ng-disabled="diablemodeofpayment">
+                                                    <span class="lbl padding-8">RTGS/NEFT</span>
+                                                </label>
+
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="optradio" data-ng-model="FYP_Bank_Or_Cash" value="S" data-ng-click="onselectmodeofpayment()" ng-disabled="diablemodeofpayment">
+                                                    <span class="lbl padding-8"> Card </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div data-ng-show="bankdetails">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5">Cheque/DD Date :</label>
+                                                <div class="col-sm-7">
+                                                    <md-datepicker ng-model="FYP_DD_Cheque_Date" name="from_date_cheque" id="chequedddate" md-placeholder="Enter date" ng-required="FYP_Bank_Or_Cash=='B'"></md-datepicker>
+
+                                                    <div class="error-messages" ng-if="interacted(myForm.from_date_cheque)" ng-messages="myForm.from_date_cheque.$error">
+                                                        <div ng-message="required">Kindly enter in (dd-mm-yyyy) format</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5">Cheque/DD No./Card No. : <span ng-if="FYP_Bank_Or_Cash!='C'" style="color:Red">*</span></label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" class="form-control" name="cardno" data-ng-model="FYP_DD_Cheque_No" id="chequeno" allow-pattern="[0-9 ]" ng-required="FYP_Bank_Or_Cash=='B'" />
+                                                    <div class="error-messages" ng-if="interacted(myForm.cardno)" ng-messages="myForm.cardno.$error">
+                                                        <div ng-message="required">Enter Cheque/DD No./Card No.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-5">Bank Name :<span ng-if="FYP_Bank_Or_Cash!='C'" style="color:Red">*</span></label>
+                                                <div class="col-sm-7">
+                                                    <input type="text" class="form-control" name="banknme" data-ng-model="FYP_Bank_Name" value={{fyP_Bank_Name}} allow-pattern="[A-Za-z ]" ng-required="FYP_Bank_Or_Cash=='B'" />
+                                                    <div class="error-messages" ng-if="interacted(myForm.banknme)" ng-messages="myForm.banknme.$error">
+                                                        <div ng-message="required">Enter Bank Name</div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr />
+                        <div class="text-center">
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+        <div class="box box-primary" ng-show="studentsavedlist">
+            <div class="box-header with-border">
+                <h3 class="box-title">PDA Refunded list </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" for="email"> Search For:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="search123" ng-change="onselectsearch()" name="search_for">
+                                    <option value="">--Select Field--</option>
+                                    <option value="0">Student Name</option>
+                                    <option value="1">Class Name</option>
+                                    <option value="6">Section Name</option>
+                                    <option value="2">Adm No.</option>
+                                    <option value="3">Receipt No.</option>
+                                    <option value="4">Refunded Date</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="search_flag">
+                        <div class="form-group" ng-show="txt">
+                            <label class="control-label col-sm-4" for="email"> Search Text:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchtxt" maxlength="30" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="numbr">
+                            <label class="control-label col-sm-4" for="email">Search Amount:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchnumbr" maxlength="20" allow-pattern="[0-9]" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="dat">
+                            <label class="control-label col-sm-4" for="email"> Search Date:</label>
+
+                            <div class="col-sm-8 input-group text-right" style="">
+                                <md-datepicker ng-model="searchdat" onkeydown="return false" name="search_date" id="date123" md-placeholder="Enter  date"></md-datepicker>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="search_flag">
+                        <div class="">
+                            <button type="button" class="btn btn-primary" name="btn_search" ng-click="ShowSearch_Report()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                Search
+                            </button>
+                            <button type="button" class="btn btn-warning" data-ng-click="clearsearch()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </button>
+
+                        </div>
+
+
+
+                    </div>
+
+
+                </div>
+
+                <br />
+
+                <table class="table table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SLNO
+                            </th>
+                            <th>
+                                Student Name
+                            </th>
+                            <th>Class Name </th>
+                            <th>Section Name </th>
+                            <th>Adm No.</th>
+                            <th>Transaction No. </th>
+                            <th>Refunded Amount </th>
+                            <th>Transaction Date </th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user1 in receiptgrid |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td> {{ user1.amsT_FirstName}} <span ng-if="user1.amsT_MiddleName !== null" class="lbl padding-8">  {{ user1.amsT_MiddleName}} {{ user1.amsT_LastName}}</span> </td>
+                            <td>{{ user1.classname}}</td>
+                            <td>{{ user1.sectionname}}</td>
+                            <td>{{ user1.amsT_AdmNo}}</td>
+                            <td>{{ user1.transactionno}}</td>
+                            <td>{{ user1.pdaE_TotAmount}}</td>
+                            <td>{{ user1.pdaE_Date |date:'dd-MM-yyyy'}}</td>
+                            <td hidden="hidden">{{ user1.pdaE_ID}}</td>
+                            <td hidden="hidden">{{ user1.amst_Id}}</td>
+                            <td hidden="hidden">{{user1.pdaE_TotAmount}}</td>
+
+                            <td class="text-center">
+                                <!--<a href="javascript:void(0)" ng-click="getorgvalue(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>-->
+                                <!--<span ng-if="user.pdamH_ActiveFlag === true ">
+                                <a href="" ng-click="deactive(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                    Deactivate
+                                </a>
+                            </span>-->
+                                <a class="text-danger padding-right-5" href="" data-placement="bottom" data-toggle="tooltip" title="Delete" ng-if="rolenamelist=='COORDINATOR' || 'Fee End User' ">
+                                    <i class="fa fa-trash" aria-hidden="true" ng-click="DeletRecord(user1)"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="" pagination-id="page1"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,552 @@
+﻿<!--<style>
+    * {
+        transform-style: preserve-3d
+    }
+
+    html,
+    body,
+    .perspective,
+    .camera,
+    .rotate {
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        background: black;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .perspective {
+        perspective: 800px;
+        overflow: hidden;
+    }
+
+    .camera {
+        transform: translateZ(800px)
+    }
+
+    .drag-area {
+        cursor: -webkit-grab
+    }
+
+        .drag-area:active {
+            cursor: -webkit-grabbing
+        }
+
+    /* Cube*/
+    .cube {
+        transform: translate3d(-50%, -100%, 0) rotateX(-360deg);
+        width: 400px;
+        height: 400px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+    }
+
+        .cube.borders .side {
+            box-shadow: inset 0 0 0px 1px green
+        }
+
+    .side {
+        background-image: url('https://user-images.githubusercontent.com/828776/224199403-9077b0ed-0210-427b-9c58-16ee9d360b4b.png');
+        background-repeat: no-repeat;
+        background-size: 400% 300%;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transform-origin: left;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transform: translateX(99.9%) rotateY(-90deg);
+    }
+
+    .cube.grid .side {
+        /*background-image: url('https://vapsclg.blob.core.windows.net/files/27/TBHS_Logo.png');*/
+        /*background-image: url('../../../../../images/school image1.jpeg');*/
+        /*background-blend-mode: lighten;*/
+        background-image: url('../../../../../images/school image2.jpg');
+    }
+
+    .cube .top {
+        background-position: 33.33% 0%;
+        transform-origin: bottom;
+        transform: translateY(-99.9%) rotateX(-90deg);
+    }
+
+    .cube .bottom {
+        background-position: 33.33% 100%;
+        transform-origin: top;
+        transform: translateY(99.9%) rotateX(90deg);
+    }
+
+    .cube .front {
+        transform: translateX(0%);
+        background-position: 0% 50%;
+    }
+
+    .cube .left {
+        background-position: 33.33% 50%
+    }
+
+    .cube .back {
+        background-position: 66.66% 50%
+    }
+
+    .cube .right {
+        background-position: 99.99% 50%
+    }
+
+    /* Axes */
+    .axes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+        .axes .rotate {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+        }
+
+    .axis {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 2px;
+        height: 150px;
+        transform-origin: top center;
+    }
+
+    .main-axis.red-axis {
+        transform: rotateZ(90deg) rotateX(180deg) translateY(-50%);
+    }
+
+    .main-axis.green-axis {
+        transform: rotateY(-90deg) translateY(-50%)
+    }
+
+    .main-axis.blue-axis {
+        transform: rotateX(90deg) translateY(-50%)
+    }
+
+    .perpendicular-axis {
+        transform: rotateY(90deg)
+    }
+
+    .red-axis {
+        background-image: linear-gradient( transparent, rgba(255, 0, 0, 0.1) 50%, red 50%, transparent );
+    }
+
+    .green-axis {
+        background-image: linear-gradient( transparent, rgba(0, 255, 0, 0.1) 50%, green 50%, transparent );
+    }
+
+    .blue-axis {
+        background-image: linear-gradient( transparent, rgba(0, 0, 255, 0.1) 50%, blue 50%, transparent );
+    }
+
+    /* Controls */
+    .controls {
+        border-radius: 5px 5px 0 0;
+        background-color: rgba(82, 120, 169, 0.35);
+        color: white;
+        font: 12px arial, sans-serif;
+        user-select: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-width: 400px;
+        margin: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+    }
+
+    .zoom {
+        flex: auto;
+        padding: 10px;
+    }
+
+        .zoom input {
+            display: block;
+            margin: auto;
+            width: 65%;
+            transform: scale(1.5) rotate(180deg);
+        }
+
+    svg {
+        height: 30px;
+        width: 30px;
+        padding: 10px;
+    }
+
+    .input-show-borders,
+    .input-show-grid,
+    .zoom input {
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+        .input-show-borders:hover,
+        .input-show-grid:hover,
+        .zoom input:hover {
+            opacity: 1;
+        }
+</style>
+    
+
+
+<script>
+    // The javascript functions are to manipulate the CSS
+
+    /*
+     * Rotation by Gyroscope.
+     * This feature don't work here.
+     * You can see it working on this page:
+     * https://angelolucas.github.io/360-view
+     */
+    window.addEventListener('deviceorientation', function (e) {
+        rotation.x = e.beta
+        rotation.y = -e.gamma
+        rotation.z = e.alpha
+
+        applyRotatiton()
+    })
+
+    // Rotation by dragging
+    var dragArea = document.querySelector('.drag-area')
+    var rotationContainers = document.querySelectorAll('.rotate')
+    var rotation = {
+        x: 90,
+        y: 0,
+        z: 0,
+    }
+
+    dragArea.onmousedown = function (e) {
+        var dragging = true
+        var prevXRotation = e.pageX
+        var prevYRotation = e.pageY
+
+        dragArea.onmousemove = function (e) {
+            if (!dragging) return false
+
+            var xRotation = e.pageX - prevXRotation
+            var yRotation = e.pageY - prevYRotation
+
+            prevXRotation = e.pageX
+            prevYRotation = e.pageY
+
+            rotation.x += yRotation / 5
+            rotation.z += xRotation / 5
+
+            applyRotatiton()
+        }
+
+        dragArea.onmouseup = function (e) {
+            dragging = false
+        }
+    }
+
+    var applyRotatiton = function () {
+        var rotate =
+            'rotateY(' +
+            rotation.y +
+            'deg) rotateX(' +
+            rotation.x +
+            'deg) rotateZ(' +
+            rotation.z +
+            'deg)'
+
+        rotationContainers.forEach(function (container) {
+            container.style.transform = rotate
+        })
+    }
+
+    document.onload = applyRotatiton()
+
+    // Controls
+    var select = {
+        cube: document.querySelector('.cube'),
+        camera: document.querySelector('.camera'),
+        input: {
+            showGrid: document.querySelector('.input-show-grid'),
+            showBorders: document.querySelector('.input-show-borders'),
+            zoom: document.querySelector('.input-zoom'),
+        },
+    }
+
+    // Range Zoom
+    select.input.zoom.oninput = function () {
+        select.camera.style.transform = 'translateZ(' + this.value + 'px)'
+    }
+
+    // Toggle Show Grid
+    select.input.showGrid.onclick = function () {
+        select.cube.classList.toggle('grid')
+    }
+
+    // Toogle Cube Borders
+    select.input.showBorders.onclick = function () {
+        select.cube.classList.toggle('borders')
+    }
+
+</script>-->
+<!--<style>
+    /*/* Define styles for the viewer container */*/
+    #viewer {
+        width: 80%;
+        height: 400px; /* Adjust height as needed */
+        overflow: hidden;
+        position: relative;
+    }
+
+    #panorama {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+    }
+    #video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>-->
+<!--<script>
+    var panorama = document.getElementById('panorama');
+    panorama.addEventListener('mousedown', onMouseDown);
+
+    var startX;
+    var currentX = 0;
+
+    function onMouseDown(event) {
+        startX = event.clientX - currentX;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseMove(event) {
+        event.preventDefault();
+        currentX = event.clientX - startX;
+        panorama.style.transform = 'rotateY(' + currentX + 'deg)';
+    }
+
+    function onMouseUp() {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+
+</script>-->
+
+<style>
+    .img-box {
+        margin: 150px auto;
+        text-align: center;
+    }
+</style>
+
+
+
+<section class="content">
+    <!--<div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Virtual Tour</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+
+                <div class="well" ng-init="obj.videoorimage='video'">
+                    <div class="text-center">
+                        <label class="radio-inline">
+                            <input type="radio" name="type" value="video" ng-model="obj.videoorimage" ng-click="onclickloaddata()">
+                            <span class="lbl padding-8">Video <span style="color:Red">*</span></span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="type" value="image" ng-model="obj.videoorimage" ng-click="onclickloaddata()">
+                            <span class="lbl padding-8">Image <span style="color:Red">*</span></span>
+                        </label>
+                    </div>
+                </div>
+                <br>
+                <div id="viewer">
+                    <img id="panorama" src="https://vapsclg.blob.core.windows.net/files/27/TBHS_Logo.png" alt="360° Panorama" />
+                </div>
+            </div>
+        </div>
+
+    </div>-->
+
+
+
+    <div class="box box-primary">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">Virtual Tour</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        
+
+                <!--<div class="well" ng-init="obj.videoorimage='video'">
+    <div class="text-center">
+        <label class="radio-inline">
+            <input type="radio" name="type" value="video" ng-model="obj.videoorimage" ng-click="onclickloaddata()">
+            <span class="lbl padding-8">Video <span style="color:Red">*</span></span>
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="type" value="image" ng-model="obj.videoorimage" ng-click="onclickloaddata()">
+            <span class="lbl padding-8">Image <span style="color:Red">*</span></span>
+        </label>
+    </div>-->
+
+                <div class="box-body">
+                    <div class="row">
+                        <div class="img-box">
+                            <iframe width="1400px" height="700px" frameborder="0" src="https://momento360.com/e/u/348bf8b6f8934757a63291a43fb4b8fb?utm_campaign=embed&utm_source=other&heading=512.04&pitch=18.14&field-of-view=75&size=medium&display-plan=true"></iframe>
+                        </div>
+
+                        <div class="img-box">
+                            <iframe width="1400px" height="700px" frameborder="0" src="https://momento360.com/e/u/8f49d1af98c1496f87536f9f9b11d9a1?utm_campaign=embed&utm_source=other&heading=0&pitch=0&field-of-view=75&size=medium&display-plan=true"></iframe>
+                        </div>
+      </div>
+ </div>
+                        <!--<div class="well">
+                <div>
+
+                    <a-scene>
+                        <img id="panorama" src="panoramamount.jpg" />
+                        <a-sky src="#panorama" rotation="0 -90 0">
+                            <a-sky>
+                                <a-scene>
+                </div>
+            </div>-->
+                        <!--<div id="panorama-container"></div>-->
+                    </div>
+                
+</section>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe-master.min.js"></script>
+<!--<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Virtual Tour</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+        </div>
+    </div>
+
+    <div class="box-body">
+        <div class="row">
+
+            <div class="well" ng-init="obj.videoorimage='video'">
+                <div class="text-center">
+                    <label class="radio-inline">
+                        <input type="radio" name="type" value="video" ng-model="obj.videoorimage" ng-click="onclickloaddata()">
+                        <span class="lbl padding-8">Video <span style="color:Red">*</span></span>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="type" value="image" ng-model="obj.videoorimage" ng-click="onclickloaddata()">
+                        <span class="lbl padding-8">Image <span style="color:Red">*</span></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+
+        <div ng-show="obj.videoorimage=='video'">
+            <div class="perspective drag-area">
+                <div class="rotate" style="transform: rotateY(0deg) rotateX(90deg) rotateZ(0deg);">
+                    <video id="videojs-panorama-player" class="video-js vjs-default-skin" crossorigin="anonymous" controls="" preload="none">
+                        <source src="https://yanwsh.github.io/videojs-panorama/assets/shark.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <div ng-show="obj.videoorimage=='image'">
+                <div class="perspective drag-area">
+                    <div class="rotate" style="transform: rotateY(0deg) rotateX(90deg) rotateZ(0deg);">
+                        <video id="videojs-panorama-player" class="video-js vjs-default-skin" crossorigin="anonymous" controls preload="none">
+                            <source src="https://yanwsh.github.io/videojs-panorama/assets/shark.mp4" type='video/mp4'></source>
+                        </video>
+                        <img src="https://vapsclg.blob.core.windows.net/files/27/TBHS_Logo.png">
+                    </div>
+                    <div class="axes">
+                        <div class="rotate" style="transform: rotateY(0deg) rotateX(90deg) rotateZ(0deg);">
+                            <div class="axis main-axis red-axis">
+                                <div class="axis perpendicular-axis red-axis"></div>
+                            </div>
+                            <div class="axis main-axis green-axis">
+                                <div class="axis perpendicular-axis green-axis"></div>
+                            </div>
+                            <div class="axis main-axis blue-axis">
+                                <div class="axis perpendicular-axis blue-axis"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>-->
+<!--<div id="campusvedio" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" style="width:100%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="removeall()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Campus View</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm2" novalidate>
+                    <div class="row">
+
+                        <div class="perspective drag-area">
+                            <div class="rotate">
+                                <video id="videojs-panorama-player" class="video-js vjs-default-skin" crossorigin="anonymous" controls preload="none">
+                                    <source src="https://yanwsh.github.io/videojs-panorama/assets/shark.mp4" type='video/mp4' />
+                                </video>
+                            </div>
+                            <div class="axes">
+                                <div class="rotate">
+                                    <div class="axis main-axis red-axis">
+                                        <div class="axis perpendicular-axis red-axis"></div>
+                                    </div>
+                                    <div class="axis main-axis green-axis">
+                                        <div class="axis perpendicular-axis green-axis"></div>
+                                    </div>
+                                    <div class="axis main-axis blue-axis">
+                                        <div class="axis perpendicular-axis blue-axis"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                            <i class="fa fa-times"></i>
+                            close
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>-->

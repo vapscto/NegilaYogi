@@ -1,0 +1,2193 @@
+﻿
+
+
+
+<style>
+    html {
+        font-size: 14px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .pdf-page {
+        margin: 0 auto;
+        box-sizing: border-box;
+        box-shadow: 0 5px 10px 0 rgba(0,0,0,.3);
+        color: #333;
+        position: relative;
+        background-size: contain;
+        background-color: #fff;
+        border: 2px solid black;
+    }
+
+    .pdf-header {
+        position: absolute;
+        top: .5in;
+        height: .6in;
+        left: .5in;
+        right: .5in;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .pdf-body {
+        position: absolute;
+        top: 3.7in;
+        bottom: 1.2in;
+        left: .5in;
+        right: .5in;
+    }
+
+    .size-a4 {
+        width: 8.3in;
+        height: 25.7in;
+    }
+
+    pre {
+        display: block;
+        padding: 0px;
+        margin: 0 0 10px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #333;
+        word-break: break-all;
+        word-wrap: break-word;
+        background-color: #fff;
+        border: none;
+    }
+
+    .pull-right {
+        padding: 20px 30px;
+        font-size: 15px;
+    }
+
+    p {
+        margin: 5px 40px;
+    }
+
+    .b {
+        font-size: 12px;
+    }
+
+    .clsmar {
+        margin: 15px;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform" data-ng-init="StuAttRptDropdownList();" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student TC Report Custom</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" ng-click="ShowHideup()"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHiddenup">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Left Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="stcrclstyr" ng-change="onchangeyear()" required>
+                                    <option value="">Select Year</option>
+                                    <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                    <div ng-message="required">Select Left Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Select Radio Button:<strong style="color:red;">*</strong></label>
+                            <div class="text-center col-sm-8" ng-show="Admno_flag">
+                                <div class="well">
+                                    <label class="radio-inline">
+                                        <input type="radio" value="regno" ng-disabled="showlist" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                        <span class="lbl padding-8">Adm.No.</span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" value="stdname" ng-disabled="showlist" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                        <span class="lbl padding-8">Name</span>
+                                    </label>
+                                </div>
+                                <div class="text-center error-messages" ng-if="interacted(myform.stcrcrad)" ng-messages="myform.stcrcrad.$error">
+                                    <div ng-message="required">Select Adm.No./Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="selsec" data-ng-model="ASMCL_Id" name="stcrccls" ng-change="onchangeclass()" required>
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="options in classlist" value="{{options.asmcL_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.stcrccls)" ng-messages="myform.stcrccls.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Student Name:</label>
+                            <div class="col-sm-8">
+                                <!--<select class="form-control" id="sel1" data-ng-model="amsT_Id" ng-click="reportshow()"  required>
+                                    <option value="" label="Select Student"> </option>
+                                    <option ng-repeat="student in studentDropdown" value="{{student.amsT_Id}}" ng-selected="{{student.Selected == true}}">
+                                        {{student.amsT_FirstName + ' ' + student.amsT_MiddleName + ' ' + student.amsT_LastName}}
+                                    </option>
+                                </select>-->
+                                <ui-select id="sel1" name="studentname" ng-model="$parent.AMST_Id" ng-change="onstudentnamechange()" theme="bootstrap"
+                                           ng-keyup="searchfilter($select,user.status);" title="Select Student" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select Or Search Student">
+                                        {{$select.selected.amsT_FirstName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="student in studentDropdown | filter: $select.search" value="{{student.amsT_Id}}"
+                                                       ng-selected="{{student.Selected == true}}">
+                                        <div ng-bind-html="student.amsT_FirstName | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myform.studentname)" ng-messages="myform.studentname.$error">
+                                    <div ng-message="required">Select Student</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="accsection" data-ng-model="ASMC_Id" name="stcrcsec" ng-change="changesection()" required>
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="options in seclist" value="{{options.asmS_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.stcrcsec)" ng-messages="myform.stcrcsec.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="mididiCoedu">
+                            <label class="control-label col-sm-4">ICSE UID No :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control active" name="uomName" placeholder="Enter ICSE UID No" ng-model="ICSEUID" required>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="mididi">
+                            <label class="control-label col-sm-4">Promotion :</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" data-ng-model="prom">
+                                    <option value="" label="Select Promotion Type"> </option>
+                                    <option value="Granted">Granted</option>
+                                    <option value="Refused">Refused</option>
+                                    <option value="Not Applicable">Not Applicable</option>
+                                    <option value="Passed ICSE">Passed ICSE</option>
+                                    <option value="ISC">ISC</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="mididi1">
+                            <label class="control-label col-sm-4">Prevoius School :</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" ng-model="pervious" maxlength="50" allow-pattern="(\s|[a-zA-Z0-9.]|-|,)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="mididi1girls">
+                            <label class="control-label col-sm-4">Admitted Class:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="selsec" data-ng-model="ASMCL_Id1" name="stcrccls1">
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="options1 in classlist1" value="{{options1.asmcL_Id}}" ng-selected="{{option1.Selected == true}}">{{options1.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myform.stcrccls1)" ng-messages="myform.stcrccls1.$error">
+                                    <div ng-message="required">Select Admitted Class.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-show="report_flag" ng-click="savetmpldata();">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="printToCart()" ng-show="Print_flag">
+                        <!--ng-show="Print_flag"-->
+                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="BStudentTc" id="BStudentTc">
+
+            <div ng-show="baldwinsboys">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="box wide hidden-on-narrow">
+                            <div class="page-container hidden-on-narrow" id="printSectionIdboys">
+                                <div class="pdf-page size-a4" style="margin-top:160px;border:none!important">
+                                    <div style="border:none!important">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-4">
+                                                School Dise No : <b>29200909303</b>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                TC No : <b> {{stuTCno}}</b>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                Academic Year : <b> {{fromyear}}-{{toyear}}</b>
+                                            </div>
+                                        </div>
+                                        <table class="table-bordered">
+                                            <!--<tr>
+            <td colspan="2">
+                <div class="col-sm-12">
+                    <img src="https://chikkatti.blob.core.windows.net/files/3/InstitutionLogo/d99490df-a6af-44d7-bb63-64cfbd882885.jpg" class="img-responsive" style="width:95%" />
+                </div>
+                <div class="col-sm-12">
+                    <p style="text-align:center;font-size:25px"> SCHOOL TRANSFER CERTIFICATE </p>
+                </div>
+            </td>
+        </tr>-->
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        1.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Admission No <!--/ ಪ್ರವೇಶ ಸಂಖ್ಯೆ.--> :
+
+                                                        <b>
+                                                            {{stuAdmno}}
+                                                        </b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        14.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Standard in which the student is studying at the time of leaving the School <!--/ಶಾಲೆ ಬಿಡುವ ಸಮಯದಲ್ಲಿ ವಿದ್ಯಾರ್ಥಿ ಓದುತ್ತಿದ್ದ ತರಗತಿ-->  :
+
+                                                        <b>{{stuLcs | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        2.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Cumulative Record No. / Enrollment No / :
+
+                                                        <b>{{govtno}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%" rowspan="2">
+                                                    <div class="col-sm-1">
+                                                        15.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Student opted Subject's /
+                                                        a) Languages Studied / {{language_studied | uppercase}}
+                                                        <br />
+                                                        b) Elective Studied / <b> {{electivestudied | uppercase}} </b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        3.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Date of Admission to School :
+
+                                                        <b>{{stuDoa|date:'dd/MM/yyyy'}}</b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        4.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Name of  the Student full :
+
+                                                        <b>{{stuFN + ' ' + stuMN + ' ' + stuLN | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        16.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Medium of Instruction :
+                                                        <b>{{mediumOfInstruction | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        5.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Gender :
+                                                        <b>{{gender | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        17.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Whether the Student has paid all the fees due to School ?
+                                                        <b> {{ASTC_FeePaid | uppercase}} </b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        6.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Nationality :
+                                                        <b>{{nationality | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        18.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Fee Concession, if any (Nature and period to be specified): <b>{{fee_concesion | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        7.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Religion  /  Caste :
+                                                        <b>{{religion | uppercase}} / {{studcaste | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        19.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Scholarship if any  (Nature and period to be specified ) : <b> - </b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        8.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Name of the Father  :
+                                                        <b>{{stuFatName | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        20.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Whether Medically Examined or not  :<b> YES </b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        9.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Name of the Mother   :
+                                                        <b>{{stuMotName | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        21.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Month of student last attendance at the School  : <b> {{last_school_attended|date:'dd/MM/yyyy'}} </b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        10.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Whether the candidate belongs to Schedule Caste or  Schedule Tribe :
+                                                        <span class="ng-binding" ng-if="studcaste=='SC'  || studcaste=='ST' || studcaste=='S.C' ||studcaste=='S.T' ">&nbsp;<b>YES</b></span>
+                                                        <span class="ng-binding" ng-if="studcaste=='OBC'  || studcaste=='GENERAL' || studcaste=='General' ">&nbsp;<b>NO</b></span>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        22.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Date on which the application for the Transfer Certificate was received   :
+                                                        <b> {{stuIssDat|date:'dd/MM/yyyy'}} </b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        11.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Whether qualified for promotion to a Higher Standard  :
+                                                        <br />
+                                                        <b>YES</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        23.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Number of School Days to the date of leaving in academic year   :<b> {{noof_schooldays}} </b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        12.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Student Date of Birth :
+                                                        <b>{{stuDob|date:'dd/MM/yyyy'}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        24.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Number of Total Days the student attended in  academic year : <b> {{noof_daysattended | uppercase}} </b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        13.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Place  :   <b>{{studPlc}}</b>
+                                                    </div>
+                                                </td>
+                                                <td width="50%">
+                                                    <div class="col-sm-1">
+                                                        25.
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        Character and Conduct    :
+                                                        <b>{{stuCond | uppercase}}</b>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <br />    <br />
+                                        <div class="col-sm-12" style="padding-top: 40px;padding-bottom:10px">
+                                            <table>
+                                                <tr>
+                                                    <td width="30%">Date of Issue:   <u> {{getdate|date:'dd/MM/yyyy'}}</u></td>
+                                                    <td width="20%"></td>
+                                                    <td width="30%" style="padding-left:15px">
+                                                        Principal Sign :.................................................
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <table class="tablenew">
+                                                <tr>
+                                                    <td width="30%"></td>
+                                                    <td width="40%"></td>
+
+                                                    <td width="38%" style="font-size:16px">
+
+                                                        <span style="padding-left:104px;font-family:Calibri">PRINCIPAL</span><br />
+                                                        <span style="padding-left:51px;font-family:Calibri">Baldwin Boys' High School</span><br />
+                                                        <span style="padding-left:95px;font-family:Calibri">BANGALORE</span>
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <label style="border:1px solid black;border-radius:50%;padding:20px;padding-left:25px;padding-right:25px;margin-left:40%; align-content:center; position: fixed;display:inline-block;">
+
+                                                            <u>School Seal</u>
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-sm-12" style="padding-top: 60px;padding-bottom:20px">
+                                            <table>
+                                                <tr>
+                                                    <td width="30%"></td>
+                                                    <td width="20%"></td>
+                                                    <td width="26%"> </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--<div class="pdf-page size-a4" style="margin-top:120px;">
+                                    <table class="table margin-top-10" style="width:90%">
+                                        <tbody>
+                                            <tr>
+
+                                                <td width="17%"><b>School Dise No : </b></td>
+                                                <td width="33%" style="text-align:center" class="border-bottom ng-binding">
+                                                    <b>   29200909303</b>
+                                                </td>
+                                                <td width="3%"></td>
+
+
+                                                <td width="35%" class="border-bottom ng-binding" ng-if="stuTCno==null"> </td>
+                                                <td width="12%"> <b>STS No : </b></td>
+                                                <td width="25%" style="text-align:center" class="border-bottom ng-binding">
+                                                    <b> {{govtno}}</b>
+                                                </td>
+
+
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-3" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="10%"><b>TC No   : </b></td>
+                                                <td width="35%" style="text-align:center" class="border-bottom ng-binding">
+                                                    <b> {{stuTCno}}</b>
+                                                </td>
+                                                <td width="58%"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="4%">1.</td>
+                                                <td width="170">  Name of the Student in full :</td>
+                                                <td class="border-bottom ng-binding" style="text-align:center">
+                                                    {{stuFN + ' ' + stuMN + ' ' + stuLN | uppercase}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="5%">2.</td>
+                                                <td width="20%"> Admission No :  </td>
+                                                <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuAdmno!=null">
+                                                    {{stuAdmno }}
+                                                </td>
+                                                <td width="18%" class="border-bottom ng-binding" ng-if="stuAdmno==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="15%">  Admn Date : </td>
+                                                <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuDoa!=null">
+                                                    {{stuDoa|date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td width="18%" class="border-bottom ng-binding" ng-if="stuDoa==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="15%"> Admitted to :</td>
+                                                <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="joinclass!=null">
+                                                    {{joinclass | uppercase}}
+                                                </td>
+                                                <td width="28%" class="border-bottom ng-binding" ng-if="joinclass==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="4%">3.</td>
+                                                <td width="15%"> Place of Birth : </td>
+                                                <td width="25%" style="text-align:center" class="border-bottom ng-binding" ng-if="birth_place!=null && birth_place!=0">
+                                                    {{birth_place | uppercase}}
+                                                </td>
+                                                <td width="20%" class="border-bottom ng-binding" ng-if="birth_place==null || birth_place==0"> <b style="font-size:22px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -</b> </td>
+
+
+                                                <td width="2%"></td>
+                                                <td width="8%"> State : </td>
+                                                <td width="25%" style="text-align:center" class="border-bottom ng-binding" ng-if="statename!=null">
+                                                    {{statename | uppercase}}
+                                                </td>
+                                                <td width="21%" class="border-bottom ng-binding" ng-if="statename==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="5%">4.</td>
+                                                <td>Date of birth [in figure & word] </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="5%"></td>
+                                                <td width="9%">In figures :</td>
+                                                <td width="10%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuDob!=null">
+                                                    {{stuDob|date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td width="20%" class="border-bottom ng-binding" ng-if="stuDob==null"> </td>
+                                                <td width="3%"></td>
+                                                <td width="8%" class="Electives"> In words  :</td>
+                                                <td width="50%" style="text-align:center" class="border-bottom ng-binding Electives" ng-if="stuDob!=null">
+                                                    {{stuDobwords | uppercase}}
+                                                </td>
+                                                <td width="50%" class="border-bottom ng-binding" ng-if="stuDob==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="5%">5.</td>
+                                                <td width="9%"> Gender :  </td>
+                                                <td width="37%" style="text-align:center" class="border-bottom ng-binding" ng-if="gender!=null">
+                                                    {{gender | uppercase}}
+                                                </td>
+                                                <td width="37%" class="border-bottom ng-binding" ng-if="gender==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="15%"> Nationality : </td>
+                                                <td width="37%" style="text-align:center" class="border-bottom ng-binding" ng-if="nationality!=null">
+                                                    {{nationality | uppercase}}
+                                                </td>
+                                                <td width="37%" class="border-bottom ng-binding" ng-if="nationality==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="5%">6.</td>
+                                                <td width="10%"> Religion : </td>
+                                                <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="religion!=null">
+                                                    {{religion | uppercase}}
+                                                </td>
+                                                <td width="18%" class="border-bottom ng-binding" ng-if="religion==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="7%">  Caste : </td>
+                                                <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="studcaste!=null">
+                                                    {{studcaste | uppercase}}
+                                                </td>
+                                                <td width="2%"></td>
+                                                <td width="22%" class="border-bottom ng-binding" ng-if="studcaste==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="12%">  Sub  Caste : </td>
+                                                <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="AMST_SubCasteIMC_Id!=null">
+                                                    {{AMST_SubCasteIMC_Id}}
+                                                </td>
+                                                <td width="22%" class="border-bottom ng-binding" ng-if="AMST_SubCasteIMC_Id==null"> <b style="font-size:22px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - </b></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">7.</td>
+                                                <td width="500">Whether the candidate belongs to Scheduled Caste / Scheduled Tribe / OBC / General ? : </td>
+                                                <td class="border-bottom ng-binding" ng-if="studcastecategory=='SC'  || studcastecategory=='ST' || studcastecategory=='S.C' ||studcastecategory=='S.T' ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;YES</td>
+                                                <td class="border-bottom ng-binding" ng-if="studcastecategory=='OBC'  || studcastecategory=='GENERAL' ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO</td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">8.</td>
+                                                <td width="120">Name of the Father : </td>
+                                                <td style="text-align:center" class="border-bottom ng-binding" ng-if="stuFatName!=null">
+                                                    Mr. &nbsp;&nbsp;{{stuFatName | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuFatName==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">9.</td>
+                                                <td width="125">Name of the Mother : </td>
+                                                <td style="text-align:center" class="border-bottom ng-binding" ng-if="stuMotName!=null && stuMotName!=0">
+                                                    Mrs. &nbsp;&nbsp;{{stuMotName | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuMotName==null || stuMotName==0"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">10.</td>
+                                                <td width="410"> Whether the candidate has qualified for promotion to a higher standard :   </td>
+                                                <td style="text-align:center" class="border-bottom ng-binding">&nbsp;  &nbsp;  &nbsp;  Yes</td>
+                                                
+
+                                                <td class="border-bottom ng-binding" ng-if="promotionflag==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">11.</td>
+                                                <td width="375"> Standard in which the student was studying at the time of leaving :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuLcs!=null">
+                                                    {{stuLcs | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuLcs==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">12.</td>
+                                                <td width="180"> Subjects opted by the student : </td>
+                                                <td style="text-align:center" class="border-bottom ng-binding" ng-if="electivestudied!=null">
+                                                    &nbsp;&nbsp;&nbsp;  {{electivestudied | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="electivestudied==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">13.</td>
+                                                <td width="160">Medium of Instruction : </td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="medicallyexamined!=null">
+                                                    {{mediumOfInstruction | uppercase}}
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">14.</td>
+                                                <td width="220">  Whether medically examined or not ? : </td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding">
+                                                  
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">15.</td>
+                                                <td width="300"> Total Number of class held  in the academic year :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="noof_schooldays!=null">
+                                                    {{noof_schooldays | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="noof_schooldays==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">16.</td>
+                                                <td width="390">  Total Number of class attended by the student in the academic year :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="noof_daysattended!=null">
+                                                    {{noof_daysattended | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="noof_daysattended==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">17.</td>
+                                                <td width="275">  Month of Student's  last  attendance  at the school :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuIssDat!=null">
+                                                    {{last_school_attended|date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuIssDat==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">18.</td>
+                                                <td width="300">  Date on which  the application for TC  was received  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuIssDat!=null">
+                                                    {{stuIssDat|date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuIssDat==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">19.</td>
+                                                <td width="160">  Reason  for leaving School  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuLeaReas!=null">
+                                                    {{stuLeaReas | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuLeaReas==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">20.</td>
+                                                <td width="140">   Character and Conduct  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuCond!=null">
+                                                    {{stuCond | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuCond==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">21.</td>
+                                                <td width="340">  Whether the student  has paid  all the fee due of the school ? : </td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="ASTC_FeePaid!=null">
+                                                    {{ASTC_FeePaid | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="ASTC_FeePaid==null || ASTC_FeePaid==0"> - </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">22.</td>
+                                                <td width="340">  Fee  Concessions, if  any [Nature  & Period to be specified]  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="fee_concesion!=null">
+                                                    {{fee_concesion | uppercase}}<b style="font-size:22px"> -</b>
+                                                </td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="fee_concesion==null || fee_concesion==0">
+                                                  
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">23.</td>
+                                                <td width="305">  Scholarship if any  [Nature  & Period to be specified]  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding"><b style="font-size:22px"> -</b> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br /><br /><br />
+
+
+                                    <table class="table margin-top-3" style="width:90%">
+                                        <tbody>
+                                            <tr>
+
+                                                <td width="23%">
+                                                    <b> Date of issue :  &nbsp; {{leaving_date|date:'dd/MM/yyyy'}}</b>
+                                                </td>
+                                                <td width="18%" style="text-align:center"></td>
+                                                <td width="10%" style="text-align:right"><b> School Seal </b> </td>
+                                                <td width="12%"></td>
+                                                <td width="25%" style="text-align:right"><b>Signature  of Principal </b></td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>-->
+                            </div>
+
+                            </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
+        <div ng-show="baldwinsgirls">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+
+                    <div id="printSectionIdgirls" class="printSectionIdgirls">
+                        <section class="margin-top-260">
+                            <h3 style="text-align:center">STUDENT TC CUSTOM REPORT</h3>
+                            <br />
+
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-110 text-bold">TC Serial No.:</td>
+                                        <td class="border-bottom width-150 text-center">{{stuTCno}}</td>
+                                        <td class="pull-right text-bold">Admission /Registration No.</td>
+                                        <td class="border-bottom width-150">{{stuAdmno}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-150 text-bold">This is to certify that</td>
+                                        <td class="border-bottom">{{stuFN + ' ' + stuMN + ' ' + stuLN |uppercase}} </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-110 text-bold">Daughter of</td>
+                                        <td class="border-bottom">{{stuFatName |uppercase}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-260 text-bold">was admitted into this school on (date)</td>
+                                        <td class="border-bottom text-left">{{stuDoa|date:'dd-MM-yyyy'}}</td>
+                                        <td class="width-110 text-bold text-center">In standard</td>
+                                        <td class="border-bottom">{{joinclass}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-180 text-bold">on a transfer from </td>
+                                        <td class="border-bottom">{{stuschoolname|uppercase}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-100 text-bold">and left on</td>
+                                        <td class="border-bottom">{{last_date_attended|date:'dd-MM-yyyy'}}</td>
+                                        <td class="width-60 text-bold text-center">with a</td>
+                                        <td class="border-bottom">GOOD</td>
+                                        <td class="width-110 text-bold text-center">character.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-200 text-bold">She was then studying in (@)</td>
+                                        <td class="border-bottom">{{data2girls}}</td>
+                                        <td class="width-150 text-bold text-center">standard of the (+)</td>
+                                        <td class="border-bottom text-bold">ICSE</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-260 text-bold">stream.The school year being from (*)</td>
+                                        <td class="border-bottom">{{frommonth1}}  {{fromyear}}</td>
+                                        <td class="width-60 text-bold text-center">to (*)</td>
+                                        <td class="border-bottom">{{tomonth1}} {{toyear}} </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-bold">All sums due to the school (%) on her account has been remitted.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-480 text-bold">Her date of birth, according to the Admission register, is (in figures)</td>
+                                        <td class="border-bottom">{{stuDob|date:'dd-MM-yyyy'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-130 text-bold">(Date in words)</td>
+                                        <td class="border-bottom">
+                                            <label>{{stuDobwords}}</label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-130 text-bold">Promotion ($)</td>
+                                        <td class="border-bottom">{{promotiontype|uppercase}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table margin-top-30">
+                                <tbody>
+                                    <tr>
+                                        <td width="80" class="text-bold">Date :</td>
+                                        <td width="100" class="border-bottom">{{tcdategirls|date:'dd-MM-yyyy'}}</td>
+                                        <td class="pull-right text-bold">Signature : </td>
+                                        <td width="100" class="border-bottom"></td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <table class="table margin-top-50" style="margin-bottom:0px;">
+                                <tbody>
+                                    <tr>
+                                        <td class="col-sm-4 text-bold"> Countersigned</td>
+                                        <td class="text-left col-sm-4 text-bold">School Seal/Rubber Stamp</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table margin-top-none">
+                                <tbody>
+                                    <tr>
+                                        <td class="border-bottom"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border-bottom"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-40">(@)</td>
+                                        <td class="width-20">-</td>
+                                        <td>To be given in words</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="width-40">(+)</td>
+                                        <td class="width-20">-</td>
+                                        <td>Mention Whether ICSE/ISC Stream</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="width-40">(*)</td>
+                                        <td class="width-20">-</td>
+                                        <td>Write Month and year</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="width-40">(%)</td>
+                                        <td class="width-20">-</td>
+                                        <td>includes payments for which provision is made in the rules supplied to the parent when the student was admitted into the school</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="width-40">($)</td>
+                                        <td class="width-20">-</td>
+                                        <td>Granted/Refused/Not Applicable/Passed ICSE/ISC.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div ng-show="baldwinscoedu">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div id="printSectionIdcoedu" class="BCOEStudentTc">
+                        <div class="box wide hidden-on-narrow">
+                            <div class="pdf-page size-a4" style="margin-top:130px;">
+                                <h3 style="text-align:center">
+                                    <span width="30%" class="border-bottom ng-binding">TRANSFER CERTIFICATE</span>
+                                </h3>
+                                <br />
+                                <table class="table margin-top-10">
+                                    <tbody>
+                                        <tr>
+
+                                            <td width="12%"><b>School Dise No : </b> </td>
+                                            <td width="30%" style="text-align:center" class="border-bottom ng-binding">
+                                                <b>29200111538</b>
+                                            </td>
+                                            <td width="3%"></td>
+
+
+                                            <td width="17%"> <b>ICSE UID No : </b></td>
+                                            <td width="25%" style="text-align:center" class="border-bottom ng-binding" ng-if="ICSEUID!=null">
+                                                <b> {{ICSEUID}}</b>
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-3">
+                                    <tbody>
+                                        <tr>
+                                            <td width="5%"><b>TC No </b>  :</td>
+                                            <td width="25%" style="text-align:center" class="border-bottom ng-binding">
+                                                <b> {{stuTCno}}</b>
+                                            </td>
+
+
+                                            <td width="3%"></td>
+
+
+                                            <td width="35%" class="border-bottom ng-binding" ng-if="stuTCno==null"> </td>
+                                            <td width="5%"> <b> STS No : </b> </td>
+                                            <td width="25%" style="text-align:center" class="border-bottom ng-binding">
+                                                <b>{{AMST_GovtAdmno}}</b>
+                                            </td>
+                                            <td width="25%" class="border-bottom ng-binding" ng-if="stuTCno==null"> </td>
+                                            <td width="10%"> <b> PEN No : </b> </td>
+                                            <td width="18%" style="text-align:center" class="border-bottom ng-binding">
+                                                <b>{{AMST_PENNo}}</b>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">01.</td>
+                                            <td width="170">  Name of the Student in full : </td>
+                                            <td class="border-bottom ng-binding" style="text-align:center">
+                                                {{stuFN + ' ' + stuMN + ' ' + stuLN | uppercase}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0" style="width:90%">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">02.</td>
+                                            <td width="15%"> Admission No :  </td>
+                                            <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuAdmno!=null">
+                                                {{stuAdmno }}
+                                            </td>
+                                            <td width="18%" class="border-bottom ng-binding" ng-if="stuAdmno==null"> </td>
+                                            <td width="2%"></td>
+                                            <td width="12%">  Admn Date : </td>
+                                            <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuDoa!=null">
+                                                {{stuDoa|date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td width="18%" class="border-bottom ng-binding" ng-if="stuDoa==null"> </td>
+                                            <td width="2%"></td>
+                                            <td width="12%"> Admitted to :</td>
+                                            <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="joinclass!=null">
+                                                {{joinclass | uppercase}}
+                                            </td>
+                                            <td width="18%" class="border-bottom ng-binding" ng-if="joinclass==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+
+
+                                <table class="table margin-top-0" style="width:90%">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">03.</td>
+                                            <td width="12%"> Place of Birth : </td>
+                                            <td width="30" style="text-align:center" class="border-bottom ng-binding" ng-if="birth_place!=null && birth_place!=0">
+                                                {{birth_place | uppercase}}
+                                            </td>
+                                            <td width="30%" class="border-bottom ng-binding" ng-if="birth_place==null || birth_place==0"> <b style="font-size:22px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b> </td>
+                                            <!--<td width="2%"></td>
+                                                <td width="9%">  District : </td>
+                                            <td width="21%" style="text-align:center" class="border-bottom ng-binding" ng-if="district!=null">
+                                                {{district | uppercase}}
+                                            </td>
+                                                <td width="21%" class="border-bottom ng-binding" ng-if="district==null"> </td>-->
+                                            <td width="2%"></td>
+                                            <td width="6%"> State : </td>
+                                            <td width="" style="text-align:center" class="border-bottom ng-binding" ng-if="statename!=null">
+                                                {{statename | uppercase}}
+                                            </td>
+                                            <td width="21%" class="border-bottom ng-binding" ng-if="statename==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">04.</td>
+                                            <td width="400">Date of birth [in figure & word] </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0" style="width:90%">
+                                    <tbody>
+                                        <tr>
+                                            <td width="5%"></td>
+                                            <td width="7%">In figures :</td>
+                                            <td width="10%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuDob!=null">
+                                                {{stuDob|date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td width="20%" class="border-bottom ng-binding" ng-if="stuDob==null"> </td>
+                                            <td width="3%"></td>
+                                            <td width="7%" class="Electives"> In words  :</td>
+                                            <td width="50%" style="text-align:center" class="border-bottom ng-binding Electives" ng-if="stuDob!=null">
+                                                {{stuDobwords | uppercase}}
+                                            </td>
+                                            <td width="50%" class="border-bottom ng-binding" ng-if="stuDob==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table margin-top-0" style="width:90%">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">05.</td>
+                                            <td width="7%"> Gender :  </td>
+                                            <td width="37%" style="text-align:center" class="border-bottom ng-binding" ng-if="gender!=null">
+                                                {{gender | uppercase}}
+                                            </td>
+                                            <td width="37%" class="border-bottom ng-binding" ng-if="gender==null"> </td>
+                                            <td width="2%"></td>
+                                            <td width="10%"> Nationality : </td>
+                                            <td width="37%" style="text-align:center" class="border-bottom ng-binding" ng-if="nationality!=null">
+                                                {{nationality | uppercase}}
+                                            </td>
+                                            <td width="37%" class="border-bottom ng-binding" ng-if="nationality==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0" style="width:90%">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">06.</td>
+                                            <td width="10%"> Religion : </td>
+                                            <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="religion!=null">
+                                                {{religion | uppercase}}
+                                            </td>
+                                            <td width="18%" class="border-bottom ng-binding" ng-if="religion==null"> </td>
+                                            <td width="2%"></td>
+                                            <td width="7%">  Caste : </td>
+                                            <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="studcaste!=null">
+                                                {{studcaste | uppercase}}
+                                            </td>
+                                            <td width="2%"></td>
+                                            <td width="22%" class="border-bottom ng-binding" ng-if="studcaste==null"> </td>
+                                            <td width="2%"></td>
+                                            <td width="10%">  Sub  Caste : </td>
+                                            <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="AMST_SubCasteIMC_Id!=null">
+                                                {{AMST_SubCasteIMC_Id}}
+                                            </td>
+                                            <td width="22%" class="border-bottom ng-binding" ng-if="AMST_SubCasteIMC_Id==null"> <b style="font-size:22px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - </b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">07.</td>
+                                            <td width="510">Whether the candidate belongs to Scheduled Caste / Scheduled Tribe / OBC / General ? : </td>
+                                            <td class="border-bottom ng-binding" style="text-align:center"> {{castecate}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">08.</td>
+                                            <td width="120">Name of the Father : </td>
+                                            <td style="text-align:center" class="border-bottom ng-binding" ng-if="stuFatName!=null">
+                                                Mr. &nbsp;&nbsp;{{stuFatName | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="stuFatName==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">09.</td>
+                                            <td width="125">Name of the Mother : </td>
+                                            <td style="text-align:center" class="border-bottom ng-binding" ng-if="stuMotName!=null && stuMotName!=0">
+                                                Mrs. &nbsp;&nbsp;{{stuMotName | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="stuMotName==null || stuMotName==0"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">10.</td>
+                                            <td width="410"> Whether the candidate has qualified for promotion to a higher standard :   </td>
+                                            <td style="text-align:center" class="border-bottom ng-binding">&nbsp;  &nbsp;  &nbsp;  Yes</td>
+                                            <!--<td style="text-align:center" class="border-bottom ng-binding" ng-if="promotionflag!=null">
+                                               {{promotionflag | uppercase}}
+                                            </td>-->
+                                            <td class="border-bottom ng-binding" ng-if="promotionflag==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!--<table class="table margin-top-5" style="width:90%;">
+                                    <tbody>
+                                        <tr>
+                                        <tr>
+                                            <td width="5%"></td>
+                                            <td width="20%">If yes, to which class : </td>
+                                            <td width="25%" style="text-align:center" class="border-bottom ng-binding" ng-if="nextclass!=null">
+                                                {{nextclass}}
+                                                <b style="font-size:22px"> -</b>
+                                            </td>
+                                            <td width="3%"></td>
+                                            <td width="22%" class="border-bottom ng-binding" ng-if="nextclass==null"> </td>
+                                            <td width="9%" class="Electives">  In words :  </td>
+                                            <td width="30%" style="text-align:center" class="border-bottom ng-binding Electives" ng-if="promotionflag!=null">
+                                                <b style="font-size:22px"> -</b>
+                                            </td>
+                                            <td width="40%%" class="border-bottom ng-binding" ng-if="promotionflag==null">
+                                                <b style="font-size:22px">   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-</b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>-->
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">11.</td>
+                                            <td width="375"> Standard in which the student was studying at the time of leaving :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuLcs!=null">
+                                                {{stuLcs | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="stuLcs==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">12.</td>
+                                            <td width="180"> Subjects opted by the student : </td>
+                                            <td style="text-align:center" class="border-bottom ng-binding" ng-if="language_studied!=null">
+                                                <!--I LANGUAGE - ENGLISH , &nbsp;&nbsp;&nbsp;  {{language_studied | uppercase}}-->
+                                                {{language_studied}} 
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="language_studied==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">13.</td>
+                                            <td width="140"> Medium of Instruction : </td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="mediumOfInstruction!=null">
+                                                {{mediumOfInstruction | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="mediumOfInstruction==null"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">14.</td>
+                                            <td width="220">  Whether medically examined or not ? : </td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="medicallyexamined!=null">
+                                                {{medicallyexamined | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="medicallyexamined==null">
+                                                <b style="font-size:22px;">
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -
+                                                </b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">15.</td>
+                                            <td width="265">  Number of School Days in the academic year :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="noof_schooldays!=null">
+                                                {{noof_schooldays | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="noof_schooldays==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">16.</td>
+                                            <td width="390">  Total  Number of  Days attended  by the student in the  academic year :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="noof_daysattended!=null">
+                                                {{noof_daysattended | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="noof_daysattended==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">17.</td>
+                                            <td width="275">  Month of Student's  last  attendance  at the school :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuIssDat!=null">
+                                                {{last_school_attended|date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="stuIssDat==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">18.</td>
+                                            <td width="300">  Date on which  the application for TC  was received  :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuIssDat!=null">
+                                                {{stuIssDat|date:'dd/MM/yyyy'}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="stuIssDat==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">19.</td>
+                                            <td width="160">  Reason  for leaving School  :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuLeaReas!=null">
+                                                {{stuLeaReas | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="stuLeaReas==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">20.</td>
+                                            <td width="140">   Character and Conduct  :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuCond!=null">
+                                                {{stuCond | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="stuCond==null"> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">21.</td>
+                                            <td width="340">  Whether the student  has paid  all the fee due of the school ? : </td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="ASTC_FeePaid!=null">
+                                                {{ASTC_FeePaid | uppercase}}
+                                            </td>
+                                            <td class="border-bottom ng-binding" ng-if="ASTC_FeePaid==null || ASTC_FeePaid==0"> - </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">22.</td>
+                                            <td width="340">  Fee  Concessions, if  any [Nature  & Period to be specified]  :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="fee_concesion!=null">
+                                                <!--{{fee_concesion | uppercase}}--><b style="font-size:22px"> -</b>
+                                            </td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding" ng-if="fee_concesion==null || fee_concesion==0">
+                                                <!--<b style="font-size:22px"> -</b>-->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="4%">23.</td>
+                                            <td width="305">  Scholarship if any  [Nature  & Period to be specified]  :</td>
+                                            <td style="text-align:center;" class="border-bottom ng-binding"><b style="font-size:22px"> -</b> </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table margin-top-0">
+                                    <tbody>
+                                        <tr>
+                                            <td width="305"> <b>Certificate that the above information is in accordance with the school register.</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table margin-top-0" style="margin-top:30px;">
+                                    <tbody>
+                                        <tr>  <td width="320"> <b>  Date of issue : </b></td>
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table margin-top-0" style="width:90%">
+                                    <tbody>
+                                        <tr>
+
+                                            <td width="10%"><b> Class Teacher :  </b></td>
+                                            <td width="18%" style="text-align:center"></td>
+                                            <td width="7%" style="text-align:right"><b>  Clerk  </b></td>
+                                            <td width="12%"></td>
+                                            <td width="25%" style="text-align:right"><b> Signature  of Principal with Seal  </b></td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--<div ng-show="baldwinscoedu">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">STUDENT TC CUSTOM REPORT</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div id="printSectionIdcoedu" class="BCOEStudentTc">
+                            <div class="box wide hidden-on-narrow">
+                                <div class="pdf-page size-a4" style="margin-top:140px;">
+
+                                    <table class="table margin-top-3" style="width:90%">
+                                        <tbody>
+                                            <tr>
+
+                                                <td width="14%">School dise No :</td>
+                                                <td width="35%" style="text-align:center" class="border-bottom ng-binding">
+                                                    29200909303
+                                                </td>
+                                                <td width="3%"></td>
+                                                <td width="14%">  Enrollment No : </td>
+                                                <td width="35%" style="text-align:center" class="border-bottom ng-binding">
+                                                    204286461
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-3" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="8%">TC No   :</td>
+                                                <td width="35%" style="text-align:center" class="border-bottom ng-binding">
+                                                    {{stuTCno}}
+                                                </td>
+
+
+                                                <td width="3%"></td>
+
+
+                                                <td width="20%"> Medium of Instruction : </td>
+                                                <td width="25%" style="text-align:center" class="border-bottom ng-binding" ng-if="mediumOfInstruction!=null">
+                                                    {{mediumOfInstruction | uppercase}}
+                                                </td>
+                                                <td width="35%" class="border-bottom ng-binding" ng-if="mediumOfInstruction==null"> </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">1.</td>
+                                                <td width="170">  Name of the Student in full : </td>
+                                                <td class="border-bottom ng-binding" style="text-align:center">
+                                                    {{stuFN + ' ' + stuMN + ' ' + stuLN | uppercase}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="4%">2.</td>
+                                                <td width="15%"> Admission No :  </td>
+                                                <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuAdmno!=null">
+                                                    {{stuAdmno }}
+                                                </td>
+                                                <td width="18%" class="border-bottom ng-binding" ng-if="stuAdmno==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="12%">  Admn Date : </td>
+                                                <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuDoa!=null">
+                                                    {{stuDoa|date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td width="18%" class="border-bottom ng-binding" ng-if="stuDoa==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="12%"> Admitted to :</td>
+                                                <td width="18%" style="text-align:center" class="border-bottom ng-binding" ng-if="joinclass!=null">
+                                                    {{joinclass | uppercase}}
+                                                </td>
+                                                <td width="18%" class="border-bottom ng-binding" ng-if="joinclass==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="4%">3.</td>
+                                                <td width="15%"> Place of Birth : </td>
+                                                <td width="20%" style="text-align:center" class="border-bottom ng-binding" ng-if="birth_place!=null">
+                                                    {{birth_place | uppercase}}
+                                                </td>
+                                                <td width="20%" class="border-bottom ng-binding" ng-if="birth_place==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="9%">  District : </td>
+                                                <td width="21%" style="text-align:center" class="border-bottom ng-binding" ng-if="district!=null">
+                                                    {{district | uppercase}}
+                                                </td>
+                                                <td width="21%" class="border-bottom ng-binding" ng-if="district==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="7%"> State : </td>
+                                                <td width="21%" style="text-align:center" class="border-bottom ng-binding" ng-if="statename!=null">
+                                                    {{statename | uppercase}}
+                                                </td>
+                                                <td width="21%" class="border-bottom ng-binding" ng-if="statename==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="4%">4.</td>
+                                                <td width="400">Date of birth [in figure & word] </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="5%"></td>
+                                                <td width="9%">In figures :</td>
+                                                <td width="10%" style="text-align:center" class="border-bottom ng-binding" ng-if="stuDob!=null">
+                                                    {{stuDob|date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td width="20%" class="border-bottom ng-binding" ng-if="stuDob==null"> </td>
+                                                <td width="3%"></td>
+                                                <td width="8%" class="Electives"> In words  :</td>
+                                                <td width="50%" style="text-align:center" class="border-bottom ng-binding Electives" ng-if="stuDob!=null">
+                                                    {{stuDobwords | uppercase}}
+                                                </td>
+                                                <td width="50%" class="border-bottom ng-binding" ng-if="stuDob==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="4%">5.</td>
+                                                <td width="9%"> Gender :  </td>
+                                                <td width="37%" style="text-align:center" class="border-bottom ng-binding" ng-if="gender!=null">
+                                                    {{gender | uppercase}}
+                                                </td>
+                                                <td width="37%" class="border-bottom ng-binding" ng-if="gender==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="11%"> Nationality : </td>
+                                                <td width="37%" style="text-align:center" class="border-bottom ng-binding" ng-if="nationality!=null">
+                                                    {{nationality | uppercase}}
+                                                </td>
+                                                <td width="37%" class="border-bottom ng-binding" ng-if="nationality==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="4%">6.</td>
+                                                <td width="10%"> Religion : </td>
+                                                <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="religion!=null">
+                                                    {{religion | uppercase}}
+                                                </td>
+                                                <td width="18%" class="border-bottom ng-binding" ng-if="religion==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="7%">  Caste : </td>
+                                                <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="studcaste!=null">
+                                                    {{studcaste | uppercase}}
+                                                </td>
+                                                <td width="2%"></td>
+                                                <td width="22%" class="border-bottom ng-binding" ng-if="studcaste==null"> </td>
+                                                <td width="2%"></td>
+                                                <td width="10%">  Sub  Caste : </td>
+                                                <td width="22%" style="text-align:center" class="border-bottom ng-binding" ng-if="AMST_SubCasteIMC_Id!=null">
+                                                    NA
+                                                </td>
+                                                <td width="22%" class="border-bottom ng-binding" ng-if="AMST_SubCasteIMC_Id==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">7.</td>
+                                                <td width="510">Whether the candidate belongs to Scheduled Caste / Scheduled Tribe / OBC / General ? : </td>
+                                                <td class="border-bottom ng-binding"> </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">8.</td>
+                                                <td width="120">Name of the Father : </td>
+                                                <td style="text-align:center" class="border-bottom ng-binding" ng-if="stuFatName!=null">
+                                                    {{stuFatName | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuFatName==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">9.</td>
+                                                <td width="125">Name of the Mother : </td>
+                                                <td style="text-align:center" class="border-bottom ng-binding" ng-if="stuMotName!=null">
+                                                    {{stuMotName | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuMotName==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">10.</td>
+                                                <td width="410"> Whether the candidate has qualified for promotion to a higher standard : </td>
+                                                <td style="text-align:center" class="border-bottom ng-binding" ng-if="promotionflag!=null">
+                                                    {{promotionflag | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="promotionflag==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="width:90%;">
+                                        <tbody>
+                                            <tr>
+                                            <tr>
+                                                <td width="5%"></td>
+                                                <td width="18%">If yes, to which class : </td>
+                                                <td width="27%" style="text-align:center" class="border-bottom ng-binding" ng-if="nextclass!=null">
+                                                    {{nextclass}}
+                                                </td>
+                                                <td width="3%"></td>
+                                                <td width="22%" class="border-bottom ng-binding" ng-if="nextclass==null"> </td>
+                                                <td width="9%" class="Electives">  In words : </td>
+                                                <td width="30%" style="text-align:center" class="border-bottom ng-binding Electives" ng-if="promotionflag!=null">
+                                                    {{}}
+                                                </td>
+                                                <td width="40%%" class="border-bottom ng-binding" ng-if="promotionflag==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">11.</td>
+                                                <td width="375"> Standard in which the student was studying at the time of leaving :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuLcs!=null">
+                                                    {{stuLcs | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuLcs==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="25">12.</td>
+                                                <td width="500"> Subjects opted by the student : </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table" style="width:90%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="5%"></td>
+                                                <td width="19%">a.  Language Studied : </td>
+                                                <td width="28%" style="text-align:center" class="border-bottom ng-binding" ng-if="language_studied!=null">
+                                                    {{language_studied | uppercase}}
+                                                </td>
+                                                <td width="28%" class="border-bottom ng-binding" ng-if="language_studied==null"> </td>
+                                                <td width="3%"></td>
+                                                <td width="19%" class="Electives">  b.  Electives Studied : </td>
+                                                <td width="30%" style="text-align:center" class="border-bottom ng-binding Electives" ng-if="electivestudied!=null">
+                                                    {{electivestudied | uppercase}}
+                                                </td>
+                                                <td width="30%" class="border-bottom ng-binding" ng-if="electivestudied==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">13.</td>
+                                                <td width="220">  Whether medically examined or not ? : </td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="medicallyexamined!=null">
+                                                    {{medicallyexamined | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="medicallyexamined==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">14.</td>
+                                                <td width="265">  Number of School Days in the academic year :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="noof_schooldays!=null">
+                                                    {{noof_schooldays | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="noof_schooldays==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">15.</td>
+                                                <td width="390">  Total  Number of  Days attended  by the student in the  academic year :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="noof_daysattended!=null">
+                                                    {{noof_daysattended | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="noof_daysattended==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">16.</td>
+                                                <td width="275">  Month of Student's  last  attendance  at the school :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuIssDat!=null">
+                                                    {{last_school_attended|date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuIssDat==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">17.</td>
+                                                <td width="300">  Date on which  the application for TC  was received  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuIssDat!=null">
+                                                    {{stuIssDat|date:'dd/MM/yyyy'}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuIssDat==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">18.</td>
+                                                <td width="160">  Reason  for leaving School  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuLeaReas!=null">
+                                                    {{stuLeaReas | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuLeaReas==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">19.</td>
+                                                <td width="140">   Character and Conduct  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="stuCond!=null">
+                                                    {{stuCond | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="stuCond==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">20.</td>
+                                                <td width="340">  Whether the student  has paid  all the fee due of the school ? : </td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="ASTC_FeePaid!=null">
+                                                    {{ASTC_FeePaid | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="ASTC_FeePaid==null"> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">21.</td>
+                                                <td width="340">  Fee  Concessions, if  any [Nature  & Period to be specified]  :</td>
+                                                <td style="text-align:center;" class="border-bottom ng-binding" ng-if="fee_concesion!=null">
+                                                    {{fee_concesion | uppercase}}
+                                                </td>
+                                                <td class="border-bottom ng-binding" ng-if="fee_concesion==null">
+                                                    {{fee_concesion | uppercase}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="30">22.</td>
+                                                <td width="305">  Scholarship if any  [Nature  & Period to be specified]  :</td>
+                                                <td class="border-bottom ng-binding"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-5" style="margin-top:50px;">
+                                        <tbody>
+                                            <tr>  <td width="320">  Date of issue : </td>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table margin-top-3" style="width:90%">
+                                        <tbody>
+                                            <tr>
+
+                                                <td width="10%">Class Teacher :  </td>
+                                                <td width="18%" style="text-align:center"></td>
+                                                <td width="7%" style="text-align:right"> Clerck  </td>
+                                                <td width="12%"></td>
+                                                <td width="25%" style="text-align:right">Signature  of Principal with Seal  </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>-->
+    </form>
+</section>

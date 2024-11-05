@@ -1,0 +1,433 @@
+﻿<style>
+    .multiselect {
+        width: 16.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: -1.3%;
+        margin-bottom: 1%;
+        padding: 1%;
+    }
+</style>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div data-ng-init="BindData()">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Exam Graph</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="well">
+                        <div class="text-center">
+                            <label class="radio-inline">
+                                <input name="Cumulative" value="classwise" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                <span class="lbl padding-8">Classwise</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="Cumulative" value="subwise" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                <span class="lbl padding-8">Subjectwise</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="Cumulative" value="subwisewithallexam" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                <span class="lbl padding-8">Subjectwise With All Exam</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="Cumulative" value="studentwiseavg" type="radio" ng-model="radiotype" ng-change="onselectradio()" required>
+                                <span class="lbl padding-8">Student Wise Average Exam Wise</span>
+                            </label>
+                            <div class="error-messages" ng-if="interacted(myForm.Cumulative)" ng-messages="myForm.Cumulative.$error">
+                                <div ng-message="required">Select Alteast One Radio Button</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sm" name="yeardd" ng-model="obj.asmaY_Id" ng-change="OnAcdyear()" required>
+                                        <option value="">Select Academic Year</option>
+                                        <option ng-repeat="year in yearlt" value="{{year.asmaY_Id}}" ng-selected="year.Selected == true">{{year.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.yeardd)" ng-messages="myForm.yeardd.$error">
+                                        <div ng-message="required">Enter Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Class :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel18" name="cls" ng-model="obj.asmcL_Id" data-ng-change="onclasschange()" required>
+                                        <option value="" label="Select class"> </option>
+                                        <option ng-repeat="option in clslist" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                        <div ng-message="required">Enter Class</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div ng-show="cwise" class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="sec" ng-model="obj.asmS_Id" data-ng-change="onsectionchange()"
+                                            ng-required="radiotype=='classwise' || radiotype=='studentwiseavg' ">
+                                        <option value="" label="Select Section"> </option>
+                                        <option ng-repeat="option in seclist" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                        <div ng-message="required">Enter Section</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6" ng-if="radiotype!='subwisewithallexam'">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Exam Name :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel11" name="examcode" ng-model="obj.emE_Id" data-ng-change="onchangeexam()" ng-required="radiotype!='subwisewithallexam'">
+                                        <option value="" label="Select Exam Name"> </option>
+                                        <option ng-repeat="option in exsplt" value="{{option.emE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.emE_ExamName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.examcode)" ng-messages="myForm.examcode.$error">
+                                        <div ng-message="required">Enter Exam</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6" ng-if="radiotype=='subwisewithallexam'">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Category Name :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel11" name="cate" ng-model="obj.emcA_Id" data-ng-change="onchangecategory()" ng-required="radiotype=='subwisewithallexam'">
+                                        <option value="" label="Select Category Name"> </option>
+                                        <option ng-repeat="option in Exm_Master_Category" value="{{option.emcA_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.emcA_CategoryName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.cate)" ng-messages="myForm.cate.$error">
+                                        <div ng-message="required">Enter Category Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div ng-show="swise" class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Subject :</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel00" name="sub" ng-model="obj.ismS_Id" ng-required="radiotype=='subwise' ||  radiotype=='subwisewithallexam'"
+                                            ng-change="onchangesubject()">
+                                        <option value="" label="Select Subject"> </option>
+                                        <option ng-repeat="option in sublist" value="{{option.ismS_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.ismS_SubjectName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.sub)" ng-messages="myForm.sub.$error">
+                                        <div ng-message="required">Enter Subject</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="radiotype =='subwisewithallexam'">
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 lblcolor">Exam :</label>
+                                <div class="multiselect col-sm-9">
+                                    <label ng-repeat="Activity in getnewexamlist" value="{{Activity.emE_Id}}">
+                                        <input type="checkbox" ng-model="Activity.Selected"
+                                               ng-required="isOptionsRequired1() && radiotype =='subwisewithallexam'">
+                                        <span class="lbl padding-8">
+                                            {{Activity.emE_ExamName}}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr />
+                    <div class="">
+                        <div class="">
+                            <div class="text-center">
+                                <input type="hidden" ng-model="EME_ID" />
+                                <md-button type="submit" class="md-raised md-primary" ng-click="saveddata(obj)" ng-disabled="form.$invalid" id="save-btn">
+                                    <i class="fa fa-list-alt " aria-hidden="true"></i>
+                                    Report
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                                <md-button type="button" class="md-raised md-primary" ng-click="Print()">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                    Print
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="main_list.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Classwise Average Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="printSectionId">
+                <div style="padding-bottom:50px;">
+                    <h2 class="text-center">{{instnamen}}  {{addrees}}</h2>
+                    <br />
+                    <h2 class="text-center">Classwise Average Report</h2>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <b> Year : {{yearname}} </b>
+                            </div>
+                            <div class="col-sm-6">
+                                <b> Class : {{classname}} </b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <b> Section : {{sectionname}} </b>
+                            </div>
+                            <div class="col-sm-6">
+                                <b> Exam : {{examname}} </b>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <a href="">SUBJECT</a>
+                                </th>
+                                <th class="text-center">
+                                    <a href="">AVG MARKS</a>
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="exm in main_list">
+                            <tr>
+                                <td class="text-left padding-left-5">{{exm.ismS_SubjectName}}</td>
+                                <td class="text-center">{{exm.estmpS_ClassAverage}} </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <h3 class="box-title">GRAPHICAL ANALYSIS OF CLASSWISE AVG REPORT</h3>
+                <div id="linechart" style="height: 350px; width: 100%;"></div>
+                <div id="imageContainer" ng-hide="true">
+                    <img id="chartImage" style="height: 300px; width: 800px;">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="box box-primary" ng-show="main_list1.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Subjectwise Average Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="printSectionId1">
+                <h2 class="text-center">{{instnamen}}  {{addrees}}</h2>
+                <br />
+                <h2 class="text-center">Subjectwise Average Reports</h2>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <b> Year : {{yearname}} </b>
+                        </div>
+                        <div class="col-sm-6">
+                            <b> Class : {{classname}} </b>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <b> Subject : {{subjectname}} </b>
+                        </div>
+                        <div class="col-sm-6">
+                            <b> Exam : {{examname}} </b>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="">SECTION</a>
+                                </th>
+                                <th>
+                                    <a href="">AVG MARKS</a>
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="exm in main_list1">
+                            <tr>
+                                <td class="text-left padding-left-5">{{exm.asmC_SectionName}}</td>
+                                <td class="text-center">{{exm.estmpS_SectionAverage}} </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <h3 class="box-title">GRAPHICAL ANALYSIS OF SUBJECTWISE AVG REPORT</h3>
+                    <div id="linechart1" style="height: 350px; width: 100%;"></div>
+                    <div id="imageContainer" ng-hide="true">
+                        <img id="chartImage1" style="height: 300px; width: 800px;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="box box-primary" ng-show="get_marks_avg.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Subjectwise Average With All Exam Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="printSectionId2">
+                <div style="padding-bottom:50px;">
+                    <h2 class="text-center">{{instnamen}}  {{addrees}}</h2>
+                    <h2 class="text-center">
+                        Subjectwise Average With All Exam Report
+                    </h2>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <b> Year : {{yearname}} </b>
+                            </div>
+                            <div class="col-sm-6">
+                                <b> Class : {{classname}} </b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <b> Subject : {{subjectname}} </b>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Section</th>
+                                <th ng-repeat="hrd in get_exam_list">{{hrd.emE_ExamName}}</th>
+                                <th>Average</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="user in getclasssection ">
+                            <tr>
+                                <td class="text-left padding-left-5">{{user.asmC_SectionName}}</td>
+                                <td class="text-center" ng-repeat="hrd in get_exam_list">
+                                    <label ng-repeat="us in user.newtemp" ng-if="hrd.emE_Id==us.emE_Id">
+                                        <span ng-if="us.estmpS_SectionAverage!=0">
+                                        {{us.estmpS_SectionAverage}}
+                                        </span>
+                                        <span ng-if="us.estmpS_SectionAverage==null">
+                                            --
+                                        </span>
+                                    </label>
+                                </td>                               
+                                <td class="text-center">{{user.averag}}</td>
+                            </tr>
+                    </table>
+                </div>
+                <div>
+                    <h3 class="box-title text-center">Subject With All Exam Average</h3>
+                    <div id="linechart121" style="height: 550px; width: 100%;"></div>
+                    <div id="imageContainer" ng-hide="true">
+                        <img id="chartImage121" style="height: 550px; width: 800px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="printSectionId3" class="box box-primary" ng-show="studentwiseavg.length>0">
+            <div class="box-header with-border">
+                <div>
+                    <h2 class="text-center">{{instnamen}}  {{addrees}}</h2>
+                    <br />
+                    <h3 class="box-title text-center">STUDENT AND EXAM WISE AVERAGE</h3>
+                    <br />
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <b> Year : {{yearname}} </b>
+                            </div>
+                            <div class="col-sm-6">
+                                <b> Class : {{classname}} </b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <b> Section : {{sectionname}} </b>
+                            </div>
+                            <div class="col-sm-6">
+                                <b> Exam : {{examname}} </b>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="linechart13" style="height: 500px; width: 100%;"></div>
+                    <div id="imageContainer" ng-hide="true">
+                        <img id="chartImage13">
+                    </div>
+                    <table class="margin-top-30">
+                        <tr>
+                            <td class="pull-right">
+                                Class Teacher<br />
+                                {{classteachername}}
+                            </td>
+                        </tr>
+                    </table>
+                    <!--<div class="text-center margin-top-50">Class Teacher</div>
+                    <div class="text-right pull-right">{{classteachername}}</div>-->
+                </div> 
+            </div>
+        </div>
+    </form>
+</section>

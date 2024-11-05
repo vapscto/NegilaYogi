@@ -1,0 +1,216 @@
+﻿<link href="/css/print/Fees/MonthEndReport.css" rel="stylesheet" />
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loadData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">HOSTEL STUDENT GATEPASS REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body"> 
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Student Name:<span style="color:red">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" data-ng-model="searchchkbx" type="text" placeholder="Search here..." />
+                                <label>
+                                    <input name="clsoption" value="all" data-ng-model="amcsT_Id" type="checkbox" ng-true-value="true" ng-false-value="false" ng-click="all_checkC()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+
+                                <label ng-repeat="emp in employees | filter:searchchkbx" value="{{emp.amcsT_Id}}">
+                                    <input type="checkbox" data-ng-model="emp.selected" ng-click="togchkbxC1()" ng-true-value="true" ng-false-value="false" ng-required="isOptionsRequired()" name="employee" />
+                                    <span class="lbl padding-8">{{emp.amcsT_FirstName}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.employee)" ng-messages="myForm.employee.$error">
+                                <div ng-message="required">Select Student Name</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">
+                                <span class="lbl padding-8">From Date : <strong style="color:red;">*</strong></span>
+                            </label>
+                            <div class="col-sm-7">
+                                <md-datepicker ng-model="fromdate" onkeydown="return false" name="From_Date" md-max-date="maxDatemf" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                    <div ng-message="required">Please Select From date</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-5">
+                                <span class="lbl padding-8">To Date : <strong style="color:red;">*</strong></span>
+                            </label>
+                            <div class="col-sm-6">
+                                <md-datepicker ng-model="todate" onkeydown="return false" name="To_Date" md-min-date="minDatemf" md-max-date="maxDatemf" ng-click="gettodate()" id="date2" md-placeholder="Enter  date" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                    <div ng-message="required">Please Select To Date</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="row">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-click="ShowReportdata()" id="save-btn">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" ng-click="Clear_Details();" class="md-raised md-warn">
+                            <i class="fa fa-times" aria-hidden="true"></i> Clear
+                        </md-button>
+                        <md-button type="button" ng-if="approvalReport.length>0" class="md-raised md-primary" id="excel-btn" ng-click="exportToExceldetails()">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                        <md-button type="button" ng-if="approvalReport.length>0" class="md-raised md-primary" id="print-btn" ng-click="Print();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>               
+        </div>        
+    </form>
+
+    <div class="box box-primary" ng-show="approvalReport.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">HOSTEL STUDENTS GATEPASS DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Name </th>
+                        <th>Going Out Date </th>
+                        <th>Going Out Time  </th>
+                        <th>Coming Back Date </th>
+                        <th>Coming Back Time  </th>
+                        <th>Status </th>
+
+
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in approvalReport|filter:search">
+                    <tr>
+                        <td>{{itemsPerPage*(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">{{user.AMCST_FirstName}}</td>
+                        <td class="text-center">{{user.HLHSTGP_GoingOutDate| date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{user.HLHSTGP_GoingOutTime}}</td>
+                        <td class="text-center">{{user.HLHSTGP_ComingBackDate| date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{user.HLHSTGP_ComingBackTime}}</td>
+                        <td class="text-center">{{user.HLHSTGPAPP_Status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+<div ng-show="table_flag" id="printSectionId">
+    <div class="row" ng-if="imagenew!=null && imagenew!=''">
+        <div class="baldwin text-center">
+            <img src="{{imagenew}}" class="img-responsive" alt="baldwin">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <h4 class="text-center">
+                HOSTEL STUDENTS GATEPASS REPORT
+            </h4>
+        </div>
+    </div>
+    <div class="row margin-top-20">
+        <div class="col-sm-12">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th>Name </th>
+                        <th>Going Out Date </th>
+                        <th>Going Out  </th>
+                        <th>Remarks </th>
+
+
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in approvalReport">
+                    <tr>
+                        <td>{{itemsPerPage*(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">{{user.AMCST_FirstName}}</td>
+                        <td class="text-center">{{user.HLHSTGP_GoingOutDate| date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{user.HLHSTGP_GoingOutTime}}</td>
+                        <td class="text-center">{{user.HLHSTGPAPP_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div ng-show="sdfsdfdsfsd==true" id="exceltopd">
+    <table class="table table-hover table-responsive table-bordered">
+        <tr style="border:0.5px solid black">
+            <td colspan="6" style="text-align:center">
+                HOSTEL STUDENTS GATEPASS REPORT
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+    </table>
+    <div class="row margin-top-20">
+        <div class="col-sm-12">           
+            <table class="table table-hover table-responsive table-bordered" style="border:0.5px solid black">
+                <thead>
+                    <tr style="border:0.5px solid black">
+                        <th>SL.No.</th>
+                        <th>Name </th>
+                        <th>Going Out Date </th>
+                        <th>Going Out  </th>
+                        <th>Remarks </th>                        
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in approvalReport" style="border:0.5px solid black">
+                    <tr style="border:0.5px solid black">
+                        <td>{{itemsPerPage*(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">{{user.AMCST_FirstName}}</td>
+                        <td class="text-center">{{user.HLHSTGP_GoingOutDate| date :'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{user.HLHSTGP_GoingOutTime}}</td>
+                        <td class="text-center">{{user.HLHSTGPAPP_Remarks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

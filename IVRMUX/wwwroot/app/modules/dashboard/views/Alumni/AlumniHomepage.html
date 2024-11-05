@@ -1,0 +1,1142 @@
+<SCRIPT language=Javascript>
+            <!--
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    //-->
+</SCRIPT>
+<style>
+    .ccc {
+        margin-left: 10px;
+    }
+
+    .ccc1 {
+        margin-left: -11px;
+        width: 308px;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary" data-ng-init="loaddata()">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Alumnus details  </h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal ng-pristine ng-valid" name="myForm" method="post" role="form" novalidate>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group" ng-show="adminslumni">
+                                    <!--ng-show="adminslumni"-->
+                                    <label class="control-label col-sm-4">Batch :</label>
+                                    <div class="col-sm-8">
+                                        <div>
+                                            <select class="form-control" id="sel1year" ng-model="ASMAY_Id" name="academic_year" ng-change="onchangeacc(ASMAY_Id)" ng-disabled="editalumni==true">
+                                                <option value="">--Select Batch Year--</option>
+                                                <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == ASMAY_Id}}">{{options.asmaY_Year}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="error-messages" ng-if="interacted(myForm.academic_year)" ng-messages="myForm.academic_year.$error">
+                                            <div ng-message="required">Select Batch Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="adminslumni==true && editalumni==false">
+                                    <label class="control-label col-sm-4">Alumnus Name :</label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel1" name="studentname" ng-model="$parent.almsT_Id" ng-disabled="accchange" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="onchange($parent.almsT_Id)" title="Select Name">
+
+                                            <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.amsT_FirstName}}</ui-select-match>
+
+                                            <ui-select-choices repeat="option in studentlst | filter: $select.search " value="{{option.almsT_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.amsT_FirstName | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="adminslumni==false || editalumni==true">
+                                    <label class="control-label col-sm-4">Alumnus Name :</label>
+                                    <div class="col-sm-8">
+                                        <input disabled class="form-control" placeholder="Enter Alumnus Name" type="text" data-ng-model="studentname">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Nick Name :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Nick Name" type="text" data-ng-model="ALMST_NickName">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Admission Number :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input class="form-control active" placeholder="Enter Admission Number" name="_AdmNo" ng-model="ALMST_AdmNo" disabled type="text">
+                                        <div class="error-messages" ng-if="interacted(myForm._AdmNo)" ng-messages="myForm._AdmNo.$error">
+                                            <div ng-message="required">Select Admission Number</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="obj.Readmittedstudent==false">
+                                    <label class="control-label col-sm-4">Year of Admission :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input ng-hide="adminslumni" class="form-control active" ng-model="ASMAY_Id_joinyear" disabled type="text">
+
+                                        <select ng-show="adminslumni" class="form-control" id="sel1year" ng-model="obj.ASMAY_Id_Join" name="academic_year" ng-disabled="disablefag==true">
+                                            <!--disabled-->
+                                            <option value="">--Select Year of Admission--</option>
+                                            <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == obj.ASMAY_Id_Join}}">{{options.asmaY_Year}}</option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.stujoinyr)" ng-messages="myForm.stujoinyr.$error">
+                                            <div ng-message="required">Select Year of Admission </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="obj.Readmittedstudent==false">
+                                    <label class="control-label col-sm-4">Passed Out Year :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input ng-hide="adminslumni" class="form-control active" ng-model="ASMAY_Id_Leftyear" disabled type="text">
+
+                                        <select ng-show="adminslumni" class="form-control" id="sel2year" ng-model="obj.ASMAY_Id_Left" name="sel2year" ng-disabled="disablefag==true">
+                                            <!--disabled-->
+                                            <option value="">--Select Year--</option>
+                                            <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == obj.ASMAY_Id_Left}}">{{options.asmaY_Year}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.stuleftyr)" ng-messages="myForm.stuleftyr.$error">
+                                            <div ng-message="required">Select Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="obj.Readmittedstudent==false">
+                                    <label class="control-label col-sm-4">Class Joined :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input ng-hide="adminslumni" class="form-control active" ng-model="ASMCL_Id_Joinyear" disabled type="text">
+
+                                        <select ng-show="adminslumni" class="form-control" id="studentclassj" name="studentclassj" data-ng-model="obj.ASMCL_Id_Join" ng-disabled="disablefag==true">
+                                            <!--disabled-->
+                                            <option value="">--Select Joined Year--</option>
+                                            <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.asmcL_Id == obj.ASMCL_Id_Join}}">{{option.asmcL_ClassName}}</option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.studentclassj)" ng-messages="myForm.studentclassj.$error">
+                                            <div ng-message="required">Select Joined Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="obj.Readmittedstudent==false">
+                                    <label class="control-label col-sm-4">Class Passed Out :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input ng-hide="adminslumni" class="form-control active" ng-model="ASMCL_Id_Leftyear" disabled type="text">
+                                        <select ng-show="adminslumni" class="form-control" id="studentclassl" name="studentclassl" data-ng-model="obj.ASMCL_Id_Left" ng-disabled="disablefag==true">
+                                            <!--disabled-->
+                                            <option value="">--Select Passed Out Year--</option>
+                                            <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.asmcL_Id == obj.ASMCL_Id_Left}}">{{option.asmcL_ClassName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.studentclassl)" ng-messages="myForm.studentclassl.$error">
+                                            <div ng-message="required">Select Passed Out Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!--readmit student-->
+
+                                <div class="form-group" ng-if="obj.Readmittedstudent==true">
+                                    <label class="control-label col-sm-4">Year of Admission :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input ng-hide="adminslumni" class="form-control active" ng-model="ASMAY_Id_joinyear" disabled type="text">
+
+                                        <select ng-show="adminslumni" class="form-control" id="sel1year" ng-model="obj.readmitted_ASMAY_Id_Join" name="academic_year" ng-disabled="disablefag==true">
+                                            <!--disabled-->
+                                            <option value="">--Select Year of Admission--</option>
+                                            <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == obj.readmitted_ASMAY_Id_Join}}">{{options.asmaY_Year}}</option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.stujoinyr)" ng-messages="myForm.stujoinyr.$error">
+                                            <div ng-message="required">Select Year of Admission </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="obj.Readmittedstudent==true">
+                                    <label class="control-label col-sm-4">Readmit Passed Out Year :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input ng-hide="adminslumni" class="form-control active" ng-model="ASMAY_Id_Leftyear" disabled type="text">
+
+                                        <select ng-show="adminslumni" class="form-control" id="sel2year" ng-model="obj.readmitted_ASMAY_Id_Left" name="sel2year" ng-disabled="disablefag==true">
+                                            <!--disabled-->
+                                            <option value="">--Select Year--</option>
+                                            <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == obj.readmitted_ASMAY_Id_Left}}">{{options.asmaY_Year}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.stuleftyr)" ng-messages="myForm.stuleftyr.$error">
+                                            <div ng-message="required">Select Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="obj.Readmittedstudent==true">
+                                    <label class="control-label col-sm-4">Class Joined :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input ng-hide="adminslumni" class="form-control active" ng-model="ASMCL_Id_Joinyear" disabled type="text">
+
+                                        <select ng-show="adminslumni" class="form-control" id="studentclassj" name="studentclassj" data-ng-model="obj.readmitted_ASMCL_Id_Join" ng-disabled="disablefag==true">
+                                            <!--disabled-->
+                                            <option value="">--Select Joined Year--</option>
+                                            <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.asmcL_Id == obj.readmitted_ASMCL_Id_Join}}">{{option.asmcL_ClassName}}</option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.studentclassj)" ng-messages="myForm.studentclassj.$error">
+                                            <div ng-message="required">Select Joined Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="obj.Readmittedstudent==true">
+                                    <label class="control-label col-sm-4">Class Passed Out :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input ng-hide="adminslumni" class="form-control active" ng-model="ASMCL_Id_Leftyear" disabled type="text">
+                                        <select ng-show="adminslumni" class="form-control" id="studentclassl" name="studentclassl" data-ng-model="obj.readmitted_ASMCL_Id_Left" ng-disabled="disablefag==true">
+                                            <!--disabled-->
+                                            <option value="">--Select Passed Out Year--</option>
+                                            <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.asmcL_Id == obj.readmitted_ASMCL_Id_Left}}">{{option.asmcL_ClassName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.studentclassl)" ng-messages="myForm.studentclassl.$error">
+                                            <div ng-message="required">Select Passed Out Year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--readmit student end-->
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Date of Birth :</label>
+                                    <div class="col-sm-8" style="">
+                                        <!--<input class="form-control active" placeholder="Select Date" name="dof" ng-model="ALMST_DOB | date:'dd/MM/yyyy'" type="text">-->
+
+                                        <md-datepicker data-ng-model="ALMST_DOB" name="dof" md-placeholder="Enter date"></md-datepicker>
+                                        <div class="error-messages" ng-if="interacted(myForm.dof)" ng-messages="myForm.dof.$error">
+                                            <div ng-message="required">Select Date of Birth</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Mobile Number :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input class="form-control active" placeholder="Enter Mobile Number" name="mob" maxlength="10" ng-pattern="/^[6-9]{1,1}[0-9]{9,9}?$/" ng-model="ALMST_MobileNo" type="text">
+                                        <div class="error-messages" ng-if="interacted(myForm.mob)" ng-messages="myForm.mob.$error">
+                                            <div ng-message="required">Enter Mobile Number</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Father's Name :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input class="form-control active" placeholder="Enter Father Name" name="fname" ng-model="ALMST_FatherName" id="fathername" type="text" ng-blur="checkregnoduplicate()">
+                                        <div class="error-messages" ng-if="interacted(myForm.fname)" ng-messages="myForm.fname.$error">
+                                            <div ng-message="required">Select Father's Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Phone Number :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input class="form-control active" placeholder="Enter Phone Number" name="studentphone" allow-pattern="(\-|[0-9])" ng-model="ALMST_PhoneNo" type="text">
+                                        <div class="error-messages" ng-if="interacted(myForm.studentphone)" ng-messages="myForm.studentphone.$error">
+                                            <div ng-message="pattern">Enter valid Phone NO</div>
+                                            <div ng-message="required">Enter Mobile number</div>
+                                            <div ng-message="minlength">Mobile number must contain 10 digits</div>
+                                            <div ng-message="maxlength">Mobile number must contain 10 digits</div>
+                                            <div ng-message="pattern">Mobile number must be numeric</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Email Id :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input class="form-control active" placeholder="Enter Valid Email" name="stuemailid" ng-model="ALMST_emailId" ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/" type="text">
+                                        <div class="error-messages" ng-if="interacted(myForm.stuemailid)" ng-messages="myForm.stuemailid.$error">
+                                            <div ng-message="required">Enter Email Id</div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Blood Group :</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ALMST_BloodGroup" name="bloodgroup" id="bdg">
+                                            <option value="">--Select Blood Group--</option>
+                                            <option value="A+">A+</option>
+                                            <option value="A-">A-</option>
+                                            <option value="B+">B+</option>
+                                            <option value="B-">B-</option>
+                                            <option value="AB+">AB+</option>
+                                            <option value="AB-">AB-</option>
+                                            <option value="O+">O+</option>
+                                            <option value="O-">O-</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.bloodgroup)" ng-messages="myForm.bloodgroup.$error">
+                                            <div ng-message="required">Select Blood Group</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Membership ID :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input class="form-control active" placeholder="Membership ID" name="MembershipID" ng-model="ALMST_MembershipId" id="fathername" type="text" ng-disabled="!adminslumni">
+                                        <div class="error-messages" ng-if="interacted(myForm.MembershipID)" ng-messages="myForm.MembershipID.$error">
+                                            <div ng-message="required">Enter Membership ID</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Membership Fee :</label>
+                                    <div class="col-sm-8" style="">
+                                        <input class="form-control active" placeholder="Membership Amount" name="MembershipFee" ng-model="ALMST_AmountPaid" id="fathername" type="text" ng-disabled="!adminslumni">
+                                        <div class="error-messages" ng-if="interacted(myForm.MembershipFee)" ng-messages="myForm.MembershipFee.$error">
+                                            <div ng-message="required">Enter Membership Fee</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Category :</label>
+                                    <div class="col-sm-8" style="">
+                                        <select class="form-control" ng-disabled="!adminslumni" id="studentclassl" name="Category" data-ng-model="ALMST_MembershipCategory">
+                                            <option value="">--Select Category--</option>
+                                            <option ng-repeat="option in membercategory" value="{{option.almmC_Id}}" ng-selected="{{option.almmC_Id == almmC_Id}}">{{option.almmC_MembershipCategory}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.Category)" ng-messages="myForm.Category.$error">
+                                            <div ng-message="required">Select Category</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <label id="stuid" ng-model="ALMST_Id" ng-hide="true"></label>
+
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+
+                                            <div style="width:60%;height:120px;border:1px solid #5cb7ff;margin:auto;">
+                                                <img style="width:100%;height:120px;margin-left: 0px;" id="stu">
+                                            </div>
+                                            <label class="custom-file-input alumnistudent" style="width:60%;margin-left: 20%;">
+
+                                                <input type="file" name="stufileF" accept="image/*,application/pdf" data-ng-model="image" onchange="angular.element(this).scope().uploadStudentProfilePicS(this)">
+                                            </label>
+                                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.stufileF)" ng-messages="myForm.stufileF.$error">
+                                                <div ng-message="required">Upload  Photo</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+
+
+                                            <div style="width:60%;height:120px;border:1px solid #5cb7ff;margin-right: 12px;">
+                                                <img style="width:100%;height:120px;" id="blahF">
+                                            </div>
+                                            <label class="custom-file-input alumnifamily" style="width:60%;margin-left: 0px;">
+
+                                                <input type="file" name="stufileF" accept="image/*" data-ng-model="image" onchange="angular.element(this).scope().uploadStudentProfilePicF(this)">
+                                            </label>
+                                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.stufileF)" ng-messages="myForm.stufileF.$error">
+                                                <div ng-message="required">Upload  Photo</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                        <b>Note:</b><span style="color:red">*</span> 1.File Formate JPG, JPEG and PNG Only
+                                        &nbsp;&nbsp; 2. Max Size 2MB
+                                    </p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Marital status :</label>
+                                    <div class="text-center">
+                                        <label class="radio-inline">
+                                            <input name="optradio" type="radio" value="1" data-ng-model="ALMST_Marital_Status">
+                                            <span class="lbl padding-8">Yes</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input name="optradio" type="radio" value="0" data-ng-model="ALMST_Marital_Status">
+                                            <span class="lbl padding-8">No</span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages text-center" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                                        <div ng-message="required">Please select this field</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="ALMST_Marital_Status==1">
+                                    <label class="control-label col-sm-4">Spouse Name :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Spouse Name" type="text" data-ng-model="ALMST_SpouseName">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="ALMST_Marital_Status==1">
+                                    <label class="control-label col-sm-4">Spouse Contact No :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Spouse Contact No" type="text" data-ng-model="ALMST_SpouseContactNo">
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="ALMST_Marital_Status==1">
+                                    <label class="control-label col-sm-4">Spouse Email Id :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Email Id" type="text" data-ng-model="ALMST_SpouseEmailId">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="ALMST_Marital_Status==1">
+                                    <label class="control-label col-sm-4">Spouse Qualification :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Spouse Qualification" type="text" data-ng-model="ALMST_SpouseQulaification">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="ALMST_Marital_Status==1">
+                                    <label class="control-label col-sm-4">Spouse Profession :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" placeholder="Enter Spouse Profession" type="text" data-ng-model="ALMST_SpouseProfession">
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="ALMST_Marital_Status==1">
+                                    <label class="control-label col-sm-4">Wedding Date:</label>
+                                    <div class="col-sm-8" style="">
+                                        <md-datepicker data-ng-model="ALMST_WeddingAnniversaryDate" name="wdof" md-placeholder="Enter date"></md-datepicker>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Country :</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" name="hconcountry" data-ng-model="ALMST_PerCountry" ng-change="onchangecountry(ALMST_PerCountry)" required>
+                                            <!--ng-blur="fulladdressadd(ALMST_ConArea,ALMST_ConStreet,ALMST_PerCity3,ALMST_ConPincode,ALMST_PerState_e,ALMST_PerCountry,ALMST_PerDistrict)">-->
+                                            <option value="">--Select Country--</option>
+
+                                            <option ng-repeat="options in arrlist" value="{{options.ivrmmC_Id}}" ng-disabled="false" ng-selected="{{options.ivrmmC_Id == ALMST_PerCountry}}">{{options.ivrmmC_CountryName}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.hconcountry)" ng-messages="myForm.hconcountry.$error">
+                                            <div ng-message="required">Select Country</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">State :</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" data-ng-model="ALMST_PerState_e"
+                                                ng-options="st.ivrmmS_Id as st.ivrmmS_Name for st in arrStatelist2" ng-change="fulladdressadd(ALMST_ConArea,ALMST_ConStreet,ALMST_PerCity3,ALMST_ConPincode,ALMST_PerState_e,ALMST_PerCountry,ALMST_PerCity4)" required>
+                                            <option value="">--Select State--</option>
+                                            <option ng-repeat="options in arrStatelist2" value="{{options.ivrmmS_Id}}" ng-disabled="true" ng-selected="{{options.ivrmmS_Id == ALMST_PerState_e}}">{{options.ivrmmS_Name}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.hconstate)" ng-messages="myForm.hconstate.$error">
+                                            <div ng-message="required">Select State</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">District :</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sel1" data-ng-model="ALMST_PerDistrict"
+                                                ng-options="st.ivrmmD_Id as st.ivrmmD_Name for st in arrDistrcitlist2">
+                                            <option value="">--Select District--</option>
+                                            <option ng-repeat="options in arrDistrcitlist2" value="{{options.ivrmmD_Id}}" ng-disabled="true" ng-selected="{{options.ivrmmD_Id == ALMST_PerDistrict}}">{{options.ivrmmD_Name}}</option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.hcondistrict)" ng-messages="myForm.hcondistrict.$error">
+                                            <div ng-message="required">Select District</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Pincode :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" ng-change="fulladdressadd(ALMST_ConArea,ALMST_ConStreet,ALMST_PerCity3,ALMST_ConPincode,ALMST_PerState_e,ALMST_PerCountry,ALMST_PerCity4)" placeholder="Enter Pincode" id="usr" type="text" name="Pincode" data-ng-model="ALMST_ConPincode" allow-pattern="(\s|[0-9])" maxlength="6">
+                                        <div class="error-messages" ng-if="interacted(myForm.Pincode)" ng-messages="myForm.Pincode.$error">
+                                            <div ng-message="required">Enter the Pincode</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-hide="pcity">
+                                    <label class="control-label col-sm-4">City :</label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel122" name="itemic" ng-model="$parent.ALMST_PerCity3" theme="bootstrap" ng-keyup="searchfilter($select);" ng-change="fulladdressadd(ALMST_ConArea,ALMST_ConStreet,ALMST_PerCity3,ALMST_ConPincode,ALMST_PerState_e,ALMST_PerCountry,ALMST_PerCity4)" title="Select City">
+                                            <ui-select-match ng-trim="false" placeholder="Select or search City in the list...">{{$select.selected.almsT_PerCity1}}</ui-select-match>
+                                            <ui-select-choices repeat="plc1 in placelist3 | filter: $select.search" value="{{plc1.id}}">
+                                                <div ng-bind-html="plc1.almsT_PerCity1 | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interacted(dataform1.itemic)" ng-messages="dataform1.itemic.$error">
+                                            <div ng-message="required">Select City</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="col-sm-4">
+                                        <input type="checkbox" value="BD1" name="pcty" ng-click="fulladdressadd(ALMST_ConArea,ALMST_ConStreet,ALMST_PerCity3,ALMST_ConPincode,ALMST_PerState_e,ALMST_PerCountry,ALMST_PerCity4)" data-ng-model="pcity">
+                                        <span class="lbl padding-3 ccc"> If No City Match :</span>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="form-group col-sm-8 " ng-show="pcity">
+                                            <input type="text" name="City" placeholder="Enter City Name" data-ng-model="ALMST_PerCity4" class="form-control ccc1" id="cityId" ng-change="fulladdressadd(ALMST_ConArea,ALMST_ConStreet,ALMST_PerCity3,ALMST_ConPincode,ALMST_PerState_e,ALMST_PerCountry,ALMST_PerCity4)" maxlength="40" ng-paste="$event.preventDefault()" allow-pattern="(\s|[a-zA-Z])" />
+                                            <div class="error-messages" ng-if="interacted(myForm.City)" ng-messages="myForm.City.$error">
+                                                <div ng-message="required">Enter the City Name</div>
+                                                <div ng-message="pattern">The field contains only alphabets</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Address line1 :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" maxlength="40" placeholder="Enter Area name" id="usr" type="text" name="hconarea" data-ng-model="ALMST_ConArea" ng-change="fulladdressadd(ALMST_ConArea,ALMST_ConStreet,ALMST_PerCity3,ALMST_ConPincode,ALMST_PerState_e,ALMST_PerCountry,ALMST_PerCity4)" ng-paste="$event.preventDefault()">
+                                        <div class="error-messages" ng-if="interacted(myForm.hconarea)" ng-messages="myForm.hconarea.$error">
+                                            <div ng-message="required">Enter the Area</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Address line2 :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" ng-change="fulladdressadd(ALMST_ConArea,ALMST_ConStreet,ALMST_PerCity3,ALMST_ConPincode,ALMST_PerState_e,ALMST_PerCountry,ALMST_PerCity4)" maxlength="40" placeholder="Enter Street Name" id="usr" type="text" name="hconstreet" data-ng-model="ALMST_ConStreet" ng-paste="$event.preventDefault()">
+                                        <div class="error-messages" ng-if="interacted(myForm.hconstreet)" ng-messages="myForm.hconstreet.$error">
+                                            <div ng-message="required">Enter the Street</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Full Address :</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" style="height:100px;resize:none;" placeholder="Enter Full Address" id="usrsd" type="text" name="fulladd" data-ng-model="ALMST_FullAddess" ng-disabled="!adminslumni"></textarea>
+                                        <div class="error-messages" ng-if="interacted(myForm.fulladd)" ng-messages="myForm.fulladd.$error">
+                                            <div ng-message="required">Enter Full Addess</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Qualification Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div>
+                                        <div>
+                                            <table class="table table-bordered" style="border: 0.5px solid #d8dde2;">
+                                                <tbody ng-repeat="qua in qualificationDetails">
+                                                    <tr>
+                                                        <td style="border:none;text-align:left" class="lblcolor">Qualification :</td>
+                                                        <td style="border:none; width:20%">
+                                                            <select class="form-control"
+                                                                    data-ng-model="qua.Qualification" id="id{{qua.Qualification}}">
+                                                                <option value="">--Select Qualification--</option>
+                                                                <option value="PUC">PUC</option>
+                                                                <option value="UG">UG</option>
+                                                                <option value="PG">PG</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="border:none;text-align:left;width: 10%;" class="lblcolor"> Institution Name :</td>
+                                                        <td style="border:none;width: 20%;">
+                                                            <input class="form-control" placeholder="Enter Institution Name" id="id{{qua.ALMST_PUC_INS_NAME}}"
+                                                                   data-ng-model="qua.ALMST_PUC_INS_NAME" value="{{ qua.ALMST_PUC_INS_NAME}}"
+                                                                   type="text" allow-pattern="(\s|[a-zA-Z])">
+                                                            <span class="error-messages">{{errorMessage2}}</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="border:none;text-align:left;width: 10%;" class="lblcolor"> Year Passed Out :</td>
+                                                        <td style="border:none;width: 20%;">
+                                                            <input class="form-control" placeholder="Enter Year Passed Out"
+                                                                   data-ng-model="qua.ALMST_PUC_PASSED_OUT"
+                                                                   type="text" allow-pattern="(\s|[0-9])" maxlength="4">
+                                                            <span class="error-messages">{{errorMessage2}}</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="border:none;text-align:left;width: 10%;" class="lblcolor">Percentage :</td>
+                                                        <td style="border:none;width: 20%;">
+                                                            <input class="form-control" placeholder="Enter Percentage"
+                                                                   data-ng-model="qua.ALSQU_Percentage"
+                                                                   type="text" onkeypress="return isNumberKey(event)" maxlength="5">
+                                                            <span class="error-messages">{{errorMessage2}}</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="border:none;text-align:left" class="lblcolor">State :</td>
+                                                        <td style="border:none">
+                                                            <select class="form-control" id="sel1" data-ng-model="qua.ALMST_PerState" ng-options="st.ivrmmS_Id as st.ivrmmS_Name for st in arrStatelist3">
+                                                                <option value="">--Select State--</option>
+                                                                <option ng-repeat="options in arrStatelist3" value="{{options.ivrmmS_Id}}" ng-disabled="true" ng-selected="{{options.ivrmmS_Id == ALMST_PerState}}">{{options.ivrmmS_Name}}</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr ng-hide="qua.placess1">
+                                                        <td style="border:none;text-align:left" class="lblcolor">City :</td>
+                                                        <td>
+                                                            <div>
+                                                                <ui-select id="sel1" name="itemic" ng-model="qua.ALMST_PLACE" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select City">
+
+                                                                    <ui-select-match ng-trim="false" placeholder="Select or search City in the list...">{{$select.selected.almsT_PerCitynew}}</ui-select-match>
+                                                                    <ui-select-choices repeat="plc in placelist | filter: $select.search " value="{{plc.id1}}" ng-selected="{{plc.Selected == true}}">
+                                                                        <div ng-bind-html="plc.almsT_PerCitynew   | highlight: $select.search"></div>
+                                                                    </ui-select-choices>
+                                                                </ui-select>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="border:none;text-align:left;width: 10%;" class="lblcolor">
+                                                            <input type="checkbox" value="false" name="ifplace" ng-model="qua.placess1">
+                                                            <span class="lbl padding-4"> If No City Match:</span>
+                                                        </td>
+                                                        <td style="border:none;width: 20%;">
+                                                            <input class="form-control" placeholder="Enter City Name"
+                                                                   data-ng-model="qua.ALMST_PLACE7"
+                                                                   type="text">
+                                                            <span class="error-messages">{{errorMessage2}}</span>
+
+                                                            <!--<input ng-show="qua.placess1" placeholder="Enter City Name" class="form-control"
+                                               data-ng-model="qua.ALMST_PLACE7"
+                                               type="text" allow-pattern="(\s|[a-zA-Z])">
+                                        <span class="error-messages">{{errorMessage2}}</span>-->
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="border:none;text-align:left;width: 10%;" class="lblcolor"> Others Details :</td>
+                                                        <td style="border:none;width: 20%;">
+                                                            <input class="form-control" placeholder="Enter Others Details"
+                                                                   data-ng-model="qua.ALSQU_OtherDetails"
+                                                                   type="text">
+                                                            <span class="error-messages">{{errorMessage2}}</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="border:none;text-align:right" colspan="2">
+                                                            <button ng-hide="qualificationDetails.length > 2" class="btn btn-primary" ng-show="$last" ng-click="addNewQualification()">
+                                                                <i class="fa fa-plus"></i>
+                                                                Add
+                                                            </button>
+                                                            <button class="btn btn-danger" id="remove" ng-hide="qualificationDetails.length ==1"
+                                                                    ng-click="removeNewQualification($index,qualification)">
+                                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                Remove
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!--Re-admitted-->
+
+                        <div class="col-sm-6" style="padding-bottom:15px;" ng-if="editalumni==true && studentCount>=1 ">
+                            <input type="checkbox" value="1" name="ReadmittedStudent" data-ng-model="obj.Readmittedstudent_check">
+                            <span class="lbl padding-3 ccc"> Readmitted Student :</span>
+                        </div>
+                        <div class="col-sm-6" ng-if="editalumni==true && studentCount>=1">
+                            <div class="box box-primary" ng-if="obj.Readmittedstudent_check">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Readmitted Student details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    
+
+
+                                    <div class="clearfix">
+                                       
+                                        <div style="height:auto;">
+                                            <table class="table table-responsive table-bordered clearfix" >
+                                                <thead>
+                                                    
+                                                    <tr>
+                                                        <th width="5px"><a href="" ng-click="order('sno')">SL NO</a> </th>
+                                                        <th style="width: 150px;"><a href="" ng-click="order('sno')">Readmitted Year</a> </th>
+                                                        <th style="width: 100px;"> <a href="" ng-click="order('PACSTCEM_RollNo')">Readmitted Class</a></th>
+
+                                                        <th style="width: 150px;"> <a href="" ng-click="order('PACSTCEM_RegistrationId')">Readmitted Left Year</a></th>
+                                                        <th style="width: 100px;"> <a href="" ng-click="order('PACSTCEM_MeritNo')">Readmitted Left Class</a></th>
+
+                                                        <th width="80px" >Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    <tr ng-repeat="readmitstudetails in readmitstudetails">
+                                                        <td class="text-center">{{ $index + 1 }}</td>
+                                                        <td>
+
+                                                            <select ng-show="adminslumni" class="form-control" id="id{{readmitstudetails.readmittedsel1year}}" name="Readmit{{$index}}" ng-model="readmitstudetails.obj.ALMSTRADM_YearJoined">
+                                                                <!--disabled-->
+                                                                <option value="">--Select Year of Admission--</option>
+                                                                <option ng-repeat="options in readmitted_yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == readmitstudetails.obj.ALMSTRADM_YearJoined}}">{{options.asmaY_Year}}</option>
+                                                            </select>
+                                                            <div class="error-messages" ng-if="interacted(myForm['Readmit'+$index])" ng-messages="myForm['Readmit'+$index].$error">
+                                                                <div ng-message="required">Select Year of Admission</div>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <select ng-show="adminslumni" class="form-control" id="id{{readmitstudetails.readmittedstudentclassj}}" name="Readmit{{$index}}" data-ng-model="readmitstudetails.obj.ALMSTRADM_ClassJoined">
+                                                                <!--disabled-->
+                                                                <option value="">--Select Class Joined --</option>
+                                                                <option ng-repeat="option in readmitted_classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.asmcL_Id == readmitstudetails.obj.ALMSTRADM_ClassJoined}}">{{option.asmcL_ClassName}}</option>
+                                                            </select>
+
+                                                            <div class="error-messages" ng-if="interacted(myForm['Readmit'+$index])" ng-messages="myForm['Readmit'+$index].$error">
+                                                                <div ng-message="required">Select Class Joined </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <select ng-show="adminslumni" class="form-control" id="id{{readmitstudetails.readmittedsel2year}}" ng-model="readmitstudetails.obj.ALMSTRADM_YearLeft" name="Readmit{{$index}}">
+                                                                <!--disabled-->
+                                                                <option value="">--Select Passed Out Year--</option>
+                                                                <option ng-repeat="options in readmitted_yearlst" value="{{options.asmaY_Id}}" ng-selected="{{options.asmaY_Id == readmitstudetails.obj.ALMSTRADM_YearLeft}}">{{options.asmaY_Year}}</option>
+                                                            </select>
+                                                            <div class="error-messages" ng-if="interacted(myForm['Readmit'+$index])" ng-messages="myForm['Readmit'+$index].$error">
+                                                                <div ng-message="required">Select Passed Out Year</div>
+                                                            </div>
+
+                                                        </td>
+
+
+                                                        <td>
+                                                            <select ng-show="adminslumni" class="form-control" id="id{{readmitstudetails.Readmittedstudentclassl}}" name="Readmit{{$index}}" data-ng-model="readmitstudetails.obj.ALMSTRADM_ClassLeft">
+                                                                <!--disabled-->
+                                                                <option value="">--Select Class Passed Out--</option>
+                                                                <option ng-repeat="option in readmitted_classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.asmcL_Id == readmitstudetails.obj.ALMSTRADM_ClassLeft}}">{{option.asmcL_ClassName}}</option>
+                                                            </select>
+                                                            <div class="error-messages" ng-if="interacted(myForm['Readmit'+$index])" ng-messages="myForm['Readmit'+$index].$error">
+                                                                <div ng-message="required">Select Class Passed Out</div>
+                                                            </div>
+
+
+                                                        </td>
+
+                                                        <td>
+                                                            <span class="" ng-hide="readmitstudetails.length > 20">
+                                                                <a href="" ng-show="$last" ng-click="addNewReadmitstudetails(readmitstudetails)">
+                                                                    <i class="fa fa-plus"></i>
+                                                                </a>
+                                                            </span>
+                                                            <span class="" id="remove" ng-hide="readmitstudetails.length ==1">
+                                                                <a href="" ng-click="removeNewReadmitstudetails($index,readmitstudetails)">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </a>
+                                                            </span>
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--//-->
+                        <div class="col-sm-6">
+                            <div class="box box-primary" data-ng-init="OnloadCourseData()">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">ACHIEVEMENTS Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Achievements :</label>
+                                            <div class="col-sm-8" style="">
+                                                <input class="form-control active" placeholder="Enter Achievements" name="ACH_DET" ng-model="ALSAC_Achievement" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Remarks :</label>
+                                            <div class="col-sm-8" style="">
+                                                <textarea class="form-control" placeholder="Enter Remarks" rows="2" ng-model="ALSAC_Remarks"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--</form>-->
+                                </div>
+                            </div>
+                            <div class="box box-primary" data-ng-init="OnloadCourseData()">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Professional Details</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Organization Name :</label>
+                                            <div class="col-sm-8" style="">
+                                                <input class="form-control active" placeholder="Enter Organization Name" name="COMPANY_NAME" ng-model="ALSPR_CompanyName" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Designation :</label>
+                                            <div class="col-sm-8" style="">
+                                                <input class="form-control active" placeholder="Enter Designation" name="PRO_DESIGNATION" ng-model="ALSPR_Designation" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Working Since :</label>
+                                            <div class="col-sm-8" style="">
+                                                <input class="form-control active" placeholder="Enter Working Since" onkeypress="return isNumberKey(event)" allow-pattern="(\s|[0-9])" name="ALSPR_WorkingSince" pattren="number" ng-model="ALSPR_WorkingSince" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Email :</label>
+                                            <div class="col-sm-8" style="">
+                                                <input class="form-control active" placeholder="Enter Valid Email" name="Email" ng-model="ALSPR_EmailId" type="text" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Address :</label>
+                                            <div class="col-sm-8" style="">
+                                                <textarea class="form-control" placeholder="Enter Address" name="PRO_ADDRESS" rows="2" ng-model="ALSPR_CompanyAddress"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Other Details :</label>
+                                            <div class="col-sm-8" style="">
+                                                <textarea class="form-control" placeholder="Enter Other Details" name="PRO_REMARKS" rows="2" ng-model="ALSPR_OtherDetails"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--</form>-->
+                                </div>
+                            </div>
+                            <div class="box box-primary">
+                                <div class="box-body">
+                                    <hr />
+                                   <label ng-hide="true" ng-model="ALMSTRADM_Id" ></label>
+                                    <div class="text-center">
+                                        <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false" ng-click="saveData()">
+                                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                            Save
+                                        </md-button>
+                                        <md-button type="button" class="md-raised md-warn" data-ng-click="cleardata()">
+                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                            Cancel
+                                        </md-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="alumnilist.length>0">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Alumni List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{alumnilist.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="((search!=null && search!='') || (searchValuecol.studentname!=null && searchValuecol.studentname!='') || (searchValuecol.ALMST_MobileNo!=null && searchValuecol.ALMST_MobileNo!='') || (searchValuecol.ALMST_emailId!=null && searchValuecol.ALMST_emailId!='') || (searchValuecol.LeftYear!=null && searchValuecol.LeftYear!='') || (searchValuecol.Leftclass!=null && searchValuecol.Leftclass!='') || (searchValuecol.city!=null && searchValuecol.city!=''))">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{classwork.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-responsive table-bordered clearfix">
+                    <thead>
+                        <tr style="background: aliceblue;">
+                            <th>
+                                <input class="form-control" ng-model="searchValuecol.studentname" type="text" placeholder="search alumni...">
+                            </th>
+                            <th>
+                                <input class="form-control" ng-model="searchValuecol.ALMST_FatherName" type="text" placeholder="search father...">
+                            </th>
+                            <th>
+                                <input class="form-control" ng-model="searchValuecol.ALMST_MobileNo" type="text" placeholder="search mobileno...">
+                            </th>
+                            <th>
+                                <input class="form-control" ng-model="searchValuecol.ALMST_emailId" type="text" placeholder="search emailid...">
+                            </th>
+                            <th>
+                                <input class="form-control" ng-model="searchValuecol.LeftYear" type="text" placeholder="search LeftYear...">
+                            </th>
+                            <th>
+                                <input class="form-control" ng-model="searchValuecol.Leftclass" type="text" placeholder="search Leftclass...">
+                            </th>
+                            <th>
+                                <input class="form-control" ng-model="searchValuecol.city" type="text" placeholder="search city...">
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>SL No</th>
+                            <th>Alumnus Name</th>
+                            <th>Year</th>
+                            <th>Class</th>
+                            <th>Mobile No</th>
+                            <th>Email Id</th>
+                            <th>Blood Group</th>
+                            <th>Father Name</th>
+                            <th>State/City</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in classwork =(alumnilist | filter : searchValuecol | filter:search) | orderBy :sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td style="text-align:left">{{ user.studentname}}</td>
+                            <td style="text-align:left">
+                                <table class="table table-hover table-responsive table-bordered text-center" style="margin-bottom: 0px !important;">
+                                    <tr>
+                                        <td>Join</td>
+                                        <td>{{ user.JoinYear}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Left</td>
+                                        <td> {{ user.LeftYear}} </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="text-align:left">
+                                <table class="table table-hover table-responsive table-bordered text-center" style="margin-bottom: 0px !important;">
+                                    <tr>
+                                        <td>Join</td>
+                                        <td>{{ user.ASMCL_Id_Join}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Left</td>
+                                        <td> {{ user.Leftclass}} </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>{{ user.ALMST_MobileNo}}</td>
+                            <td style="text-align:left">{{ user.ALMST_emailId}}</td>
+                            <td>{{ user.ALMST_BloodGroup}}</td>
+                            <td>{{user.ALMST_FatherName}}</td>
+                            <td style="text-align:left">{{ user.city}}</td>
+                            <td ng-hide="true">{{ user.ASMAY_Id_Join}}</td>
+                            <td ng-hide="true">{{ user.ASMAY_Id_Left}}</td>
+                            <td ng-hide="true">{{ user.ASMCLId_Join}}</td>
+                            <td ng-hide="true">{{ user.ASMCLId_Left}}</td>
+                            <td ng-hide="true">{{ user.ALMSTRADM_Id}}</td>
+                            <td>
+                                <span>
+                                    <a href="" ng-click="edit(user.ALMST_Id,user.ASMAY_Id_Left,user.ASMCLId_Join,user.ASMCLId_Left,user.ASMAY_Id_Join,user.ASMAY_Id_Left,user.studentname,user.AMST_Id,user.ALMSTRADM_Id)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true">Update</i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.ALMST_ActiveFlag === false">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-green" data-placement="bottom" data-toggle="tooltip" title="Activate">
+                                        <i> Activate </i>
+                                    </a>
+                                </span>
+                                <span ng-if="user.ALMST_ActiveFlag === true">
+                                    <a href="" ng-click="deactive(user)"
+                                       class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Deactivate">
+                                        <i> Deactivate</i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="myModalCoverview" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:70%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Alumni Details </h4>
+            </div>
+            <div class="">
+                <div class="box box-primary">
+                    <div class="box box-body" ng-show="qualification.length>0">
+                        <h4 class="modal-title text-blue">qualification Details </h4>
+                        <input type="checkbox" ng-model="quacheck" />
+                        <span class="lbl padding-4"></span>:
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <th>Qulification</th>
+                                    <th>Year Of Passing</th>
+                                    <th>Other Details</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="qu in qualification">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{ qu.alsqU_Qulification}}</td>
+                                    <td>{{ qu.alsqU_YearOfPassing}}</td>
+                                    <td>{{ qu.alsqU_OtherDetails}}</td>
+                                    <td>
+                                        <span ng-if="qu.alsqU_ActiveFlg==true">
+                                            <a style="color:green">
+                                                Active
+                                            </a>
+                                        </span>
+                                        <span ng-if="qu.alsqU_ActiveFlg==false">
+                                            <a style="color:red">
+                                                De-Active
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="box box-body" ng-show="profession.length>0">
+                        <h4 class="modal-title text-blue">Profession Details </h4>
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <th>Company Name</th>
+                                    <th>Company Address</th>
+                                    <th>Designation</th>
+                                    <th>Email</th>
+                                    <th>Working Since</th>
+                                    <th>Other Details</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="pr in profession">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{ pr.alspR_CompanyName}}</td>
+                                    <td>{{ pr.alspR_CompanyAddress}}</td>
+                                    <td>{{ pr.alspR_Designation}}</td>
+                                    <td>{{ pr.alspR_EmailId}}</td>
+                                    <td>{{ pr.alspR_WorkingSince}}</td>
+                                    <td>{{ pr.alspR_OtherDetails}}</td>
+                                    <td>
+                                        <span ng-if="pr.alspR_ActiveFlg==true">
+                                            <a style="color:green">
+                                                Active
+                                            </a>
+                                        </span>
+                                        <span ng-if="pr.alspR_ActiveFlg==false">
+                                            <a style="color:red">
+                                                De-Active
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="box box-body" ng-show="achivement.length>0">
+                        <h4 class="modal-title text-blue">Achivement Details </h4>
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>SL NO</th>
+                                    <th>Achievement</th>
+                                    <th>Remarks</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ac in achivement">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{ ac.alsaC_Achievement}}</td>
+                                    <td>{{ ac.alsaC_Remarks}}</td>
+                                    <td>
+                                        <span ng-if="ac.alsaC_ActiveFlg==true">
+                                            <a style="color:green">
+                                                Active
+                                            </a>
+                                        </span>
+                                        <span ng-if="ac.alsaC_ActiveFlg==false">
+                                            <a style="color:red">
+                                                De-Active
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

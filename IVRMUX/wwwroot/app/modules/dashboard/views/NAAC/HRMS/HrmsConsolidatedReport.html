@@ -1,0 +1,680 @@
+﻿<style>
+    #wrapper {
+        overflow-x: scroll;
+        width: 1072px;
+    }
+
+    .ui-grid-sort-priority-number {
+        font-size: 0;
+    }
+
+    .UploadEmpDoc .file-blue:before {
+        content: 'Upload Doc' !important;
+        font-size: 12px;
+    }
+</style>
+<section class="content">
+    <div class="box box-primary" ng-app="MyModule" data-ng-init="onLoadGetDataEmployeeType()">
+        <div class="box-header with-border">
+            <h3 class="box-title">HRMS NAAC CONSOLIDATED REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="col-sm-12">
+                                <label class="control-label">
+                                    Group Type:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                </label>
+                                <input name="option[]" value="All" type="checkbox" ng-model="groupTypeselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupTypeAll(groupTypeselectedAll)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </div>
+                            <div class="multiselect col-sm-12">
+                                <label ng-repeat="groupType in groupTypedropdown">
+                                    <input type="checkbox" name="selclass" ng-model="groupType.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeBygroupType(groupType)">
+                                    <span class="lbl padding-8">
+                                        {{groupType.hrmgT_EmployeeGroupType}}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 padding-left-right-none">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="col-sm-12">
+                                <label class="control-label">
+                                    Department:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                </label>
+                                <input name="option[]" value="All" type="checkbox" ng-model="departmentselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartmentAll(departmentselectedAll)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </div>
+                            <div class="multiselect col-sm-12">
+                                <label ng-repeat="department in departmentdropdown">
+                                    <input type="checkbox" name="selclass" ng-model="department.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDepartment(department)">
+                                    <span class="lbl padding-8">
+                                        {{department.hrmD_DepartmentName}}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 padding-left-none">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="col-sm-12">
+                                <label class="control-label">
+                                    Designation:<strong style="color:red;display:inline; font-weight: bolder;">*</strong>
+                                </label>
+                                <input name="option[]" value="All" type="checkbox" ng-model="designationselectedAll" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignationAll(designationselectedAll)">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </div>
+                            <div class="multiselect col-sm-12">
+                                <label ng-repeat="designation in designationdropdown">
+                                    <input type="checkbox" name="selclass" ng-model="designation.selected" ng-true-value="true" ng-false-value="false" ng-change="GetEmployeeByDesignation(designation)">
+                                    <span class="lbl padding-8">
+                                        {{designation.hrmdeS_DesignationName}}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="well" data-ng-init="allind ='Indi'">
+                        <input type="radio" value="All" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                        <span class="lbl padding-8">All</span>
+                        <input type="radio" value="Indi" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                        <span class="lbl padding-8">Individual</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-6">
+                            Employee  : <strong style="color:red;" ng-show="!disabledata">*</strong>
+                        </label>
+                        <div class="col-sm-12">
+                            <ui-select id="sel1" name="empname" ng-model="hrmE_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Employee" ng-disabled="disabledata" ng-required="!disabledata" ng-change="leavedetails(hrmE_Id)">
+                                <ui-select-match placeholder="Select or search Employee in the list...">
+                                    {{$select.selected.hrmE_EmployeeFirstName}}
+                                </ui-select-match>
+                                <ui-select-choices repeat="option in employee | propsFilter: {hrmE_EmployeeFirstName: $select.search}"
+                                                   value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                    <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                </ui-select-choices>zr
+                            </ui-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">
+                            <span class="lbl">Year :</span>
+                        </label>
+                        <div class="col-sm-6">
+                            <input class="form-control" style="width: 150px;" name="yearname" data-ng-model="hrmlY_Id" type="text" ng-pattern="^[0-9]$" allow-pattern="^[0-9]$" maxlength="4" ng-paste="$event.preventDefault()" required>
+                            <div class="error-messages" ng-if="interacted(myForm.yearname)" ng-messages="myForm.yearname.$error">
+                                <div ng-message="required">Please enter Year</div>
+                                <div ng-message="pattern">Pattern does not match</div>
+                            </div>
+                            <!--<select class="form-control" name="yearname" data-ng-model="hrmlY_Id" ng-disabled="actleave" required>
+                                <option value="">--Select--</option>
+                                <option ng-repeat="option in leaveyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected===true}}">
+                                    {{option.hrmlY_LeaveYear}}
+                                </option>
+                            </select>-->
+                        </div>
+                        <!--<div class="error-messages" ng-if="interacted(myForm.yearname)" ng-messages="myForm.yearname.$error">
+                            <div ng-message="required" style="margin-left:195px;">Please Select Year</div>
+                        </div>-->
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <table>
+                        <tr>
+                            <td>
+                                <input type="radio" value="Orientation" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Orientation</span>
+                            </td>
+                            <!--<td>
+                                <input type="radio" value="StudentActivity" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">StudentActivity Data</span>
+                            </td>-->
+                            <td>
+                                <input type="radio" value="Examination" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Examination</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" value="Professional" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Professional Activities</span>
+                            </td>
+                            <td>
+                                <input type="radio" value="ResearchProject" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Research Project</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" value="ResearchGuidance" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Research Guidance</span>
+                            </td>
+                            <td>
+                                <input type="radio" value="BOSBOE" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">BOS/BOE</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" value="Journal" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Research publication</span>
+                            </td>
+                            <td>
+                                <input type="radio" value="Conference" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Conference Proceeding</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" value="Book" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Book Pubilshed</span>
+                            </td>
+                            <td>
+                                <input type="radio" value="BookChapter" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Book Chapter</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!--<td>
+                                <input type="radio" value="Commettee" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Commettee Data</span>
+                            </td>-->
+                            <td>
+                                <input type="radio" value="QualifingExam" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Qualifing Exam</span>
+                            </td>
+                            <td>
+                                <input type="radio" value="OtherDetail" name="dataoption" data-ng-model="dataoption">
+                                <span class="lbl padding-8">Other Detail</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!--<div class="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Employee :<span style="color:Red">*</span></label>
+                        <div class="col-sm-8">
+                            <ui-select id="sel1" name="empname" ng-model="obj.hrmE_Id" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" ng-change="emp_Sel(obj.hrmE_Id)" title="Select Employee" required>
+                                <ui-select-match placeholder="Select or search Employee in the list...">
+                                    {{$select.selected.hrmE_EmployeeFirstName}}
+                                </ui-select-match>
+                                <ui-select-choices repeat="option in employee | propsFilter: {hrmE_EmployeeFirstName: $select.search}" value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                    <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>
+                        <div class="error-messages" ng-if="interacted(myForm1.empname)" ng-messages="myForm1.empname.$error">
+                            <div ng-message="required" style="margin-left:270px;"> Select Employee First</div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="GenerateReport()">
+                    Generate
+                    <i class="fa fa-chevron" aria-hidden="true"></i>
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Clear
+                </md-button>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="EmployeeDis">
+            <div class="box-header with-border">
+                <h3 class="box-title">HRMS NAAC CONSOLIDATED REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="container-fluid">
+                <form class="form-horizontal" role="form" name="myForm" novalidate>
+                    <div class="box-body" id="EmpNaacHRMS">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h2 class="text-center"> Teresian College, Siddharthanagar</h2>
+                                <h2 class="text-center"> Mysore</h2>
+                            </div>
+
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6"><u><b>Consolidated Report</b></u></label>
+                                </div>
+                            </div>
+
+                            <div class="scrollTable">
+                                <div id="orientation" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'Orientation'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Name of the Coure/FDP/Summer School</th>
+                                                <th>Place</th>
+                                                <th style="width:auto">Duration</th>
+                                                <th style="width:auto">From Date(yy/mm/dd)</th>
+                                                <th style="width:auto">To Date(yy/mm/dd)</th>
+                                                <th>Sponsoring  Authority</th>
+                                                <th>Remarks</th>
+                                                <th>Upload support document(Mandatory field)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.HREORCO_OrientationCourse}}</td>
+                                                <td>{{doc.HREORCO_Place}}</td>
+                                                <td>{{doc.HREORCO_Duration}}</td>
+                                                <td>{{doc.HREORCO_From|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{doc.HREORCO_To|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{doc.HREORCO_SposoringAuthority}}</td>
+                                                <td>{{doc.HREORCO_Remarks}}</td>
+                                                <td>
+                                                    <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.HREORCO_Document}}">
+                                                        View Document
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="StudentActivity" class="col-sm-12 margin-top-20 margin-bottom-10" ng-show="dataoption === 'StudentActivity'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Type of Activity</th>
+                                                <th>Date</th>
+                                                <th>Role</th>
+                                                <th>Place</th>
+                                                <th>Sponsoring agency</th>
+                                                <th>Duration</th>
+                                                <th>Support Document</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.HRESACT_TypeOfActivity}}</td>
+                                                <td>{{doc.HRESACT_ActivityDate|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{doc.HRESACT_Role}}</td>
+                                                <td>{{doc.HRESACT_Place}}</td>
+                                                <td>{{doc.HRESACT_OrgAgency}}</td>
+                                                <td>{{doc.HRESACT_Duration}}</td>
+                                                <td>
+                                                    <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.HRESACT_Document}}">
+                                                        View Document
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="Professional" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'Professional'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Type of Activity</th>
+                                                <th>Level</th>
+                                                <th>Date</th>
+                                                <th>Organizing agency</th>
+                                                <th>Place</th>
+                                                <th>Duration</th>
+                                                <th>Role</th>
+                                                <th>Support Document(Mandatory field)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.HREDACT_DevelopmentActivity}}</td>
+                                                <td></td>
+                                                <td>{{doc.HREDACT_ActivityDate|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{doc.HREDACT_OrgAgency}}</td>
+                                                <td>{{doc.HREDACT_Place}}</td>
+                                                <td>{{doc.HREDACT_Duration}} Days</td>
+                                                <td>{{doc.HREDACT_Role}}</td>
+                                                <td>
+                                                    <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.HREDACT_Document}}">
+                                                        View Document
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="ResearchProject" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'ResearchProject'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Title of the Project</th>
+                                                <th>Funding Agency</th>
+                                                <th>Principal Investigator</th>
+                                                <th>Period</th>
+                                                <th>Total funding</th>
+                                                <th>Role</th>
+                                                <th>Status of the project</th>
+                                                <th>Year</th>
+                                                <th>Document</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.HREREPR_ProjectTitle}}</td>
+                                                <td>{{doc.HREREPR_FundingAgency}}</td>
+                                                <td></td>
+                                                <td>{{doc.HREREPR_Period}}</td>
+                                                <td>{{doc.HREREPR_FundsReceived}}</td>
+                                                <td>{{doc.HREREPR_Role}}</td>
+                                                <td>{{doc.HREREPR_ProjectStatus}}</td>
+                                                <td>{{doc.HREREPR_Year}}</td>
+                                                <td>
+                                                    <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.HREREPR_Document}}">
+                                                        View Document
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="ResearchGuidance" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'ResearchGuidance'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Name of the Coure/FDP/Summer School</th>
+                                                <th>Place</th>
+                                                <th style="width:auto">Duration</th>
+                                                <th style="width:auto">From Date(yy/mm/dd)</th>
+                                                <th style="width:auto">To Date(yy/mm/dd)</th>
+                                                <th>Sponsoring  Authority</th>
+                                                <th>Remarks</th>
+                                                <th>Upload support document(Mandatory field)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.HREORCO_OrientationCourse}}</td>
+                                                <td>{{doc.HREORCO_Place}}</td>
+                                                <td>{{doc.HREORCO_Duration}}</td>
+                                                <td>{{doc.HREORCO_From|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{doc.HREORCO_To|date:'dd-MM-yyyy'}}</td>
+                                                <td>{{doc.HREORCO_SposoringAuthority}}</td>
+                                                <td>{{doc.HREORCO_Remarks}}</td>
+                                                <td>
+                                                    <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.HREORCO_Document}}">
+                                                        View Document
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="BOSBOE" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'BOSBOE'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>BOS/BOE</th>
+                                                <th>Subject</th>
+                                                <th>University/College/Autonomous College</th>
+                                                <th>Year</th>
+                                                <th>Period From-To date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.hreboS_BOSBOEFlg}}</td>
+                                                <td>{{doc.hreboS_Subject}}</td>
+                                                <td>{{doc.hreboS_UnvCollegeFlg}}</td>
+                                                <td>{{doc.hreboS_Year}}</td>
+                                                <td>
+                                                    <table class="text-center">
+                                                        <tr>
+                                                            <td>From : {{doc.hreboS_FromToDate|date:'dd-MM-yyyy'}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>To: {{doc.hreboS_ToDate|date:'dd-MM-yyyy'}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="Journal" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'Journal'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Title of the Paper</th>
+                                                <th>Author</th>
+                                                <th>Published Journal</th>
+                                                <th>ISSN/ISBN</th>
+                                                <th>Impact Factor</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.hrejornL_ArticleTitle}}</td>
+                                                <td>{{doc.hrejornL_Authors}}</td>
+                                                <td>
+                                                    <table class="text-center">
+                                                        <tr>
+                                                            <td>Name: {{doc.hrejornL_JournalName}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Volume: {{doc.hrejornL_Volume}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Issue: {{doc.hrejornL_IssueNo}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Page Nos: {{doc.hrejornL_PageNo}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td>{{doc.hrejornL_ISSNISBN}}</td>
+                                                <td>{{doc.hrejornL_ImpactFactor}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="Conference" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'Conference'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Title of the Paper</th>
+                                                <th>Author</th>
+                                                <th>Conference Name</th>
+                                                <th>Year</th>
+                                                <th>Venue</th>
+                                                <th>Duration</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.hreconF_PaperTitle}}</td>
+                                                <td>{{doc.hreconF_Authors}}</td>
+                                                <td>{{doc.hreconF_ConferenceName}}</td>
+                                                <td>{{doc.hreconF_Year}}</td>
+                                                <td>{{doc.hreconF_ConferenceVenue}}</td>
+                                                <td>{{doc.hreconF_Duration}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="Book" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'Book'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Title of the Book</th>
+                                                <th>Author</th>
+                                                <th>Publishing agency</th>
+                                                <th>Year</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.hrebK_BookName}}</td>
+                                                <td>{{doc.hrebK_Author}}</td>
+                                                <td>
+                                                    <table class="text-center">
+                                                        <tr>
+                                                            <td>Name: {{doc.hrebK_PublisherName}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Volume: {{doc.hrebK_Volume}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Issue: {{doc.hrebK_IssueNo}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Page Nos: {{doc.hrebK_PageNo}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td>{{doc.hrebK_Year}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="BookChapter" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'BookChapter'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Title of the Book Chapter</th>
+                                                <th>Author</th>
+                                                <th>Publishing agency</th>
+                                                <th>Year</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.hrebkcP_BookName}}</td>
+                                                <td>{{doc.hrebkcP_Author}}</td>
+                                                <td>
+                                                    <table class="text-center">
+                                                        <tr>
+                                                            <td>Name: {{doc.hrebkcP_PublisherName}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Volume: {{doc.hrebkcP_Volume}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Issue: {{doc.hrebkcP_IssueNo}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Page Nos: {{doc.hrebkcP_PageNo}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td>{{doc.hrebkcP_Year}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="Commettee" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'Commettee'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Committee/Cell/Club</th>
+                                                <th>Year</th>
+                                                <th>Role</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.hrecoM_Flg}}</td>
+                                                <td>{{doc.hrecoM_Year}}</td>
+                                                <td>{{doc.hrecoM_Role}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="OtherDetail" class="margin-top-20 margin-bottom-10" ng-show="dataoption === 'OtherDetail'">
+                                    <table class="col-sm-12 table-bordered text-center margin-bottom-10">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Year</th>
+                                                <th>Details</th>
+                                                <th>Upload</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="doc in documentList">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{doc.hreothdeT_Year}}</td>
+                                                <td>{{doc.hreothdeT_OtherDetails}}</td>
+                                                <td>
+                                                    <a style="color: blue; text-decoration:underline; font-size:large" href="{{doc.hreothdeT_Document}}">
+                                                        View Document
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="text-center">
+                <md-button type="button" class="md-raised md-primary" data-ng-click="printToCart('Baldwin')" ng-disabled="print_flag">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    Print
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" data-ng-click="cancel()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+
+    </div>
+</section>

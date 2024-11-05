@@ -1,0 +1,276 @@
+﻿<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onpageload()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Promotion Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmaY_Id" name="acdyr" required ng-change="onchangeyear()">
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in yearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdyr)" ng-messages="myForm.acdyr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmcL_Id" name="acclasss" ng-change="onchangeclass()" required>
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmcL_ClassName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acclasss)" ng-messages="myForm.acclasss.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmS_Id" name="acdsec" required ng-change="onchangesection()">
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in sectionlist" value="{{option.asmS_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmC_SectionName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdsec)" ng-messages="myForm.acdsec.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group text-center">
+                            <div class="well" data-ng-init="dailybtedates ='overall'">
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="dailybtedates" value="overall" name="scldbet" ng-click="onclickdates()" required>
+                                    <span class="lbl padding-8">Over All </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="dailybtedates" value="subjwise" name="scldbet" ng-click="onclickdates()" required>
+                                    <span class="lbl padding-8">Subject Wise </span>
+                                </label>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.scldbet)" ng-messages="myForm.scldbet.$error">
+                                <div ng-message="required">Select Atleast One Radio Button </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" data-ng-click="Report()">
+                            <i class="fa fa-file" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" data-ng-click="printData()" ng-disabled="print_flag">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#A')" ng-disabled="print_flag">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="box box-primary" ng-show="alldata.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Promotion Report </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div ng-if="dailybtedates =='overall'">
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Class</th>
+                            <th>Section</th>
+                            <th>Total Students</th>
+                            <th>Pass</th>
+                            <th>Fail</th>
+                            <th>Absent</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in alldata">
+                        <tr>
+                            <td>{{$index+1}}</td>
+                            <td>{{user.ASMCL_ClassName}}</td>
+                            <td>{{user.ASMC_SectionName}}</td>
+                            <td>{{user.total}}</td>
+                            <td>{{user.pass}}</td>
+                            <td>{{user.fail}}</td>
+                            <td>{{user.absent}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr />
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Student Name</th>
+                            <th>Admission No.</th>
+                            <th>Total Marks</th>
+                            <th>Obtained Marks</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user1 in alldata1">
+                        <tr>
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-left padding-left-5">{{user1.AMST_FirstName}}</td>
+                            <td class="text-left padding-left-5">{{user1.AMST_AdmNo}}</td>
+                            <td class="text-center">{{user1.ESTMPP_TotalMaxMarks}}</td>
+                            <td class="text-center">{{user1.ESTMPP_TotalObtMarks}}</td>
+                            <td class="text-center">{{user1.ESTMPP_Result}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+
+            <div ng-if="dailybtedates =='subjwise'">
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Sl.No.</th>
+                            <th>Subject</th>
+                            <th>Total Students</th>
+                            <th>Pass</th>
+                            <th>Fail</th>
+                            <th>Absent</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="user in alldata">
+                        <tr>
+                            <td>{{$index+1}}</td>
+                            <td class="text-left padding-left-5">{{user.ISMS_SubjectName}}</td>
+                            <td>{{user.total}}</td>
+                            <td>{{user.pass}}</td>
+                            <td>{{user.fail}}</td>
+                            <td>{{user.absent}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="printareaId" ng-show="tadprint">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <center> <h4>Promotion Report For Academic Year {{yearname}}</h4></center>
+        <br />
+        <div id="A">
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr  style="border :solid 0.5px black">
+                        <th>Sl.No.</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Total Students</th>
+                        <th>Pass</th>
+                        <th>Fail</th>
+                        <th>Absent</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in alldata">
+                    <tr style="border :solid 0.5px black">
+                        <td style="text-align:center;">{{$index+1}}</td>
+                        <td style="text-align:center;">{{user.ASMCL_ClassName}}</td>
+                        <td style="text-align:center;">{{user.ASMC_SectionName}}</td>
+                        <td style="text-align:center;">{{user.total}}</td>
+                        <td style="text-align:center;">{{user.pass}}</td>
+                        <td style="text-align:center;">{{user.fail}}</td>
+                        <td style="text-align:center;">{{user.absent}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+            <table class="table table-bordered table-responsive" id="A">
+                <thead>
+                    <tr>
+                        <th width="30">Sl.No.</th>
+                        <th width="72">Student Name</th>
+                        <th width="53">Admission No.</th>
+                        <th width="40">Total Marks</th>
+                        <th width="50">Obtained Marks</th>
+                        <th width="32">Result</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user1 in alldata1">
+                    <tr>
+                        <td style="text-align:center;">{{$index+1}}</td>
+                        <td style="text-align:left;word-wrap:break-word;padding-left:10px;">{{user1.AMST_FirstName}}</td>
+                        <td style="text-align:left;padding-left:10px;">{{user1.AMST_AdmNo}}</td>
+                        <td style="text-align:center;">{{user1.ESTMPP_TotalMaxMarks}}</td>
+                        <td style="text-align:center;">{{user1.ESTMPP_TotalObtMarks}}</td>
+                        <td style="text-align:center;">{{user1.ESTMPP_Result}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="printareaId55" ng-show="tadprint">
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <center> <h4>Promotion Report For Academic Year {{yearname}} Class {{classname}} Section {{sectionname}}</h4></center>
+        <br />
+        <div id="A1">
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr  style="border :solid 0.5px black">
+                        <th>Sl.No.</th>
+                        <th>Subject</th>
+                        <th>Total Students</th>
+                        <th>Pass</th>
+                        <th>Fail</th>
+                        <th>Absent</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="user in alldata">
+                    <tr  style="border :solid 0.5px black">
+                        <td style="text-align:center;">{{$index+1}}</td>
+                        <td style="text-align:left;">{{user.ISMS_SubjectName}}</td>
+                        <td style="text-align:center;">{{user.total}}</td>
+                        <td style="text-align:center;">{{user.pass}}</td>
+                        <td style="text-align:center;">{{user.fail}}</td>
+                        <td style="text-align:center;">{{user.absent}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

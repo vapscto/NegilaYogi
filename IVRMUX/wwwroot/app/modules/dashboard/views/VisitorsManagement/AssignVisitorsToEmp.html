@@ -1,0 +1,356 @@
+﻿<style>
+    .teststyle {
+        width: 98%;
+    }
+
+    .multiselect {
+        width: 24.1em;
+        height: 12em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: -0.3%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<section class="content" ng-init="loadgrid()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Assign Visitor To Employee</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Visitor Name :</label>
+                            <div class="col-sm-8">
+                                <ui-select id="sel16" name="studentnamed" ng-model="obj1.VMMV_Id" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                           ng-change="getVisitorDetails(obj1.VMMV_Id)" title="Select Visitor" required>
+                                    <ui-select-match ng-trim="false" placeholder="Select or Search Employee">
+                                        {{$select.selected.vmmV_VisitorName}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="option in visitorlist | filter: $select.search " value="{{option.vmmV_Id}}" ng-selected="{{option.Selected == true}}">
+                                        <div ng-bind-html="(option.vmmV_VisitorName) | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm.studentnamed)" ng-messages="myForm.studentnamed.$error">
+                                    <div ng-message="required">Select Visitor Name</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-if="gridoptions.length>0" class="well">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12">Visitor Name : <b>{{VMMV_VisitorName}}</b></label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12"> Meeting Purpose : <b>{{VMMV_MeetingPurpose}}</b></label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12"> Meeting Date : <b>{{VMMV_MeetingDateTime}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12"> Entry Time : <b>{{VMMV_EntryDateTime}}</b></label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12"> Meeting Date Time : <b>{{VMVTMT_DateTime | date :'dd/MM/yyyy HH:mm'}}</b></label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-sm-12"> Assigned By : <b>{{ASSIGNEDBY}}</b></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">To Meet :</label>
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel16" name="studentname" ng-model="obj1.ToMeetHRMEId" theme="bootstrap" ng-keyup="searchfilter($select);"
+                                                   ng-change="get_empdetails($parent.emp1)" title="Select emp" ng-required="radiomodal!='out_dept'">
+                                            <ui-select-match ng-trim="false" placeholder="Select or Search Employee">
+                                                {{$select.selected.hrmE_EmployeeFirstName}}
+                                            </ui-select-match>
+                                            <ui-select-choices repeat="option in emplist | filter: $select.search " value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="(option.hrmE_EmployeeFirstName) | highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <div class="error-messages" ng-if="interacted(myForm.studentname)" ng-messages="myForm.studentname.$error">
+                                            <div ng-message="required">Select To Meet</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Meet Date : <strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker name="entdate" id="sel10" ng-model="obj1.VMVTMT_DateTime" onkeydown="return false" md-max-date="maxDate"
+                                                       md-min-date="minDate" md-placeholder="Select date" required></md-datepicker>
+                                        <div class="error-messages col-sm-offset-1" ng-if="interacted(myForm.entdate)" ng-messages="myForm.entdate.$error">
+                                            <div ng-message="required">Select Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" style="padding-top: 29px;">Meet Time:<span style="color:red;">*</span></label>
+                                    <div uib-timepicker name="sch_time1" ng-model="obj1.VMMV_EntryDateTimed" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" required id="sel11"></div>
+                                    <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.sch_time1)" ng-messages="myForm.sch_time1.$error">
+                                        <div ng-message="required">Select Time :<span style="color:red;">*</span></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">SMS Required :</label>
+                                    <div class="col-sm-8">
+                                        <label>
+                                            <input type="checkbox" ng-model="obj1.SMS_Required" name="smsreq">
+                                            <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                                        </label>
+                                        <div class="error-messages" ng-if="interacted(myForm.smsreq)" ng-messages="myForm.smsreq.$error">
+                                            <div ng-message="required">Select SMS Required</div>
+                                        </div>
+                                    </div>
+                                </div>                                
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Location:<span style="color:red;">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="obj1.VMVTMT_Location" class="form-control" name="dfdfd" placeholder="visitor location">
+                                        <div class="error-messages" ng-if="interacted(myForm.dfdfd)" ng-messages="myForm.dfdfd.$error">
+                                            <div ng-message="required">Enter Location</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Remarks :</label>
+                                    <div class="col-sm-8">
+                                        <textarea id="dd" ng-model="obj1.VMVTMT_Remarks" rows="5" style="resize:none" class="form-control" required name="rmks"></textarea>
+                                        <div class="error-messages" ng-if="interacted(myForm.rmks)" ng-messages="myForm.rmks.$error">
+                                            <div ng-message="required">Enter Remarks</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Meet Flag:</label>
+                                    <div class="form-group">
+                                        <input type="checkbox" id="sel10" ng-model="obj1.VMVTMT_MetFlg" name="aemoncb">
+                                        <span class="lbl padding-8"></span>
+                                        <div class="error-messages" ng-if="interacted(myForm.aemoncb)" ng-messages="myForm.aemoncb.$error">
+                                            <div ng-message="required">Select Meet Flag</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Email Required :</label>
+                                    <div class="col-sm-8">
+                                        <label>
+                                            <input type="checkbox" ng-model="obj1.Email_Required" name="smsreq">
+                                            <span class="lbl padding-8"></span><span style="color:lightgreen;font-size:20px;"></span>
+                                        </label>
+                                        <div class="error-messages" ng-if="interacted(myForm.smsreq)" ng-messages="myForm.smsreq.$error">
+                                            <div ng-message="required">Select Email Required</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <input type="hidden" ng-model="VMMV_Id" value="{{vmmV_Id}}" />
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData(obj1)" id="save-btn">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-if="assigned_visitorlist.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Assign Visitor Details </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered table-responsive table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Sl.No</th>
+                                    <th>Organization</th>
+                                    <th>Visitor Name</th>
+                                    <th>From</th>
+                                    <th>Purpose</th>
+                                    <th>Meeting Date</th>
+                                    <th>Meet Flag</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="obj in filterValue1 = (assigned_visitorlist | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                    <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td class="text-left">{{obj.MI_Name}}</td>
+                                    <td class="text-left">{{obj.VMMV_VisitorName}}</td>
+                                    <td class="text-left">{{obj.VMMV_FromPlace}}</td>
+                                    <td class="text-left">{{obj.VMMV_MeetingPurpose}}</td>
+                                    <td class="text-center">{{obj.VMMV_MeetingDateTime}}</td>
+                                    <td class="text-center">
+                                        <a href="" ng-if="obj.VMVTMT_MetFlg">
+                                            <i class="fa fa-check text-green" title="Meet"></i>
+                                        </a>
+                                        <a href="" ng-if="!obj.VMVTMT_MetFlg">
+                                            <i class="fa fa-times text-red" title="Not Meet"></i>
+                                        </a>
+                                    </td>
+                                    <td class="text-left">{{obj.VMMV_CkeckedInOutStatus}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</section>
+
+<div id="mymodalviewdetailsfirsttab" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                <h4 class="modal-title text-white">Update Status</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm1" novalidate>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Visitor Name :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{visitorname}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Meeting Date :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{MeetingDateTime | date:'dd/MM/yyyy'}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Remarks :</label>
+                                    <div class="col-sm-8">
+                                        <textarea ng-model="VMMV_Remarkss" rows="3" class="form-control"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" style="padding-top: 29px;">Exit Time:<span style="color:red;">*</span></label>
+                                    <div uib-timepicker name="sch_time12" ng-model="obsupdate.VMMV_ExitDateTimes" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian" id="sel11" required></div>
+                                    <div class="error-messages col-sm-offset-4" ng-if="interacted1(myForm1.sch_time12)" ng-messages="myForm1.sch_time12.$error">
+                                        <div ng-message="required">Select Time</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">To Meet :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{sempname}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Entry Time :</label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">{{EntryDateTime}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" style="padding-top: 9px;">Exit Date : <strong style="color:red;">*</strong></label>
+                                    <div class="col-sm-8">
+                                        <md-datepicker name="entdate1" id="sel10" ng-model="VMMV_ExitDate" onkeydown="return false" md-max-date="maxDate1"
+                                                       md-min-date="minDate1" md-placeholder="Select date" required></md-datepicker>
+                                        <div class="error-messages col-sm-offset-1" ng-if="interacted1(myForm1.entdate1)" ng-messages="myForm1.entdate1.$error">
+                                            <div ng-message="required">Select Date</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="UpdateStatus(obsupdate)" id="save-btn">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" data-dismiss="modal">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                close
+                            </md-button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

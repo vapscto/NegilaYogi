@@ -1,0 +1,379 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="StuAttRptDropdownList();" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Overall Daily Attendance Report:</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+
+                  
+                    <div class="col-sm-6 col-sm-offset-3">
+
+                        <div class="text-center well" ng-init="AttendanceType=0">
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="AttendanceType" value="0" type="radio" required>
+                                <span class="lbl padding-8">Daily Once</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="AttendanceType" value="1" type="radio" required>
+                                <span class="lbl padding-8">Daily Twice</span>
+                            </label>
+
+
+                            <div class="error-messages" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                                <div ng-message="required">Select Type</div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="cat" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in yearDropdown" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected===true}}">{{option.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-if="categoryflag==true">
+                            <label class="control-label col-sm-4">Category:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="objj.amC_Id" name="catg">
+                                    <option value="">Select Category</option>
+                                    <option value="0">All</option>
+                                    <option ng-repeat="cat in categoryDropdown" value="{{cat.amC_Id}}">{{cat.amC_Name}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.catg)" ng-messages="myForm.catg.$error">
+                                    <div ng-message="required">Select Category</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="fdate" onkeydown="return false" ng-model="fromdate" md-placeholder="Enter date" md-min-date="minDatedof" md-max-date="maxDatedof" required></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="showReport()" id="save-btn" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="button" ng-disabled="catreport1_btn" class="md-raised md-primary" ng-click="saveUseronce()">
+                            <i class="fa fa-commenting" aria-hidden="true"></i>
+                            Send SMS
+                        </md-button>
+                        <md-button type="button" ng-disabled="catreport1_btn" ng-click="saveUseronceemail()" target="_blank" class="md-raised md-primary">
+                            <i class="fa fa-envelope" aria-hidden="true"></i> Send Email
+                        </md-button>
+                        <!--<md-button type="button"  ng-click="smartcardatt()" target="_blank" class="md-raised md-primary">
+                            <i class="fa fa-envelope" aria-hidden="true"></i> Transfer Smart Card Attendance
+                        </md-button>
+                        <md-button type="button" ng-click="createuser()" target="_blank" class="md-raised md-primary">
+                            <i class="fa fa-envelope" aria-hidden="true"></i> Create User
+                        </md-button>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="catreport">
+        <div class="box-header with-border">
+            <h3 class="box-title">Overall Daily Attendance SMS And Email</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="searchValue!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue1.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                <thead>
+                    <tr>                      
+                        <th>
+                            <a href="" ng-click="order('sno')">SL. No.</a>
+                        </th>
+
+                        <th>
+                            <a href="" ng-click="order('ASMCL_ClassName')">Class-Section</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('TOTAL')">Strength</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('PRESENT')">Present</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('ABSENT')">Absent</a>
+                        </th>
+                        <th>
+                            <a href="" ng-click="order('HALFDAY')">Half Day</a>
+                        </th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (students | filter :searchValue)|orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="page1">                      
+                        <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{ user.ASMCL_ClassName + '-' + user.ASMC_SectionName }}</td>
+                        <td>{{ user.TOTAL}}</td>
+                        <td>{{ user.PRESENT}}</td>
+                        <td>{{ user.ABSENT}}</td>
+                        <td>{{ user.HALFDAY}}</td>
+                        <td hidden="hidden">{{user.ASMCL_Id}}</td>
+                        <td hidden="hidden">{{user.ASMS_ID}}</td>                       
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="4" direction-links="true" boundary-links="true" pagination-id="page1"></dir-pagination-controls>
+        </div>
+
+        <div class="box-body">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{presentCountgrid1}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="searchValue1234!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue11.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" ng-model="searchValue1234" type="text" placeholder="search here...">
+
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center" id="table11">
+                <thead>
+                    <tr>
+                        <th class="hdTH">
+                            <label>
+                                <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th ng-show="AttendanceType==1"><a href="">I Half  </a></th>
+                        <th ng-show="AttendanceType==1"><a href="">II Half</a></th>
+                        <th><a href="" ng-click="order('sno')">SL.No.</a></th>
+                        <th><a href="" ng-click="order('classsection')">Class-Section</a></th>
+                        <th><a href="" ng-click="order('studentname')">Student Name</a></th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user1 in student_teacherList | filter :searchValue1234  ">
+                        <td class="text-center  hdTD">
+                            <label>
+                                <input type="checkbox" ng-model="user1.selected" value="{{user1.Id}}" ng-change="optionToggled(user1,itemsPerPage1 *(currentPage1-1)+$index)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td class="text-center" ng-show="AttendanceType==1">
+                            <input type="checkbox" id="check-{{user1.AMST_Id}}" ng-model="user1.FirstHalfflag" name="aemoncb" ng-checked="user1.ASA_Class_Attended==0.50 || (user1.ASA_Class_Attended==0.00 && user1.FirstHalf==1)" >
+                            <span class="lbl padding-8"></span>
+                        </td>
+                        <td class="text-center" ng-show="AttendanceType==1">
+                            <input type="checkbox" id="check-{{user1.AMST_Id}}" ng-model="user1.SecondHalfflag" name="aemoncb" ng-checked="user1.ASA_Class_Attended==0.50 || (user1.ASA_Class_Attended==0.00 && user1.SecondHalf==1)" >
+                            <span class="lbl padding-8"></span>
+                        </td>
+                        <td style="text-align:center">{{$index+1}}</td>
+                        <td>{{ user1.classsection }}</td>
+                        <td>{{ user1.studentname}}</td>
+
+                    </tr>
+                </tbody>
+            </table>           
+        </div>
+    </div>
+</section>
+
+<div id="myModalotp" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="BindData()" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">Absent Student SMS </h4>
+
+            </div>
+            <div class="modal-body">
+                <div>
+                    <center>
+                        <div class="" ng-init="otptype='Appsts'">
+                            <label class="checkbox-inline" ng-show="mobileotpshow">
+                                <input type="radio" value="M" ng-model="otptype" ng-click="otponclickloaddata()" name="otp" required>
+                                <span class="lbl padding-8"><b>Mobile OTP</b></span>
+                            </label>
+                            <label class="checkbox-inline" ng-show="emailotpshow">
+                                <input type="radio" value="E" ng-model="otptype" ng-click="otponclickloaddata()" name="otp" required>
+                                <span class="lbl padding-8"><b>Email OTP</b></span>
+                            </label>
+                        </div>
+                        <div ng-show="otpmobile">
+
+                            <p><h4 style="color:red;">OTP will be Send To Authorised Mobile No!!</h4></p>
+                            <br />
+                            <p><h4>Mobile Number: ******{{mobileno}}</h4></p>
+
+                        </div>
+                        <div ng-show="otpemail">
+
+                            <p><h4 style="color:red;">OTP will be Send To Authorised Email Id!!</h4></p>
+                            <br />
+                            <p><h4>Email Id: <b class="text-lowercase">{{emailid | capitalize}}******</b></h4></p>
+
+                        </div>
+                    </center>
+                    <br />
+                    <div ng-show="buttonotp">
+                        <center>
+                            <button type="button" class="btn btn-primary" ng-click="sendotpsms(otptype)">SEND OTP</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"> Close</button>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="myModalswal" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:80%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i><!--&times;--></button>
+                <h4 class="modal-title text-white">Absent Student SMS  </h4>
+            </div>
+            <div class="modal-body">
+
+                <div ng-show="radioval=='Student'">
+                    <center>
+                        <p><h4 style="color:red;">Students List Which You Are Selected !!!</h4></p>
+                    </center>
+                    <center><p ng-if="snd_sms==true && snd_email!=true"><b>NOTE:SMS Will Trigger For The Same </b></p></center>
+                    <center><p ng-if="snd_email==true && snd_sms!=true"><b>NOTE:Email Will Trigger For The Same </b></p></center>
+                    <center><p ng-if="snd_email==true && snd_sms==true"><b>NOTE:SMS and Email Will Trigger For The Same </b></p></center>
+
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">SL.NO.</th>
+                                <th style="text-align:center">Class-Section</th>
+                                <th style="text-align:center">NAME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="cl in clslst2" pagination-id="page3">
+                                <td>{{$index+1}}</td>
+                                <td>{{ cl.classsection }}</td>
+                                <td>{{ cl.studentname}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <dir-pagination-controls max-size="5" pagination-id="page3"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+
+                <hr />
+                <div>
+                    <div ng-show="otpcheck">
+                        <label for="mobile" class="control-label col-sm-4" style="text-align:right"><b>Enter OTP :</b></label>
+                        <div class="col-sm-3">
+                            <input type="password" class="form-control" name="OTP Number" placeholder="ENTER OTP NUMBER" data-ng-model="forgetEmailOTP" ng-pattern="/^[0-9]+$/">
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-xs" ng-click="VerifyforgetEmailOtp(forgetEmailOTP)">
+                            Submit
+                        </button>
+                        <button type="button" ng-show="resendotpbutton" class="btn btn-primary btn-xs" ng-click="sendotpsms(otptype)">
+                            <!--ng-click="resendotp()"-->
+                            Resend OTP
+                        </button>
+                    </div>
+                </div>
+                <br />
+                <div style="text-align:center">
+                    <md-button type="button" ng-click="sendsms()" ng-disabled="otpcheck" ng-show="smsdata" class="md-raised md-primary" id="submit">
+                        SEND
+                    </md-button>
+                    <md-button type="button" ng-click="sendemail()" ng-disabled="otpcheck" ng-show="emaildata" class="md-raised md-primary" id="submit">
+                        SEND
+                    </md-button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

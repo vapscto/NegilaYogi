@@ -1,0 +1,463 @@
+﻿<style>
+    .multiselect {
+        width: 22.4em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Monthly Collection Extract Register </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" ng-click="ShowHideup()"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHiddenup">
+
+                <div class="">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="text-center well" ng-init="allindi='all';regnonamestd = true;">
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="allindi" value="all" ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">All</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ng-model="allindi" value="indi" ng-click="onclickloaddata()">
+                                    <span class="lbl padding-8">Individual</span>
+                                </label>
+                            </div>
+
+                        </div>
+                        <div class="" ng-hide="regnonamestd">
+                            <div class="col-sm-4">
+                                <div class="well">
+                                    <div class="text-center" ng-init="admnoname='admno'">
+                                        <label class="radio-inline">
+                                            <input type="radio" ng-model="admnoname" value="admno" data-ng-click="onclickregnoname()">
+                                            <span class="lbl padding-8">Adm No</span>
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" ng-model="admnoname" value="name" data-ng-click="onclickregnoname()">
+                                            <span class="lbl padding-8">Name</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-5">
+                                        Student Name : <span style="color:red;">*</span>
+                                    </label>
+                                    <div class="col-sm-7">
+                                        <select class="form-control" id="selname" ng-model="amsT_Id" name="stu" ng-required="!regnonamestd">
+                                            <option value=""> Select Student </option>
+                                            <option ng-repeat="option in studentlst" value="{{option.amsT_Id}}" ng-selected="{{option.Selected == true}}">
+                                                {{option.amsT_FirstName + ' ' + option.amsT_MiddleName + ' ' + option.amsT_LastName}}
+                                            </option>
+                                        </select>
+
+                                        <div class="error-messages" ng-if="interacted(myForm.stu)" ng-messages="myForm.stu.$error">
+                                            <div ng-message="required">Select Student </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="groupterm">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <span class="padding-8">Custom Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong><!--ng-hide="custom_check_flag"-->
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in custom" ng-model="fmgG_Id" value="{{role.fmgG_Id}}" ng-click="get_groups()">
+                                            <input type="checkbox" data-ng-model="role.fmgG_Id_chk1" name="fee_ct1" ng-selected="{{option.Selected == true}}" ng-required="groupterm && is_optionrequired_groupterm_cg()"><!--ng-disabled="custom_check_flag"-->
+                                            <span class="lbl padding-8">
+                                                {{role.fmg_groupname}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_ct1)" ng-messages="myForm.fee_ct1.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group">
+
+                                <div class="col-sm-12">
+
+                                    <label class="control-label">
+                                        <label class="checkbox-inline">
+                                            <span class="lbl padding-8">Fee Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong><!--ng-hide="group_check_flag"-->
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in group" ng-model="fmG_Id" value="{{role.fmG_Id}}" ng-click="binddatagrp3(group)">
+                                            <input type="checkbox" data-ng-model="role.fmG_Id_chk1" name="fee_gp1" ng-selected="{{option.Selected == true}}" ng-required="groupterm && is_optionrequired_groupterm_grp()"><!--ng-disabled="group_check_flag"-->
+                                            <span class="lbl padding-8">
+                                                {{role.fmG_GroupName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_gp1)" ng-messages="myForm.fee_gp1.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" name="All" ng-model="group_check" ng-true-value="1" ng-false-value="0" data-ng-click="load_group_check()" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="term">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+
+                                    <label class="control-label padding-left-10">
+                                        <label class="">
+                                            <span class="">Custom Group</span>
+                                        </label>
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong>
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in custom" ng-model="fmgG_Id" value="{{role.fmgG_Id}}" ng-click="get_groups()">
+                                            <!--ng-click="binddatagrp1(custom)"-->
+                                            <input type="checkbox" data-ng-model="role.fmgG_Id_chk" name="fee_ct" ng-required="term && is_optionrequired_trm_cg()">
+                                            <span class="lbl padding-8">
+                                                {{role.fmg_groupname}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_ct)" ng-messages="myForm.fee_ct.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+
+                                <div class="col-sm-12">
+                                    <!--<input type="checkbox" name="All" ng-model="group_check" ng-true-value="1" ng-false-value="0" data-ng-click="load_group_check()" />-->
+                                    <label class="control-label padding-left-10">
+                                        <span class="">  Fee Group</span>
+
+                                        <strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong>
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <label ng-repeat="role in group" ng-model="fmG_Id" value="{{role.fmG_Id}}" ng-click="binddatagrp3(group)">
+                                            <input type="checkbox" data-ng-model="role.fmG_Id_chk" name="fee_gp" ng-required="term && is_optionrequired_trm_grp()">
+                                            <span class="lbl padding-8">
+                                                {{role.fmG_GroupName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_gp)" ng-messages="myForm.fee_gp.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" name="All" ng-model="group_check" ng-true-value="1" ng-false-value="0" data-ng-click="load_group_check()" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <label class="control-label padding-left-10">
+                                        <span class="padding-8"> Term Name</span><strong style="color:red;display:inline; font-weight : bolder; margin-left: 7px;">*</strong>
+                                    </label>
+                                    <div class="multiselect col-sm-12">
+                                        <input class="form-control" ng-model="checkallhrd1" type="checkbox" ng-change="hrdallcheck1()" />
+                                        <span class="lbl padding-8"> ALL </span>
+                                        <label ng-repeat="role in groupcount" ng-model="fmT_Id" value="{{role.fmT_Id}}" ng-click="binddatagrp2(groupcount)">
+                                            <input type="checkbox" data-ng-model="role.fmT_Id_chk" name="fee_tr" ng-required="term && is_optionrequired_trm_trm()">
+                                            <span class="lbl padding-8">
+                                                {{role.fmT_Name}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.fee_tr)" ng-messages="myForm.fee_tr.$error">
+                                        <div ng-message="required">Select Atleast one Checkbox</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-sm-2">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" ng-model="chequedate" ng-true-value="1" ng-false-value="0" ng-checked="false" data-ng-click="cheque_date()" />
+                                <span class="lbl padding-8">Cheque Date</span>
+                            </label>
+                        </div>
+                        <div class="col-sm-3">
+
+                            <div class="well" ng-init="status='act'">
+                                <div class="text-center">
+                                    <label class="checkbox-inline">
+                                        <input type="radio" value="act" ng-model="status" name="All" required>
+                                        <span class="lbl padding-8">Active</span>
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="radio" value="lft" ng-model="status" name="All" required>
+                                        <span class="lbl padding-8">Left</span>
+                                    </label>
+                                    <div class="error-messages" ng-if="interacted(myForm.All)" ng-messages="myForm.All.$error">
+                                        <div ng-message="required" style="margin-left:20px;">Please Select Status</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">
+                                    From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong>
+                                </label>
+                                <div class="col-sm-3">
+                                    <md-datepicker name="sch_datefrom" id="sch_datefrom1" onkeydown="return false" ng-model="fromdate" placeholder="Enter date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.sch_datefrom)" ng-messages="myForm.sch_datefrom.$error">
+                                        <div ng-message="required">Select Date</div>
+                                        <div ng-message="valid">The entered value is not a date!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-3">
+                                    <md-datepicker name="sch_date" id="sch_date1" onkeydown="return false" ng-model="todate" placeholder="Enter date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.sch_date)" ng-messages="myForm.sch_date.$error">
+                                        <div ng-message="required">Select Date</div>
+                                        <div ng-message="valid">The entered value is not a date!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                    <hr />
+                    <div class="text-center" ng-show="IsHiddenup">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="getreport()">
+                            <i class="fa fa-edit" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="submit" class="md-raised md-warn" ng-click="exportToExcel('#table123')" ng-show="export_flag">
+                            <i class="fa fa-excel" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>
+
+                        <md-button type="submit" class="md-raised md-primary" ng-click="printData(printSectionId);" ng-show="export_flag">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="lower_grid">
+        <div class="box-header with-border">
+            <h3 class="box-title">Grid View</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" style="overflow:scroll;height:250px;">
+            <!--<div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label">
+                        <b> Total Grid Records :</b>
+                        <label class="badge">
+                            {{totcountfirst}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group" ng-if="search!=''">
+                    <label class="control-label">
+                        <b>Total Records Searched : </b>
+                        <label class="badge">
+                            {{filterValue.length}}
+                        </label>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+
+                    </div>
+                </div>
+            </div>-->
+            <!--<div id="month" >
+                               <div >
+                                    <table class="table table-hover table-responsive table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th class="hdTH">
+                                                    <label>
+                                                        <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </th>
+
+                                                <th>
+                                                    <a href="" ng-click="sort('admno')">SLNO</a>
+                                                </th>
+                                                <th><a href="" ng-click="sort('admno')">Adm.No</a> </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('Name')">Student Name</a>
+                                                </th>
+                                                <th>
+                                                    <a href="" ng-click="sort('redate')">ReceiptNo/Date</a>
+                                                </th>
+                                                <th ng-repeat="column in columnsTest"> {{column.monthyear}}</th>
+                                                <th>
+                                                    <a href="" ng-click="sort(Total)">Total</a>
+                                                </th>
+
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="user in filterValue=(students  | filter : search) | orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                                                <td class="text-center  hdTD">
+                                                    <label>
+                                                        <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,$index)">
+                                                        <span class="lbl padding-8"></span>
+                                                    </label>
+                                                </td>
+                                                <td>{{ $index + 1}}</td>
+                                                <td>{{ user.admno}}</td>
+                                                <td>{{ user.Name}}</td>
+                                                <td>{{user.redate}}</td>
+                                                <td ng-repeat="column in columnsTest"> {{user[column.monthyear]}}</td>
+
+                                                <td>{{user.Total}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td><b>Total</b></td>
+                                                <td ng-repeat="column in columnsTest"></td>
+                                                <td ng-if="columnsTest.lenght==count">
+                                                    <b>{{tot}}</b>
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                               </div>
+
+            </div>-->
+
+            <div id="gridind"></div>
+        </div>
+
+        <div id="printSectionId" ng-show="export_table_flag">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+
+            <center> <h4><u>Fee Monthly Collection Report </u></h4></center>
+            <table class="table table-bordered" id="table123">
+                <thead>
+                    <tr>
+                        <th>
+                            SLNO
+                        </th>
+                        <th>Adm.No </th>
+                        <th>
+                            Student Name
+                        </th>
+                        <th>
+                            ReceiptNo/Date
+                        </th>
+                        <th ng-repeat="column in columnsTest"> {{column.monthyear}}</th>
+                        <th>
+                            Total
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr ng-repeat="user in printdatatable | orderBy:sortKey:reversee">
+
+
+                        <td>{{ $index + 1}}</td>
+                        <td>{{ user.AdmNo}}</td>
+                        <td>{{ user.StudentName}}</td>
+                        <td>{{user.ReceiptDetails}}</td>
+                        <td ng-repeat="column in columnsTest"> {{user[column.monthyear]}}</td>
+                        <!--<td ng-repeat="user in students"> {{column.monthyear}}</td>-->
+
+                        <td>{{user.Total}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><b>Total</b></td>
+                        <td ng-repeat="column in columnsTest"></td>
+                        <td ng-if="columnsTest.lenght==count">
+                            <b>{{tot}}</b>
+                        </td>
+
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="16" class="col-sm-12 text-center ">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>

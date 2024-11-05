@@ -1,0 +1,327 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="StuAttRptDropdownList();" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Categorywise Attendance Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="cat" ng-change="setfromdate(asmaY_Id)" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in yearDropdown" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected===true}}">{{option.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.cat)" ng-messages="myForm.cat.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="categoryflag==true">
+                            <label class="control-label col-sm-4">Category:<strong style="color:red;">*</strong></label>
+                            <!--<div class="col-sm-8">
+        <select class="form-control" id="sel1" data-ng-model="objj.amC_Id" name="catg" ng-required="type23==2"
+                ng-disabled="type23==1">
+            <option value="">Select Category</option>
+            <option value="All">All</option>
+            <option ng-repeat="cat in categoryDropdown" value="{{cat.amC_Id}}">{{cat.amC_Name}}</option>
+        </select>
+        <div class="error-messages" ng-if="interacted(myForm.catg)" ng-messages="myForm.catg.$error">
+            <div ng-message="required">Select Category</div>
+        </div>
+    </div>-->
+
+
+                            <label for="sel2" class="control-label col-sm-8">Category : <span style="color:red;">*</span></label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                <label>
+                                    <input name="clsoption" ng-model="obj.usercheckC" type="checkbox" ng-click="al_checkcategory(obj.usercheckC, ASMCL_Id)">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="role in categoryDropdown | filter:searchchkbx1" value="{{amC_Id}}">
+                                    <input type="checkbox" ng-model="role.selected" ng-click="togchkbxC()" ng-required="isOptionsRequiredclass()" name="catg" />
+                                    
+                                    <span class="lbl padding-8">{{role.amC_Name}} </span>
+                                </label>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Select Date:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker name="fdate" onkeydown="return false" ng-model="fromdate" md-placeholder="Enter date" md-min-date="minDatef" md-max-date="maxDatef" required></md-datepicker>
+                                <!--<input type="date"  ng-model="fromdate" class="form-control" />-->
+                                <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                    <div ng-message="required">Select Date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="showReport()" aria-disabled="false">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <md-button type="submit" ng-disabled="catreport" ng-click="exportToExcel('#table')" target="_blank" class="md-raised md-primary">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export
+                        </md-button>
+                        <md-button type="submit" ng-disabled="catreport" class="md-raised md-warn" id="print-btn" aria-disabled="false" ng-click="printData()">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+
+    <div class="box box-primary" ng-show="catreport_grid">
+        <div class="box-header with-border">
+            <h3 class="box-title">Categorywise Attendance Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <table class="table table-hover table-responsive table-bordered text-center" id="table1">
+                <thead>
+                    <tr>
+                        <th class="hdTH" rowspan="2">
+                            <label>
+                                <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th rowspan="2">
+                            SL. No.
+                        </th>
+                        <th rowspan="2">
+
+                            <a href="" ng-click="sortBy('AMC_Name')"> Category Name</a>
+
+                        </th>
+                        <th colspan="3">
+                            Total No. of Students on Roll
+                        </th>
+                        <th colspan="3">
+                            No. of Students Attended
+                        </th>
+                        <th colspan="3">
+                            No. of Students Absentees
+                        </th>
+                    </tr>
+
+                    <tr>
+
+                        <th>
+                            <a href="" ng-click="sortBy('Total_Male')">Total Boys </a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('Total_Female')"> Total  Girls </a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('Total_Male+Total_Female')"> Total Students </a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('Premale')">Boys </a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('PreFemale')">Girls </a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('Premale+PreFemale')">Total Present Students </a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('absmale')"> Boys </a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('absFemale')"> Girls </a>
+
+                        </th>
+                        <th>
+                            <a href="" ng-click="sortBy('absmale+absFemale')"> Total Absent Students </a>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1 = (students | filter :searchValue)|orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td class="text-center  hdTD">
+                            <label>
+                                <input type="checkbox" ng-model="user.selected" value="{{user.Id}}" ng-change="optionToggled(user,itemsPerPage *(currentPage-1)+$index)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                        <td>{{user.AMC_Name}}</td>
+                        <td>{{user.Total_Male}}</td>
+                        <td>{{user.Total_Female}}</td>
+                        <td>{{user.Total_Male+user.Total_Female}}</td>
+
+                        <td>{{user.Premale}}</td>
+                        <td>{{user.PreFemale}}</td>
+
+                        <td>{{user.Premale+user.PreFemale}}</td>
+                        <td>{{user.absmale}}</td>
+                        <td>{{user.absFemale}}</td>
+                        <td>{{user.absmale+user.absFemale}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="4" direction-links="true" boundary-links="true"></dir-pagination-controls>
+        </div>
+
+
+        <!--For Printing and Exporting code-->
+
+        <div ng-show="table_flag" id="print_id">
+            <div class="baldwin text-center">
+                <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+            </div>
+            <div class="form-group">
+                <center>CategoryWise Attendance Report</center>
+            </div>
+          <br/>
+            <br/>
+            <br/>
+            <table class="table table-hover table-responsive table-bordered text-center" id="table">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="text-center">
+                            SL. No.
+                        </th>
+                        <th rowspan="2" class="text-center">
+                            Category Name
+                        </th>
+                        <th colspan="3" class="text-center">
+                            Total No. of Students on Roll
+                        </th>
+                        <th colspan="3" class="text-center">
+                            No. of Students Attended
+                        </th>
+                        <th colspan="3" class="text-center">
+                            No. of Students Absentees
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="text-center">
+                            Total Boys
+                        </th>
+                        <th class="text-center">
+                            Total  Girls
+                        </th>
+                        <th class="text-center">
+                            Total Students
+                        </th>
+                        <th class="text-center">
+                            Boys
+                        </th>
+                        <th class="text-center">
+                            Girls
+                        </th>
+                        <th class="text-center">
+                            Total Present Students
+                        </th>
+                        <th class="text-center">
+                            Boys
+                        </th>
+                        <th class="text-center">
+                            Girls
+                        </th>
+                        <th class="text-center">
+                            Total Absent Students
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in printdatatable|filter:searchValue">
+                        <td>{{$index+1}}</td>
+                        <td>{{user.AMC_Name}}</td>
+                        <td>{{user.Total_Male}}</td>
+                        <td>{{user.Total_Female}}</td>
+                        <td>{{user.Total_Male+user.Total_Female}}</td>
+                        <td>{{user.Premale}}</td>
+                        <td>{{user.PreFemale}}</td>
+                        <td>{{user.Premale+user.PreFemale}}</td>
+                        <td>{{user.absmale}}</td>
+                        <td>{{user.absFemale}}</td>
+                        <td>{{user.absmale+user.absFemale}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="16" class="col-sm-12 text-center ">
+                            <label>
+                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                            </label>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</section>

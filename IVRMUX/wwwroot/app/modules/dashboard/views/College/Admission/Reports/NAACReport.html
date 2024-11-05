@@ -1,0 +1,655 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" ng-init="BindData()" name="myForm" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">NAAC Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="text-center well">
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="NAAC" value="StdAdm" type="radio" ng-click="onselectradio()" required>
+                                <span class="lbl padding-8">No. of Students Admitted(last 4 years)</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="NAAC" value="CatStd" type="radio" ng-click="onselectradio()" required>
+                                <span class="lbl padding-8">Category wise Student profile(last 4 years)</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="NAAC" value="StdEnrol" type="radio" ng-click="onselectradio()" required>
+                                <span class="lbl padding-8">Student Enrollment</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="NAAC" value="ProgOffer" type="radio" ng-click="onselectradio()" required>
+                                <span class="lbl padding-8">Programmes Offered</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="NAAC" value="DeptList" type="radio" ng-click="onselectradio()" required>
+                                <span class="lbl padding-8">List of Department</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input name="optradio" ng-model="NAAC" value="CasteRep" type="radio" ng-click="onselectradio()" required>
+                                <span class="lbl padding-8">Caste wise Report</span>
+                            </label>
+                            <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.optradio)" ng-messages="myForm.optradio.$error">
+                                <div ng-message="required">Select Type</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group" ng-show="NAAC == 'StdAdm' || NAAC == 'CatStd'">
+                            <label for="sel2" class="control-label col-sm-4">Academic Year:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <div class="multiselect col-sm-12">
+                                    <label ng-repeat="std in acdlist">
+                                        <input value="{{std.asmaY_Id}}" data-ng-model="std.Selected" type="checkbox" ng-required="(isOptionsRequired() && NAAC == 'StdAdm') || (isOptionsRequired() && NAAC == 'CatStd')" name="ccoption">
+                                        <span class="lbl padding-8">{{std.asmaY_Year}}</span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.ccoption)" ng-messages="myForm.ccoption.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="NAAC == 'StdEnrol' || NAAC == 'ProgOffer' || NAAC == 'DeptList' || NAAC == 'CasteRep'">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMAY_Id" name="aetacdyr" ng-required="NAAC == 'StdEnrol' || NAAC == 'ProgOffer' || NAAC == 'DeptList' || NAAC == 'CasteRep'">
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="acedmicYear in acdlist" value="{{acedmicYear.asmaY_Id}}" ng-selected="{{acedmicYear.Selected == true}}">
+                                        {{acedmicYear.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.aetacdyr)" ng-messages="myForm.aetacdyr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="NAAC == 'CasteRep'">
+                            <label class="control-label col-sm-4">Course :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel2" name="course" ng-model="AMCO_Id" data-ng-change="onselectCourse(ASMCL_Id,ASMAY_Id,EMCA_Id)" ng-required="NAAC == 'CasteRep'">
+                                    <option value="" label="Select Course"> </option>
+                                    <option ng-repeat="option2 in courselist" value="{{option2.amcO_Id}}" ng-selected="{{option2.Selected == true}}">
+                                        {{option2.amcO_CourseName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.course)" ng-messages="myForm.course.$error">
+                                <div ng-message="required">Select Course</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="onreport()">
+                        <i class="fa fa-save" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-show="print" id="save-btn1" ng-click="onprint()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                    <!--<md-button type="button" class="md-raised md-warn" ng-click="exportToExcel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Excel
+                    </md-button>-->
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="StdAdm">
+            <div class="box-header with-border">
+                <h3 class="box-title">No. of Students Admitted Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="table">
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center" rowspan="2">
+                                    <a href="">Sl No.</a>
+                                </th>
+                                <th style="text-align:center" rowspan="2">
+                                    <a href="">Categories</a>
+                                </th>
+
+                                <th style="text-align:center" colspan="2" ng-repeat="value in column_list">
+                                    {{value.asmaY_Year}}
+                                </th>
+
+                            </tr>
+                            <tr>
+                                <th style="text-align:center" ng-repeat="uh in uharray track by $index">
+                                    {{uh.name}}
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody ng-repeat="std in main_list">
+                            <tr>
+                                <td>{{$index+1}}</td>
+                                <td>{{std.ACQC_CategoryName}}</td>
+                                <td ng-repeat="s in uharray">
+                                    <label ng-if="s.name=='Male' && s.asmaY_Id == std.ASMAY_Id">{{std.Male}}</label>
+                                    <label ng-if="s.name=='Female' && s.asmaY_Id == std.ASMAY_Id">{{std.Female}}</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="" id="tablestdadm" ng-show="StdAdm1">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>Students Admitted Category Academic Year Wise</h4></center>
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center" rowspan="2">
+                                    Sl No.
+                                </th>
+                                <th style="text-align:center" rowspan="2">
+                                    Categories
+                                </th>
+
+                                <th style="text-align:center" colspan="2" ng-repeat="value in column_list">
+                                    {{value.asmaY_Year}}
+                                </th>
+                            </tr>
+                            <tr>
+                                <th style="text-align:center" ng-repeat="uh in uharray track by $index">
+                                    {{uh.name}}
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody ng-repeat="std in main_list">
+                            <tr>
+                                <td>{{$index+1}}</td>
+                                <td class="text-left">{{std.ACQC_CategoryName}}</td>
+                                <td ng-repeat="s in uharray">
+                                    <label ng-if="s.name=='Male' && s.asmaY_Id == std.ASMAY_Id">{{std.Male}}</label>
+                                    <label ng-if="s.name=='Female' && s.asmaY_Id == std.ASMAY_Id">{{std.Female}}</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="box box-primary" ng-show="CatStd">
+            <div class="box-header with-border">
+                <h3 class="box-title">Category wise Student profile</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="table1">
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">
+                                    <a href="">Sl No.</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">Categories</a>
+                                </th>
+                                <th style="text-align:center" ng-repeat="value in column_list">
+                                    {{value.asmaY_Year}}
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody ng-repeat="std in main_list">
+                            <tr>
+                                <td>{{$index+1}}</td>
+                                <td>{{std.ACQC_CategoryName}}</td>
+                                <td ng-repeat="s in column_list">
+                                    <label ng-if="s.asmaY_Id == std.ASMAY_Id">{{std.No_of_Seats}}</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="" id="tablestdcatstd" ng-show="CatStd1">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>Students Profile Category Academic Year Wise</h4></center>
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">
+                                    Sl No.
+                                </th>
+                                <th style="text-align:center">
+                                    Categories
+                                </th>
+                                <th style="text-align:center" ng-repeat="value in column_list">
+                                    {{value.asmaY_Year}}
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody ng-repeat="std in main_list">
+                            <tr>
+                                <td>{{$index+1}}</td>
+                                <td class="text-left">{{std.ACQC_CategoryName}}</td>
+                                <td ng-repeat="s in column_list">
+                                    <label ng-if="s.asmaY_Id == std.ASMAY_Id">{{std.No_of_Seats}}</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="StdEnrol">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Enrollment</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="table1">
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">
+                                    Sl.No
+                                </th>
+                                <th style="text-align:center">
+                                    Type of Students
+                                </th>
+                                <th style="text-align:center" ng-repeat="value in column_list">
+                                    {{value.amcoC_Name}}
+                                </th>
+                                <th style="text-align:center">
+                                    Total
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="std1 in main_list">
+                                <td>{{$index+1}}</td>
+                                <td>{{std1.ACQ_QuotaName}}</td>
+                                <td ng-repeat="column in column_list">
+                                    {{std1[column.amcoC_Name]}}
+                                </td>
+                                <td><b>{{std1.total}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="" id="tablestdStdEnrol1" ng-show="StdEnrol1">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>Student Enrollment Report</h4></center>
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">
+                                    Sl.No
+                                </th>
+                                <th style="text-align:center">
+                                    Type of Students
+                                </th>
+                                <th style="text-align:center" ng-repeat="value in column_list">
+                                    {{value.amcoC_Name}}
+                                </th>
+                                <th style="text-align:center">
+                                    Total
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="std1 in main_list">
+                                <td>{{$index+1}}</td>
+                                <td class="text-left">{{std1.ACQ_QuotaName}}</td>
+                                <td ng-repeat="column in column_list">
+                                    {{std1[column.amcoC_Name]}}
+                                </td>
+                                <td><b>{{std1.total}}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="box box-primary" ng-show="ProgOffer">
+            <div class="box-header with-border">
+                <h3 class="box-title">Programmes Offered</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="table1">
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">
+                                    <a href="">Sl No.</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">Programme Level</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">Name of the Programme/Course</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">Duration</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">Medium of instruction</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">Sanctioned/Approved/Student</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">No.of Students Admitted</a>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody ng-repeat="std in main_list">
+                            <tr>
+                                <td>{{$index+1}}</td>
+                                <td class="text-left">{{std.catgory}}</td>
+                                <td class="text-left">{{std.coursename}}</td>
+                                <td>{{std.duration}}</td>
+                                <td>{{std.medium}}</td>
+                                <td>{{std.noofseatsan}}</td>
+                                <td>{{std.alloted}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="" id="tablestdProgOffer" ng-show="ProgOffer1">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>Programs Offered Report</h4></center>
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">
+                                    Sl No.
+                                </th>
+                                <th style="text-align:center">
+                                    Programme Level
+                                </th>
+                                <th style="text-align:center">
+                                    Name of the Programme/Course
+                                </th>
+                                <th style="text-align:center">
+                                    Duration
+                                </th>
+                                <th style="text-align:center">
+                                    Medium of instruction
+                                </th>
+                                <th style="text-align:center">
+                                    Sanctioned/Approved/Student
+                                </th>
+                                <th style="text-align:center">
+                                    No.of Students Admitted
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody ng-repeat="std in main_list">
+                            <tr>
+                                <td>{{$index+1}}</td>
+                                <td class="text-left">{{std.catgory}}</td>
+                                <td class="text-left">{{std.coursename}}</td>
+                                <td>{{std.duration}}</td>
+                                <td>{{std.medium}}</td>
+                                <td>{{std.noofseatsan}}</td>
+                                <td>{{std.alloted}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-show="DeptList">
+            <div class="box-header with-border">
+                <h3 class="box-title">List of Department</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" id="table1">
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">
+                                    Sl.No
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">Faculty</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">Departments</a>
+                                </th>
+                                <th style="text-align:center">
+                                    <a href="">No. of Departments</a>
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody ng-repeat="std in main_list">
+                            <tr>
+                                <td>{{$index+1}}</td>
+                                <td>{{std.amcO_CourseName}}</td>
+                                <td>{{std.branchname}}</td>
+                                <td>{{std.no_of_dept}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="" id="tablestddept" ng-show="DeptList1">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>List Of Department Report</h4></center>
+                <div style="padding-bottom:50px;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">
+                                    Sl.No
+                                </th>
+                                <th style="text-align:center">
+                                    Faculty
+                                </th>
+                                <th style="text-align:center">
+                                    Departments
+                                </th>
+                                <th style="text-align:center">
+                                    No. of Departments
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody ng-repeat="std in main_list">
+                            <tr>
+                                <td>{{$index+1}}</td>
+                                <td>{{std.amcO_CourseName}}</td>
+                                <td>{{std.branchname}}</td>
+                                <td>{{std.no_of_dept}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="CasteRep">
+            <div class="box-header with-border">
+                <h3 class="box-title">Caste Wise Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center" rowspan="2">
+                                Sl No.
+                            </th>
+                            <th style="text-align:center" rowspan="2">
+                                Religion
+                            </th>
+                            <th style="text-align:center" rowspan="2">
+                                Categories
+                            </th>
+
+                            <th style="text-align:center" colspan="3" ng-repeat="value in semester">
+                                {{value.amsE_Year}}
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align:center" ng-repeat="uh in uharraycw track by $index">
+                                {{uh.name}}
+                            </th>
+                        </tr>
+
+
+                    </thead>
+
+                    <tbody ng-repeat="std in temparry">
+
+                        <tr>
+                            <td rowspan="{{std.categary.length+1}}">{{$index+1}}</td>
+                            <td rowspan="{{std.categary.length+1}}">{{std.relign}}</td>
+
+                            <!--<td>{{std.no_of_dept}}</td>-->
+                        </tr>
+                        <tr ng-repeat="std1 in std.catlst">
+
+                            <td>{{std1.categrynm}}</td>
+
+                            <td ng-repeat="qw in std1.qttp track by $index" ng-if="qw>=0">
+                                {{qw}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="" id="tablestdProgOffercaste" ng-show="CasteRep1">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <center><h4>Caste Wise Report</h4></center>
+                <div style="padding-bottom:50px;" id="tablestdProgOffercaste1">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center" rowspan="2">
+                                    Sl No.
+                                </th>
+                                <th style="text-align:center" rowspan="2">
+                                    Religion
+                                </th>
+                                <th style="text-align:center" rowspan="2">
+                                    Categories
+                                </th>
+
+                                <th style="text-align:center" colspan="3" ng-repeat="value in semester">
+                                    {{value.amsE_Year}}
+                                </th>
+                            </tr>
+                            <tr>
+                                <th style="text-align:center" ng-repeat="uh in uharraycw track by $index">
+                                    {{uh.name}}
+                                </th>
+                            </tr>
+
+
+                        </thead>
+
+                        <tbody ng-repeat="std in temparry">
+
+                            <tr>
+                                <td rowspan="{{std.categary.length+1}}">{{$index+1}}</td>
+                                <td rowspan="{{std.categary.length+1}}">{{std.relign}}</td>
+
+                                <!--<td>{{std.no_of_dept}}</td>-->
+                            </tr>
+                            <tr ng-repeat="std1 in std.catlst">
+
+                                <td>{{std1.categrynm}}</td>
+
+                                <td ng-repeat="qw in std1.qttp track by $index" ng-if="qw>=0">
+                                    {{qw}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </form>
+</section>

@@ -1,0 +1,504 @@
+
+<section class="content" data-ng-init="details()">
+
+    <div>
+        <div class="box box-primary">
+            <div class="text-right">
+                <md-button type="button" class="md-raised md-primary pull-left" id="save-btn" ng-click="Previous()">
+                    <i class="fa fa-chevron-circle-left" aria-hidden="true"></i>
+                    Previous
+                </md-button>
+                <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="Next()">
+                    Next
+                    <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                </md-button>
+                <md-button type="button" class="md-raised md-warn"
+                           ng-click="Finish()">
+                    Finish
+                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                </md-button>
+            </div>
+        </div>
+    </div>
+    <form class="form-horizontal" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Master Institution Role and Module Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" ng-click="ShowHide1()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body" ng-show="IsHidden1">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Institution Name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="institute" ng-model="MI_Id" required ng-change="onchangeInstitute()">
+                                    <option value="">Select Institute</option>
+                                    <option ng-repeat="option in institutionDropDown" value="{{option.mI_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.mI_Name}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.institute)" ng-messages="myForm.institute.$error">
+                                    <div ng-message="required">Select institute</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Module:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="module" required ng-model="IVRMM_Id" ng-change="getpagesname(IVRMM_Id)">
+                                    <option value="">Select Module</option>
+                                    <option ng-repeat="option in moduleDropDown" value="{{option.ivrmM_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.ivrmM_ModuleName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.module)" ng-messages="myForm.module.$error">
+                                    <div ng-message="required">Select module</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Role name:<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="roleid" ng-model="IVRMRT_Id" required ng-change="getPagedetailsRoleType(IVRMRT_Id)">
+                                    <option value="">Select Role name</option>
+                                    <option ng-repeat="option in roleDropDown" value="{{option.ivrmrT_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.ivrmrT_Role}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.roleid)" ng-messages="myForm.roleid.$error">
+                                    <div ng-message="required">Select Role name</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Page gridview1-->
+    </form>
+    <div class="box box-primary" ng-show="pagelist.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Page List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" ng-click="ShowHide2()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" ng-show="IsHidden2">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </div>
+                            <input class="form-control" ng-model="searchPage" type="text" placeholder="search here..">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">SL.NO</th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sortPage('ivrmmP_PageName')">Page Name</a>
+                        </th>
+                        <th style="text-align:center">Add/Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in pagelist |orderBy:sortKey:reverse1 |filter:searchPage |itemsPerPage:itemsPerPage1" pagination-id="page1" current-page="currentPage1" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                        <td>{{ user.ivrmmP_PageName}}</td>
+                        <td hidden="hidden">{{ user.ivrmP_Id}}</td>
+                        <td class="text-center">
+                            <span class="lbl padding-8"></span>
+                            <input type="checkbox" id="check-{{user.ivrmP_Id}}" ng-model="user.checked" ng-click="addtocart(user,secondgrid,itemsPerPage1 *(currentPage1-1)+$index)" data-placement="bottom" data-toggle="tooltip" title="Add Cart" ng-disabled="pagedata">
+                            <span class="lbl padding-8"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5" pagination-id="page1"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+    <!--<div class="box box-primary" ng-show="privilegesList.length>0">
+       
+        <div class="box-header with-border">
+            <h3 class="box-title">Master Page Role Privilege List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" ng-click="ShowHide3()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+    
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </div>
+                            <input class="form-control" ng-model="searchPrevilege" type="text" placeholder="search here..">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th style="text-align:center"><a href="" ng-click="order('sno')">SL.NO</a></th>
+                        <th style="text-align:center">
+                            <label>
+                                <input type="checkbox" ng-model="selectedAll" ng-click="checkAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th style="text-align:center"><a href="" ng-click="sortMasterPrevilege('ivrmmP_PageName')">Page Name</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sortMasterPrevilege('ivrmrP_AddFlag')">Add</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortMasterPrevilege('ivrmrP_DeleteFlag')">Delete</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortMasterPrevilege('ivrmrP_UpdateFlag')">Update</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sortMasterPrevilege('ivrmrP_ProcessFlag')">Process</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sortMasterPrevilege('ivrmrP_ReportFlag')">Report</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sortMasterPrevilege('ivrmrP_SearchFlag')">Search</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="privilege in privilegesList |orderBy:sortKey:reverse2 |filter:searchPrevilege|itemsPerPage:itemsPerPage2" pagination-id="page2" current-page="currentPage2" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage2 *(currentPage2-1)+$index+1}}</td>
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="privilege.Selected" ng-change="test(privilege)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td>{{privilege.ivrmmP_PageName}}</td>
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="privilege.ivrmrP_AddFlag" value="{{privilege.ivrmrP_AddFlag}}">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="privilege.ivrmrP_DeleteFlag" value="{{privilege.ivrmrP_DeleteFlag}}">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="privilege.ivrmrP_UpdateFlag" value="{{privilege.ivrmrP_UpdateFlag}}">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="privilege.ivrmrP_ProcessFlag" value="{{privilege.ivrmrP_ProcessFlag}}">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="privilege.ivrmrP_ReportFlag" value="{{privilege.ivrmrP_ReportFlag}}">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" ng-model="privilege.ivrmrP_SearchFlag" value="{{privilege.ivrmrP_SearchFlag}}">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5" pagination-id="page2"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>-->
+
+    <div class="box box-primary" ng-show="secondgrid.length>0">
+        <!--<div class="box box-primary" ng-show="gridview2">-->
+        <div class="box-header with-border">
+
+            <h3 class="box-title">SELECTED INSTITUTE ROLE</h3>
+
+
+            <div class="box-tools pull-right">
+                <button type="button" ng-click="ShowHide4()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" ng-show="IsHidden4">
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">SL.NO</th>
+                        <th style="text-align:center"><a href="" ng-click="sortSelectedRecord('ivrmmP_PageName')">Page Name</a></th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sortSelectedRecord('ivrmrP_AddFlag')">Add </a><label>
+                                <input name="option[]" value="1" type="checkbox" ng-model="Addsaveall2" ng-click="Toggle_Addsave()">
+                                <span class="lbl padding-10"></span>
+                            </label>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sortSelectedRecord('ivrmrP_DeleteFlag')">Delete</a> <label>
+                                <input name="option[]" value="8" type="checkbox" ng-model="Deletesaveall2" ng-click="Toggle_Deletesave()">
+                                <span class="lbl padding-12"></span>
+                            </label>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sortSelectedRecord('ivrmrP_UpdateFlag')">Update</a>
+                            <label>
+                                <input name="option[]" value="9" type="checkbox" ng-model="Updatesaveall2" ng-click="Toggle_Updatesave()">
+                                <span class="lbl padding-12"></span>
+                            </label>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sortSelectedRecord('ivrmrP_ProcessFlag')">Process</a>
+                            <label>
+                                <input name="option[]" value="10" type="checkbox" ng-model="Processsaveall2" ng-click="Toggle_Processsave()">
+                                <span class="lbl padding-12"></span>
+                            </label>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sortSelectedRecord('ivrmrP_ReportFlag')">Report</a>
+                            <label>
+                                <input name="option[]" value="11" type="checkbox" ng-model="Reportsaveall2" ng-click="Toggle_Reportsave()">
+                                <span class="lbl padding-12"></span>
+                            </label>
+                        </th>
+                        <th style="text-align:center">
+                            <a href="" ng-click="sortSelectedRecord('ivrmrP_SearchFlag')">Search</a>
+                            <label>
+                                <input name="option[]" value="11" type="checkbox" ng-model="Searchaveall2" ng-click="Toggle_Searchsave()">
+                                <span class="lbl padding-12"></span>
+                            </label>
+                        </th>
+                        <!--<th>Action</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in secondgrid |orderBy:sortKey:revers3 | itemsPerPage: itemsPerPage3" pagination-id="page3" current-page="currentPage3" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage3 *(currentPage3-1)+$index+1}}</td>
+                        <td>{{user.ivrmmP_PageName}}</td>
+                        <td><input type="checkbox" ng-model="user.ivrmrP_AddFlag" value="{{user.ivrmrP_AddFlag}}" ng-click="Toggle_addsavegrd()"> <span class="lbl padding-8"></span> </td>
+                        <td><input type="checkbox" ng-model="user.ivrmrP_DeleteFlag" value="{{user.ivrmrP_DeleteFlag}}" ng-click="Toggle_Deletesavegrd()"> <span class="lbl padding-8"></span> </td>
+                        <td><input type="checkbox" ng-model="user.ivrmrP_UpdateFlag" value="{{user.ivrmrP_UpdateFlag}}" ng-click="Toggle_Updatesavegrd()"> <span class="lbl padding-8"></span> </td>
+                        <td><input type="checkbox" ng-model="user.ivrmrP_ProcessFlag" value="{{user.ivrmrP_ProcessFlag}}" ng-click="Toggle_Processsavegrd()"> <span class="lbl padding-8"></span> </td>
+                        <td><input type="checkbox" ng-model="user.ivrmrP_ReportFlag" value="{{user.ivrmrP_ReportFlag}}" ng-click="Toggle_Reportsavegrd()"> <span class="lbl padding-8"></span> </td>
+                        <td><input type="checkbox" ng-model="user.ivrmrP_SearchFlag" value="{{user.ivrmrP_SearchFlag}}" ng-click="Toggle_Searchsavegrd()"> <span class="lbl padding-8"></span> </td>
+                        <!--<td class="text-center">
+                            <a href="javascript:void(0)" ng-click="deletesecondgriddata(itemsPerPage3 *(currentPage3-1)+$index+1,user,this)"
+                               class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Remove">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                Remove
+                            </a>
+                        </td>-->
+
+                        <td hidden="hidden">{{ user.ivrmrT_Id}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls pagination-id="page3" max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+
+            <hr />
+            <div class="">
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savadata(secondgrid)" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+
+                    <md-button type="submit" class="md-raised md-warn" data-ng-click="cleardata()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="box box-primary" ng-show="institutionRolePrivilegesList.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Search list</h3>
+            <div class="box-tools pull-right">
+                <button type="button" ng-click="ShowHide5()" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" ng-show="IsHidden5">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </div>
+                            <input class="form-control" ng-model="searchList" type="text" placeholder="search here..">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+
+                            <label>
+                                <input name="option[]" value="" type="checkbox" ng-model="alll" ng-click="toggleAllmaster()">
+                                <span class="lbl padding-12">Remove</span>
+                            </label>
+                        </th>
+                        <th style="text-align:center">SL.NO</th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('mI_Name')">Institution Name</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmM_ModuleName')">Module</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmmP_PageName')">Page Name</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmrT_Role')">Role Name</a> </th>
+
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_AddFlag')">Add</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_DeleteFlag')">Delete</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_UpdateFlag')">Update</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_ProcessFlag')">Process</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_ReportFlag')">Report</a> </th>
+                        <th style="text-align:center"> <a href="" ng-click="sortList('ivrmirP_SearchFlag')">Search</a> </th>
+                        <!--<th style="text-align:center">Action</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue1master = (  institutionRolePrivilegesList |filter:searchList) |orderBy:sortKey:reverse4 |filter:searchList |itemsPerPage:itemsPerPage4" pagination-id="page4" current-page="currentPage4" ng-class-odd="'odd'">
+                        <!--<tr ng-repeat="user in institutionRolePrivilegesList">-->
+                        <td class="text-center">
+                            <label>
+                                <input type="checkbox" id="check-{{user.ivrmirP_Id}}" ng-model="user.checked" ng-click="addtocartdelete(user,itemsPerPage4*(currentPage4-1)+$index)" data-placement="bottom" data-toggle="tooltip" title="Add Cart">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td>{{itemsPerPage4 *(currentPage4-1)+$index+1}}</td>
+                        <td>{{user.mI_Name}}</td>
+                        <td>{{user.ivrmM_ModuleName}}</td>
+                        <td>{{user.ivrmmP_PageName}}</td>
+                        <td>{{user.ivrmrT_Role}}</td>
+
+                        <td>{{user.ivrmirP_AddFlag}}</td>
+                        <td>{{user.ivrmirP_DeleteFlag}}</td>
+                        <td>{{user.ivrmirP_UpdateFlag}}</td>
+                        <td>{{user.ivrmirP_ProcessFlag}}</td>
+                        <td>{{user.ivrmirP_ReportFlag}}</td>
+                        <td>{{user.ivrmirP_SearchFlag}}</td>
+                        <!--<td class="text-center">
+                            <a href="javascript:void(0)" ng-click="edit(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+
+                            </a> 
+                            <a href="javascript:void(0)" ng-click="delete(user.ivrmirP_Id)"
+                               class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+
+                            </a>
+                        </td>-->
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls pagination-id="page4" max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+    <!---deltesavedgrid----->
+    <!--gridview2-->
+    <div class="box box-primary" ng-show="showdelete">
+        <div class="box-header with-border">
+            <h3 class="box-title">Deleting Saved Pages</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-3 col-sm-offset-9">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <input class="form-control" ng-model="search5" type="text" placeholder="search here..">
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">SL.NO</th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('mI_Name')">Institution Name</a></th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmM_ModuleName')">Module</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmmP_PageName')">Page Name</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmrT_Role')">Role Name</a> </th>
+
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_AddFlag')">Add</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_DeleteFlag')">Delete</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_UpdateFlag')">Update</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_ProcessFlag')">Process</a> </th>
+                        <th style="text-align:center"><a href="" ng-click="sortList('ivrmirP_ReportFlag')">Report</a> </th>
+                        <th style="text-align:center"> <a href="" ng-click="sortList('ivrmirP_SearchFlag')">Search</a> </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr dir-paginate="user in deletegrid |orderBy:sortKey:reverse5 |filter:search5 |itemsPerPage:itemsPerPage5" current-page="currentPage5" pagination-id="page5">
+                        <td>{{itemsPerPage5 *(currentPage5-1)+$index+1}}</td>
+                        <td>{{user.mI_Name}}</td>
+                        <td>{{user.ivrmM_ModuleName}}</td>
+                        <td>{{user.ivrmmP_PageName}}</td>
+                        <td>{{user.ivrmrT_Role}}</td>
+
+                        <td>{{user.ivrmirP_AddFlag}}</td>
+                        <td>{{user.ivrmirP_DeleteFlag}}</td>
+                        <td>{{user.ivrmirP_UpdateFlag}}</td>
+                        <td>{{user.ivrmirP_ProcessFlag}}</td>
+                        <td>{{user.ivrmirP_ReportFlag}}</td>
+                        <td>{{user.ivrmirP_SearchFlag}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <dir-pagination-controls max-size="5" pagination-id="page5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+            <hr />
+            <div class="text-center">
+                <span>
+                    <md-button type="submit" class="md-raised md-primary" data-ng-click="deletedata(deletegrid)" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Delete
+                    </md-button>
+                </span>
+                <md-button type="button" class="md-raised md-warn" ng-click="clearForm()" id="Clear-btn">
+                    <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+
+            </div>
+        </div>
+    </div>
+
+</section>

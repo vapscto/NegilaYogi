@@ -1,0 +1,242 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="loaddata()" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Year Loss Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="text-center well" ng-init="TC_allorind='all'">
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="TC_allorind" name="sylallind" value="all" ng-click="onclickloaddata()" required>
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" ng-model="TC_allorind" name="sylallind" value="indi" ng-click="onclickloaddata()" required>
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                            <div class="error-messages" ng-if="interacted(myForm.sylallind)" ng-messages="myForm.sylallind.$error">
+                                <div ng-message="required">Select All/Individual.</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" data-ng-model="ASMAY" name="sylacdyr" required>
+                                    <option value="">Select</option>
+                                    <option ng-repeat="options in yearlst" value="{{options.asmaY_Id}}" ng-selected="{{option.Selected == true}}">{{options.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sylacdyr)" ng-messages="myForm.sylacdyr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Class:<strong style="color:red;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="selxx1" data-ng-model="ASMCL" name="sylcls" ng-required="TC_allorind=='indi'"
+                                        ng-disabled="TC_allorind!='indi'">
+                                    <option value="">Select</option>
+                                    <option ng-repeat="options in arrclasslist" value="{{options.asmcL_Id}}" ng-selected="{{options.Selected == true}}">{{options.asmcL_ClassName}}</option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.sylcls)" ng-messages="myForm.sylcls.$error">
+                                <div ng-message="required" style="color:red">Select Class</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">
+                                Section:<strong style="color:red;">*</strong>
+                            </label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="szXel1" name="sylsec" data-ng-model="ASMC" ng-required="TC_allorind=='indi'"
+                                        ng-disabled="TC_allorind!='indi'">
+                                    <option value="">Select</option>
+                                    <option ng-repeat="options in arrseclist" value="{{options.asmS_Id}}" ng-selected="{{options.Selected == true}}">{{options.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.sylsec)" ng-messages="myForm.sylsec.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="well text-center">
+                            <div class="radio-inline" ng-init="format='0'">
+                                <label>
+                                    <input type="radio" ng-model="format" value="0" ng-change="Onchagneformat()">
+                                    <span class="lbl padding-8">Table Format</span>
+                                </label>
+                                <label>
+                                    <input type="radio" ng-model="format" value="1" ng-change="Onchagneformat()">
+                                    <span class="lbl padding-8">Kendo Format</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="">
+                        <div class="col-sm-6">
+                            <label class="col-sm-6">
+                                <input name="option[]" value="1" type="checkbox" ng-model="all" ng-click="Toggle_header()">
+                                <span class="lbl padding-12">Select All</span>
+                            </label>
+                            <div class="multiselect col-sm-12">
+                                <label ng-repeat="role in headertest">                                    
+                                    <input type="checkbox" value="{{role.id}}" ng-model="role.selected" name="sylmulsel" ng-required="isOptionsRequired()" ng-click="addColumn(role)" required>
+                                    <span class="lbl padding-8">{{role.value}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages col-sm-12" ng-if="interacted(myForm.sylmulsel)" ng-messages="myForm.sylmulsel.$error">
+                                <div ng-message="required">Select atleast one checkbox</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" 
+                                   ng-click="ShowReport(TC_allorind,tctemporperm,headertest)">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-disabled="print_flag" id="print-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="excel_flag" id="excel-btn" aria-disabled="false" ng-click="exportToExcel('#table')">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Excel
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="Clear_Details();">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="gridflag">
+        <div class="box-header with-border">
+            <h3 class="box-title">STUDENT YEAR LOSS REPORT</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body" ng-show="format=='0'">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group" ng-if="searchValue!=''">
+                        <label class="control-label">
+                            <b>Total Records Searched : </b>
+                            <label class="badge">
+                                {{filterValue1.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix" style="overflow:scroll">
+                <table class="table table-hover table-responsive table-bordered text-center" id="tabel1">
+                    <thead style="font-weight: bold;">
+                        <tr>
+                            <th class="hdTH">
+                                <label>
+                                    <input type="checkbox" value="" ng-model="all2" ng-click="toggleAll()">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>SL. No.</th>
+                            <th ng-click="order(column.columnID)" class="text-right" ng-repeat="column in columnsTest"> {{column.columnName}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="row in filterValue1 = (students | filter :searchValue)|orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                            <td class="text-center  hdTD">
+                                <label>
+                                    <input type="checkbox" ng-model="row.selected" value="{{row.columnID}}" ng-change="optionToggled(row,itemsPerPage *(currentPage-1)+$index)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </td>
+                            <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td ng-repeat="column in columnsTest">
+                                {{row[column.columnID]}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <dir-pagination-controls max-size="4" direction-links="true" boundary-links="true"></dir-pagination-controls>
+        </div>
+
+
+        <div class="box-body" ng-show="format=='1'">
+            <div id="gridlst"></div>
+        </div>        
+    </div>
+</section>
+
+<div id="printSectionId" ng-show="print_data">
+    <div class="baldwin text-center">
+        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+    </div>
+    <center> <h4>Student Year Loss Report</h4></center>
+    <br />
+    <table class="table table-hover table-responsive table-bordered" id="table" ng-show="table_flag">
+        <thead style="font-weight: bold;">
+            <tr>
+                <th>SL. No.</th>
+                <th class="text-right" ng-repeat="column in columnsTest">
+                    {{column.columnName}}
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in printdatatable|filter:searchValue">
+                <td style="text-align:center">{{$index+1}}</td>
+                <td style="text-align:left ; word-wrap:break-word" ng-repeat="column in columnsTest">
+                    {{row[column.columnID]}}
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="16" class="col-sm-12 text-center ">
+                    <label>
+                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                    </label>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

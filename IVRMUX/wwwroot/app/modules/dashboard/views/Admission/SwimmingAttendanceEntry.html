@@ -1,0 +1,170 @@
+﻿
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Swimming Attendance Entry</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" data-ng-model="att.asmaY_Id" name="aeacdyr" required ng-change="onchnageyear()">
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="academicyear in academicYearList" value="{{academicyear.asmaY_Id}}" ng-selected="{{academicyear.Selected == true}}">{{academicyear.asmaY_Year}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.aeacdyr)" ng-messages="myForm.aeacdyr.$error || myForm.aeacdyr.$dirty">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" data-ng-model="att.asmcL_Id" name="aeclass" ng-change="onchangeclass()" required>
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="class in classList" value="{{class.asmcL_Id}}">{{class.asmcL_ClassName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.aeclass)" ng-messages="myForm.aeclass.$error || myForm.aeclass.$dirty">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" data-ng-model="att.asmS_Id" name="aesec" ng-change="getStudent()" required>
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="section in sectionList" value="{{section.asmS_Id}}">{{section.asmC_SectionName}}</option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.aesec)" ng-messages="myForm.aesec.$error || myForm.aesec.$dirty">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">DOE:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <md-datepicker ng-model="att.ASSC_AttendanceDate" onkeypress="return false" name="aedoe"
+                                               md-placeholder="Enter Date" md-date-filter="onlyWeekendsPredicate" md-min-date="minDatedof"
+                                               md-max-date="maxDatedof" required>
+                                </md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.aedoe)" ng-messages="myForm.aedoe.$error || myForm.aedoe.$dirty">
+                                    <div ng-message="required">Select DOE</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <div class="form-group">
+                            <md-button type="button" class="md-raised md-primary" ng-click="search(att);">
+                                <i class="fa fa-search" aria-hidden="true"></i>Search
+                            </md-button>
+
+                            <md-button type="button" class="md-raised md-warn" ng-click="clearData();">
+                                <i class="fa fa-times" aria-hidden="true"></i>Cancel
+                            </md-button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <form name="newform" novalidate>
+        <div class="box box-primary" ng-show="studentgrid">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group pull-right">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SL. NO.</th>
+                                <th><a href="" ng-click="sortBy('studentname')">Student Name</a> </th>
+                                <th ng-show="showadmno"><a href="" ng-click="sortBy('amsT_AdmNo')">Admission No.</a> </th>
+                                <th ng-show="showregno"><a href="" ng-click="sortBy('amsT_RegistrationNo')">Registration No.</a> </th>
+                                <th ng-show="showrollno"><a href="" ng-click="sortBy('amaY_RollNo')">Roll No.</a> </th>
+                                <th><a href="">Days</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in studentlist|filter:filterValue|itemsPerPage:itemsPerPage |orderBy:sortKey:sortReverse"
+                                current-page="currentPage" ng-class-odd="'odd'">
+                                <td class="text-center">{{$index+1}}</td>
+                                <td class="text-left">{{ user.studentname}}</td>
+                                <td class="text-center" ng-show="showadmno">{{ user.amsT_AdmNo}}</td>
+                                <td class="text-center" ng-show="showregno">{{user.amsT_RegistrationNo}}</td>
+                                <td class="text-center" ng-show="showrollno">{{ user.amaY_RollNo}}</td>
+                                <td class="text-center">
+                                    <label>
+                                        <input class="text-center" type="text" data-ng-model="user.ALSSC_AttendanceCount" name="t1_{{user.AMST_Id}}"
+                                               allow-pattern="[0-9.]" ng-pattern="/^[0-9]+(\.[0,5]{2})?$/" maxlength="4"
+                                               ng-required="user" ng-blur="addtopdays(user)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                    <div class="error-messages"ng-if="interacted1(newform['t1_'+user.AMST_Id])" ng-messages="newform['t1_'+user.AMST_Id].$error">
+                                        <div ng-message="pattern">Please Enter valid input format e.g., 15.5, 10.5,10</div>
+                                        <div ng-message="required">Please Enter No. Of Days Present</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true" on-page-change="pageChanged(newPageNumber)">
+                </dir-pagination-controls>
+                <hr />
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-click="save(att);">
+                        <!--ng-if="userPrivileges.ivrmirP_AddFlag===true && update==0" ng-disabled="SaveDis"-->
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" ng-click="save(att);" ng-if="userPrivileges.ivrmirP_UpdateFlag===true  && update!=0" ng-disabled="SaveDis">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>Update
+                    </md-button>
+
+                    <!--<md-button type="button" class="md-raised md-primary" ng-click="Deleteattendance(att);" ng-if="userPrivileges.ivrmirP_DeleteFlag===true  && update!=0" ng-disabled="SaveDis">
+                        <i class="fa fa-trash" aria-hidden="true"></i>Delete
+                    </md-button>-->
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

@@ -1,0 +1,963 @@
+﻿
+<div data-ng-init="loaddata()">
+    <section class="content">
+        <form class="form-horizontal" role="form" data-ng-submit="savedata(students)" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">FEE REFUNDABLE</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="academicyear" data-ng-model="cfg.ASMAY_Id" ng-disabled="false" ng-change="changeacademicyear()" required>
+                                        <option value="">--Select-- </option>
+                                        <option ng-repeat="option in yearlst" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == cfg.ASMAY_Id}}">
+                                            {{option.asmaY_Year}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.academicyear)" ng-messages="myForm.academicyear.$error">
+                                        <div ng-message="required">Select Academic Year </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Class:<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="clsname" ng-model="ASMCL_Id" ng-change="GetSection()" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in classlst" value="{{option.asmcL_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.clsname)" ng-messages="myForm.clsname.$error">
+                                        <div ng-message="required">Select Class </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="seluse1" data-ng-model="sectiondrp" name="stu_Section" ng-change="GetStudent()" required>
+                                        <option value="" label="Select Section"> </option>
+                                        <option ng-repeat="option1 in sectiondrpre" value="{{option1.asmS_Id}}" ng-selected="{{option1.Selected == true}}">
+                                            {{option1.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.stu_Section)" ng-messages="myForm.stu_Section.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Section</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Student Name :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="studentname" ng-model="Amst_Id" ng-change="GetStudentListByamst()" required>
+                                        <option value="">--Select-- </option>
+                                        <option ng-repeat="option in studentlst" value="{{option.amst_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.amsT_FirstName==null?'':option.amsT_FirstName}}
+                                            {{option.amsT_MiddleName==null?'':' '+option.amsT_MiddleName}}
+                                            {{option.amsT_LastName==null?'':' '+option.amsT_LastName}}
+                                        </option>
+                                    </select>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.studentname)" ng-messages="myForm.studentname.$error">
+                                        <div ng-message="required">Select Student name </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <div class="well" ng-show="studentviewdetails.length>0">
+                                        <label class="checkbox-inline" style="color:darkgreen; font-size:larger;" data-ng-model="details" data-toggle="modal" data-target="#myModaldetails">
+                                            <span class="lbl padding-8">View Fee Details</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <div class="well" ng-show="studentviewdetails.length>0">
+                                        <label style="color:darkgreen; font-size:larger;">
+                                            Instant Refund
+                                            <input name="option3[]" value="1" type="checkbox" ng-model="instantrefund">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                        <label style="color:darkgreen; font-size:small;">For Instant refund Extra charges are applicable</label>
+                                        <label class="checkbox-inline pull-right" style="color:darkgreen; font-size:larger;font-weight:500;" data-ng-model="details" data-toggle="modal" data-target="#myModaldetailspayment">
+                                            <span class="lbl padding-8"><b>View Charges</b></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="well">
+                                <label class="radio-inline col-sm-6">
+                                    <input type="radio" name="" value="Refunable" data-ng-model="filterdata1" data-ng-click="GetStudentListByamst()">
+                                    <span class="lbl padding-8">Refundable</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="filter" value="NonRefunable" data-ng-model="filterdata1" data-ng-click="GetStudentListByamst()">
+                                    <span class="lbl padding-8">Non Refundable</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Fee Group :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="multiselect col-sm-8" style="height:7em;">
+                                        <label data-ng-model="FMG_Id" ng-repeat="roleG in grouplst">
+                                            <input type="checkbox" ng-model="roleG.selected" value="{{roleG.fmG_Id}}" ng-click="optionToggledGF()" name="roleG" required>
+                                            <span class="lbl padding-8">{{roleG.fmG_GroupName}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages col-sm-8 col-sm-offset-4" ng-if="interacted(myForm.roleG)" ng-messages="myForm.roleG.$error">
+                                        <div ng-message="required">Select atleast one From Group</div>
+                                    </div>
+
+                                    <!--<select class="form-control" id="sel1" name="feegrp" ng-model="FMG_Id" ng-change="onselectgroup()" required>
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in grouplst" value="{{option.fmG_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.fmG_GroupName}}
+                                    </option>
+                                </select>
+
+                                <div class="error-messages" ng-if="interacted(myForm.feegrp)" ng-messages="myForm.feegrp.$error">
+                                    <div ng-message="required">Select Group </div>
+                                </div>-->
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Voucher No :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control active" name="recno" id="reservation" type="text" data-ng-model="REF_REC_No" maxlength="60" required>
+
+                                    <div class="error-messages" ng-if="interacted(myForm.recno)" ng-messages="myForm.recno.$error">
+                                        <div ng-message="required">Select Voucher no </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4"> Refund Date :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <!--<div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>-->
+                                    <md-datepicker name="ref_dt" ng-model="REF_DATE" onkeydown="return false" required></md-datepicker>
+                                    <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm.ref_dt)" ng-messages="myForm.ref_dt.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>
+                                    <!--<input class="form-control active" id="reservation" type="date" data-ng-model="REF_DATE">-->
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div><!--end row-->
+            </div>
+
+            <div class="box box-primary" ng-show="gridview1">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fee Head List</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="studsearch" type="text" placeholder="search here...">
+                                <!--<span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <select class="form-control" id="sel1">
+                                <option>All</option>
+                                <option>Name</option>
+                                <option>SNO</option>
+                            </select>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="error-messages col-sm-offset-5" ng-if="interacted(myForm.studChk)" ng-messages="myForm.studChk.$error">
+                        <div ng-message="required">Select at least one checkbox to proceed.</div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+
+
+                                <th>
+                                    <a href="" ng-click="order('SNO')">SLNO</a>
+                                </th>
+
+                                  <th>
+                                    <label>
+                                        <input type="checkbox" ng-model="selectedAll" ng-click="toggleAll(selectedAll)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+
+                                <th>
+                                    <a href="" ng-click="sort1('fmH_FeeName')">Fee Head</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort1('ftI_Name')">Installment</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort1('fsS_RunningExcessAmount')">Excess Amount</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort1('FR_RefundAmount')">Refund Amount</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sort1('balamt')">Balance Amount</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="order('ReceiptNo')">Refund Over</a>
+                                </th>
+                                <!--<th>
+                                <a href="" ng-click="order('ReceiptNo')">Balance Amount</a>
+                            </th>-->
+                                <!--<th>
+                                <a href="" ng-click="order('ReceiptNo')">Adjust Amount</a>
+                            </th>-->
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in students | orderBy:predicate:default | filter:paginate| filter:search" ng-class-odd="'odd'">
+                                <td>{{$index+1}}</td>
+                                <td>
+                                    <label>
+                                        <input name="studChk" type="checkbox" ng-model="user.Selected" ng-required="isOptionsRequired()" ng-disabled="disablerec">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td>{{ user.fmH_FeeName}}</td>
+                                <td>{{ user.ftI_Name}}</td>
+                                <td>{{ user.Amountall}}</td>
+                                <td hidden="hidden">{{user.fmH_ID}}</td>
+                                <td hidden="hidden">{{user.fmG_Id}}</td>
+                                <td>
+                                    <input class="form-control" type="number" min="0" allow-pattern="\d" name="refund{{$index}}" max="{{user.Amountall}}" placeholder="Refund Amount..." data-ng-model="user.FR_RefundAmount" value="{{user.FR_RefundAmount}}" ng-blur="balanceamt(user,$index)" ng-required="user.Selected">
+                                    <div class="error-messages" ng-if="interacted(myForm['refund'+$index])" ng-messages="myForm['refund'+$index].$error">
+                                        <div ng-message="required">This field should not be empty</div>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm['refund'+$index])" ng-messages="myForm['refund'+$index].$error">
+                                        <div ng-message="max">Refund Amount Should not be greater than Excess Amount</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {{user.balamt}}
+                                </td>
+                                <td>
+                                    <label>
+                                        <input value="1" type="checkbox" ng-model="user.Selected1" ng-disabled="disableflag">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+
+                                </td>
+                                <!--<td>
+                                <input class="form-control" type="text" placeholder="Refund Amount..." ng-disabled="user.Bal_AMOUNT" value="{{user.Bal_AMOUNT}}"  >
+
+                            </td>-->
+                                <!--<td>{{ user.adjustamt}}</td>-->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--<pagination total-items="totalItems" ng-model="currentPage"
+                            max-size="5" boundary-links="true"
+                            items-per-page="numPerPage" class="pagination-sm">
+                </pagination>-->
+                    <div class="box-body" ng-show="gridview1">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-5">Narration:</label>
+                                <div class="col-sm-7">
+                                    <textarea class="form-control active" id="reservation" data-ng-model="REF_REMARKS"></textarea>
+                                    <!--<textarea class="form-control" rows="4" id="comment"></textarea>-->
+                                </div>
+                            </div>
+                            <!--<div class="form-group">
+                            <label class="control-label col-sm-5">Balance Amount:</label>
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" data-ng-model="Bal_AMOUNT" value={{Bal_AMOUNT}} ng-disabled="Bal_AMOUNT" />
+                            </div>
+                        </div>-->
+
+
+                            <div class="well col-lg-12">
+                                <div class="form-group">
+                                    <label class="radio-inline col-sm-3">
+                                        <input type="radio" name="FYP_Bank_Or_Cash" data-ng-model="REF_BANK_CASH" value="C" data-ng-click="onselectmodeofpayment()">
+                                        <span class="lbl padding-8">Cash</span>
+                                    </label>
+                                    <label class="radio-inline  col-sm-3">
+                                        <input type="radio" name="optradio" data-ng-model="REF_BANK_CASH" value="B" data-ng-click="onselectmodeofpayment()">
+                                        <span class="lbl padding-8">Bank</span>
+                                    </label>
+
+                                    <label class="radio-inline  col-sm-3">
+                                        <input type="radio" name="optradio" data-ng-model="REF_BANK_CASH" value="O" data-ng-click="onselectmodeofpayment()">
+                                        <span class="lbl padding-8">Online</span>
+                                    </label>
+
+                                </div>
+                            </div>
+                            <div class="form-group" ng-if="REF_BANK_CASH=='B'">
+                                <label class="control-label col-sm-5">Bank Name:</label>
+                                <div class="col-sm-7">
+                                    <input type="text" class="form-control" data-ng-model="bank.REF_BANK_NAME" value={{reF_BANK_NAME}} allow-pattern="(\s|[a-zA-Z])" />
+                                </div>
+                            </div>
+                            <!--<div class="form-group" ng-if="REF_BANK_CASH=='B'">
+                            <label class="control-label col-sm-5">Bank Name : </label>
+                            <div class="col-sm-7 input-group text-right" style="">
+                                <input type="text" class="form-control" data-ng-model="L_Code" id="chequeno"  allow-pattern="[a-zA-Z]" />
+                                <select class="form-control" id="sel1" ng-model="L_Code" ng-change="onselectaccount(yearlst)">
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in accountlst" value="{{option.l_Code}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.l_Name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>-->
+
+
+                            <div class="form-group" ng-if="REF_BANK_CASH=='B'">
+                                <label class="control-label col-sm-5">Cheque/DD Date:</label>
+                                <div class="col-sm-7">
+                                    <!--<div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input class="form-control active" id="chequedddate" type="date" data-ng-model="REF_CheqDate" >-->
+                                    <md-datepicker name="chq_dt" ng-model="REF_CheqDate" onkeydown="return false"></md-datepicker>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-if="REF_BANK_CASH=='B'">
+                                <label class="control-label col-sm-5">Cheque/DD No:<span style="color:Red" ng-if="REF_BANK_CASH=='B'">*</span></label>
+                                <div class="col-sm-7">
+                                    <input type="text" ng-model="bank.REF_CheqNo" allow-pattern="[0-9]" ng-required="REF_BANK_CASH=='B'" name="ddno" class="form-control" />
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.ddno)" ng-messages="myForm.ddno.$error">
+                                    <div ng-message="required">Enter Cheque/DD No.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class=" text-center" ng-show="formbtns">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-warn" id="clear-btn" ng-click="cleardata()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                        <!--<button type="submit" class="btn btn-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </button>
+                    <button type="button" class="btn btn-info" data-ng-click="()">
+                        <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
+                        Cancel
+                    </button>-->
+                        <!--<button type="button" class="btn btn-danger" ng-click="button=!button">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        Deactive
+                    </button>-->
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        </form>
+        <div class="box box-primary" ng-show="thirdgrid.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Fee Refundable</h3>
+                <!--<h3 class="box-title"> (Total Count -  {{totcountfirst}} )</h3>-->
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{totcountfirst}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label" ng-if="searchValue!=''">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue1.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" for="email"> Search For:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="search123" ng-change="onselectsearch()" name="search_for" required>
+                                    <option value="">--Select Field--</option>
+                                    <option value="0">Student Name</option>
+                                    <option value="1">Head Name</option>
+                                    <option value="2">Refunded Amount</option>
+                                    <option value="3">Date</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5" ng-show="search_flag">
+                        <div class="form-group" ng-show="txt">
+                            <label class="control-label col-sm-4" for="email"> Search Text:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchtxt" maxlength="30" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="numbr">
+                            <label class="control-label col-sm-4" for="email">Search Amount:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchnumbr" maxlength="20" allow-pattern="[0-9]" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="dat">
+                            <label class="control-label col-sm-4" for="email"> Search Date:</label>
+                            <div class="col-sm-8 input-group" style="">
+                                <md-datepicker ng-model="searchdat" onkeydown="return false" name="search_date" id="date123" md-placeholder="Enter  date" required></md-datepicker>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-3" ng-show="search_flag">
+                        <div class="">
+                            <button type="button" class="btn btn-primary" name="btn_search" ng-click="ShowSearch_Report()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                Search
+                            </button>
+                            <button type="button" class="btn btn-warning" data-ng-click="clearsearch()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>-->
+                <br />
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="order('sno')">SL. NO</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('amsT_FirstName')">Student Name </a>
+                            </th>
+                            <th><a href="" ng-click="sort('fmH_FeeName')">Admision No</a> </th>
+                            <th><a href="" ng-click="sort('fmH_FeeName')">Voucher No</a> </th>
+                            <th><a href="" ng-click="sort('fR_RefundAmount')">Refunded Amount</a> </th>
+                            <th><a href="" ng-click="sort('FR_BANK_CASH')">Mode of Payment</a> </th>
+
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--<tr dir-paginate="user in thirdgrid |orderBy:sortKey:reverse |filter:searchValue |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page">-->
+
+                        <tr dir-paginate="user in filterValue1 = (thirdgrid | filter : searchValue)  |orderBy:sortKey:sortReverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td style="text-align:center;"> {{ user.amsT_FirstName}} <span ng-if="user.amsT_MiddleName !== null" class="lbl padding-8">  {{ user.amsT_MiddleName}} </span> <span ng-if="user.amsT_LastName !== null" class="lbl padding-8">{{ user.amsT_LastName}}</span><!--{{ user.amsT_FirstName + ' ' + user.amsT_MiddleName + ' ' + user.amsT_LastName}}--></td>
+                            <td style="text-align:center;">{{ user.amsT_AdmNo}}</td>
+                            <td style="text-align:center;">{{ user.fR_RefundNo}}</td>
+                            <td style="text-align:center;">{{ user.fR_RefundAmount}}</td>
+                            <td style="text-align:center;">{{ user.FR_BANK_CASH}}</td>
+
+                            <td class="text-center">
+                                <!--<a href="javascript:void(0)" ng-click="edit(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        </a>-->
+                                <a href="javascript:void(0)" ng-click="DeletRecord(user)"
+                                   class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </a>
+                                <a href="javascript:void(0)" class="text-primary padding-right-5" data-placement="bottom" data-toggle="modal" title="Print Receipt" data-ng-model="receiptdetails" data-target="#myModal1" data-ng-click="showmodaldetails(user)">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <dir-pagination-controls max-size="5" pagination-id="page"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+        <div id="myModaldetails" class="modal fade" role="dialog" data-backdrop="false">
+            <div class="modal-dialog modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <!--<div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
+                </div>-->
+                    <div class="modal-body">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Fee Details</h3>
+
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body">
+
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th><a href="" ng-click="order('sno')">SLNO</a></th>
+                                            <th><a href="" ng-click="order('fyP_DD_Cheque_Date')">Date</a></th>
+                                            <th><a href="" ng-click="order('fyP_Receipt_No')">Receipt No</a> </th>
+                                            <th><a href="" ng-click="order('fyP_Tot_Amount')">Total Paid Amount</a> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr dir-paginate="user in studentviewdetails |orderBy:sortKey:reverse |filter:searchthird |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                            <td>{{ user.fyP_DD_Cheque_Date |date:'dd-MM-yyyy'}}</td>
+                                            <td>{{ user.fyP_Receipt_No}}</td>
+                                            <td>{{ user.fyP_Tot_Amount}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <dir-pagination-controls max-size="5"
+                                                         direction-links="true"
+                                                         boundary-links="true">
+                                </dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="myModal1" class="modal fade feetransaction" role="dialog" data-backdrop="false">
+            <div>
+
+                <div class="modal-dialog modal-lg">
+
+                    <div class="modal-content">
+
+                        <div class="modal-body">
+
+                            <div class="row" id="printmodalnew">
+                                <div class="col-sm-6">
+                                    <div class="printmodal clearfix">
+
+                                        <div class="">
+                                            <div class="baldwin text-center">
+                                                <img src="{{imgname}}" class="img-responsive" alt="SCHOOL LOGO">
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="col-sm-12 text-center"><h5>SCHOOL COPY</h5></div>
+                                            <hr />
+                                            <div class="row margin-bottom-5">
+
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Receipt No.</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{fR_RefundNo}} </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Class</label>
+                                                        <div class="col-sm-8">
+
+                                                            <label class="control-label">: {{ASMCL_ClassName}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Adm No.</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{AMST_AdmNo}} </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Section</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{ASMC_SectionName}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Student Name</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{amsT_FirstName}} <span ng-if="amsT_MiddleName !== null" class="lbl padding-8">  {{amsT_MiddleName}} {{ amsT_LastName}}</span> </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Aca Year</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{asmaY_Year}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Father</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{AMST_FatherName}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Date</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{date|date:'dd/MM/yyyy'}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Mother</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{AMST_MotherName}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            SLNO
+                                                        </th>
+                                                        <th>Fee Name</th>
+                                                        <th>Fee Amount</th>
+                                                        <th>Refound Date</th>
+                                                        <th>Refound No</th>
+                                                        <th>Refound Amount</th>
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="user1 in showdetailsreceipt">
+                                                        <td>{{$index+1}}</td>
+                                                        <td>{{ user1.fmH_FeeName}}</td>
+                                                        <td>{{ user1.fmA_Amount}}</td>
+                                                        <td>{{ user1.fR_Date|date:'dd/MM/yyyy'}}</td>
+                                                        <td>{{ user1.fR_RefundNo}}</td>
+                                                        <td>{{ user1.fR_RefundAmount}}</td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="5"><b>Total</b></td>
+
+                                                        <td><b>{{atotA}}</b></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4"><b>Amount Received (in Words)</b></label>
+                                                <div class="col-sm-8">
+                                                    <label class="control-label">: {{words}} Only/-</label>
+                                                </div>
+                                            </div>
+                                            <hr />
+                                            <div class="row">
+
+                                                <!--<div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4"><b>Note </b></label>
+                            <div class="col-sm-8">
+                                <label class="control-label">: This receipt is valid subject to realisation of Cheque </label>
+                            </div>
+                        </div>
+                    </div>-->
+                                            </div>
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-sm-offset-8 col-sm-4">
+                                                    <h5>Authorised Signatory</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="printmodal clearfix">
+
+                                        <div class="">
+                                            <div class="baldwin text-center">
+                                                <img src="{{imgname}}" class="img-responsive" alt="SCHOOL LOGO">
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="col-sm-12 text-center"><h5>PARENT COPY</h5></div>
+                                            <hr />
+                                            <div class="row margin-bottom-5">
+
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Receipt No.</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{fR_RefundNo}} </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Class</label>
+                                                        <div class="col-sm-8">
+
+                                                            <label class="control-label">: {{ASMCL_ClassName}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Adm No.</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{AMST_AdmNo}} </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Section</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{ASMC_SectionName}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Student Name</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{amsT_FirstName}} <span ng-if="amsT_MiddleName !== null" class="lbl padding-8">  {{amsT_MiddleName}} {{ amsT_LastName}}</span> </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Aca Year</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{asmaY_Year}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Father</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{AMST_FatherName}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Date</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{date|date:'dd/MM/yyyy'}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-8">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4">Mother</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="control-label">: {{AMST_MotherName}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            SLNO
+                                                        </th>
+                                                        <th>Fee Name</th>
+                                                        <th>Fee Amount</th>
+                                                        <th>Refound Date</th>
+                                                        <th>Refound No</th>
+                                                        <th>Refound Amount</th>
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="user1 in showdetailsreceipt">
+                                                        <td>{{$index+1}}</td>
+                                                        <td>{{ user1.fmH_FeeName}}</td>
+                                                        <td>{{ user1.fmA_Amount}}</td>
+                                                        <td>{{ user1.fR_Date|date:'dd/MM/yyyy'}}</td>
+                                                        <td>{{ user1.fR_RefundNo}}</td>
+                                                        <td>{{ user1.fR_RefundAmount}}</td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="5"><b>Total</b></td>
+
+                                                        <td><b>{{atotA}}</b></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4"><b>Amount Received (in Words)</b></label>
+                                                <div class="col-sm-8">
+                                                    <label class="control-label">: {{words}} Only/-</label>
+                                                </div>
+                                            </div>
+                                            <hr />
+                                            <div class="row">
+
+                                               
+                                            </div>
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-sm-offset-8 col-sm-4">
+                                                    <h5>Authorised Signatory</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printDatanew();">Print</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closedata();">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div id="test">
+            </div>
+        </div>
+    </section>
+</div>
+<div class="modal fade" id="myModaldetailspayment" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header row">
+                <h4 class="modal-title text-white col-sm-8">PAYMENT GATE WAY REFUND CHARGES</h4>
+                <button type="button" class="btn btn-default pull-right col-sm-2" data-dismiss="modal">Close<i class="fa fa-times" aria-hidden="true"></i></button>
+            </div>
+
+            <div class="modal-body">
+                <label class="">
+                    <span class="lbl lableline">
+                        <h4 style="margin-left: 59px;">
+                            Online Payment Refund Charges as Follows
+                        </h4>
+                    </span>
+                    <span class="lbl lableline">
+                        <h3>
+                            1) RazorPay
+                        </h3>
+                    </span>
+
+                    <span class="lbl padding-8"> <b> <span> <b>For less than 1000 Rs Refund charges is Rs 3.</b></span></b> </span><br /><br />
+                    <span class="lbl padding-8"> <b> <span> <b>For less than 1000 - 25000 Rs Refund charges is Rs 5. </b></span></b> </span><br /><br />
+                    <span class="lbl padding-8"> <b> <span> <b>For greater than 25000 Rs Refund charges is Rs 8. </b></span></b> </span><br /><br />
+                </label>
+                <br /><br />
+            </div>
+
+            <div class="modal-footer">
+            </div>
+        </div>
+
+    </div>
+</div>

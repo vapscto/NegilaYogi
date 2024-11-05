@@ -1,0 +1,382 @@
+﻿<!--<link type="text/css" media="print" rel="stylesheet" href="css/print/BBKV/BBKVTC/BBKVTCPdf.css" />-->
+<!--<link href="css/print/EligibilityCert/Eligibilitycert.css" rel="stylesheet" />-->
+<style>
+    .tdclassd {
+        text-align: center
+    }
+
+    @media (min-width: 1200px) {
+        .container {
+            width: 1064px !important
+        }
+    }
+
+
+
+    .s1 {
+        height: 2px;
+        border-top: 1px solid black;
+        border-bottom: 1.5px solid black;
+    }
+
+    td, tr {
+        text-align: left !important
+    }
+
+    th, td {
+        border-bottom: 1px;
+        border-top: 1px;
+        border-right: 1px;
+    }
+
+    table {
+        border: 1px 0.5px dashed !important
+    }
+</style>
+
+<div data-ng-init="loaddata()" class="challan">
+    <section class="content">
+        <form class="form-horizontal" role="form" method="post" name="myform">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">TC Custom Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="well text-center" ng-init="admname='regno'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="regno" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Admno</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="stdname" name="stcrcrad" ng-model="admname" data-ng-click="onclickregnoname()" required>
+                                    <span class="lbl padding-8">Name</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year:<strong style="color:red">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" data-ng-model="asmaY_Id" name="stcrclstyr" required ng-change="onclickregnoname()">
+                                        <option value="">Select Year</option>
+                                        <option ng-repeat="academic in yearDropdown" value="{{academic.asmaY_Id}}">{{academic.asmaY_Year}}</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myform.stcrclstyr)" ng-messages="myform.stcrclstyr.$error">
+                                        <div ng-message="required">Select Academic Year</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="well text-center" ng-init="tctempper='per'">
+                                <label class="radio-inline">
+                                    <input type="radio" value="temp" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Temp Student</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="per" name="stcrcradtc" ng-model="tctempper" data-ng-click="onclicktcperortemo()" required>
+                                    <span class="lbl padding-8">Permanent Student</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Student Name: <strong style="color:red">*</strong> </label>
+                                <div class="col-sm-8">
+                                    <ui-select id="sel1" name="studentnamed" ng-model="$parent.AMST_Id" theme="bootstrap"
+                                               ng-keyup="searchfilter($select,user.status)" title="Select Student" required ng-change="stdnamechange()">
+                                        <ui-select-match ng-trim="false" placeholder="Select or search Student in the list">
+                                            {{$select.selected.studentname}}
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="student in studentDropdown | filter: $select.search" value="{{student.amsT_Id}}"
+                                                           ng-selected="{{student.Selected == true}}">
+                                            <div ng-bind-html="student.studentname | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                    <div class="error-messages" ng-if="interacted(myform.studentnamed)" ng-messages="myform.studentnamed.$error">
+                                        <div ng-message="required">Selec Student</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false"
+                                   ng-click="savetmpldata()">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+
+                        <md-button type="button" class="md-raised md-primary" ng-click="printToCart()" ng-show="Print_flag">
+                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <link href="css/print/BBKV/BBKVTC/BBKVTC.css" rel="stylesheet" />
+
+            <div class="box box-primary" ng-show="report">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Student TC Custom Report</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="" id="HHSTCCustomReport">
+                        <div>
+                            <!--<img src="https://sthomashowrah.blob.core.windows.net/files/NDS LOGO 3.jpg" style="width:100% !important;height:125px !important" />-->
+                            <img src="https://sthomashowrah.blob.core.windows.net/files/NDS Exam CBSC Logo.jpg" style="width:100% !important;height:125px !important" />
+                        </div>
+
+                        <div class="text-center">TRANSFER /SCHOOL LEAVING CERTIFICATE</div>
+
+                        <table class="table">
+                            <tr>
+                                <td>NO.{{tcno}}</td>
+                                <td class="text-right">Admission No: {{admno}}</td>
+                            </tr>
+
+                            <tr style=" border: none">
+                                <td>UDISE No.:27361710002 </td>
+                                <td class="text-right">Student ID :{{govtno}}</td>
+                            </tr>
+                        </table>
+                        <table>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered">
+                            <tr style="width:100%!important">
+                                <td width="20">1.</td>
+                                <td>Name of Pupil </td>
+                                <td>{{FirstName| uppercase}} {{MiddleName| uppercase}} {{LastName| uppercase}}</td>
+                            </tr>
+                            <tr style="width:100%!important">
+                                <td>2.</td>
+                                <td>Father’s / Guardian’s Name</td>
+                                <td width:60%">{{lblfathername| uppercase}}</td>
+                            </tr>
+                            <tr style="width:100%!important">
+                                <td>3.</td>
+                                <td>Mother’s Name  </td>
+                                <td width:60%">{{lblmothername| uppercase}}</td>
+                            </tr>
+                            <tr style="width:100%!important">
+                                <td>4.</td>
+                                <td>Nationality </td>
+                                <td>{{lblnationality| uppercase}}</td>
+
+                            </tr>
+                            <tr style="width:100%!important">
+                                <td>5.</td>
+                                <td>Religion and Caste</td>
+                                <td>{{lblreligioncaste| uppercase}} and  {{studcaste| uppercase}}</td>
+                            </tr>
+                            <tr style="width:100%!important">
+                                <td width="20">6.</td>
+                                <td>Whether the candidate belongs to SC or ST or OBC</td>
+                                <td>{{IMCC_CategoryCode| uppercase}}</td>
+                            </tr>
+                            <tr style="width:100%!important">
+                                <td width="20">7.</td>
+                                <td>Place of Birth  </td>
+                                <td>{{lblpobirth | uppercase}}</td>
+                            </tr>
+                            <tr style="width:100%!important">
+                                <td>8.</td>
+                                <td>Date of First admission in the School with class</td>
+                                <td>&nbsp;&nbsp;{{lbldoa |date:'dd/MM/yyyy'}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Class:&nbsp;&nbsp;{{admittedclass | uppercase}}</td>
+                            </tr>
+
+                            <tr style="width:100%!important">
+                                <td width="20">9.</td>
+                                <td>Date of Birth ( in Christian Era ) according to admission Register ( in figures ) </td>
+                                <td>{{lbldob | date :'dd/MM/yyyy'}}</td>
+                            </tr>
+                            <tr>
+                                <td width="20">&nbsp;</td>
+                                <td>in Words</td>
+                                <td>{{lbldobwords | uppercase}}</td>
+                            </tr>
+                            <tr>
+                                <td width="20">10.</td>
+                                <td>Proof for Date of Birth submitted at the time of admission </td>
+                                <td>Municipal Birth Certificate</td>
+
+
+                            </tr>
+                            <tr>
+                                <td>11.</td>
+                                <td>Class in which the pupil last studied (in figures) STD </td>
+                                <td>
+                                    <TABLE class="table">
+                                        <tr>
+                                            <td>Class:&nbsp;&nbsp;{{laststudied | uppercase}} </td>
+                                            <td>SEC:&nbsp;&nbsp;{{ASMC_SectionName | uppercase}} </td>
+                                            <td>in words:&nbsp;&nbsp;{{laststudiedinwords | uppercase}}</td>
+                                        </tr>
+                                    </TABLE>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>12.</td>
+                                <td>School/ Board Annual Examination last taken with result </td>
+                                <td>{{lastexam | uppercase}}  {{ASTC_Result | uppercase}}</td>
+
+                            </tr>
+
+                            <tr>
+                                <td>13.</td>
+                                <td>Whether failed ( Give Reason ) </td>
+                                <td>No<!--{{ASTC_ResultDetails | uppercase}}--></td>
+                            </tr>
+
+
+
+                            
+
+                            r>
+
+
+
+                            <tr>
+                                <td width="20">14.</td>
+                                <td>Standard & Section studying this year Subjects Studied / Studying </td>
+                                <td>{{subjectstudied | uppercase}}</td>
+                            </tr>
+
+
+
+                            <tr>
+                                <td width="20">15.</td>
+                                <td>Whether qualified for promotion to the higher class </td>
+                                <td>{{promotionflag | uppercase}}</td>
+
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>If so, to which class (in fig )</td>
+                                <td>{{lblPromotion | uppercase}}</td>
+                            </tr>
+                            <tr>
+                                <td>16.</td>
+                                <td>Month up to which the pupil has paid school dues </td>
+                                <td>{{lastdatepaid}}</td>
+
+                            </tr>
+
+                            <tr>
+                                <td width="20">17.</td>
+                                <td>Any fee concession availed of, if so, the nature of such concession </td>
+                                <td>{{fee_concesion | uppercase}}</td>
+
+                            </tr>
+                            <tr>
+                                <td>18.</td>
+                                <td> Total No. of working days </td>
+                                <td>{{noof_schooldays}}</td>
+
+
+                            </tr>
+                            <tr>
+                                <td>19.</td>
+                                <td>Total no. of working days present </td>
+                                <td>{{noof_daysattended}}</td>
+
+
+                            </tr>
+                            <tr>
+                                <td>20.</td>
+                                <td>Whether NCC cadet/boy scout/ girl guide ( details may be given )  </td>
+                                <td>No</td>
+
+                            </tr>
+                            <tr>
+                                <td>21.</td>
+                                <td>Whether school is under Govt/Minority/Independent category </td>
+                                <td>Minority</td>
+                            </tr>
+
+                            <tr style="width:100%!important">
+                                <td width="20">22.</td>
+                                <td>Games played or extra – curricular activities in which the pupils usually took part  </td>
+                                <td>{{astc_extraactivities | uppercase}}</td>
+
+                            </tr>
+
+                            <tr>
+                                <td width="20">23.</td>
+                                <td>General conduct </td>
+                                <td>{{lblconduct | uppercase}}</td>
+                            </tr>
+                            <tr>
+                                <td>24.</td>
+                                <td>Date of application for certificate  </td>
+                                <td>{{applidate | date :'dd/MM/yyyy'}}</td>
+                            </tr>
+                            <tr>
+                                <td>25.</td>
+                                <td>Date of issue for certificate </td>
+                                <td>{{todaydate | date :'dd/MM/yyyy'}}</td>
+                            </tr>
+                            <tr>
+                                <td>26.</td>
+                                <td>Date on which pupil name was struck off the roll of the school  </td>
+                                <td>{{lbldate | date :'dd/MM/yyyy'}}</td>
+                            </tr>
+                            <tr>
+                                <td>27.</td>
+                                <td>Reason for leaving the school  </td>
+                                <td>{{lblreasonleaving | uppercase}}</td>
+                            </tr>
+                            <tr>
+                                <td>28.</td>
+                                <td>Any other remarks </td>
+                                <td>{{amsT_AadharNo}}</td>
+                            </tr>
+                        </table>
+
+                        <div>
+                            <p>
+                                <b>
+                                    I hereby declare that the above information including Name of the Candidate, Father's Name, mother's Name, and
+                                    Date of Birth furnished above is correct as per school records.
+
+                                </b>
+                            </p>
+                            <div class="padding-top-30">
+                                &nbsp;
+                            </div>
+                            <table class="table">
+                                <tr style="border: none">
+                                    <td><b> Signature of the Principal </b></td>
+                                    <td style="text-align:right"> <b>Signature of the Parent</b></td>
+                                </tr>
+                            </table>
+                            <hr style="border: 1px solid black" />
+                            <p>(No Changes in any entry is to be made except by the authority issuing the Certificate. Certified that the above information is in accordance with the School Register.)</p>
+                        </div>
+
+
+
+
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+    </section>
+</div>

@@ -1,0 +1,179 @@
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="savedata(objmaster)">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Online Exam Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+
+                            <div class="col-sm-4 input-group text-right" style="">
+                                <md-datepicker ng-model="FMCB_fromDATE" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+                            </div>
+                            <!--</div>-->
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+
+                            <div class="col-sm-4 input-group text-right" style="">
+                                <md-datepicker ng-model="FMCB_toDATE" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+                            </div>
+                            <!--</div>-->
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="savedata()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel('#table1')" target="_blank" ng-show="export_flag">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData(printSectionId);" ng-show="print_flag">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+
+
+            </div>
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="result">
+        <div class="box-header with-border">
+            <h3 class="box-title">Online Exam Report </h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+
+            <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                <thead>
+
+                    <tr>
+                        <th class="hdTH">
+                            <label>
+                                <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </th>
+                        <th><a href="" ng-click="sort('LMSMOES_Id')">SLNO</a></th>
+                        <th><a href="" ng-click="sort('Name')">Name</a></th>
+                        <th><a href="" ng-click="sort('Mobileno')">Mobile No</a></th>
+                        <th><a href="" ng-click="sort('Examdate')">Exam Date</a> </th>
+                        <th><a href="" ng-click="sort('LMSSTE_TotalMarks')">Total Marks</a></th>
+                        <th><a href="" ng-click="sort('LMSSTE_Percentage')">Percentage</a> </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in result |orderBy:sortKey:reverse  |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td class="text-center  hdTD">
+                            <label>
+                                <input type="checkbox" ng-model="user.selected" ng-change="optionToggled(user,$index)">
+                                <span class="lbl padding-8"></span>
+                            </label>
+                        </td>
+                        <td>{{ itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td>{{ user.Name}}</td>
+                        <td>{{ user.Mobileno}}</td>
+                        <td>{{ user.Examdate | date:"dd-MM-yyyy" }}</td>
+                        <td>{{ user.LMSSTE_TotalMarks}}</td>
+                        <td>{{ user.LMSSTE_Percentage}}</td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+
+
+    <div id="printSectionId" ng-show="export_table_flag">
+
+        <div class="baldwin text-center">
+            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+        </div>
+        <br />
+        <center> <h4><u> Online Exam Report</u></h4></center>
+        <br />
+        <table ng-show="tadprint" class="table table-hover table-responsive table-bordered text-center" id="table1">
+            <thead>
+                <tr>
+
+                    <th>SL.NO</th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Mobile No
+                    </th>
+                    <th>
+                        Exam Date
+                    </th>
+                    <th>
+                        Total Marks
+                    </th>
+                    <th>
+                        Total Percentage
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in printdatatable | orderBy:propertyName:reverse" ng-class-odd="'odd'">
+                    <td>{{$index+1}}</td>
+                    <td>{{ user.Name}}</td>
+                    <td>{{ user.Mobileno}}</td>
+                    <td>{{ user.Examdate | date:"dd-MM-yyyy" }}</td>
+                    <td>{{ user.LMSSTE_TotalMarks}}</td>
+                    <td>{{ user.LMSSTE_Percentage}}</td>
+
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="16" class="col-sm-12 text-center ">
+                        <label>
+                            Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                        </label>
+                    </td>
+                </tr>
+
+            </tfoot>
+        </table>
+    </div>
+</section>

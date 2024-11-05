@@ -1,0 +1,259 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+
+<section class="content">
+
+    <md-content class="ng-pristine ng-valid" ng-init="Loaddata()">
+        <form class="form-horizontal ng-pristine ng-valid" role="form" method="post" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">IVRM Training Request List</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group margin-left-none">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{getloadgrid.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>SL NO</th>
+                                <th>Employee Name</th>
+                                <th> Training Type</th>
+                                <th><a href="" ng-click="sortBy('hrexttrN_StartDate')">Start Date</a></th>
+                                <th><a href="" ng-click="sortBy('hrexttrN_StartTime')">Start Time</a></th>
+                                <th><a href="" ng-click="sortBy('hrexttrN_EndTime')">End Time</a></th>
+                                <th> Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="indl in filterValue = (getloadgrid | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-center">{{indl.IVRMTT_EmployeeName}}</td>
+                                <td class="text-center">{{indl.IVRMTT_TrainingMode}}</td>
+                                <td class="text-center">{{indl.IVRMTT_TentetiveDate|date:'dd/MM/yyyy'}}</td>
+                                <td class="text-center">{{indl.IVRMTT_TentetiveStartTime}}</td>
+                                <td class="text-center">{{indl.IVRMTT_TentetiveEndTime}}</td>
+                                <td class="text-center">{{indl.IVRMTT_Status}}</td>
+                                <td style="text-align:center">
+                                    <span ng-if="indl.IVRMTT_Status == 'Pending'">
+                                        <a href="javascript:void(0)" ng-click="EditData(indl)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <dir-pagination-controls max-size="10"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+                <div class="box-body" ng-show="getloadgrid.length==0" style="text-align:center;color:red">
+                    <b> REQUEST NOT AVAILABLE FOR UPDATE</b>
+                </div>
+            </div>
+
+            <div class="box box-primary" ng-show="appliedlist.length>0">
+                <div class="box-header with-border">
+                    <h3 class="box-title">IVRM TRAINING REQUEST DETAILS</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="col-sm-12 box-content clearfix">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h5>Employee :  &nbsp;&nbsp;{{IVRMTT_EmployeeName}}  </h5>
+                            </div>
+                            <div class="col-sm-6">
+                                <h5>TrainingMode :  &nbsp;&nbsp;{{IVRMTT_TrainingMode}} </h5>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-sm-6">
+                                <h5>Start Time : <b>{{IVRMTT_TentetiveStartTime |date :"h:mma"}}</b>  </h5>
+                            </div>  <div class="col-sm-6">
+                                <h5>End Time : <b>{{IVRMTT_TentetiveEndTime |date :"h:mma"}} </b> </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 box-content clearfix" style="margin-top: 25px !important">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="sel2" class="control-label col-sm-2">Date : <span style="color:Red">*</span></label>
+                                        <div class="col-sm-8">
+                                            <md-datepicker data-ng-model="obj.IVRMTT_TrainingDate" name="start_date" md-placeholder="Enter date" md-min-date="entry_date" required></md-datepicker>
+                                            <div class="error-messages" ng-if="interacted(myForm.start_date)" ng-messages="myForm.start_date.$error">
+                                                <div ng-message="required">Select Meeting Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">
+                                            Trainer Name  : <strong style="color:red;">*</strong>
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <ui-select id="sel1" name="empname" data-ng-model="obj.hrmE_Id" ng-true-value="1" theme="bootstrap" ng-keyup="searchfilter($select,filterdata);" title="Select Employee">
+                                                <ui-select-match placeholder="Select or search Employee in the list...">
+                                                    {{$select.selected.hrmE_EmployeeFirstName}}
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="option in get_emp | propsFilter: {hrmE_EmployeeFirstName: $select.search}"
+                                                                   value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                                    <div ng-bind-html="option.hrmE_EmployeeFirstName | highlight: $select.search"></div>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3" style="padding-top:7%;">From Time :<strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-7">
+                                                <div uib-timepicker name="fromtime" data-ng-model="obj.IVRMTT_TentetiveStartTime" ng-change="validateTomintime(obj.IVRMTT_TentetiveStartTime)" hour-step="hstep" minute-step="mstep" show-meridian="true" required></div>
+                                                <div class="error-messages" ng-if="interacted(myForm.fromtime)" ng-messages="myForm.fromtime.$error">
+                                                    <div ng-message="required">Select  From Time</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3" style="padding-top:7%;">To Time : <strong style="color:red;">*</strong></label>
+                                            <div class="col-sm-7">
+                                                <div uib-timepicker name="totime" data-ng-model="obj.IVRMTT_TentetiveEndTime" ng-change="validatemax(obj.IVRMTT_TentetiveEndTime)" hour-step="hstep" minute-step="mstep" show-meridian="true" required></div>
+                                                <div class="error-messages" ng-if="interacted(myForm.totime)" ng-messages="myForm.totime.$error">
+                                                    <div ng-message="required">Select To Time</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <input type="hidden" data-ng-model="obj.IVRMTT_Id" value="{{IVRMTT_Id}}" />
+                                <input type="hidden" data-ng-model="obj.IVRMTMT_Id" value="{{IVRMTMT_Id}}" />
+                                <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="saveData(obj)" id="save-btn">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                    Save
+                                </md-button>
+                                <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    Cancel
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </md-content>
+
+    <div class="box box-primary" ng-if="gridassigned.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">IVRM Training Assigned List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group margin-left-none">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{gridassigned.length}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-4 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th>Employee Name</th>
+                        <th> Training Type</th>
+                        <th>Start Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Trainer</th>
+                        <th> Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue = (gridassigned | filter : searchValue)  | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                        <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">{{user.IVRMTT_EmployeeName}}</td>
+                        <td class="text-center">{{user.IVRMTT_TrainingMode}}</td>
+                        <td class="text-center">{{user.IVRMTT_TentetiveDate|date:'dd/MM/yyyy'}}</td>
+                        <td class="text-center">{{user.IVRMTT_TentetiveStartTime}}</td>
+                        <td class="text-center">{{user.IVRMTT_TentetiveEndTime}}</td>
+                        <td class="text-center">{{user.IVRMTMT_TrainerName}}</td>
+                        <td class="text-center">{{user.IVRMTMT_Status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <dir-pagination-controls max-size="10"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>
+
+

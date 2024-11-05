@@ -1,0 +1,560 @@
+﻿<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
+<script src="https://printjs-4de6.kxcdn.com/print.min.css"></script>
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onpageload()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Promotion Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmaY_Id" name="acdyr" required ng-change="onchangeyear()">
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in yearlist" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == asmaY_Id}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdyr)" ng-messages="myForm.acdyr.$error">
+                                    <div ng-message="required">Select Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmcL_Id" name="acclasss" ng-change="onchangeclass()" required>
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in classlist" value="{{option.asmcL_Id}}" ng-selected="{{option.asmcL_Id == asmcL_Id}}">
+                                        {{option.asmcL_ClassName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acclasss)" ng-messages="myForm.acclasss.$error">
+                                    <div ng-message="required">Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section:<strong style="color:red;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="asmS_Id" name="acdsec" required ng-change="onchangesection()">
+                                    <option value="">--Select-- </option>
+                                    <option ng-repeat="option in sectionlist" value="{{option.asmS_Id}}" ng-selected="{{option.asmS_Id == asmS_Id}}">
+                                        {{option.asmC_SectionName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acdsec)" ng-messages="myForm.acdsec.$error">
+                                    <div ng-message="required">Select Section</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">
+                                <input name="allcheck" value="" ng-model="all" type="checkbox" ng-click="OnClickAll()">
+                                <span class="lbl padding-8">
+                                    Student :
+                                </span><span style="color:Red">*</span>
+                            </label>
+                            <div class="col-sm-8">
+                                <div class="multiselect">
+                                    <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here..." style="margin:1%;">
+                                    <label data-ng-model="AMST_Id" ng-repeat="sub in studentlistdetails | filter:filterchkbx" value="{{sub.amsT_Id}}">
+                                        <input name="Subjectoption" value="" ng-click="individual()" ng-model="sub.checkedsub" type="checkbox" ng-required="isOptionsRequired3()">
+                                        <span class="lbl padding-8">
+                                            {{sub.amsT_FirstName}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.Subjectoption)" ng-messages="myForm.Subjectoption.$error">
+                                    <div ng-message="required">Select Student</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false"
+                               data-ng-click="saveddata()">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+
+                    <button type="button" class="btn btn-danger" onclick="printPDF()">
+                        Print
+                    </button>
+                    <div id="loadingIndicator" style="display: none;">
+                        <!-- Loading indicator content (e.g., spinner, text) -->
+                        Loading PDF...
+                    </div>
+                    <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel('#Baldwinddd');" ng-disabled="reportdata==true">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Excel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-if="studentdetails.length > 0">
+            <div class="box-body">
+                <div>
+                    <div class="CumulativeReportBB divclass" style="overflow:auto !important">
+                        <table class="text-center" style="width: 100%;">
+                            <tr class="row">
+                                <td colspan="{{colspan}}" class="text-center col-sm-12">
+                                    <h3>
+                                        {{inst_name}}
+                                    </h3>
+                                </td>
+                            </tr>
+                            <tr class="row">
+                                <td colspan="{{colspan}}" class="text-center col-sm-12">
+                                    <h5>
+                                        CUMULATIVE REPORT
+                                    </h5>
+                                </td>
+                            </tr>
+                            <tr class="row">
+                                <td colspan="{{colspan}}" class="text-uppercase col-sm-12 text-center">
+                                    <label> <b>ACADEMIC YEAR : {{Accdemic}} </b></label>
+                                </td>
+                            </tr>
+                            <tr class="row">
+                                <td colspan="{{colspan}}" class="text-uppercase col-sm-12 text-center">
+                                    <label><b>CLASS & SEC : {{classs}} - {{clasection}}</b></label>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered" id="table1" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="6">
+
+                                    </th>
+                                    <th ng-repeat="subject in employeeid" colspan="2">
+                                        <span ng-if="subject.GropuFlag==true"> {{subject.ESG_SubjectGroupName}} </span>
+                                        <span ng-if="subject.GropuFlag ==false"> {{subject.ISMS_SubjectName}} </span>
+                                    </th>
+                                    <th colspan="3">
+                                        GRAND TOTAL
+                                    </th>
+                                    <th colspan="3">
+                                        PERCENTAGE
+                                    </th>
+                                </tr>
+                                <tr>
+
+                                    <th colspan="2"><b>Roll No</b></th>
+                                    <th colspan="2">
+                                        <b>Student Name</b>
+
+                                    </th>
+                                    <td colspan="2">Attendence</td>
+                                    <th ng-repeat="col in TotalApplicable"><b>{{col.Column}}</b></th>
+                                    <th colspan="3">
+
+                                    </th>
+                                    <th colspan="3">
+
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in studentdetails | orderBy:sortKey:reverse">
+
+                                    <td colspan="2">{{user.rollno}} </td>
+                                    <td class="text-left padding-left-5" colspan="2">{{user.studentname}} </td>
+                                    <td colspan="2">{{user.ATTENDANCEPERCENTAGE}}</td>
+                                    <td ng-repeat="col in MarksTotal" ng-if="col.AMST_Id==user.AMST_Id">
+
+                                        <b ng-if="col.Column=='TOTAL'">
+                                            <span ng-if="col.GropuFlag==true && col.GroupMarks > 0">
+                                                <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                    {{col.GroupMarks}}
+                                                </span>
+                                                <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                    --
+                                                </span>
+
+                                            </span>
+
+                                            <span ng-if="col.GropuFlag==false && col.ESTMPPSG_GroupObtMarks > 0">
+                                                <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                    {{col.ESTMPPSG_GroupObtMarks}}
+                                                </span>
+                                                <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                    --
+                                                </span>
+
+                                            </span>
+                                        </b>
+                                        <b ng-if="col.Column=='AVERAGE' && col.YeralyGroupObtMarks> 0">
+
+                                            <span ng-if="col.GropuFlag==true && col.YearlyMarks > 0">
+                                                <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                    {{col.YearlyMarks}}
+                                                </span>
+                                                <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                    --
+                                                </span>
+
+                                            </span>
+
+                                            <span ng-if="col.GropuFlag==false && col.YeralyGroupObtMarks > 0">
+                                                <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                    {{col.YeralyGroupObtMarks}}
+                                                </span>
+                                                <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                    --
+                                                </span>
+
+                                            </span>
+
+                                        </b>
+
+
+                                    </td>
+                                    <td colspan="3" ng-repeat="dd in getgradelist" ng-if="dd.AMST_Id==user.AMST_Id">
+                                        <b>
+                                            {{dd.GroupMarks_Total |number:0}}/{{dd.maxmarks}}
+                                        </b>
+
+
+                                    </td>
+
+                                    <td colspan="3" ng-repeat="dd in getgradelist" ng-if="dd.AMST_Id==user.AMST_Id"><b> {{dd.GroupMarks_PER}}%</b>  </td>
+
+                                </tr>
+
+                            </tbody>
+                            <!--<tr>
+                                <td class="text-left" colspan="3"><b>Subject Teacher </b></td>
+                                <td class="text-right" colspan="3">  <b>Principal & Secretary </b></td>
+                            </tr>-->
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+            <div id="Baldwinexcel" ng-hide="true">
+                <div class="CumulativeReportBB divclass">
+                    <table class="text-center" style="width: 100%;">
+                        <tr class="row">
+                            <td colspan="6" class="text-center col-sm-12">
+                                <h3>
+                                    {{inst_name}}
+                                </h3>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="6" class="text-center col-sm-12">
+                                <h5>
+                                    CUMULATIVE REPORT
+                                </h5>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="6" class="text-uppercase col-sm-12 text-center">
+                                <label> <b>ACADEMIC YEAR : {{Accdemic}} </b></label>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="6" class="text-uppercase col-sm-12 text-center">
+                                <label><b>CLASS & SEC : {{classs}} - {{clasection}}</b></label>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered" id="table1" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th colspan="6">
+
+                                </th>
+                                <th ng-repeat="subject in employeeid" colspan="2">
+                                    <span ng-if="subject.GropuFlag==true"> {{subject.ESG_SubjectGroupName}} </span>
+                                    <span ng-if="subject.GropuFlag ==false"> {{subject.ISMS_SubjectName}} </span>
+                                </th>
+                                <th colspan="3">
+                                    GRAND TOTAL
+                                </th>
+                                <th colspan="3">
+                                    PERCENTAGE
+                                </th>
+                            </tr>
+                            <tr>
+
+                                <th colspan="2"><b>Roll No</b></th>
+                                <th colspan="2">
+                                    <b>Student Name</b>
+
+                                </th>
+                                <td colspan="2">Attendence</td>
+                                <th ng-repeat="col in TotalApplicable"><b>{{col.Column}}</b></th>
+                                <th colspan="3">
+
+                                </th>
+                                <th colspan="3">
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in studentdetails | orderBy:sortKey:reverse">
+
+                                <td colspan="2">{{user.rollno}} </td>
+                                <td class="text-left padding-left-5" colspan="2">{{user.studentname}} </td>
+                                <td colspan="2">{{user.ATTENDANCEPERCENTAGE}}</td>
+                                <td ng-repeat="col in MarksTotal" ng-if="col.AMST_Id==user.AMST_Id">
+
+                                    <b ng-if="col.Column=='TOTAL'">
+                                        <span ng-if="col.GropuFlag==true && col.GroupMarks > 0">
+                                            <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                {{col.GroupMarks}}
+                                            </span>
+                                            <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                --
+                                            </span>
+
+                                        </span>
+
+                                        <span ng-if="col.GropuFlag==false && col.ESTMPPSG_GroupObtMarks > 0">
+                                            <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                {{col.ESTMPPSG_GroupObtMarks}}
+                                            </span>
+                                            <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                --
+                                            </span>
+
+                                        </span>
+                                    </b>
+                                    <b ng-if="col.Column=='AVERAGE' && col.YeralyGroupObtMarks> 0">
+
+                                        <span ng-if="col.GropuFlag==true && col.YearlyMarks > 0">
+                                            <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                {{col.YearlyMarks}}
+                                            </span>
+                                            <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                --
+                                            </span>
+
+                                        </span>
+
+                                        <span ng-if="col.GropuFlag==false && col.YeralyGroupObtMarks > 0">
+                                            <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                {{col.YeralyGroupObtMarks}}
+                                            </span>
+                                            <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                --
+                                            </span>
+
+                                        </span>
+
+                                    </b>
+
+
+                                </td>
+                                <td colspan="3" ng-repeat="dd in getgradelist" ng-if="dd.AMST_Id==user.AMST_Id">
+                                    <b>
+                                        {{dd.GroupMarks_Total |number:0}}/{{dd.maxmarks}}
+                                    </b>
+
+
+                                </td>
+
+                                <td colspan="3" ng-repeat="dd in getgradelist" ng-if="dd.AMST_Id==user.AMST_Id">
+                                    <b> {{dd.GroupMarks_PER}}%</b>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+                        <!--<tr>
+                            <td class="text-left" colspan="3"><b>Subject Teacher </b></td>
+                            <td class="text-right" colspan="3">  <b>Principal & Secretary </b></td>
+                        </tr>-->
+                    </table>
+
+                </div>
+            </div>
+
+            <div id="Baldwinddd" ng-hide="true">
+                <div class="CumulativeReportBB divclass">
+                    <table class="text-center" style="width: 100%;">
+                        <tr class="row">
+                            <td colspan="{{colspan}}" class="text-center col-sm-12">
+                                <h3>
+                                    {{inst_name}}
+                                </h3>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="{{colspan}}" class="text-center col-sm-12">
+                                <h5>
+                                    CUMULATIVE REPORT
+                                </h5>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="{{colspan}}" class="text-uppercase col-sm-12 text-center">
+                                <label> <b>ACADEMIC YEAR : {{Accdemic}} </b></label>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td colspan="{{colspan}}" class="text-uppercase col-sm-12 text-center">
+                                <label><b>CLASS & SEC : {{classs}} - {{clasection}}</b></label>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered" id="table1" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th colspan="6">
+
+                                </th>
+                                <th ng-repeat="subject in employeeid" colspan="2">
+                                    <span ng-if="subject.GropuFlag==true"> {{subject.ESG_SubjectGroupName}} </span>
+                                    <span ng-if="subject.GropuFlag ==false"> {{subject.ISMS_SubjectName}} </span>
+                                </th>
+                                <th colspan="3">
+                                    GRAND TOTAL
+                                </th>
+                                <th colspan="3">
+                                    PERCENTAGE
+                                </th>
+                            </tr>
+                            <tr>
+
+                                <th colspan="2"><b>Roll No</b></th>
+                                <th colspan="2">
+                                    <b>Student Name</b>
+
+                                </th>
+                                <td colspan="2">Attendence</td>
+                                <th ng-repeat="col in TotalApplicable"><b>{{col.Column}}</b></th>
+                                <th colspan="3">
+
+                                </th>
+                                <th colspan="3">
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in studentdetails | orderBy:sortKey:reverse">
+
+                                <td colspan="2">{{user.rollno}} </td>
+                                <td class="text-left padding-left-5" colspan="2">{{user.studentname}} </td>
+                                <td colspan="2">{{user.ATTENDANCEPERCENTAGE}}</td>
+                                <td ng-repeat="col in MarksTotal" ng-if="col.AMST_Id==user.AMST_Id">
+
+                                    <b ng-if="col.Column=='TOTAL'">
+                                        <span ng-if="col.GropuFlag==true && col.GroupMarks > 0">
+                                            <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                {{col.GroupMarks}}
+                                            </span>
+                                            <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                --
+                                            </span>
+
+                                        </span>
+
+                                        <span ng-if="col.GropuFlag==false && col.ESTMPPSG_GroupObtMarks > 0">
+                                            <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                {{col.ESTMPPSG_GroupObtMarks}}
+                                            </span>
+                                            <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                --
+                                            </span>
+
+                                        </span>
+                                    </b>
+                                    <b ng-if="col.Column=='AVERAGE' && col.YeralyGroupObtMarks> 0">
+
+                                        <span ng-if="col.GropuFlag==true && col.YearlyMarks > 0">
+                                            <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                {{col.YearlyMarks}}
+                                            </span>
+                                            <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                --
+                                            </span>
+
+                                        </span>
+
+                                        <span ng-if="col.GropuFlag==false && col.YeralyGroupObtMarks > 0">
+                                            <span ng-if="col.EYCES_MarksDisplayFlg==true">
+                                                {{col.YeralyGroupObtMarks}}
+                                            </span>
+                                            <span ng-if="col.EYCES_GradeDisplayFlg==true">
+                                                --
+                                            </span>
+
+                                        </span>
+
+                                    </b>
+
+
+                                </td>
+                                <td colspan="3" ng-repeat="dd in getgradelist" ng-if="dd.AMST_Id==user.AMST_Id">
+                                    <b>
+                                        {{dd.GroupMarks_Total |number:0}}/{{dd.maxmarks}}
+                                    </b>
+
+
+                                </td>
+
+                                <td colspan="3" ng-repeat="dd in getgradelist" ng-if="dd.AMST_Id==user.AMST_Id"><b> {{dd.GroupMarks_PER}}%</b>  </td>
+
+                            </tr>
+
+                        </tbody>
+                        <!--<tr>
+                            <td class="text-left" colspan="3"><b>Subject Teacher </b></td>
+                            <td class="text-right" colspan="3">  <b>Principal & Secretary </b></td>
+                        </tr>-->
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+</section>
+
+
+<script>
+    function printPDF() {
+        var loadingIndicator = document.getElementById('loadingIndicator');
+        loadingIndicator.style.display = 'block'; // Show loading indicator
+
+        printJS({
+            printable: 'Baldwinddd',
+            type: 'html',
+            css: ['css/print/PrintPdf_Bootstrap.css', 'css/print/baldwin/InvoicePdf.css', 'css/print/PrintPdf.css'],
+            onComplete: function () {
+                var loadingIndicator = document.getElementById('loadingIndicator');
+                loadingIndicator.style.display = 'none'; // Hide loading indicator when printing is complete
+            }
+        });
+    }
+</script>
+

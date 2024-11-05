@@ -1,0 +1,994 @@
+﻿<style>
+    .error-messages.ng-active {
+        color: red;
+    }
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 280px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-submit="ShowReportdata()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Route Mapping</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="radio text-center well">
+                            <label>
+                                <input type="radio" value="class_wise" data-ng-model="radioval" ng-init="radioval='class_wise'" ng-click="changeradio(radioval)" name="selll">
+                                <span class="lbl padding-8">Class Wise </span>
+                            </label>
+                            <label>
+                                <input type="radio" value="route_wise" data-ng-model="radioval" ng-click="changeradio(radioval)" name="selll">
+                                <span class="lbl padding-8">Route Wise</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="box-content clearfix" style="min-height:auto" ng-show="radioval=='route_wise' ">
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">PickUp Route<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="acd" ng-model="trmR_Id_pic" name="acd_yr11" ng-change="on_pic_route_change()">
+                                        <option value="">PickUp Route</option>
+                                        <option ng-repeat="year1 in pick_route_new" value="{{year1.trmR_Id}}"> {{year1.trmR_RouteName}} </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_yr11)" ng-messages="myForm.acd_yr11.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select PickUp Route</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Drop Route<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="acd" ng-model="trmR_Id_drp" name="acd_yree" ng-change="on_drp_route_change()">
+                                        <option value="">Drop Route</option>
+                                        <option ng-repeat="year in drop_route_new" value="{{year.trmR_Id}}"> {{year.trmR_RouteName}} </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_yree)" ng-messages="myForm.acd_yree.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select the Drop Route</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">PickUp Location<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="acd" ng-model="TRSR_PickUpLocation" name="acd_yrpl" ng-required="trmR_Id_pic!=undefined && trmR_Id_pic!=null && trmR_Id_pic!=''">
+                                        <option value="">PickUp Location</option>
+                                        <option ng-repeat="pl in picloclist" value="{{pl.trsR_PickUpLocation}}"> {{pl.pickUp_LocationName}} </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_yrpl)" ng-messages="myForm.acd_yrpl.$error">
+                                    <div ng-message="required" style="margin-left:195px;"> Select Pickup Location</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Drop Location<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="acd" ng-model="TRSR_DropLocation" name="acd_yrdrp" ng-required="trmR_Id_drp!=undefined && trmR_Id_drp!=null && trmR_Id_drp!=''">
+                                        <option value="">Drop Location</option>
+                                        <option ng-repeat="year123 in droploclist" value="{{year123.trsR_DropLocation}}"> {{year123.drop_LocationName}} </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_yrdrp)" ng-messages="myForm.acd_yrdrp.$error">
+                                    <div ng-message="required" style="margin-left:195px;"> Select the Drop Location</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">PickUp Session<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="acd" ng-model="PickUp_Session" name="acd_yrssp" ng-required="trmR_Id_pic!=undefined && trmR_Id_pic!=null && trmR_Id_pic!=''">
+                                        <option value="">PickUp Session</option>
+                                        <option ng-repeat="ssn in picsesslist" value="{{ssn.trmS_Id}}"> {{ssn.trmS_SessionName}} </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_yrssp)" ng-messages="myForm.acd_yrssp.$error">
+                                    <div ng-message="required" style="margin-left:195px;"> Select the PickUp Session</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Drop Session<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="acd" ng-model="Drop_Session" name="acd_yr1111" ng-required="trmR_Id_drp!=undefined && trmR_Id_drp!=null && trmR_Id_drp!=''">
+                                        <option value="">Drop Session</option>
+                                        <option ng-repeat="dss in drpsesslist" value="{{dss.trmS_Id}}"> {{dss.trmS_SessionName}} </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_yr1111)" ng-messages="myForm.acd_yr1111.$error">
+                                    <div ng-message="required" style="margin-left:195px;"> Select the Drop Session</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="box-content clearfix" style="min-height:auto">
+                    <div class="row">
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="acd" ng-model="asmaY_Id" name="acd_yr" ng-change="get_cls_secs()" required>
+                                        <option value="">Select Academic Year</option>
+                                        <option ng-repeat="year in yearlist" value="{{year.asmaY_Id}}"> {{year.asmaY_Year}} </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_yr)" ng-messages="myForm.acd_yr.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select the Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Class:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="selus2e" ng-model="clsdrp" name="stu_Class" ng-change="get_sections()" required>
+                                        <option value="">Select Class</option>
+                                        <option ng-repeat="option11 in class_list" value="{{option11.asmcL_Id}}" ng-selected="{{option11.Selected == true}}">
+                                            {{option11.asmcL_ClassName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.stu_Class)" ng-messages="myForm.stu_Class.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Class</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Date :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <div class="col-sm-4 input-group text-right">
+                                        <md-datepicker ng-model="TRSR_Date" onkeydown="return false" name="att_from_date" id="date1" md-placeholder="Enter  date" md-min-date="minDatemf" md-max-date="maxDatemf" required></md-datepicker><!--md-min-date="Today_td"-->
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.att_from_date)" ng-messages="myForm.att_from_date.$error">
+                                        <div ng-message="required">Select Date From The Calendar</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Section:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="seluse1" data-ng-model="sectiondrp" name="stu_Section" required>
+                                        <option value="">Select Section</option>
+                                        <option ng-repeat="option1 in section_list" value="{{option1.asmS_Id}}" ng-selected="{{option1.Selected == true}}">
+                                            {{option1.asmC_SectionName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.stu_Section)" ng-messages="myForm.stu_Section.$error">
+                                    <div ng-message="required" style="margin-left:195px;">Please Select Section</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" id="save-btn" aria-disabled="false">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        Show
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" id="clear-btn" ng-click="clear1()" ng-show="students.length==0">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+        <div class="box box-primary" ng-show="students.length>0 && radioval=='class_wise' ">
+            <div class="box-header with-border">
+                <h3 class="box-title">Students List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <!--<div class="row">-->
+                <div class="col-sm-3 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" ng-model="search1" type="text" placeholder="search here...">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+                <!--</div>-->
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+
+                                SLNO
+                            </th>
+                            <th>
+                                <label>
+                                    <input type="checkbox" value="" ng-click="toggleAll()" ng-model="all">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort1('amsT_FirstName')">Student Name</a>
+                            </th>
+
+                            <th>
+                                Groups
+                            </th>
+                            <th>
+                                <label>
+                                    <input type="checkbox" value="" ng-click="toggleAllpick()" ng-model="allpick">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>
+                                Pick-Up  Route
+                            </th>
+
+                            <th>
+                                Pick-Up Location
+                            </th>
+                            <th>
+                                Pick-Up Session
+                            </th>
+                            <th>
+                                <label>
+                                    <input type="checkbox" value="" ng-click="toggleAlldrop()" ng-model="alldrop">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+                            </th>
+                            <th>
+                                Drop  Route
+                            </th>
+                            <th>
+                                Drop Location
+                            </th>
+                            <th>
+                                Drop Session
+                            </th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in students |orderBy:sortKey1:reverse1| filter:search1" ng-class-odd="'odd'">
+                            <!--| filter:paginate-->
+                            <td>{{ $index + 1}}</td>
+                            <td class="text-center">
+                                <label>
+                                    <input type="checkbox" name="adcheckt_{{user.amsT_Id}}" ng-model="user.checkedvalue" ng-change="optionToggled(user)">
+
+                                    <span class="lbl padding-8"></span>
+
+                                </label>
+
+                            </td>
+                            <td>{{user.amsT_FirstName}}</td>
+                            <!--<td>
+        <input class="form-control" type="text" placeholder="Enter Application No..."   data-ng-model="user.TRSR_ApplicationNo" name="t_{{user.amsT_Id}}" maxlength="15" ng-required="user.checkedvalue" />
+        <div class="error-messages" ng-if="interacted(myForm['t_'+user.amsT_Id])" ng-messages="myForm['t_'+user.amsT_Id].$error">
+            <div ng-message="required">Please  Enter Application No</div>
+
+        </div>
+
+    </td>-->
+
+                            <td>
+                                <label>
+                                    <input type="checkbox" name="grp54" ng-model="user.grp_flag" ng-disabled="!user.checkedvalue" ng-change="select_grps(user.grp_flag,user)">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+
+                            </td>
+                            <td>
+                                <label>
+                                    <input type="checkbox" name="grp54" ng-model="user.grp_flagpick" >
+                                    <span class="lbl padding-8"></span>
+                                </label>
+
+                            </td>
+                            <!--<td>
+                                style="width:130px;"
+                                <select class="form-control" id="sel1" name="route_{{user.amsT_Id}}" ng-model="user.TRMR_Id"  ng-required=" user.checkedvalue && user.grp_flagpick==true"    ng-disabled="!user.checkedvalue" ng-change="get_loca_sches_p(user);">  
+                                        ng-required="user.checkedvalue && (user.TRMR_Drop_Route==null || user.TRMR_Drop_Route=='')" 
+                                       
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in route_list" value="{{option.trmR_Id}}" ng-selected="{{option.trmR_Id == user.TRMR_Id}}">
+                                        {{option.trmR_RouteNo}} : {{option.trmR_RouteName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['route_'+user.amsT_Id])" ng-messages="myForm['route_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Pick-Up Route</div>
+                                </div>
+                            </td>-->
+
+                            <td>
+                                <ui-select id="sel1" name="route_{{user.amsT_Id}}" ng-model="user.TRMR_Id" ng-required="user.checkedvalue && user.grp_flagpick==true" ng-disabled="!user.checkedvalue" ng-change="get_loca_sches_p(user);">
+                                    <ui-select-match placeholder="Select or search route">{{$select.selected.trmR_RouteName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in route_list | filter: $select.search" value="{{option.trmR_Id}}">
+                                        <div>{{option.trmR_RouteNo}} : {{option.trmR_RouteName}}</div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm['route_'+user.amsT_Id])" ng-messages="myForm['route_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Pick-Up Route</div>
+                                </div>
+                            </td>
+
+
+                            <!--<td>
+                                <select class="form-control" id="sel1" name="PUL_{{user.amsT_Id}}" ng-model="user.TRSR_PickUpLocation" ng-disabled="!user.checkedvalue"   ng-required="user.checkedvalue && user.grp_flagpick==true" >   
+                                        ng-required="user.checkedvalue &&  (user.TRMR_Id!=null && user.TRMR_Id!='')">
+                                    ng-required="user.checkedvalue"
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in user.location_list_p" value="{{option.trmL_Id}}" ng-selected="{{option.trmL_Id == user.TRSR_PickUpLocation}}">
+                                        {{option.trmL_LocationName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['PUL_'+user.amsT_Id])" ng-messages="myForm['PUL_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select  PickUp Location</div>
+                                </div>
+                            </td>-->
+
+                            <td style="width:130px;">
+                                <ui-select id="sel1" name="PUL_{{user.amsT_Id}}" ng-model="user.TRSR_PickUpLocation" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue && user.grp_flagdrop==true">
+                                    <ui-select-match placeholder="Select or search pick-up location">{{$select.selected.trmL_LocationName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in user.location_list_p | filter: $select.search" value="{{option.trmL_Id}}">
+                                        <div>{{option.trmL_LocationName}}</div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm['PUL_'+user.amsT_Id])" ng-messages="myForm['PUL_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Pick-Up Location</div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <select class="form-control" id="sel1" name="PUSC_{{user.amsT_Id}}" ng-model="user.PickUp_Session" ng-disabled="!user.checkedvalue"   ng-required=" user.checkedvalue &&   user.grp_flagpick==true"    >
+                                        <!--ng-required="user.checkedvalue &&  (user.TRMR_Id!=null && user.TRMR_Id!='')">-->
+                                    <!--ng-required="user.checkedvalue"-->
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in user.sesslist_list_p" value="{{option.trmS_Id}}" ng-selected="{{option.trmS_Id == user.PickUp_Session}}">
+                                        {{option.trmS_SessionName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['PUSC_'+user.amsT_Id])" ng-messages="myForm['PUSC_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select PickUp Session</div>
+                                </div>
+                            </td>
+                            <td>
+                                <label>
+                                    <input type="checkbox" name="grp54" ng-model="user.grp_flagdrop">
+                                    <span class="lbl padding-8"></span>
+                                </label>
+
+                            </td>
+                            <!--<td>
+                                style="width:130px;"
+                                <select class="form-control" id="sel1" name="droproute_{{user.amsT_Id}}" ng-model="user.TRMR_Drop_Route"    ng-required=" user.checkedvalue &&   user.grp_flagdrop==true"    ng-change="get_loca_sches_d(user);">
+                                        ng-required="user.checkedvalue && (user.TRMR_Id==null || user.TRMR_Id=='')" ng-disabled="!user.checkedvalue"
+                                     
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in route_list" value="{{option.trmR_Id}}" ng-selected="{{option.trmR_Id == user.TRMR_Drop_Route}}">
+                                        {{option.trmR_RouteNo}} : {{option.trmR_RouteName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['droproute_'+user.amsT_Id])" ng-messages="myForm['droproute_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Drop Route</div>
+                                </div>
+                            </td>-->
+
+                            <td>
+                                <ui-select id="sel1" name="droproute_{{user.amsT_Id}}" ng-model="user.TRMR_Drop_Route" ng-required="user.checkedvalue && user.grp_flagpick==true" ng-disabled="!user.checkedvalue" ng-change="get_loca_sches_d(user);">
+                                    <ui-select-match placeholder="Select or drop route">{{$select.selected.trmR_RouteName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in route_list | filter: $select.search" value="{{option.trmR_Id}}">
+                                        <div>{{option.trmR_RouteNo}} : {{option.trmR_RouteName}}</div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm['droproute_'+user.amsT_Id])" ng-messages="myForm['droproute_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Drop Route</div>
+                                </div>
+                            </td>
+
+                            <!--<td>
+                                <select class="form-control" id="sel1" name="DL_{{user.amsT_Id}}" ng-model="user.TRSR_DropLocation" ng-disabled="!user.checkedvalue"  ng-required="user.checkedvalue &&   user.grp_flagdrop==true">
+                                       ng-required="user.checkedvalue &&  (user.TRMR_Drop_Route!=null && user.TRMR_Drop_Route!='')"                                       
+                                    ng-required="user.checkedvalue"
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in user.location_list_d" value="{{option.trmL_Id}}" ng-selected="{{option.trmL_Id == user.TRSR_DropLocation}}">
+                                        {{option.trmL_LocationName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['DL_'+user.amsT_Id])" ng-messages="myForm['DL_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Drop Location</div>
+                                </div>
+                            </td>-->
+
+                            <td style="width:130px;">
+                                <ui-select id="sel1" name="DL_{{user.amsT_Id}}" ng-model="user.TRSR_DropLocation" ng-disabled="!user.checkedvalue" ng-required="user.checkedvalue && user.grp_flagdrop==true">
+                                    <ui-select-match placeholder="Select or search drop location">{{$select.selected.trmL_LocationName}}</ui-select-match>
+                                    <ui-select-choices repeat="option in user.location_list_d | filter: $select.search" value="{{option.trmL_Id}}">
+                                        <div>{{option.trmL_LocationName}}</div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div class="error-messages" ng-if="interacted(myForm['DL_'+user.amsT_Id])" ng-messages="myForm['DL_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Drop Location</div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <select class="form-control" id="sel1" name="DSC_{{user.amsT_Id}}" ng-model="user.Drop_Session" ng-disabled="!user.checkedvalue"   ng-required="user.checkedvalue && user.grp_flagdrop==true">
+                                        <!--ng-required="user.checkedvalue &&  (user.TRMR_Drop_Route!=null && user.TRMR_Drop_Route!='')">-->
+                                    <!--ng-required="user.checkedvalue"-->
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="option in user.sesslist_list_d" value="{{option.trmS_Id}}" ng-selected="{{option.trmS_Id == user.Drop_Session}}">
+                                        {{option.trmS_SessionName}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['DSC_'+user.amsT_Id])" ng-messages="myForm['DSC_'+user.amsT_Id].$error">
+                                    <div ng-message="required">Select Drop Session</div>
+                                </div>
+                            </td>
+
+                            <td hidden="hidden">{{user.amsT_Id}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div hidden="hidden">{{returntxt}}</div>
+                <hr />
+                <div class="well text-center">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="savedata(students)" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-show="students.length>0 && radioval=='route_wise'">
+            <div class="box-header with-border">
+                <h3 class="box-title">Students List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!--<div class="row">-->
+                        <div class="col-sm-3 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="search1" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--</div>-->
+
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+
+                                        SLNO
+                                    </th>
+                                    <th>
+                                        <label>
+                                            <input type="checkbox" value="" ng-click="toggleAll1()" ng-model="all1">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="sort1('amsT_FirstName')">Student Name</a>
+                                    </th>
+
+                                    <th>
+                                        Groups
+                                    </th>
+                                    <th>
+                                        Adm No
+                                    </th>
+                                    <th>
+                                        Roll No
+                                    </th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in students |orderBy:sortKey1:reverse1| filter:search1" ng-class-odd="'odd'">
+                                    <!--| filter:paginate-->
+                                    <td>{{ $index + 1}}</td>
+                                    <td class="text-center">
+                                        <label>
+                                            <input type="checkbox" name="adcheckt_{{user.amsT_Id}}" ng-model="user.checkedvalue1" ng-change="optionToggled1(user)">
+
+                                            <span class="lbl padding-8"></span>
+
+                                        </label>
+
+                                    </td>
+                                    <td>{{user.amsT_FirstName}}</td>
+
+
+
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="grp54" ng-model="user.grp_flag" ng-disabled="!user.checkedvalue1" ng-change="select_grps(user.grp_flag,user)">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+
+                                    </td>
+                                    <td>{{user.amst_admno}}</td>
+                                    <td>{{user.amst_admno}}</td>
+
+
+                                    <td hidden="hidden">{{user.amsT_Id}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div hidden="hidden">{{returntxt}}</div>
+                <hr />
+                <div class="well text-center">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="addtempdata(students)" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        ADD
+                    </md-button>
+                    <!--<md-button type="button" class="md-raised md-primary" data-ng-click="savedata_route(students)" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>-->
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        CANCEL
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-show="radioval=='route_wise' && students2.length>0 ">
+            <div class="box-header with-border">
+                <h3 class="box-title">Students List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-12" style="overflow:scroll">
+                        <!--<div class="row">-->
+                        <div class="col-sm-3 pull-right">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="search1" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--</div>-->
+
+                        <table class="table table-hover table-responsive table-bordered text-center" >
+                            <thead>
+                                <tr>
+                                    <th>
+
+                                        SL.NO
+                                    </th>
+                                 
+                                    <th>
+                                        <a href="" ng-click="sort1('amsT_FirstName')">Student Name</a>
+                                    </th>
+
+                                    <th>
+                                        Admission No.
+                                    </th>
+                                    <th>
+                                        Pickup Route
+                                    </th>
+                                    <th>
+                                        Pickup Location
+                                    </th>
+                                    <th>
+                                        Pickup Session
+                                    </th>
+                                    <th>
+                                        Drop Route
+                                    </th>
+                                    <th>
+                                        Drop Location
+                                    </th>
+                                    <th>
+                                        Drop Session
+                                    </th>
+                                    <th>
+                                        Action
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in students2 |orderBy:sortKey1:reverse1| filter:search1" ng-class-odd="'odd'">
+                                    <!--| filter:paginate-->
+                                    <td>{{ $index + 1}}</td>
+                                    <td style="overflow-wrap:break-word">{{user.name}}</td>
+                                    <td>{{user.adm}}</td>
+                                    <td style="overflow-wrap:break-word">{{user.pr}}</td>
+                                    <td style="overflow-wrap:break-word">{{user.pl}}</td>
+                                    <td style="overflow-wrap:break-word">{{user.ps}}</td>
+                                    <td style="overflow-wrap:break-word">{{user.dr}}</td>
+                                    <td style="overflow-wrap:break-word">{{user.dl}}</td>
+                                    <td style="overflow-wrap:break-word">{{user.ds}}</td>
+                                    <td>
+                                        <div class="grid-action-cell">
+                                          
+                                            <a href="javascript:void(0)" ng-click="removetemp(user)"> <i class="fa fa-trash text-danger"></i></a> 
+                                        </div>
+                                    </td>
+
+
+                                    <td hidden="hidden">{{user.amsT_Id}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div hidden="hidden">{{returntxt}}</div>
+                <hr />
+                <div class="well text-center">
+                    <md-button type="button" class="md-raised md-primary" data-ng-click="savedata_route(students)" ng-disabled="form.$invalid" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Student Route Mapped List</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-10">
+
+                    <div class="col-sm-3">
+                        <select class="form-control" id="sel1" ng-model="searchColumn1" ng-change="getcolumnId(searchColumn1)">
+                            <option value="" ng-selected="true">Select</option>
+                            <option value="0">Student Name</option>
+                            <option value="1">Date</option>
+                            <option value="2">Application number</option>
+                            <option value="3">Route Name</option>
+                            <option value="4">Admission No.</option>
+                            <option value="5">Academic Year</option>
+
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <input class="form-control col-sm-3" ng-model="search123" type="text" placeholder="search here..." ng-show="searchColumn1!='1' && searchColumn1!=''">
+
+                        <md-datepicker ng-model="search1" onkeydown="return false" name="att_from_date" id="date11" md-placeholder="Enter  date" ng-show="searchColumn1=='1' && searchColumn1!=''"></md-datepicker>
+
+                    </div>
+                    <div class="col-sm-4" ng-show="searchColumn1!=''">
+                        <md-button class="md-raised md-primary" type="submit" ng-click="searchByColumn()"><i class="fa fa-search"></i>Search</md-button>
+
+                        <md-button class="md-raised md-warn" type="submit" ng-click="searchByclear()">Clear</md-button>
+
+                    </div>
+
+                </div>
+            </div>
+            <br />
+            <div style="overflow:scroll">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                SLNO
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('asmaY_Year')">Academic Year</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('trsR_ApplicationNo')">Admission No</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('amsT_FirstName')">Student Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('ASMCL_ClassName')">Class Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('ASMC_SectionName')">Section Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('trsR_Date')">Date</a>
+                            </th>
+
+                            <th>
+                                <a href="" ng-click="sort('trsR_ApplicationNo')">Application No</a>
+                            </th>
+
+                            <th>
+                                <a href="" ng-click="sort('trmR_RouteName')">PickUp Route Name</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('trmR_DropRouteName')">Drop Route Name</a>
+                            </th>
+                            <th style="width:70px !important">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="user in students_list |orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page">
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td>{{user.asmaY_Year}}</td>
+                            <td style="overflow-wrap:break-word">{{user.AMST_AdmNo}}</td>
+                            <td style="overflow-wrap:break-word"> {{user.amsT_FirstName}}</td>
+                            <td style="overflow-wrap:break-word"> {{user.ASMCL_ClassName}}</td>
+                            <td style="overflow-wrap:break-word"> {{user.ASMC_SectionName}}</td>
+                            <td>{{user.trsR_Date}}</td>
+                            <td>
+
+                                <span ng-if="user.trsR_ApplicationNo=='0'"> </span>
+                                <span ng-if="user.trsR_ApplicationNo!='0'">{{user.trsR_ApplicationNo}}</span>
+                            </td>
+
+                            <td style="overflow-wrap:break-word">{{user.trmR_RouteName}}</td>
+
+                            <td style="overflow-wrap:break-word">{{user.trmR_DropRouteName}}</td>
+                            <td class="text-center">
+                                <a href="javascript:void(0)" ng-click="editvalue(user)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+
+
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#popup" ng-click="viewrecordspopup(user);">
+                                    <i class="fa fa-eye text-purple"></i><md-tooltip md-direction="down">View</md-tooltip>
+                                </a>
+                                <a ng-if="user.trsR_ActiveFlg === false" href="javascript:void(0)" style="color:green;" ng-click="deactive(user);"> <md-tooltip md-direction="down">Activate Now</md-tooltip> <i class="fa fa-toggle-off text-red" aria-hidden="true"></i></a><!--&& user.opt_flag==true-->
+                                <a ng-if="user.trsR_ActiveFlg === true" href="javascript:void(0)" style="color:red;" ng-click="deactive(user);">  <md-tooltip md-direction="down">Deactivate Now</md-tooltip> <i class="fa fa-toggle-on text-green" aria-hidden="true"></i></a> <!--&& user.opt_flag==true-->
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <dir-pagination-controls max-size="5" pagination-id="page"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+           
+        </div>
+    </div>
+
+
+
+</section>
+
+<div class="modal fade modal-small" modal="model_exam" id="popup5" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="clearpopupgrid5()"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            <!--<button type="button" class="btn btn-default" ng-click="clearpopupgrid5(subexam_list)">Close</button>-->
+            <h4 class="modal-title text-white">"{{Student_Name}}":Groups Mapping</h4>
+        </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" name="myForm2" novalidate>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Groups :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="multiselect col-sm-8">
+                                    <label data-ng-model="ftI_Id" ng-repeat="grp in group_list">
+                                        <input type="checkbox" ng-model="grp.checkedvalue_g" name="selrole" ><!--binddata(group_list)--> <!--ng-click="select_one(group_list,grp)"--> 
+                                        <span class="lbl padding-0">{{grp.fmG_GroupName}}</span>
+                                    </label>
+                                </div>
+
+                                <div class="error-messages col-sm-8" ng-if="interacted2(myForm2.selrole)" ng-messages="myForm2.selrole.$error">
+                                    <div ng-message="required">Select Atleast One Group</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-6">Application No :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <input class="form-control" type="text" placeholder="Enter Application No..." ng-blur="checkduplicateno()" ng-model="TRSR_ApplicationNo" allow-pattern="[0-9]" name="t_" maxlength="15"  ng-paste="$event.preventDefault()" ng-disabled="disableappno" /><!--ng-disabled="true"-->
+                                    <div class="error-messages" ng-if="interacted2(myForm2.t_)" ng-messages="myForm2.t_.$error">
+                                        <div ng-message="required">Enter Application No</div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-6">PickUP Mobile No :<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <input class="form-control" type="text" placeholder="Enter PickUP Mobile No..." ng-pattern="/^[7-9]{1,1}[0-9]{0,}?$/" allow-pattern="\d" maxlength="10" ng-minlength="10" ng-model="TRSR_PickUpMobileNo" name="t1_" ng-paste="$event.preventDefault()" required />
+                                    <div class="error-messages" ng-if="interacted2(myForm2.t1_)" ng-messages="myForm2.t1_.$error">
+                                        <div ng-message="pattern">Enter valid Mobile NO</div>
+                                        <div ng-message="required">Enter PickUp Mobile No</div>
+                                        <div ng-message="minlength">Enter 10 Digit Mobile No</div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-6">Drop Mobile No:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                                <div class="col-sm-6">
+                                    <input class="form-control" type="text" placeholder="Enter Drop Mobile No..." ng-pattern="/^[7-9]{1,1}[0-9]{0,}?$/" allow-pattern="\d" maxlength="10" ng-minlength="10" ng-model="TRSR_DropMobileNo" value="" name="t2_" ng-paste="$event.preventDefault()" required />
+                                    <div class="error-messages" ng-if="interacted2(myForm2.t2_)" ng-messages="myForm2.t2_.$error">
+                                        <div ng-message="pattern">Enter valid Mobile NO</div>
+                                        <div ng-message="required">Enter Drop Mobile No</div>
+                                        <div ng-message="minlength">Enter 10 Digit Mobile No</div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" ng-click="saveddata2(group_list)">
+                            <i class="fa fa-save" aria-hidden="true"></i> ADD & Close
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clear2()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="clearpopupgrid5()">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade modal-large" id="popup" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+            <h4 class="modal-title text-white">"{{amsT_FirstName}}-{{trmR_RouteName}}" Mapped Details</h4>
+        </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <!--  <div ui-grid="gridOptionspopup" ui-grid-pagination class="grid text-center" style="height: 270px;"></div>-->
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <!--<th>
+                               Group Name
+                            </th>-->
+                            <th>
+                                Pick-UP Session
+                            </th>
+                            <th>
+                                Pick-UP Location
+                            </th>
+                            <th>
+                                Pick-UP Mobile No
+                            </th>
+                            <th>
+                                Drop Session
+                            </th>
+                            <th>
+                                Drop Location
+                            </th>
+                            <th>
+                                Drop Mobile No
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <!--<td>{{viewobj.fmG_GroupName}}</td>-->
+                            <td>{{pickUp_ScheduleName}}</td>
+                            <td>{{pickUp_LocationName}}</td>
+                            <td>{{trsR_PickUpMobileNo}}</td>
+                            <td>{{drop_ScheduleName}}</td>
+                            <td>{{drop_LocationName}}</td>
+                            <td>{{trsR_DropMobileNo}}</td>
+
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,286 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myform2" method="post" novalidate>
+        <div class="box box-primary">
+            <dCanceliv class="box-header with-border">
+                <h3 class="box-title">External Training Approval</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </dCanceliv>
+
+            <div class="box-body" style="overflow:scroll; max-height:600px;">
+                <!--<div class="row">-->
+                <div class="col-sm-3 pull-right">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <table class="table table-hover table-bordered"
+                           style="width:1500px !important">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+                                <th>Check</th>
+                                <th class="text-center">
+                                    Training Topic <strong style="color:red;">*</strong>
+                                </th>
+                                <th class="text-center">
+                                    Training Details <strong style="color:red;">*</strong>
+                                </th>
+                                <th class="text-center">
+                                    Employee Name <strong style="color:red;">*</strong>
+                                </th>
+                                <th class="text-center">
+                                    Approved Hours <strong style="color:red;">*</strong>
+                                </th>
+                                <th class="text-center">
+                                    Remarks <strong style="color:red;">*</strong>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="document in filterValue=(getloaddetails | filter : search)">
+
+                                <td>{{$index+1}}</td>
+                                <td>
+                                    <input name="lvemp" ng-model="document.chkitem" type="checkbox"
+                                           ng-required="isOptionsRequired()" />
+                                    <span class="lbl padding-8"></span>
+                                </td>
+
+                                <td class="text-left" value={{"document.HREXTTRN_Id"}}>{{document.HREXTTRN_TrainingTopic}}</td>
+                                <td class="text-left">
+                                    <div class="col-sm-12">
+                                        <b>
+                                            Training Details :
+                                            <a href="javascript:void(0)" ng-model="document.HREXTTRN_Id" value="document.HREXTTRN_Id" data-toggle="modal" title="View Comments"
+                                               data-target="#myModalgetclasslist" ng-click="viewcomment(document.HREXTTRN_Id)">
+                                                <i class="fa fa-eye fa-1x" aria-hidden="true"></i>
+                                            </a>
+                                        </b>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="lbl padding-8">{{document.EmpName}}</span>
+                                </td>
+                                <td>
+                                    <input class="form-control" data-ng-model="document.hrexttrnapP_ApprovedHrs"
+                                           type="number" maxlength="50"
+                                           ng-paste="$event.preventDefault()"
+                                           ng-required="document.chkitem" name="t13_{{$index}}" allow-pattern="[0-9.]" />
+                                    <div class="error-messages"
+                                         ng-if="interacted(myform2['t13_'+$index])"
+                                         ng-messages="myform2['t13_'+$index].$error" allow-pattern="[0-9.]">
+                                        <div ng-message="required">Enter Approval Hours</div>
+                                    </div>
+
+                                </td>
+                                <td>                                  
+                                    <textarea class="form-control" data-ng-model="document.hrexttrnapP_ApproverRemarks" type="text"  ng-required="document.chkitem" name="t14_{{$index}}"></textarea>
+                                    <div class="error-messages"
+                                         ng-if="interacted(myform2['t14_'+$index])"
+                                         ng-messages="myform2['t14_'+$index].$error">
+                                        <div ng-message="required"> Enter Remark</div>
+
+                                    </div>
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--</div>-->
+            </div>
+
+            <div class="box-body">
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="hrmetrceN_Id" value="{{hrmetrceN_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="approvalstatus('A')" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Approve
+                    </md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="approvalstatus('R')" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Reject
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+
+    <div id="myModalgetclasslist" class="modal fade" role="dialog" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <div class="modal-content">
+                <div class="model-header custom-header">
+                    <center><h4 class="modal-title custom">Training Details</h4></center>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 "><b>Employee Name : {{emplYoeeName}}</b></label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <h4>Training Details</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl.No.</th>
+                                <th>Training Topic</th>
+                                <th>Training Type</th>
+                                <th>Training Center</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Applied Hours</th>
+                                <th>Document</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="cmnt in trainingdetails">
+                                <td>{{$index + 1}}</td>
+                                <td class="text-center">{{cmnt.hrexttrN_TrainingTopic}}</td>
+                                <td class="text-center">{{cmnt.hrmetrtY_ExternalTrainingType}}</td>
+                                <td class="text-center">{{cmnt.hrmetrceN_TrainingCenterName | date:'dd/MM/yyyy'}}</td>
+                                <td class="text-center">{{cmnt.hrexttrN_StartDate | date:'dd/MM/yyyy'}}</td>
+                                <td class="text-center">{{cmnt.hrexttrN_EndDate | date:'dd/MM/yyyy'}}</td>
+                                <td class="text-center">{{cmnt.hrexttrN_StartTime}}</td>
+                                <td class="text-center">{{cmnt.hrexttrN_EndTime}}</td>
+                                <td class="text-center">{{cmnt.hrexttrN_TotalHrs}}</td>
+                                <td class="text-center">
+                                    <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="cmnt.hrexttrN_CertificateFilePath  !=null && cmnt.hrexttrN_CertificateFilePath !=''" style="color:limegreen;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(cmnt.hrexttrN_CertificateFilePath)">
+                                        view
+                                    </a>
+                                </td>
+                                <td class="text-center">{{cmnt.hrexttrN_ApprovedFlg}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer custom-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!--==================== Image Preview Model ===========================-->
+    <div id="myimagePreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:55%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h3>{{filenames}}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--====================PDF view========-->
+    <div id="showpdf" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <form id="qqqq">
+                <div class="modal-content">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                    <div id="pdfIdzz">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">EXTERNAL TRAINING APPROVAL DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="col-sm-4 pull-right">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input class="form-control" type="text" ng-model="search" placeholder="search here...">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>SL.No.</th>
+                        <th> Employee Name</th>
+                        <th> Training Topic</th>
+                        <th>Center Name</th>
+                        <th>Date</th>
+                        <th> Approver Name</th>
+                        <th> Approved Hours</th>
+                        <th>Remarks</th>
+                        <th>Status</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in filterValue=(getloaddetailsTT | filter : search) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                        <td class="text-center">{{user.EmployeeName}}</td>
+                        <td class="text-center">{{user.HREXTTRN_TrainingTopic}}</td>
+                        <td class="text-center">{{user.HRMETRCEN_TrainingCenterName}}</td>
+                        <td class="text-center">{{user.HREXTTRN_StartDate |date:dd/mm/yy}}</td>
+                        <td class="text-center">{{user.ApproverName}}</td>
+                        <td class="text-center">{{user.HREXTTRNAPP_ApprovedHrs}}</td>
+                        <td class="text-center">{{user.HREXTTRNAPP_ApproverRemarks}}</td>
+                        <td class="text-center">{{user.HREXTTRNAPP_ApprovalFlg}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+    </div>
+</section>

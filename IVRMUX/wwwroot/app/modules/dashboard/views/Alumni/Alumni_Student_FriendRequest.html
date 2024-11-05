@@ -1,0 +1,399 @@
+﻿
+<section class="content" ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Alumni Friend Request </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="order('Field')">Field&nbsp;<span style="color:red;">*</span></a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order('Like')">Like&nbsp;<span style="color:red;">*</span></a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="order('Value')">Value&nbsp;<span style="color:red;">*</span></a>
+                            </th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr ng-repeat="item in result">
+                            <td>
+                                <select name="field{{$index}}" ng-model="items.field[$index]" class="form-control" ng-change="filterOperator(items.field[$index],$index)" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="fld in item.fields" value="{{fld.value}}" ng-selected="{{fld.Selected==true}}">
+                                        {{fld.name}}
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['field'+$index])" ng-messages="myForm['field'+$index].$error">
+                                    <div ng-message="required">Please Select Field</div>
+                                </div>
+                            </td>
+                            <td>
+
+                                <select name="oprt{{$index}}" ng-model="items.oprtr[$index]" class="form-control" required>
+                                    <option value="">--Select--</option>
+                                    <option ng-repeat="op in item.operator" value="{{op.value}}" ng-selected="{{op.Selected==true}}">
+                                        {{op.name}}
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm['oprt'+$index])" ng-messages="myForm['oprt'+$index].$error">
+                                    <div ng-message="required">Please Select Operator</div>
+                                </div>
+                            </td>
+                            <td>
+
+                                <input type="text" ng-model="items.val[$index]" ng-if="items.field[$index] == 'StudentName' " maxlength="25" class="form-control" placeholder="enter value" name="val{{$index}}" id="val{{$index}}" ng-paste="$event.preventDefault()">
+
+                                <div class="error-messages" ng-if="interacted(myForm['val'+$index])" ng-messages="myForm['val'+$index].$error">
+                                    <div ng-message="required">Please Enter Value</div>
+                                    <div ng-message="pattern">Please Enter valid pattern Value</div>
+                                    <div ng-message="minlength">Please Enter minimum {{minall}}</div>
+                                </div>
+                            </td>
+
+                            <!--<td>
+
+                           <select name="cond{{$index}}" ng-model="items.conditn[$index]" ng-hide="$last" class="form-control" ng-required="condflag{{$index}}==true">
+                                <option value="">--Select--</option>
+                                <option ng-repeat="condn in item.condition" value="{{condn.value}}" ng-selected="{{condn.Selected==true}}">
+                                    {{condn.name}}
+                            </select>
+                           <div class="error-messages" ng-if="interacted(myForm['cond'+$index])" ng-messages="myForm['cond'+$index].$error">
+                                <div ng-message="required">Please Select Condition</div>
+                            </div>
+                        </td>-->
+
+                        </tr>
+                    </tbody>
+                </table>
+                <pagination total-items="totalItems" ng-model="currentPage"
+                            max-size="5" boundary-links="true"
+                            items-per-page="numPerPage" class="pagination-sm">
+                </pagination>
+                <hr />
+                <div class="text-center">
+
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="searchStud(items)">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        Search
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Clear
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">ALUMNI FRIEND REQUEST SEARCH</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+
+            <div class="box-body">
+                <div class="row clearfix">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{searchResult.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix" id="style-4">
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tbl">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" value="" ng-model="all" ng-click="toggleAll()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th>SL NO</th>
+                                <th>Alumni Name</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                                <th>View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user in filterValue =(searchResult | filter : searchValue) | orderBy :sortKey:reverse |itemsPerPage:itemsPerPage" current-page="currentPage" pagination-id="qq">
+
+                                <td class="text-center">
+                                    <label>
+                                        <input type="checkbox" ng-disabled="user.checktru" ng-model="user.selected" ng-change="optionToggled(user)">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td style="text-align:left">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td style="text-align:left">{{ user.studentname}} </td>
+                                <td style="text-align:left">{{ user.ASMAY_Year}}</td>
+                                <td>
+                                    <span ng-if="user.ALSFRND_AcceptFlag==null && user.ALSFRND_RequestDate!=null">
+                                        <a class="text-rgb(197,17,98)" data-placement="bottom" data-toggle="tooltip" title="Requesting...">
+                                            <i> Requesting... </i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="user.ALSFRND_AcceptFlag=='ACCEPT' && user.ALSFRND_AcceptedDate!=null">
+                                        <a class="text-green" data-placement="bottom" data-toggle="tooltip" title="Accepted">
+                                            <i> Accept</i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="user.ALSFRND_AcceptFlag=='REJECT' && user.ALSFRND_AcceptedDate!=null">
+                                        <a class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Accepted">
+                                            <i> Reject</i>
+                                        </a>
+                                    </span>
+
+                                </td>
+                                <td>
+
+                                    <span ng-show="user.ALSFRND_AcceptFlag=='ACCEPT' && user.ALSFRND_AcceptedDate!=null">
+                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" title="View" ng-click="viewData(user)">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+
+                                </td>
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true" pagination-id="qq">
+                    </dir-pagination-controls>
+                </div>
+
+                <hr />
+
+                <div class="text-center">
+                    <md-button type="button" class="md-raised md-primary" ng-click="sendrequest()">
+                        Send Request
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+
+        <!--<div class="box box-primary" ng-show="friendrequest>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">ALUMNI FRIEND REQUEST LIST</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+           
+            <div class="box-body">
+                <div class="row clearfix">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{searchResult.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="searchValue!=''">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{filterValue.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input class="form-control" ng-model="searchValue" type="text" placeholder="search here...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="overflow:scroll;" class="clearfix" id="style-4">
+                    <table class="table table-hover table-responsive table-bordered text-center" id="tbl">
+                        <thead>
+                            <tr>
+                              
+                                <th>SL NO</th>
+                                <th>Alumni Name</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                                <th>View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="user1 in filterValue =(friendrequest | filter : searchValue) | orderBy :sortKey:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" pagination-id="qq1">
+
+                                <td style="text-align:left">{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                                <td style="text-align:left">{{ user1.studentname}} </td>
+                                <td style="text-align:left">{{ user1.ASMAY_Year}}</td>
+                                <td>
+                                    <span ng-if="user1.ALSFRNDREQ_AcceptFlg==null && user1.ALSFRNDREQ_AcceptedDate==null">
+                                        <a class="text-rgb(197,17,98)" data-placement="bottom" data-toggle="tooltip" title="Requesting...">
+                                            <i> Requesting... </i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="user1.ALSFRNDREQ_AcceptFlg==true && user1.ALSFRNDREQ_AcceptFlg!=null">
+                                        <a class="text-green" data-placement="bottom" data-toggle="tooltip" title="Accepted">
+                                            <i> Accept</i>
+                                        </a>
+                                    </span>
+                                    <span ng-if="user1.ALSFRNDREQ_AcceptFlg==false && user1.ALSFRNDREQ_AcceptFlg!=null">
+                                        <a class="text-danger" data-placement="bottom" data-toggle="tooltip" title="Accepted">
+                                            <i> Reject</i>
+                                        </a>
+                                    </span>
+
+                                </td>
+                                <td>
+
+                                    <span ng-show="user1.ALSFRNDREQ_AcceptFlg==true && user1.ALSFRNDREQ_AcceptFlg!=null"">
+                                        <a href="javascript:void(0)" class="text-primary" data-placement="bottom" title="View" ng-click="viewData(user1)">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true" pagination-id="qq1">
+                    </dir-pagination-controls>
+                </div>
+
+               
+            </div>
+        </div>-->
+
+        <div id="profileview" class="modal fade" role="dialog">
+            <div class="modal-dialog" style="width:70%;">
+                <div class="modal-content">
+                    <div class="modal-header" style="padding-top: 5px;">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h4 class="modal-title text-white"><b>Alumni Name: &nbsp;{{alumniname1}}  </b> </h4>
+                    </div>
+                    <div class="">
+                        <div class="box box-primary" style="margin-top: -17px;">
+
+                            <div class="box box-body" style="padding: 2px;">
+
+                                <table class="table table-hover table-responsive table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>SL NO</th>
+                                            <th>Batch</th>
+                                            <th>Mobile No</th>
+                                            <th>Email Id</th>
+                                            <th>Profile View</th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="option in almst_profile">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{ option.ASMAY_Year}}</td>
+                                            <td>{{ option.ALMST_MobileNo}}</td>
+                                            <td>{{ option.ALMST_emailId}}</td>
+                                            <td>
+
+                                                <span>
+                                                    <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="View" data-ng-model="itemOption" ng-click="previewimg(option.ALMST_StudentPhoto)">
+                                                        View Profile
+                                                    </a>
+                                                </span>
+
+
+                                            </td>
+
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="height:49px; margin-top: -19px;">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="myimagePreview" class="modal fade" role="dialog">
+            <div class="modal-dialog" style="width:55%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                        <h3>{{filenames}}</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div class="box">
+                            <div class="box-body">
+                                <img id="preview" class="img-responsive" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- Modal -->
+</section>

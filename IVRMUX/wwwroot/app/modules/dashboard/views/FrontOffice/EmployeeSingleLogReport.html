@@ -1,0 +1,266 @@
+﻿
+<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary" ng-app="MyModule">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    Employee Single Log Report
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <form class="form-horizontal" role="form" name="myForm" data-ng-submit="GetReport()" novalidate>
+                <div class="box-body">
+                    <div class="col-sm-12">
+
+                        <div class="well text-center" data-ng-init="allind ='All'">
+                            <label class="radio-inline">
+                                <input type="radio" value="All" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                                <span class="lbl padding-8">All</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="Indi" name="allind" data-ng-model="allind" ng-click="All_Individual(allind)">
+                                <span class="lbl padding-8">Individual</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="chktype" ng-model="usercheck" data-ng-click="all_check()">
+                                    <span class="lbl padding-8"> Type <strong style="color:red;">*</strong></span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label data-ng-model="Emp_GroupType" ng-repeat="option in staff_types">
+                                        <input type="checkbox" ng-model="option.selected" value="{{option.hrmgT_Id}}" ng-click="get_departments()" name="option" ng-required="isOptionsRequired();">
+                                        <span class="lbl padding-8">{{option.hrmgT_EmployeeGroupType}}</span>
+                                    </label>
+                                   
+                                </div>
+                              
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.option)" ng-messages="myForm.option.$error">
+                                <div ng-message="required">Please Select Atleast One Type</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="chkdept" ng-model="deptcheck" data-ng-click="all_checkdep()">
+                                    <span class="lbl padding-8">Department <strong style="color:red;">*</strong></span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label data-ng-model="Emp_DepartmentName" ng-repeat="option in Department_types">
+                                        <input type="checkbox" ng-model="option.selected" value="{{option.hrmD_Id}}" ng-click="get_designation()" name="option1" ng-required="isOptionsRequired1();">
+                                        <span class="lbl padding-8">{{option.hrmD_DepartmentName}}</span>
+                                    </label>
+                                    
+                                </div>
+                               
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.option1)" ng-messages="myForm.option1.$error">
+                                <div ng-message="required">Please Select Atleast One Department</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 padding-left-none">
+                            <div class="form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="chkdesg" ng-model="desgcheck" data-ng-click="all_checkdesg()">
+                                    <span class="lbl padding-8">Designation <strong style="color:red;">*</strong></span>
+                                </label>
+                                <div class="multiselect col-sm-8">
+                                    <label data-ng-model="Emp_DesignationName" ng-repeat="option in Designation_types">
+                                        <input type="checkbox" ng-model="option.selected" value="{{option.hrmdeS_Id}}" ng-click="get_employee()" name="option2" ng-required="isOptionsRequired2();">
+                                        <span class="lbl padding-8">{{option.hrmdeS_DesignationName}}</span>
+                                    </label>
+                                    
+                                </div>
+                               
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.option2)" ng-messages="myForm.option2.$error">
+                                        <div ng-message="required">Please Select Atleast One Designation</div>
+                                    </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Employee : <strong style="color:red;" ng-show="!disabledata">*</strong></label>
+
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" name="emphrmE_Id" ng-model="hrmE_Id" ng-disabled="disabledata" ng-required="!disabledata">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in Employeelst" value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.hrmE_EmployeeFirstName + ' ' + option.hrmE_EmployeeMiddleName + ' ' + option.hrmE_EmployeeLastName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.emphrmE_Id)" ng-messages="myForm.emphrmE_Id.$error">
+                                        <div ng-message="required">Select Employee</div>
+                                    </div> 
+                                </div>                               
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" data-ng-init="datedata1='datewise';datechange('datewise')">
+                                    <input type="radio" value="datewise" name="datedata1" data-ng-model="datedata1" ng-click="datechange(datedata1)">
+                                    <span class="lbl padding-8">Date : <strong style="color:red;" ng-show="datedata1=='datewise'">*</strong></span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <md-datepicker ng-model="Datepic" onkeydown="return false" name="Datepic1" id="Datepic1" md-placeholder="Enter date"  ng-disabled="disabledate1" ng-required="datedata1=='datewise'"></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.Datepic1)" ng-messages="myForm.Datepic1.$error">
+                                        <div ng-message="required">Select Date</div>
+                                    </div>                                    
+                                </div>                               
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    <input type="radio" value="monthwise" name="datedata1" data-ng-model="datedata1" ng-click="datechange(datedata1)">
+                                    <span class="lbl padding-8">Monthly : <strong style="color:red;" ng-show="datedata1=='monthwise'">*</strong></span>
+                                </label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="year1" ng-model="year"  ng-disabled="disabledate2" ng-required="datedata1=='monthwise'">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in fillyear" value="{{option.hrmlY_LeaveYear}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.hrmlY_LeaveYear}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.year1)" ng-messages="myForm.year1.$error">
+                                        <div ng-message="required">Select Year</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="month1" ng-model="month" ng-disabled="disabledate3" ng-required="datedata1=='monthwise'">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in fillmonth" value="{{option.monthid}}" ng-selected="{{option.Selected == true}}">
+                                            {{option.monthname}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.month1)" ng-messages="myForm.month1.$error">
+                                        <div ng-message="required">Select Month</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="well text-center">
+                                <label class="radio-inline">
+                                    <input class="" type="radio" name="Punch" ng-model="rdoPunch" value="punch"/>
+                                    <span class="lbl">Punch Time</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input class="" type="radio" name="Punch" ng-model="rdoPunch" value="late"/>
+                                    <span class="lbl">Late In</span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input class="" type="radio" name="Punch" ng-model="rdoPunch" value="early"/>
+                                    <span class="lbl">Early Out</span>
+                                </label>
+                            </div>
+                            <!--<div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    <input class="" type="checkbox" name="Date" ng-model="Date" />
+                                    <span class="lbl padding-8">Relaxed Time :</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <input class="" type="checkbox" name="RelaxedTime" ng-model="RelaxedTime" />
+                                </div>
+                                <div class="error-messages" ng-if="interacted(myForm.insname)" ng-messages="myForm.insname.$error">
+                                    <div ng-message="required">Enter RelaxedTime</div>
+                                </div>
+                            </div>-->
+                            <!--<div class="well text-center">
+                                <label class="checkbox-inline">
+                                    <input class="" type="checkbox" name="Detailed" ng-model="Detailed" />
+                                    <span class="lbl">Detailed</span>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input class="" type="checkbox" name="Format1" ng-model="Format1" />
+                                    <span class="lbl">Format1</span>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input class="" type="checkbox" name="Time" ng-model="Time" />
+                                    <span class="lbl">Time Out/in</span>
+                                </label>
+                            </div>-->
+                        </div>
+                    </div>
+                    <div class="row">
+                        
+                            <label class="control-label col-sm-2">
+                                <input type="radio" value="fromwise" name="datedata1" data-ng-model="datedata1"  ng-click="datechange(datedata1)">
+                                <span class="lbl padding-8">From Date : <strong style="color:red;" ng-show="datedata1=='fromwise'">*</strong></span>
+                            </label>
+                            <div class="col-sm-3">
+                                <md-datepicker ng-model="fromdate" onkeydown="return false"  md-max-date="maxDatemf" name="fromdatenew" id="fromdatenew" md-placeholder="Enter date" ng-disabled="disabledate4" ng-required="datedata1=='fromwise'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.fromdatenew)" ng-messages="myForm.fromdatenew.$error">
+                                    <div ng-message="required">Please Select From date</div>
+                                </div>
+                            </div>
+                            <label class="control-label col-sm-1">
+                                <span class="lbl padding-8">To Date : <strong style="color:red;" ng-show="datedata1=='fromwise'">*</strong></span>
+                            </label>
+                            <div class="col-sm-4">
+                                <md-datepicker ng-model="todate" onkeydown="return false"  md-min-date="minDatemf" md-max-date="maxDatemf" ng-click="gettodate()" name="todatenew" id="todatenew" md-placeholder="Enter  date" ng-disabled="disabledate5"  ng-required="datedata1=='fromwise'"></md-datepicker>
+                                <div class="error-messages" ng-if="interacted(myForm.todatenew)" ng-messages="myForm.todatenew.$error">
+                                    <div ng-message="required">Please Select To Date</div>
+                                </div>
+                            </div>
+                      
+                    </div>
+                    <hr />
+                    <div class="text-center">                        
+                        <md-button type="submit" ng-disabled="form.$invalid" class="md-raised md-primary">
+                            <i class="fa fa-bar-chart" aria-hidden="true"></i> Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clearid()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                        <md-button type="button" ng-click="exptoex();" class="md-raised md-primary" ng-disabled="!grid_view">
+
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Export to Excel
+                        </md-button>                       
+                       <md-button type="button" class="md-raised md-warn" ng-disabled="!grid_view" id="print-btn" aria-disabled="false" ng-click="printData();">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            Print
+                        </md-button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="box box-primary" ng-show="grid_view">
+        
+        <div class="box-header with-border">
+            <h3 class="box-title">Grid View</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body" style="overflow:scroll">
+            <div>
+                <table id="table1" class="table table-hover table-responsive table-bordered text-center" border="1" style="border-collapse:collapse;width:100%;text-align:center">
+                    <thead>
+                        <!--<tr><th colspan="9">Report On {{datenew | date:'dd-MM-yyyy'}}</th></tr>-->
+                        <tr>
+                            <th>SLNO</th>
+                            <th ng-click="sort('ecode')">Employee Code</th>
+                            <th ng-click="sort('ename')">Employee Name</th>
+                            <th ng-click="sort('gtype')">Punch Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in yearlyemprep |orderBy:sortKey:reverse" ng-class-odd="'odd'">
+                            <td>{{$index+1}}</td>
+                            <td>{{user.HRME_EmployeeCode}}</td>
+                            <td>{{user.HRME_EmployeeFirstName}} {{user.HRME_EmployeeMiddleName}} {{user.HRME_EmployeeLastName}}</td>
+                            <td>{{user.PunchDate| date:'dd-MM-yyyy'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>         
+    </div>   
+</section>

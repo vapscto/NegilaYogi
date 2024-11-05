@@ -1,0 +1,187 @@
+﻿<style>
+    .box-content {
+        list-style-type: none;
+        position: relative;
+        border: 1px solid #3e85a0;
+        padding: 12px;
+        min-height: 150px;
+        border-radius: 5px;
+    }
+</style>
+<section class="content" ng-init="Loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" method="post" novalidate>
+        <div class="box box-primary">
+            <dCanceliv class="box-header with-border">
+                <h3 class="box-title">Training Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </dCanceliv>
+            <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="control-label col-sm-4">Training Type:<span style="color:red">*</span></label>
+                        <div class="col-sm-8">
+                            <ui-select ng-model="obj.hrmetrtY_Id" name="stucst" required>
+                                <ui-select-match placeholder="Training Type">
+                                    <span ng-bind="$select.selected.hrmetrtY_ExternalTrainingType"></span>
+                                </ui-select-match>
+                                <ui-select-choices repeat="item in (emp_list | filter: $select.search) track by item.hrmetrtY_Id" value="item.hrmetrtY_Id"
+                                                   ng-selected="{{item.Selected == true}}">
+                                    <span ng-bind-html="item.hrmetrtY_ExternalTrainingType | highlight: $select.search"></span>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="text-center">
+                    <input type="hidden" ng-model="hrmetrtY_Id" value="{{hrmetrtY_Id}}" />
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" ng-click="ShowReport()" id="save-btn">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+
+
+    <!--==================== Image Preview Model ===========================-->
+    <div id="myimagePreview" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="width:55%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times text-white" aria-hidden="true"></i></button>
+                    <h3>{{filenames}}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="box">
+                        <div class="box-body">
+                            <img id="preview" class="img-responsive" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--====================PDF view========-->
+    <div id="showpdf" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <form id="qqqq">
+
+                <div class="modal-content">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+
+
+                    <div id="pdfIdzz">
+
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!--Grid-->
+    <div class="box box-primary" ng-if="trngtpwisrpt.length>0">
+        <div class="box-header with-border">
+            <h3 class="box-title">Training report DETAILS</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group margin-left-none">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{presentCountgrid}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="search" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!--Trainingtype-->
+            <div class="col-sm-12" id="Training">
+                <div  id="table1">
+                    <table class="table table-hover table-responsive table-bordered"  border="1">
+                        <thead>
+                            <tr>
+                                <th>SL.No.</th>
+                                <th>Staff Name</th>
+                                <th>Schedul</th>
+                                <th>Total Duration</th>
+                                <th>Venue</th>
+                                <th>Status</th>
+                                <th>Certificate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in filterValue=(trngtpwisrpt | filter : search) ">
+                                <!--<tr dir-paginate="user in filterValue=(trngtpwisrpt | filter : search) ">-->
+                                <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                <td class="text-left">{{user.emplYoeeName}}</td>
+                                <td class="text-center">
+                                    <span class="text-center">{{user.hrexttrN_StartDate|date:'dd/MM/yyyy'}}</span>|
+                                    <span class="text-center">{{user.hrexttrN_StartTime}}</span>
+                                    <!--<span class="text-center">{{user.hrexttrN_EndDate |date:'dd/MM/yyyy'}}</span>
+        <span class="text-center">{{user.hrexttrN_EndTime}}</span>-->
+                                </td>
+                                <td class="text-center">{{user.hrexttrN_TotalHrs}}</td>
+                                <td class="text-left">{{user.hrmetrceN_CenterAddress}}</td>
+                                <td class="text-center">{{user.hrexttrN_ApprovedFlg}}</td>
+                                <td class="text-center">
+                                    <a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="user.hrexttrN_CertificateFilePath  !=null && user.hrexttrN_CertificateFilePath !=''" style="color:limegreen;display:inline; font-weight: bolder;" data-ng-click="previewimg_new(user.hrexttrN_CertificateFilePath)">
+                                        view
+                                    </a>
+                                    <!--<a id="viewid{{$index}}" name="viewname{{$index}}" ng-if="user.hrexttrN_CertificateFilePath  !=null && user.hrexttrN_CertificateFilePath !=''" value="user.hrexttrN_CertificateFilePath" style="color:red;display:inline; font-weight: bolder;" data-ng-click="download(user.hrexttrN_CertificateFilePath)">
+            Download
+        </a>-->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center">
+                <md-button type="button" ng-click="printToCart('Training')" class="md-raised md-primary">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                    print
+                </md-button>
+                <md-button type="button" ng-click="exportToExcel('#table1')" target="_blank" class="md-raised md-primary">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>Export to Excel
+                </md-button>
+                <md-button type="button" class="md-raised md-warn" ng-click="Clearid()">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    Cancel
+                </md-button>
+            </div>
+        </div>
+    </div>
+</section>

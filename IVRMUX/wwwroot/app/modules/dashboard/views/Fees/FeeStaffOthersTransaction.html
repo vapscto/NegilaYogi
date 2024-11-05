@@ -1,0 +1,1787 @@
+﻿
+<style>
+    .btn-default {
+        background-color: white;
+        color: black;
+        /*border-color: #0463c2;*/
+    }
+</style>
+
+<div data-ng-init="formload()" class="feetransaction">
+    <section class="content">
+        <form class="form-horizontal" role="form" name="myForm" novalidate>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fee Staff Others Transaction</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+
+                            <div class="well" ng-init="filterdata='Staff'">
+                                <label class="radio-inline col-sm-6">
+                                    <input type="radio" name="Staff" data-ng-model="filterdata" value="Staff" ng-click="clear_values()">
+                                    <span class="lbl padding-8">     Staff    </span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="Others" value="Others" data-ng-model="filterdata" ng-click="clear_values()">
+                                    <span class="lbl padding-8">   Others   </span>
+                                </label>
+                            </div>
+
+                            <div class="well">
+                                <label class="control-label col-sm-4">Date :</label>
+                                <div class="col-sm-8 input-group text-center" style="">
+                                    <md-datepicker ng-model="FYP_Date" name="from_date" id="reservation" md-placeholder="Enter date" md-min-date="minDatemf" md-max-date="today"></md-datepicker>
+
+                                </div>
+                            </div>
+
+                            <div class="well" ng-show="staffviewdetails.length>0">
+                                <label class="checkbox-inline" style="color:darkgreen; font-size:larger;" data-ng-model="details" data-toggle="modal" data-target="#myModaldetails">
+                                    <span class="lbl padding-8">View Fee Details</span>
+                                </label>
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-5">
+                            <div class="well">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="academicyear" id="sel1" data-ng-model="cfg.ASMAY_Id" ng-change="onselectacademic(yearlst)" ng-disabled="disableacademicyear" required>
+                                            <!--ng-change="onselectacademic(yearlst)" ng-disabled="cfg.ASMAY_Id"-->
+
+                                            <option ng-repeat="option in yearlst" value="{{option.asmaY_Id}}" ng-selected="{{option.asmaY_Id == cfg.ASMAY_Id}}">
+                                                {{option.asmaY_Year}}
+                                            </option>
+                                        </select>
+                                        <div class="error-messages" ng-if="interacted(myForm.academicyear)" ng-messages="myForm.academicyear.$error">
+                                            <div ng-message="required">Select Academic Year </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="filterdata == 'Staff'">
+                                    <!--<label ng-if="filterdata == 'Others'" class="control-label col-sm-4">Student Name :<span style="color:Red">*</span></label>-->
+                                    <label class="control-label col-sm-4">Staff Name :<span style="color:Red">*</span></label>
+
+                                    <!--<div class="col-sm-8">
+                                        <select class="form-control" id="sm" name="empname" ng-model="HRME_Id" data-ng-change="select_emp(HRME_Id)" ng-required="filterdata == 'Staff'">
+                                            <option value="">Select Staff Name</option>
+                                            <option ng-repeat="emp in staff_list" value="{{emp.hrmE_Id}}" ng-selected="emp.hrmE_Id == HRME_Id" ng-disabled="disablestaff">
+                                                {{emp.hrmE_EmployeeFirstName}}
+                                            </option>
+                                        </select>
+                                        <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+                                    </div>-->
+
+                                    <div class="col-sm-8">
+                                        <ui-select id="sel1" name="studentname" ng-model="$parent.HRME_Id" ng-disabled="accchange" theme="bootstrap" ng-keyup="searchfilter($select);" title="Select Staff" data-ng-change="select_emp($parent.HRME_Id)">
+
+                                            <ui-select-match ng-trim="false" placeholder="Select or search Student in the list...">{{$select.selected.hrmE_EmployeeFirstName}}</ui-select-match>
+
+                                            <ui-select-choices repeat="option in admsudentslist | filter: $select.search " value="{{option.hrmE_Id}}" ng-selected="{{option.Selected == true}}">
+                                                <div ng-bind-html="option.hrmE_EmployeeFirstName| highlight: $select.search"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <label id="upnme" ng-show="updateshowlabel">{{updatename}}</label>
+                                    </div>
+
+
+
+
+
+                                    <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.empname)" ng-messages="myForm.empname.$error">
+                                        <div ng-message="required"> Please Select Employee Name</div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group" ng-show="filterdata == 'Others'">
+                                    <!--<label ng-if="filterdata == 'Others'" class="control-label col-sm-4">Student Name :<span style="color:Red">*</span></label>-->
+                                    <label class="control-label col-sm-4">Student Name :<span style="color:Red">*</span></label>
+
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="sm" name="studentname" ng-model="FMOST_Id" data-ng-change="select_student(FMOST_Id)" ng-required="filterdata == 'Others'" ng-disabled="disablestu" >
+                                            <option value="">Select Student Name</option>
+                                            <option ng-repeat="student in student_list" value="{{student.fmosT_Id}}" ng-selected="student.Selected == true" >
+                                                {{student.fmosT_StudentName}}
+                                            </option>
+                                        </select>
+
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.studentname)" ng-messages="myForm.studentname.$error">
+                                        <div ng-message="required"> Please Select Student Name</div>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="form-group" ng-show="grouporterm == 'T'">
+                                    <label for="sel2" class="control-label col-sm-4">
+                                        Term Name :
+                                        <input name="terms_all" value="usercheck" ng-model="usercheck_t" type="checkbox" data-ng-click="all_check_terms()" ng-disabled="term_list.length==0 || all_t_disable">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8" style="">
+                                            <label data-ng-model="FMG_Id" ng-repeat="option in term_list">
+                                                <input name="terms" ng-model="option.selected" type="checkbox" value="{{option.fmT_Id}}" ng-click="togchkbx_group_term(option)" ng-disabled="option.t_disable">
+                                                <span class="lbl padding-8">
+                                                    {{option.fmT_Name}}
+                                                </span>
+                                                <md-tooltip md-direction="left">
+                                                    Order: {{option.fmT_Order}}
+                                                </md-tooltip>
+                                            </label>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group" ng-show="grouporterm == 'G'">
+                                    <label for="sel2" class="control-label col-sm-4">
+                                        Group Name :
+                                        <input name="terms_all" value="usercheck" ng-model="usercheck_g" type="checkbox" data-ng-click="all_check_groups()" ng-disabled="group_list.length==0 || all_g_disable">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+
+                                    <div class="col-sm-8">
+                                        <div class="multiselect col-sm-8" style="">
+                                            <label data-ng-model="FMG_Id" ng-repeat="option in group_list">
+                                                <input name="option[]" ng-model="option.selected" type="checkbox" value="{{option.fmG_Id}}" ng-click="togchkbx_group_term(option)" ng-disabled="option.g_disable"><!--ng-disabled="option.netamount<option.paidamount"-->
+                                                <span class="lbl padding-8">
+                                                    {{option.fmG_GroupName}}
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" ng-show="showreceiptno">
+                                    <label class="control-label col-sm-4">Receipt No :<span style="color:Red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" id="reservation" name="receiptno" type="text" data-ng-model="FYP_Receipt_No" ng-disabled="recchkbox" ng-required="showreceiptno==true" ng-blur="checkforduplicates(FYP_Receipt_No)">  <!--ng-disabled="disablecheckbox"--><!--allow-pattern="[0-9A-Za-z]"-->
+
+                                        <div class="error-messages" ng-if="interacted(myForm.receiptno)" ng-messages="myForm.receiptno.$error">
+                                            <div ng-message="required">Enter Receipt No </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-hide="true">
+                                    <label class="control-label col-sm-4">Amount :</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control active" id="reservation" type="text" data-ng-model="amtadjustment" allow-pattern="[0-9]">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 padding-left-none" ng-show="filterdata == 'Staff'">
+                            <md-subheader>Staff Information</md-subheader>
+                            <div class="well text-bold sinfo">
+                                <div class="row">
+                                    <div class="col-sm-4 col-xs-3 padding-right-none">Name </div>
+                                    <div class="col-sm-8 col-xs-9 padding-right-none"><span>: {{HRME_EmployeeFirstName}}</span> <!--<span ng-if="amsT_MiddleName !== null" class="lbl padding-8">  {{amsT_MiddleName}} </span> {{amsT_LastName}}--></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4 col-xs-3 padding-right-none">Code </div>
+                                    <div class="col-sm-8 col-xs-9"><span>: {{HRME_EmployeeCode}}</span></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4 col-xs-3 padding-right-none">Department</div>
+                                    <div class="col-sm-8 col-xs-9"><span>: {{HRMD_DepartmentName}}</span></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4 col-xs-3 padding-right-none">Designation</div>
+                                    <div class="col-sm-8 col-xs-9"><span>: {{HRMDES_DesignationName}}</span></div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                        <div class="col-sm-3 padding-left-none" ng-show="filterdata == 'Others'">
+                            <md-subheader>Student Information</md-subheader>
+                            <div class="well text-bold sinfo">
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-3 padding-right-none">Name </div>
+                                    <div class="col-sm-9 col-xs-9 padding-right-none"><span>: {{FMOST_StudentName}}</span> <!--<span ng-if="amsT_MiddleName !== null" class="lbl padding-8">  {{amsT_MiddleName}} </span> {{amsT_LastName}}--></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-3 padding-right-none">MobileNo</div>
+                                    <div class="col-sm-9 col-xs-9"><span>: {{FMOST_StudentMobileNo}}</span></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-3 padding-right-none">Email-Id</div>
+                                    <div class="col-sm-9 col-xs-9"><span>: {{FMOST_StudentEmailId}}</span></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!--end row-->
+                    <!-- /.box-header -->
+
+                    <div ng-show="Head_Instl_list.length>0">
+                        <!--ng-show="grigview1"-->
+
+                        <table class="table table-responsive table-bordered text-center">
+                            <!--ng-show="Head_Instl_list.length>0"-->
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="order('FeeHead')">Sno</a>
+                                    </th>
+                                    <th>
+                                        <label>
+                                            <input name="option[]" value="1" type="checkbox" ng-click="toggleAll_st(all)" ng-model="all" ng-disabled="allcheck">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+                                    </th>
+                                    <th style="width:200px;">
+                                        <a href="" ng-click="order('FeeHead')">Fee Head</a>
+                                    </th>
+                                    <th style="width:120px;">
+                                        <a href="" ng-click="order('Installment')">Installment</a>
+                                    </th>
+
+                                    <th>
+                                        <a href="" ng-click="order('currentcharges')">Current Charges</a>
+                                    </th>
+
+                                    <th>
+                                        <a href="" ng-click="order('totalcharges')">Total Charges</a>
+                                    </th>
+
+                                    <th>
+                                        <a href="" ng-click="order('Concess')">Concession</a>
+                                    </th>
+
+                                    <th><a href="" ng-click="order('Fine')">Fine</a> </th>
+
+                                    <th>
+                                        <a href="" ng-click="order('Amount')">Payable Amount</a>
+                                    </th>
+
+
+                                    <th>
+                                        <a href="" ng-click="order('NetAmount')">Net Amount</a>
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in Head_Instl_list track by $index | orderBy:predicate:default | filter:paginate| filter:search" ng-class-odd="'odd'">
+                                    <td>{{$index+1}}</td>
+                                    <td>
+                                        <label>
+                                            <input name="option[]" value="1" type="checkbox" ng-model="user.isSelected" data-ng-change="amtdetails_st(user,Head_Instl_list,$index)" ng-disabled="allcheck">
+                                            <span class="lbl padding-8"></span>
+                                        </label>
+
+                                        <md-tooltip md-direction="right">
+                                            {{user.fmG_GroupName}}
+                                        </md-tooltip>
+                                    </td>
+
+                                    <td>
+                                        {{user.fmH_FeeName}}
+                                    </td>
+                                    <td hidden="hidden">{{user.fmH_Id}}</td>
+
+                                    <td hidden="hidden">{{user.fyP_Id}}</td>
+
+                                    <td>
+                                        {{user.ftI_Name}}
+                                    </td>
+                                    <td hidden="hidden">{{user.ftI_Id}}</td>
+
+                                    <td hidden="hidden">{{user.fmA_Id}}</td>
+
+                                    <td>
+
+                                        <input class="form-control" type="text" placeholder="Current Charges..." data-ng-model="user.currentYrCharges" value="{{user.currentYrCharges}}" ng-disabled="disablefsS_CurrentYrCharges">
+                                    </td>
+
+                                    <td>
+                                        <input class="form-control" type="text" placeholder="Total Charges..." data-ng-model="user.totalCharges" value="{{user.totalCharges}}" ng-disabled="disablefsS_TotalToBePaid">
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="text" placeholder="Concession Amount..." data-ng-model="user.concessionAmount" value="{{user.concessionAmount}}" ng-disabled="disableconcession" ng-blur="concessionamt(Head_Instl_list,$index)">
+
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="text" placeholder="Fine Amount..." data-ng-model="user.fineAmount" value="{{user.fineAmount}}" ng-disabled="disablefine" ng-blur="fineamt(Head_Instl_list,$index)">
+
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="text" placeholder="Payable Amount..." data-ng-model="user.toBePaid" value="{{user.toBePaid}}" ng-disabled="!user.isSelected || FYP_Id>0" maxlength="10" ng-change="tobepaidamt_st(Head_Instl_list,$index)" allow-pattern="[0-9]">
+
+                                    </td>
+
+                                    <td>
+
+                                        <input class="form-control" type="text" placeholder="Net Amount..." data-ng-model="user.netAmount" value="{{user.netAmount}}" ng-disabled="disablenetamount">
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="well">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-3">Narration :</label>
+                                        <div class="col-sm-9">
+                                            <!--<input class="form-control active" id="reservation" type="text" data-ng-model="FYP_Remarks">-->
+                                            <textarea class="form-control" rows="1" id="Narration" data-ng-model="FYP_Remarks"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="text-center padding-rignt-10">
+                                        <div class="well" ng-init="FYP_Bank_Or_Cash='B'">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="FYP_Bank_Or_Cash" data-ng-model="FYP_Bank_Or_Cash" value="C" ng-disabled="diablemodeofpayment"><!--data-ng-click="onselectmodeofpayment()"-->
+                                                <span class="lbl padding-8">Cash</span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optradio" data-ng-model="FYP_Bank_Or_Cash" value="B" ng-disabled="diablemodeofpayment"><!--data-ng-click="onselectmodeofpayment()"-->
+                                                <span class="lbl padding-8">Bank</span>
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optradio" data-ng-model="FYP_Bank_Or_Cash" value="R" ng-disabled="diablemodeofpayment"><!--data-ng-click="onselectmodeofpayment()"-->
+                                                <span class="lbl padding-8">RTGS/NTF</span>
+                                            </label>
+
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optradio" data-ng-model="FYP_Bank_Or_Cash" value="S" ng-disabled="diablemodeofpayment"><!--data-toggle="modal" data-target="#CARDDETAILS"  data-ng-click="onselectmodeofpayment()"-->
+                                                <span class="lbl padding-8"> Card No </span>
+                                            </label>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group hidden">
+                                        <label class="control-label col-sm-5">Account Information : </label>
+                                        <div class="col-sm-7 input-group text-right" style="">
+                                            <select class="form-control" id="sel1" ng-model="L_Code" ng-change="onselectaccount(yearlst)">
+                                                <option value="" label="Select Account"> </option>
+                                                <option ng-repeat="option in accountlst" value="{{option.l_Code}}" ng-selected="{{option.Selected == true}}">
+                                                    {{option.l_Name}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="FYP_Bank_Or_Cash == 'B' || FYP_Bank_Or_Cash == 'R' || FYP_Bank_Or_Cash == 'S'">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Cheque/DD Date :</label>
+                                            <div class="col-sm-7">
+                                                <md-datepicker ng-model="FYP_DD_Cheque_Date" name="from_date" id="chequedddate" md-placeholder="Enter date" md-min-date="minDatemf" md-max-date="maxDatemf"></md-datepicker>
+
+                                                <div class="error-messages" ng-if="interacted(myForm.from_date)" ng-messages="myForm.from_date.$error">
+                                                    <div ng-message="valid">Kindly enter in (dd-mm-yyyy) format</div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Cheque/DD No/Card No :<span ng-show="FYP_Bank_Or_Cash!='C'" style="color:Red">*</span></label>
+                                            <div class="col-sm-7">
+                                                <input type="text" class="form-control" data-ng-model="FYP_DD_Cheque_No" id="chequeno" allow-pattern="[0-9 ]" name="chk_dd_card" ng-required="FYP_Bank_Or_Cash!='C'" />
+                                                <div class="error-messages" ng-if="interacted(myForm.chk_dd_card)" ng-messages="myForm.chk_dd_card.$error">
+                                                    <div ng-message="required">Enter Cheque/DD No/Card No</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Bank Name :<span ng-show="FYP_Bank_Or_Cash!='C'" style="color:Red">*</span></label>
+                                            <div class="col-sm-7">
+                                                <input type="text" class="form-control" data-ng-model="FYP_Bank_Name" value={{fyP_Bank_Name}} allow-pattern="[A-Za-z ]" name="bank_name" ng-required="FYP_Bank_Or_Cash!='C'" />
+                                                <div class="error-messages" ng-if="interacted(myForm.bank_name)" ng-messages="myForm.bank_name.$error">
+                                                    <div ng-message="required">Enter Bank Name</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="well">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Total Fee:</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-ng-model="totalfee" value={{totalfee}} ng-disabled="true" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Concession:</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-ng-model="FYP_Tot_Concession_Amt" value={{FYP_Tot_Concession_Amt}} ng-disabled="true" /><!--totalconcession-->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Fine:</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-ng-model="FYP_Tot_Fine_Amt" value={{FYP_Tot_Fine_Amt}} ng-disabled="true" /><!--totalfine-->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Now Paying:</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-ng-model="FYP_Tot_Amount" value={{FYP_Tot_Amount}} ng-disabled="true" /><!--curramount-->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Current Balance:</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-ng-model="currbalance" value={{currbalance}} ng-disabled="true" />
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group hidden">
+                                        <label class="control-label col-sm-5">Total Waived:</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" data-ng-model="totalwaived" value={{totalwaived}} ng-disabled="true" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="text-center">
+                            <input type="hidden" name="fyP_Id" ng-model="fyP_Id" value="{{fyP_Id}}" />
+
+                            <md-button type="button" class="md-raised md-primary" id="save-btn" data-ng-click="savedata_st(Head_Instl_list)">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Save
+                            </md-button>
+                            <md-button type="button" class="md-raised md-warn" ng-click="cleardata()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <!--//modal radha-->
+        <!--//modal radha-->
+
+        <div class="box box-primary" ng-show="filterdata == 'Staff' && saved_staff_list.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Staff Transaction List </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="totcountsearch!=0">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{totcountsearch}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" for="email"> Search For:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="search123" ng-change="onselectsearch()" name="search_for" required>
+                                    <option value="">--Select Field--</option>
+                                    <option value="0">Staff Name</option>
+                                    <option value="1">Staff Code</option>
+                                    <option value="7">Department</option>
+                                    <option value="2">Designation</option>
+                                    <option value="3">Receipt No</option>
+                                    <option value="4">Paid Date</option>
+                                    <option value="5">Paid Amount</option>
+                                    <option value="6">Mode of Payment</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="search_flag">
+                        <div class="form-group" ng-show="txt">
+                            <label class="control-label col-sm-4" for="email"> Search Text:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchtxt" maxlength="30" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="numbr">
+                            <label class="control-label col-sm-4" for="email">Search Amount:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchnumbr" maxlength="20" allow-pattern="[0-9]" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="dat">
+                            <label class="control-label col-sm-4" for="email"> Search Date:</label>
+                            <div class="col-sm-8 input-group text-right" style="">
+                                <md-datepicker ng-model="searchdat" onkeydown="return false" name="search_date" id="date123" md-placeholder="Enter  date" required></md-datepicker>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="search_flag">
+                        <div class="">
+                            <button type="button" class="btn btn-primary" name="btn_search" ng-click="ShowSearch_Report()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                Search
+                            </button>
+                            <button type="button" class="btn btn-warning" data-ng-click="clearsearch()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <table class="table table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="order('sno')">SL NO</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('amsT_FirstName')">Staff Name</a>
+                            </th>
+                            <th><a href="" ng-click="sort('classname')">Staff Code</a> </th>
+                            <th><a href="" ng-click="sort('classname')">Department</a> </th>
+                            <th><a href="" ng-click="sort('classname')">Designation</a> </th>
+                            <th><a href="" ng-click="sort('fyP_Receipt_No')">Receipt No</a> </th>
+                            <th><a href="" ng-click="sort('fyP_Receipt_No')">Paid Date</a> </th>
+                            <th><a href="" ng-click="sort('fyP_Tot_Amount')">Paid Amount</a> </th>
+                            <th><a href="" ng-click="sort('FYP_Bank_Or_Cash')">Mode of Payment</a> </th>
+                            <th><a href="">Action</a> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--filterOnLocation-->
+                        <tr dir-paginate="user1 in saved_staff_list |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td  style="text-align:left;"> {{ user1.hrmE_EmployeeFirstName}} </td>
+                            <td  style="text-align:left;">{{ user1.hrmE_EmployeeCode}}</td>
+                            <td  style="text-align:left;">{{ user1.hrmD_DepartmentName}}</td>
+                            <td  style="text-align:left;">{{ user1.hrmdeS_DesignationName}}</td>
+                            <td  style="text-align:left;">{{ user1.fyP_Receipt_No}}</td>
+                            <td  style="text-align:left;">{{ user1.fyP_Date |date:'dd-MM-yyyy'}}</td>
+                            <td  style="text-align:left;">{{ user1.fyP_Tot_Amount}}</td>
+                            <td  style="text-align:left;">{{ user1.fyP_Bank_Or_Cash}}</td>
+
+                            <td hidden="hidden">{{ user1.fyP_Id}}</td>
+                            <td hidden="hidden">{{ user1.hrmE_Id}}</td>
+
+                            <td class="text-center">
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Print Receipt" data-ng-model="receiptdetails" data-target="#myModal_s" data-ng-click="showmodaldetails_s(user1.fyP_Id,user1.hrmE_Id)">
+                                    <!--ng-click="EditMasterSectvalue(user)"-->
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                                <a class="text-danger" href="" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                    <i class="fa fa-trash" aria-hidden="true" ng-click="DeletRecord_s(user1.fyP_Id,user1.hrmE_Id)"></i>
+                                </a>
+
+                                <a href="javascript:void(0)" ng-click="edittransactionstaff(user1.fyP_Id,user1.hrmE_Id)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+
+                            </td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="" pagination-id="page1"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-show="filterdata == 'Others' && saved_others_list.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Student Transaction List </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+
+                    <div class="col-sm-4">
+                        <div class="form-group" ng-if="totcountsearch_o!=0">
+                            <label class="control-label">
+                                <b>Total Records Searched : </b>
+                                <label class="badge">
+                                    {{totcountsearch_o}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" for="email"> Search For:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="search123_o" ng-change="onselectsearch_o()" name="search_for_o" required>
+                                    <option value="">--Select Field--</option>
+                                    <option value="0">Student Name</option>
+                                    <!--<option value="1">Class Name</option>-->
+                                    <option value="1">Mobile No</option>
+                                    <option value="2">Email-Id</option>
+                                    <option value="3">Receipt No</option>
+                                    <option value="4">Paid Date</option>
+                                    <option value="5">Paid Amount</option>
+                                    <option value="6">Mode of Payment</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="search_flag_o">
+                        <div class="form-group" ng-show="txt_o">
+                            <label class="control-label col-sm-4" for="email"> Search Text:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchtxt_o" maxlength="30" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="numbr_o">
+                            <label class="control-label col-sm-4" for="email">Search Amount:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="search_text" ng-model="searchnumbr_o" maxlength="20" allow-pattern="[0-9]" />
+                            </div>
+
+                        </div>
+                        <div class="form-group" ng-show="dat_o">
+                            <label class="control-label col-sm-4" for="email"> Search Date:</label>
+                            <!--<div class="col-sm-4">
+                                <input type="text" name="search_text" ng-model="searchtext" />
+                            </div>-->
+                            <div class="col-sm-8 input-group text-right" style="">
+                                <md-datepicker ng-model="searchdat_o" onkeydown="return false" name="search_date" id="date123" md-placeholder="Enter  date" required></md-datepicker>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="search_flag_o">
+                        <div class="">
+                            <button type="button" class="btn btn-primary" name="btn_search" ng-click="ShowSearch_Report_o()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                Search
+                            </button>
+                            <button type="button" class="btn btn-warning" data-ng-click="clearsearch_o()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </button>
+
+                        </div>
+
+
+
+                    </div>
+
+
+                </div>
+
+                <br />
+
+                <table class="table table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="" ng-click="order('sno')">SL NO</a>
+                            </th>
+                            <th>
+                                <a href="" ng-click="sort('amsT_FirstName')">Student Name</a>
+                            </th>
+                            <th><a href="" ng-click="sort('classname')">Mobile NO</a> </th>
+                            <th><a href="" ng-click="sort('classname')">Email-Id</a> </th>
+                            <!--<th><a href="" ng-click="sort('classname')">Adm No</a> </th>-->
+                            <th><a href="" ng-click="sort('fyP_Receipt_No')">Receipt No</a> </th>
+                            <th><a href="" ng-click="sort('fyP_Receipt_No')">Paid Date</a> </th>
+                            <th><a href="" ng-click="sort('fyP_Tot_Amount')">Paid Amount</a> </th>
+                            <th><a href="" ng-click="sort('FYP_Bank_Or_Cash')">Mode of Payment</a> </th>
+                            <th><a href="">Action</a> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--filterOnLocation-->
+                        <tr dir-paginate="user1 in saved_others_list |orderBy:sortKey:reverse |filter:search |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'" pagination-id="page1">
+
+                            <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                            <td  style="text-align:left;"> {{ user1.fmosT_StudentName}}  </td>
+                            <td  style="text-align:left;">{{ user1.fmosT_StudentMobileNo}}</td>
+                            <td  style="text-align:left;">{{ user1.fmosT_StudentEmailId}}</td>
+                            <!--<td>{{ user1.amsT_AdmNo}}</td>-->
+                            <td  style="text-align:left;">{{ user1.fyP_Receipt_No}}</td>
+                            <td  style="text-align:left;">{{ user1.fyP_Date |date:'dd-MM-yyyy'}}</td>
+                            <td  style="text-align:right;">{{ user1.fyP_Tot_Amount}}</td>
+                            <td  style="text-align:left;">{{ user1.fyP_Bank_Or_Cash}}</td>
+
+                            <td hidden="hidden">{{ user1.fyP_Id}}</td>
+                            <td hidden="hidden">{{ user1.fmosT_Id}}</td>
+
+                            <td class="text-center">
+
+                                <a href="javascript:void(0)" class="text-primary" data-placement="bottom" data-toggle="modal" title="Print Receipt" data-ng-model="receiptdetails" data-target="#myModal_o" data-ng-click="showmodaldetails_o(user1.fyP_Id,user1.fmosT_Id)">
+                                    <!--ng-click="EditMasterSectvalue(user)"-->
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                                <a class="text-danger" href="" data-placement="bottom" data-toggle="tooltip" title="Delete">
+                                    <i class="fa fa-trash" aria-hidden="false" ng-click="DeletRecord_o(user1.fyP_Id,user1.fmosT_Id)"></i>
+                                </a>
+
+                                <a href="javascript:void(0)" ng-click="edittransactionstaff(user1.fyP_Id,user1.fmosT_Id)" class="text-primary" data-placement="bottom" data-toggle="tooltip" title="Edit">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="" pagination-id="page1"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+
+    </section>
+</div>
+
+
+<div id="myModal_s" class="modal fade feetransaction" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row" id="printmodal_s">
+                    <div class="col-sm-6">
+                        <div class="printmodal clearfix">
+                            <div class="">
+                                <div class="baldwin text-center">
+                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="col-sm-12 text-center"><h5>School Copy</h5></div>
+                                <hr />
+                                <div class="row margin-bottom-5">
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Receipt No</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: <b>{{staff_fee_receipt_details[0].fyP_Receipt_No}}</b> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Date</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].fyP_Date | date:'dd/MM/yyyy'}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Adm No</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label">: {{AMST_AdmNo}} </label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Employee Name</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: <b>{{staff_fee_receipt_details[0].hrmE_EmployeeFirstName}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Department</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].hrmD_DepartmentName}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Employee Code</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].hrmE_EmployeeCode}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Designation</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].hrmdeS_DesignationName}} </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label">: {{AMST_MotherName}}</label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Academic Year</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].asmaY_Year}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Period</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{period}} {{to_day |date:'yyyy'}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                SLNO
+                                            </th>
+                                            <th>Head Name</th>
+                                            <th ng-if="Merge_Installments != 1">Installment</th>
+                                            <!--<th>Total Charges</th>-->
+                                            <th>Fee Amount</th>
+                                            <th>Discount Amount</th>
+                                            <th>Paid Amount</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                        <tr ng-repeat="user in staff_fee_receipt_details">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{ user.fmH_FeeName}}</td>
+                                            <td ng-if="Merge_Installments != 1">{{ user.ftI_Name}}</td>
+                                            <!--<td>{{ user.toBePaid}}</td>-->
+                                            <td>{{ user.toBePaid}}</td><!--fyP_Tot_Amount-->
+                                            <td>{{ user.ftposT_ConcessionAmount}}</td>
+                                            <td>{{ user.ftposT_PaidAmount}}</td>
+                                        </tr>
+
+                                        <!--<tr ng-repeat="user in showdetailsreceipt |orderBy:sortKey:reverse |filter:searchthird |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+
+                                        <tr>
+                                            <!--<td></td>-->
+                                            <td colspan="{{colspan}}"><b>Total</b></td>
+                                            <!--<td><b>{{tot_toBePaid}}</b></td>-->
+                                            <td><b>{{tot_toBePaid}}</b></td>
+                                            <td><b>{{tot_ftposT_ConcessionAmount}}</b></td>
+                                            <td><b>{{tot_ftposT_PaidAmount}}</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <label><b>Current Payment Detail</b></label>
+                                <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                    <thead>
+                                        <tr>
+                                            <th>SLNO</th>
+                                            <!--<th>Mode</th>-->
+                                            <th>Amount</th>
+                                            <th>Bank</th>
+                                            <th>DD.No</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!--<tr ng-repeat="user1 in paymenrgrid">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{ user1.fyP_Bank_Or_Cash}}</td>
+                                            <td>{{ atotA}}</td>
+                                            <td ng-if="FYP_Bank_Name!=null">{{ FYP_Bank_Name}}</td>
+                                            <td ng-if="FYP_Bank_Name==null">--</td>
+
+                                            <td ng-if="FYP_DD_Cheque_No!=null">{{ FYP_DD_Cheque_No}}</td>
+                                            <td ng-if="FYP_DD_Cheque_No==null">--</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='B'">{{FYP_DD_Cheque_Date |date:'dd-MM-yyyy'}}</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='C'">{{FYP_Date |date:'dd-MM-yyyy'}}</td>
+                                        </tr>-->
+                                        <tr>
+                                            <!--ng-repeat="user1 in paymenrgrid"-->
+                                            <td>1</td><!--{{$index+1}}-->
+                                            <!--<td>{{ user1.fyP_Bank_Or_Cash}}</td>-->
+                                            <td>{{ tot_ftposT_PaidAmount}}</td>
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{staff_fee_receipt_details[0].fyP_Bank_Name}}</td>
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="FYP_Bank_Name!=null">{{ FYP_Bank_Name}}</td>
+                                            <td ng-if="FYP_Bank_Name==null">--</td>-->
+
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{staff_fee_receipt_details[0].fyP_DD_Cheque_No}}</td>
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="FYP_DD_Cheque_No!=null">{{ FYP_DD_Cheque_No}}</td>
+                                            <td ng-if="FYP_DD_Cheque_No==null">--</td>-->
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{staff_fee_receipt_details[0].fyP_DD_Cheque_Date|date:'dd/MM/yyyy'}}</td>
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="user1.fyP_Bank_Or_Cash=='B'">{{FYP_DD_Cheque_Date |date:'dd-MM-yyyy'}}</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='C'">{{FYP_Date |date:'dd-MM-yyyy'}}</td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="row">
+                                    <label class="control-label col-sm-4"><b>Amount Received (in Words)</b></label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{tot_in_words}} Rupees Only/-</label>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-7"><b>Next Due Amount :</b></label>
+                                            <div class="col-sm-5">
+                                                <label class="control-label"><b>{{Next_due_amount}}/-</b> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" ng-if="Next_due_amount>0">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-8"><b>Next Due Date :</b></label>
+                                            <div class="col-sm-4">
+                                                <label class="control-label"><b>{{Next_due_date}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2"><b> Remarks </b></label>
+                                            <div class="col-sm-10">
+                                                <label class="control-label">: {{feeremarks}} </label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2"><b>Note </b></label>
+                                            <div class="col-sm-10">
+                                                <label class="control-label">: This receipt is valid subject to realisation of Cheque </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-offset-8 col-sm-4">
+                                        <h5>Authorised Signatory</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="printmodal clearfix">
+                            <div class="">
+                                <div class="baldwin text-center">
+                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="col-sm-12 text-center"><h5>Parent Copy</h5></div>
+                                <hr />
+                                <div class="row margin-bottom-5">
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Receipt No</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: <b>{{staff_fee_receipt_details[0].fyP_Receipt_No}}</b> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Date</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].fyP_Date | date:'dd/MM/yyyy'}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Adm No</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label">: {{AMST_AdmNo}} </label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Employee Name</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: <b>{{staff_fee_receipt_details[0].hrmE_EmployeeFirstName}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Department</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].hrmD_DepartmentName}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Employee Code</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].hrmE_EmployeeCode}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Designation</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].hrmdeS_DesignationName}} </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label">: {{AMST_MotherName}}</label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Academic Year</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].asmaY_Year}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Period</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{period}} {{to_day |date:'yyyy'}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                SLNO
+                                            </th>
+                                            <th>Head Name</th>
+                                            <th ng-if="Merge_Installments != 1">Installment</th>
+                                            <!--<th>Total Charges</th>-->
+                                            <th>Fee Amount</th>
+                                            <th>Discount Amount</th>
+                                            <th>Paid Amount</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                        <tr ng-repeat="user in staff_fee_receipt_details">
+                                            <td>{{$index+1}}</td>
+                                            <td  style="text-align:left;">{{ user.fmH_FeeName}}</td>
+                                            <td ng-if="Merge_Installments != 1">{{ user.ftI_Name}}</td>
+                                            <!--<td>{{ user.toBePaid}}</td>-->
+                                            <td  style="text-align:right;">{{ user.toBePaid}}</td><!--fyP_Tot_Amount-->
+                                            <td  style="text-align:right;">{{ user.ftposT_ConcessionAmount}}</td>
+                                            <td  style="text-align:right;">{{ user.ftposT_PaidAmount}}</td>
+                                        </tr>
+
+                                        <!--<tr ng-repeat="user in showdetailsreceipt |orderBy:sortKey:reverse |filter:searchthird |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+
+                                        <tr>
+                                            <!--<td></td>-->
+                                            <td colspan="{{colspan}}"><b>Total</b></td>
+                                            <!--<td><b>{{tot_toBePaid}}</b></td>-->
+                                            <td><b>{{tot_toBePaid}}</b></td>
+                                            <td><b>{{tot_ftposT_ConcessionAmount}}</b></td>
+                                            <td><b>{{tot_ftposT_PaidAmount}}</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <label><b>Current Payment Detail</b></label>
+
+                                <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                    <thead>
+                                        <tr>
+                                            <th>SLNO</th>
+                                            <!--<th>Mode</th>-->
+                                            <th>Amount</th>
+                                            <th>Bank</th>
+                                            <th>DD.No</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!--<tr ng-repeat="user1 in paymenrgrid">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{ user1.fyP_Bank_Or_Cash}}</td>
+                                            <td>{{ atotA}}</td>
+                                            <td ng-if="FYP_Bank_Name!=null">{{ FYP_Bank_Name}}</td>
+                                            <td ng-if="FYP_Bank_Name==null">--</td>
+
+                                            <td ng-if="FYP_DD_Cheque_No!=null">{{ FYP_DD_Cheque_No}}</td>
+                                            <td ng-if="FYP_DD_Cheque_No==null">--</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='B'">{{FYP_DD_Cheque_Date |date:'dd-MM-yyyy'}}</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='C'">{{FYP_Date |date:'dd-MM-yyyy'}}</td>
+                                        </tr>-->
+                                        <tr>
+                                            <!--ng-repeat="user1 in paymenrgrid"-->
+                                            <td>1</td><!--{{$index+1}}-->
+                                            <!--<td>{{ user1.fyP_Bank_Or_Cash}}</td>-->
+                                            <td>{{ tot_ftposT_PaidAmount}}</td>
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{staff_fee_receipt_details[0].fyP_Bank_Name}}</td>
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="FYP_Bank_Name!=null">{{ FYP_Bank_Name}}</td>
+                                            <td ng-if="FYP_Bank_Name==null">--</td>-->
+
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{staff_fee_receipt_details[0].fyP_DD_Cheque_No}}</td>
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="FYP_DD_Cheque_No!=null">{{ FYP_DD_Cheque_No}}</td>
+                                            <td ng-if="FYP_DD_Cheque_No==null">--</td>-->
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{staff_fee_receipt_details[0].fyP_DD_Cheque_Date|date:'dd/MM/yyyy'}}</td>
+                                            <td ng-if="staff_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="user1.fyP_Bank_Or_Cash=='B'">{{FYP_DD_Cheque_Date |date:'dd-MM-yyyy'}}</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='C'">{{FYP_Date |date:'dd-MM-yyyy'}}</td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="row">
+                                    <label class="control-label col-sm-4"><b>Amount Received (in Words)</b></label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{tot_in_words}} Rupees Only/-</label>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-7"><b>Next Due Amount :</b></label>
+                                            <div class="col-sm-5">
+                                                <label class="control-label"><b>{{Next_due_amount}}/-</b> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" ng-if="Next_due_amount>0">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-8"><b>Next Due Date :</b></label>
+                                            <div class="col-sm-4">
+                                                <label class="control-label"><b>{{Next_due_date}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2"><b>Note </b></label>
+                                            <div class="col-sm-10">
+                                                <label class="control-label">: This receipt is valid subject to realisation of Cheque</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-offset-8 col-sm-4">
+                                        <h5>Authorised Signatory</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printData_s();">Print</button>
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button><!--ng-click="closedata();"-->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="myModal_o" class="modal fade feetransaction" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row" id="printmodal_o">
+                    <div class="col-sm-6">
+                        <div class="printmodal clearfix">
+                            <div class="">
+                                <div class="baldwin text-center">
+                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="col-sm-12 text-center"><h5>School Copy</h5></div>
+                                <hr />
+                                <div class="row margin-bottom-5">
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Receipt No</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: <b>{{others_fee_receipt_details[0].fyP_Receipt_No}}</b> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Date</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{others_fee_receipt_details[0].fyP_Date | date:'dd/MM/yyyy'}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Adm No</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label">: {{AMST_AdmNo}} </label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Student Name</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: <b>{{others_fee_receipt_details[0].fmosT_StudentName}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Mobile No</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{others_fee_receipt_details[0].fmosT_StudentMobileNo}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Email-Id</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{others_fee_receipt_details[0].fmosT_StudentEmailId}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Designation</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].hrmdeS_DesignationName}} </label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <!--<div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label">: {{AMST_MotherName}}</label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Academic Year</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{others_fee_receipt_details[0].asmaY_Year}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Period</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{period}} {{to_day |date:'yyyy'}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                SLNO
+                                            </th>
+                                            <th>Head Name</th>
+                                            <th ng-if="Merge_Installments != 1">Installment</th>
+                                            <!--<th>Total Charges</th>-->
+                                            <th>Fee Amount</th>
+                                            <th>Discount Amount</th>
+                                            <th>Paid Amount</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                        <tr ng-repeat="user in others_fee_receipt_details">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{ user.fmH_FeeName}}</td>
+                                            <td ng-if="Merge_Installments != 1">{{ user.ftI_Name}}</td>
+                                            <!--<td>{{ user.toBePaid}}</td>-->
+                                            <td>{{ user.toBePaid}}</td><!--fyP_Tot_Amount-->
+                                            <td>{{ user.ftposT_ConcessionAmount}}</td>
+                                            <td>{{ user.ftposT_PaidAmount}}</td>
+                                        </tr>
+
+                                        <!--<tr ng-repeat="user in showdetailsreceipt |orderBy:sortKey:reverse |filter:searchthird |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+
+                                        <tr>
+                                            <!--<td></td>-->
+                                            <td colspan="{{colspan}}"><b>Total</b></td>
+                                            <!--<td><b>{{tot_toBePaid}}</b></td>-->
+                                            <td><b>{{tot_toBePaid}}</b></td>
+                                            <td><b>{{tot_ftposT_ConcessionAmount}}</b></td>
+                                            <td><b>{{tot_ftposT_PaidAmount}}</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <label><b>Current Payment Detail</b></label>
+                                <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                    <thead>
+                                        <tr>
+                                            <th>SLNO</th>
+                                            <!--<th>Mode</th>-->
+                                            <th>Amount</th>
+                                            <th>Bank</th>
+                                            <th>DD.No</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!--<tr ng-repeat="user1 in paymenrgrid">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{ user1.fyP_Bank_Or_Cash}}</td>
+                                            <td>{{ atotA}}</td>
+                                            <td ng-if="FYP_Bank_Name!=null">{{ FYP_Bank_Name}}</td>
+                                            <td ng-if="FYP_Bank_Name==null">--</td>
+
+                                            <td ng-if="FYP_DD_Cheque_No!=null">{{ FYP_DD_Cheque_No}}</td>
+                                            <td ng-if="FYP_DD_Cheque_No==null">--</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='B'">{{FYP_DD_Cheque_Date |date:'dd-MM-yyyy'}}</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='C'">{{FYP_Date |date:'dd-MM-yyyy'}}</td>
+                                        </tr>-->
+                                        <tr>
+                                            <!--ng-repeat="user1 in paymenrgrid"-->
+                                            <td>1</td><!--{{$index+1}}-->
+                                            <!--<td>{{ user1.fyP_Bank_Or_Cash}}</td>-->
+                                            <td>{{ tot_ftposT_PaidAmount}}</td>
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{others_fee_receipt_details[0].fyP_Bank_Name}}</td>
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="FYP_Bank_Name!=null">{{ FYP_Bank_Name}}</td>
+                                            <td ng-if="FYP_Bank_Name==null">--</td>-->
+
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{others_fee_receipt_details[0].fyP_DD_Cheque_No}}</td>
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="FYP_DD_Cheque_No!=null">{{ FYP_DD_Cheque_No}}</td>
+                                            <td ng-if="FYP_DD_Cheque_No==null">--</td>-->
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{others_fee_receipt_details[0].fyP_DD_Cheque_Date|date:'dd/MM/yyyy'}}</td>
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="user1.fyP_Bank_Or_Cash=='B'">{{FYP_DD_Cheque_Date |date:'dd-MM-yyyy'}}</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='C'">{{FYP_Date |date:'dd-MM-yyyy'}}</td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="row">
+                                    <!--form-group-->
+                                    <label class="control-label col-sm-4"><b>Amount Received (in Words)</b></label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{tot_in_words}} Rupees Only/-</label>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-7"><b>Next Due Amount :</b></label>
+                                            <div class="col-sm-5">
+                                                <label class="control-label"><b>{{Next_due_amount}}/-</b> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" ng-if="Next_due_amount>0">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-8"><b>Next Due Date :</b></label>
+                                            <div class="col-sm-4">
+                                                <label class="control-label"><b>{{Next_due_date}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2"><b> Remarks </b></label>
+                                            <div class="col-sm-10">
+                                                <label class="control-label">: {{feeremarks}} </label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2"><b>Note </b></label>
+                                            <div class="col-sm-10">
+                                                <label class="control-label">: This receipt is valid subject to realisation of Cheque </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-offset-8 col-sm-4">
+                                        <h5>Authorised Signatory</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="printmodal clearfix">
+                            <div class="">
+                                <div class="baldwin text-center">
+                                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="col-sm-12 text-center"><h5>Parent Copy</h5></div>
+                                <hr />
+                                <div class="row margin-bottom-5">
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Receipt No</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: <b>{{others_fee_receipt_details[0].fyP_Receipt_No}}</b> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Date</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{others_fee_receipt_details[0].fyP_Date | date:'dd/MM/yyyy'}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Adm No</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label">: {{AMST_AdmNo}} </label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Student Name</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: <b>{{others_fee_receipt_details[0].fmosT_StudentName}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Mobile No</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{others_fee_receipt_details[0].fmosT_StudentMobileNo}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Email-Id</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{others_fee_receipt_details[0].fmosT_StudentEmailId}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Designation</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{staff_fee_receipt_details[0].hrmdeS_DesignationName}} </label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <!--<div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Mother</label>
+                                            <div class="col-sm-8">
+                                                <label class="control-label">: {{AMST_MotherName}}</label>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Academic Year</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{others_fee_receipt_details[0].asmaY_Year}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-5">Period</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label">: {{period}} {{to_day |date:'yyyy'}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                SLNO
+                                            </th>
+                                            <th>Head Name</th>
+                                            <th ng-if="Merge_Installments != 1">Installment</th>
+                                            <!--<th>Total Charges</th>-->
+                                            <th>Fee Amount</th>
+                                            <th>Discount Amount</th>
+                                            <th>Paid Amount</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                        <tr ng-repeat="user in others_fee_receipt_details">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{ user.fmH_FeeName}}</td>
+                                            <td ng-if="Merge_Installments != 1">{{ user.ftI_Name}}</td>
+                                            <!--<td>{{ user.toBePaid}}</td>-->
+                                            <td>{{ user.toBePaid}}</td><!--fyP_Tot_Amount-->
+                                            <td>{{ user.ftposT_ConcessionAmount}}</td>
+                                            <td>{{ user.ftposT_PaidAmount}}</td>
+                                        </tr>
+
+                                        <!--<tr ng-repeat="user in showdetailsreceipt |orderBy:sortKey:reverse |filter:searchthird |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">-->
+
+                                        <tr>
+                                            <!--<td></td>-->
+                                            <td colspan="{{colspan}}"><b>Total</b></td>
+                                            <!--<td><b>{{tot_toBePaid}}</b></td>-->
+                                            <td><b>{{tot_toBePaid}}</b></td>
+                                            <td><b>{{tot_ftposT_ConcessionAmount}}</b></td>
+                                            <td><b>{{tot_ftposT_PaidAmount}}</b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <label><b>Current Payment Detail</b></label>
+
+                                <table class="table table-hover table-responsive table-bordered text-center table-width" id="modaltblr">
+                                    <thead>
+                                        <tr>
+                                            <th>SLNO</th>
+                                            <!--<th>Mode</th>-->
+                                            <th>Amount</th>
+                                            <th>Bank</th>
+                                            <th>DD.No</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <!--ng-repeat="user1 in paymenrgrid"-->
+                                            <td>1</td><!--{{$index+1}}-->
+                                            <!--<td>{{ user1.fyP_Bank_Or_Cash}}</td>-->
+                                            <td>{{ tot_ftposT_PaidAmount}}</td>
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{others_fee_receipt_details[0].fyP_Bank_Name}}</td>
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="FYP_Bank_Name!=null">{{ FYP_Bank_Name}}</td>
+                                            <td ng-if="FYP_Bank_Name==null">--</td>-->
+
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{others_fee_receipt_details[0].fyP_DD_Cheque_No}}</td>
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="FYP_DD_Cheque_No!=null">{{ FYP_DD_Cheque_No}}</td>
+                                            <td ng-if="FYP_DD_Cheque_No==null">--</td>-->
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash!='C'">{{others_fee_receipt_details[0].fyP_DD_Cheque_Date|date:'dd/MM/yyyy'}}</td>
+                                            <td ng-if="others_fee_receipt_details[0].fyP_Bank_Or_Cash=='C'">--</td>
+                                            <!--<td ng-if="user1.fyP_Bank_Or_Cash=='B'">{{FYP_DD_Cheque_Date |date:'dd-MM-yyyy'}}</td>
+                                            <td ng-if="user1.fyP_Bank_Or_Cash=='C'">{{FYP_Date |date:'dd-MM-yyyy'}}</td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="row">
+                                    <label class="control-label col-sm-4"><b>Amount Received (in Words)</b></label>
+                                    <div class="col-sm-8">
+                                        <label class="control-label">: {{tot_in_words}} Rupees Only/-</label>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-7"><b>Next Due Amount :</b></label>
+                                            <div class="col-sm-5">
+                                                <label class="control-label"><b>{{Next_due_amount}}/-</b> </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" ng-if="Next_due_amount>0">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-8"><b>Next Due Date :</b></label>
+                                            <div class="col-sm-4">
+                                                <label class="control-label"><b>{{Next_due_date}}</b></label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2"><b>Note </b></label>
+                                            <div class="col-sm-10">
+                                                <label class="control-label">: This receipt is valid subject to realisation of Cheque</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-offset-8 col-sm-4">
+                                        <h5>Authorised Signatory</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="printData_o();">Print</button>
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button><!--ng-click="closedata();"-->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div id="myModaldetails" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <!--<div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>-->
+            <div class="modal-body">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Fee Details</h3>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a href="" ng-click="order('sno')">SLNO</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="order('fmG_GroupName')">Group Name</a>
+                                    </th>
+                                    <th><a href="" ng-click="order('fmH_FeeName')">Total Charges</a> </th>
+                                    <th><a href="" ng-click="order('fmH_FeeName')">Total Paid Amount</a> </th>
+                                    <th><a href="" ng-click="order('fmH_FeeName')">Total Outstanding</a> </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr dir-paginate="user in staffviewdetails |orderBy:sortKey:reverse |filter:searchthird |itemsPerPage:itemsPerPage" current-page="currentPage" ng-class-odd="'odd'">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td style="text-align:left;">{{ user.fmG_GroupName}}</td>
+                                    <td style="text-align:right;">{{ user.fsS_CurrentYrCharges}}</td>
+                                    <td style="text-align:right;">{{ user.fsS_PaidAmount}}</td>
+                                    <td style="text-align:right;">{{ user.fsS_ToBePaid}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>

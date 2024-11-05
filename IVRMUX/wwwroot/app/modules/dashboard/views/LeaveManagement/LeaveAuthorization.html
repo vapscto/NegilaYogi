@@ -1,0 +1,403 @@
+﻿<style>
+    .multiselect {
+        width: 23.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-left: 2.7%;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+
+    .my-custom-scrollbar {
+        position: relative;
+        height: 600px;
+        overflow: auto;
+    }
+
+    .table-wrapper-scroll-y {
+        display: block;
+    }
+</style>
+
+<section class="content">
+    <div data-ng-init="loadData()">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Leave Authorization</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Institution : </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="inst" ng-model="MI_Id" ng-change="OnChangeInstitution()"
+                                            ng-disabled="addtocartflag==true" required>
+                                        <option value="">--Select Institution--</option>
+                                        <option ng-repeat="dd in get_institution" value="{{dd.mI_Id}}" ng-selected="{{dd.mI_Id===MI_Id}}">
+                                            {{dd.mI_Name}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.inst)" ng-messages="myForm.inst.$error">
+                                        <div ng-message="required">Select Institution</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Select Grade :<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="gradename" data-ng-model="hrmG_Id" ng-change="getemployeelist()"
+                                            required ng-disabled="addtocartflag==true">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in grade_name" value="{{option.hrmG_Id}}" ng-selected="{{option.Selected===true}}">
+                                            {{option.hrmG_GradeName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.gradename)" ng-messages="myForm.gradename.$error">
+                                        <div ng-message="required">Please Select Grade</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Group Type :<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="gtname" data-ng-model="hrmgT_Id" ng-change="getemployeelist()"
+                                            required ng-disabled="addtocartflag==true">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in staff_types" value="{{option.hrmgT_Id}}" ng-selected="{{option.Selected===true}}">
+                                            {{option.hrmgT_EmployeeGroupType}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.gtname)" ng-messages="myForm.gtname.$error">
+                                        <div ng-message="required">Please Select Group Type</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Department Type :<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="depname" data-ng-model="hrmD_Id" ng-change="getemployeelist()" required
+                                            ng-disabled="addtocartflag==true">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in Department_types" value="{{option.hrmD_Id}}" ng-selected="{{option.Selected===true}}">
+                                            {{option.hrmD_DepartmentName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.depname)" ng-messages="myForm.depname.$error">
+                                        <div ng-message="required">Please Select Department</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Designation Type :<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="desname" data-ng-model="hrmdeS_Id" ng-change="getemployeelist()" required
+                                            ng-disabled="addtocartflag==true">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in Designation_types" value="{{option.hrmdeS_Id}}" ng-selected="{{option.Selected===true}}">
+                                            {{option.hrmdeS_DesignationName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.desname)" ng-messages="myForm.desname.$error">
+                                        <div ng-message="required">Please Select Designation</div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-sm-6">
+                            <!--<div class="form-group">
+                                <label for="sel2" class="control-label col-sm-4">Employee Name :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <label class="checkbox-inline padding-left-none">
+                                        <input type="checkbox" name="Typeemp" ng-model="employeeck" data-ng-click="all_check_Emp()">
+                                        <span class="lbl padding-8">All</span>
+                                    </label>
+                                    <div class="multiselect col-sm-8">
+                                        <input type="text" class="form-control" ng-model="filteremp" placeholder="Search Employee Here" />
+                                        <label data-ng-model="hrmEId" ng-repeat="emp in employeelist | filter: filteremp " value="{{emp.hrmE_Id}}">
+                                            <input name="lvemp" value="1" ng-model="emp.selected" type="checkbox" ng-required="isOptionsRequired();" ng-click="emptogchkbx();">
+                                            <span class="lbl padding-8">
+                                                {{emp.hrmE_EmployeeFirstName}}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="error-messages" ng-if="interacted(myForm.lvemp)" ng-messages="myForm.lvemp.$error">
+                                        <div ng-message="required">Select Employee Name</div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Leave Type :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="HRML_Id" name="leavefror" required
+                                            ng-disabled="addtocartflag==true && TempData.length>0">
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="dd in leave_name" value="{{dd.hrmL_Id}}" ng-selected="{{dd.Selected===true}}">
+                                            {{dd.hrmL_LeaveName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.leavefror)" ng-messages="myForm.leavefror.$error">
+                                        <div ng-message="required">Select Leave Type</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Order Of Approval :<span style="color:Red">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="sel1" ng-model="HRLAON_SanctionLevelNo" name="search_for" required>
+                                        <option value="">--Select--</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.search_for)" ng-messages="myForm.search_for.$error">
+                                        <div ng-message="required">Select Order of Approval</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">
+                                    Approval Person :<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="authemp" data-ng-model="ivrmuL_Id" required>
+                                        <option value="">--Select--</option>
+                                        <option ng-repeat="option in get_emp" value="{{option.id}}" ng-selected="{{option.Selected===true}}">
+                                            {{option.userName}}
+                                        </option>
+                                    </select>
+                                    <div class="error-messages" ng-if="interacted(myForm.authemp)" ng-messages="myForm.authemp.$error">
+                                        <div ng-message="required">Select Approval Person</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="Typeemp" ng-model="finalflag">
+                                    <span class="lbl padding-8">Final Flag</span>
+                                </label>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row text-center">
+                        <md-button type="button" ng-click="AddToCart()" class="md-raised md-primary">
+                            <i class="fa fa-plus" aria-hidden="true"></i> Add To Cart
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="box box-primary" ng-if="TempData.length>0">
+            <div class="box-header with-border">
+                <h3 class="box-title">Cart Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <td>Sl.No</td>
+                                    <th>Approved Person</th>
+                                    <th>Approved Level</th>
+                                    <th>Final Flag</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="dd in TempData">
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-left">{{dd.ApprovalEmpName}}</td>
+                                    <td class="text-center">{{dd.ApprovalLevelNo}}</td>
+                                    <td class="text-center">
+                                        <span ng-if="dd.ApprovalFinalFlag">
+                                            <i class="fa fa-check text-green" title="Final Flag"></i>
+                                        </span>
+                                        <span ng-if="!dd.ApprovalFinalFlag">
+                                            <i class="fa fa-times text-red" title=""></i>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-click="DeleteTempdata(dd, $index)">
+                                            <i class="fa fa-trash text-red" title="Delete Record"></i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center row">
+                    <input type="hidden" value="{{HRLA_Id}}" ng-model="hrlA_Id" />
+                    <md-button type="submit" ng-disabled="form.$invalid" ng-click="SaveData()" class="md-raised md-primary">
+                        <i class="fa fa-save" aria-hidden="true"></i> Save
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                        <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Grid View</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-4 pull-right">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="searchValue.$" type="text" placeholder="search here...">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                            <table class="table table-bordered table-striped mb-0">
+                                <thead>
+                                    <tr style="background: aliceblue;">
+                                        <th>
+                                            <input class="form-control" ng-model="searchValue.hrmG_GradeName" type="text" placeholder="search grade name...">
+                                        </th>
+                                        <th>
+                                            <input class="form-control" ng-model="searchValue.HRMD_DepartmentName" type="text" placeholder="search department name...">
+                                        </th>
+                                        <th>
+                                            <input class="form-control" ng-model="searchValue.HRMDES_DesignationName" type="text" placeholder="search desgination name...">
+                                        </th>
+                                        <th>
+                                            <input class="form-control" ng-model="searchValue.HRMGT_EmployeeGroupType" type="text" placeholder="search group type name...">
+                                        </th>
+                                        <!--<th>
+                                            <input class="form-control" ng-model="searchValue.hrmE_EmployeeFirstName" type="text" placeholder="search employee name...">
+                                        </th>-->
+                                        <th>
+                                            <input class="form-control" ng-model="searchValue.hrmL_LeaveType" type="text" placeholder="search leave type...">
+                                        </th>
+                                        
+                                        <th>
+                                            <input class="form-control" ng-model="searchValue.hrmE_EmployeeFirstName" type="text" placeholder="search approvar name...">
+                                        </th>
+                                        <th>
+                                            <input class="form-control" ng-model="searchValue.hrlaoN_SanctionLevelNo" type="text" placeholder="search Sanctioned order...">
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+                            <table class="table table-bordered table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th><a href="" ng-click="sort('')">SL.No.</a></th>
+                                        <th><a href="" ng-click="sort('hrmG_GradeName')">Grade Name</a></th>
+                                        <th><a href="" ng-click="sort('HRMD_DepartmentName')">Department Name</a></th>
+                                        <th><a href="" ng-click="sort('HRMDES_DesignationName')">Designation Name</a></th>
+                                        <th><a href="" ng-click="sort('HRMGT_EmployeeGroupType')">Group Type Name</a></th>
+                                        <!--<th><a href="" ng-click="sort('hrmE_EmployeeFirstName')">Employee Name</a></th>-->
+                                        <th><a href="" ng-click="sort('hrmL_LeaveType')">Leave Type</a></th>                                     
+                                        <th><a href="" ng-click="sort('hrmE_EmployeeFirstName')">Approvar Name</a></th>
+                                        <th><a href="" ng-click="sort('hrlaoN_SanctionLevelNo')">Sanctioned Order</a></th>
+                                        <th><a href="" ng-click="sort('HRLAON_FinalFlg')">Final Flag</a></th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr dir-paginate="newuser in  filterValue1 = (gridAuth | filter : searchValue) |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                                        <td class="text-center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                        <td class="text-left">{{ newuser.hrmG_GradeName}}</td>
+                                        <td class="text-left">{{ newuser.HRMD_DepartmentName}}</td>
+                                        <td class="text-left">{{ newuser.HRMDES_DesignationName}}</td>
+                                        <td class="text-left">{{ newuser.HRMGT_EmployeeGroupType}}</td>
+                                        <!--<td class="text-left">{{ newuser.hrmE_EmployeeFirstName }}</td>-->
+                                        <td class="text-left">{{ newuser.hrmL_LeaveType }}</td>
+                                      
+                                        <td class="text-left">{{ newuser.hrmE_EmployeeFirstName }}</td>
+                                        <td class="text-center">{{ newuser.hrlaoN_SanctionLevelNo }}</td>
+                                        <td class="text-center">
+                                            <span>
+                                                <i ng-if="newuser.HRLAON_FinalFlg" class="fa fa-check text-green" title="Final Flag"></i>
+                                                <i ng-if="!newuser.HRLAON_FinalFlg" class="fa fa-times text-red" title=""></i>
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span>
+                                                <a href="javascript:void(0)" ng-click="getorgvalue(newuser)" title="Edit">
+                                                    <i class="fa fa-pencil-square-o text-primary" title="Edit"></i>
+                                                </a>
+                                            </span>
+                                            <span>
+                                                <a href="javascript:void(0)" ng-click="deletedataY(newuser);" data-placement="bottom" data-toggle="tooltip" title="Delete"> <i class="fa fa-trash"></i></a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <dir-pagination-controls max-size="10"
+                                                     direction-links="true"
+                                                     boundary-links="true">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--<div ui-grid="gridAuth" ui-grid-pagination ui-grid-edit class="grid text-center" id="style-4" style="height: 270px;"></div>-->
+            </div>
+        </div>
+    </div>
+</section>

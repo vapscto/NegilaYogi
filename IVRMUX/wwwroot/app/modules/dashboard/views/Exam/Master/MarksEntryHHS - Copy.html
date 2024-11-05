@@ -1,0 +1,636 @@
+﻿
+<section class="content" ng-init="BindData()">
+    <!--<div class="well" ng-init="subj_type='S'">
+        <div class="text-center">
+            <label class="radio-inline">
+                <input value="SSSE" type="radio" ng-model="subj_type" ng-click="get_form(subj_type)">
+                <span class="lbl padding-8">Sub-Subject && Sub-Exam</span>
+            </label>
+            <label class="radio-inline">
+                <input value="SS" type="radio" ng-model="subj_type" ng-click="get_form(subj_type)">
+                <span class="lbl padding-8">Only Sub-Subject</span>
+            </label>
+            <label class="radio-inline">
+                <input value="SE" type="radio" ng-model="subj_type" ng-click="get_form(subj_type)">
+                <span class="lbl padding-8">Only Sub-Exam</span>
+            </label>
+            <label class="radio-inline">
+                <input value="S" type="radio" ng-model="subj_type" ng-click="get_form(subj_type)">
+                <span class="lbl padding-8">Only Subject</span>
+            </label>
+        </div>
+    </div>-->
+    <style>
+        .ui-grid-row:hover .ui-grid-cell {
+            background-color: #469ef7;
+            color: black;
+        }
+    </style>
+    <form class="form-horizontal ng-pristine ng-valid" name="myForm" role="form" novalidate>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Marks Entry For HHS</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" name="Year" ng-model="ASMAY_Id" data-ng-change="get_classes(ASMAY_Id)" required>
+                                    <option value="">Select Academic Year</option>
+                                    <option ng-repeat="yr in year_list" value="{{yr.asmaY_Id}}" ng-selected="{{yr.Selected == true}}">
+                                        {{yr.asmaY_Year}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.Year)" ng-messages="myForm.Year.$error">
+                                <div ng-message="required">Please Select Academic Year</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Class :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel2" name="cls" ng-model="ASMCL_Id" data-ng-change="get_sections(ASMCL_Id,ASMAY_Id)" required>
+                                    <option value="">Select Class</option>
+                                    <option ng-repeat="clss in class_list" value="{{clss.asmcL_Id}}" ng-selected="{{clss.Selected == true}}">
+                                        {{clss.asmcL_ClassName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+
+                                <div ng-message="required">Please Select Class</div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Section :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel3" name="sec" ng-model="ASMS_Id" data-ng-change="get_exams(ASMS_Id,ASMCL_Id,ASMAY_Id)" required>
+                                    <option value="">Select Section</option>
+                                    <option ng-repeat="sect in section_list" value="{{sect.asmS_Id}}" ng-selected="{{sect.Selected == true}}">
+                                        {{sect.asmC_SectionName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                <div ng-message="required">Please Select Section</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Exam :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel4" name="exm" ng-model="EME_Id" data-ng-change="get_subjects(ASMS_Id,ASMCL_Id,ASMAY_Id,EME_Id)" required>
+                                    <option value="">Select Exam</option>
+                                    <option ng-repeat="exam in exam_list" value="{{exam.emE_Id}}" ng-selected="{{exam.Selected == true}}">
+                                        {{exam.emE_ExamName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.exm)" ng-messages="myForm.exm.$error">
+                                <div ng-message="required">Please Select Exam</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Subject :<span style="color:Red">*</span></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel5" name="sub" ng-model="ISMS_Id" ng-change="temp_student_list_S=[]" required>
+                                    <!--data-ng-change="onselectSubject()"-->
+                                    <option value="">Select Subject</option>
+                                    <option ng-repeat="subj in subject_list" value="{{subj.ismS_Id}}" ng-selected="{{subj.Selected == true}}">
+                                        {{subj.ismS_SubjectName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-4 error-messages" ng-if="interacted(myForm.sub)" ng-messages="myForm.sub.$error">
+
+                                <div ng-message="required">Please Select Subject</div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" ng-show="temp_student_list_S.length>0 || temp_student_list_SSSE.length>0 || temp_student_list_SS.legth>0 || temp_student_list_SE.length>0">
+                        <div class="form-group">
+                            <i class="fa fa-question" style="color:red;"></i>
+                            <md-tooltip md-direction="down">
+                                <p>M- Max.Marks<br>ME-Marks Entry Max</p>
+                                <!--M- Max.Marks &nbsp;&nbsp;
+                                ME-Marks Entry Max-->
+                            </md-tooltip>
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <hr />
+                <div class="">
+
+                    <div class="">
+                        <div class="text-center">
+                            <!--<input type="hidden" ng-model="EME_ID" />-->
+                            <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="onsearch(ASMS_Id,ASMCL_Id,ASMAY_Id,EME_Id,ISMS_Id)">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                Search
+                            </md-button>
+                            <md-button ng-hide="temp_student_list_S.length>0 || temp_student_list_SSSE.length>0 || temp_student_list_SS.length>0 || temp_student_list_SE.length>0" type="submit" class="md-raised md-warn" ng-click="clear()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                                Cancel
+                            </md-button>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+        <div class="box box-primary" ng-show="temp_student_list_S.length>0 || temp_student_list_SSSE.length>0 || temp_student_list_SS.length>0 || temp_student_list_SE.length>0">
+            <!--ng-if="gridOptions.data.length>0"-->
+            <div class="box-header with-border">
+                <h3 class="box-title">Student Marks Details</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" ng-show="!eyceS_SubSubjectFlg && !eyceS_SubExamFlg" style="overflow:scroll;">
+                <!--<div ui-grid="gridOptions" class="grid text-center" id="style-4" style="height: 720px;"></div>-->  <!--ui-grid-pagination-->
+                <div>
+                    <table class="table table-hover table-responsive table-bordered" id="tre">
+                        <thead>
+                            <tr>
+                                <th rowspan="{{row_span}}">
+                                    <label>
+                                        <input type="checkbox" value="" data-ng-model="all_s" ng-click="toggleAll_S()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th rowspan="{{row_span}}">
+                                    <a href="" ng-click="order('sno')">SL NO</a>
+                                </th>
+                                <th rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_FirstName')">
+                                        Student Name
+                                    </a>
+                                </th>
+                                <th ng-show="regno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_RegistrationNo')">
+                                        Reg No
+                                    </a>
+                                </th>
+                                <th ng-show="admno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_AdmNo')">
+                                        Admission No
+                                    </a>
+                                </th>
+                                <th ng-show="rollno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amaY_RollNo')">
+                                        Roll No
+                                    </a>
+                                </th>
+
+
+                                <th colspan="{{col_span}}" ng-repeat="subjs in subject_details track by $index">
+                                    {{subjs.ismS_SubjectName}}-(M-{{subjs.eyceS_MaxMarks}})-(ME-{{subjs.eyceS_MarksEntryMax}})
+                                </th>
+                            </tr>
+
+                            <!--<tr ng-if="eyceS_SubSubjectFlg">
+                                <th colspan="{{col_span/subject_subsubjects_details.length}}"  ng-repeat="X in subject_subsubjects_details track by $index">
+                                        {{X.emsS_SubSubjectName}}-(M-{{X.eycessS_MaxMarks}})
+                                </th>
+
+
+                            </tr>-->
+                            <!--<tr ng-if="eyceS_SubExamFlg">
+
+
+                                <th  ng-repeat="Y in temp_sub_subjs_exams track by $index">
+
+                                    {{Y.sub_exam.emsE_SubExamName}}-(M-{{Y.sub_exam.eycessE_MaxMarks}})
+                                </th>
+                            </tr>-->
+
+
+                        </thead>
+                        <tbody>
+                            <!--<tr ng-repeat="datum in filterValue=(temp_student_list_S  | filter : searchValue|orderBy:sortKey:reverse)">-->
+                            <tr ng-repeat="datum in temp_student_list_S | orderBy:sortKey:sortReverse">
+                                <td class="text-center">
+                                    <!--hdTD-->
+                                    <label>
+                                        <input type="checkbox" ng-model="datum.selected_s" ng-change="optionToggled_S()"><!--optionToggled(datum,$index) ng-true-value="true" ng-false-value="false"-->
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    {{$index+1}}
+                                </td>
+                                <td class="text-left">{{datum.amsT_FirstName}}</td>
+                                <td ng-show="regno"> {{datum.amsT_RegistrationNo}} </td>
+                                <td ng-show="admno"> {{datum.amsT_AdmNo}} </td>
+                                <td ng-show="rollno"> {{datum.amaY_RollNo}} </td>
+
+
+                                <!--<td ng-repeat="X in newarray1 track by $index">
+                                   {{datum[X.name1]}}
+                                </td>-->
+                                <td class="text-center" ng-repeat="Y in subject_details track by $index">
+                                    <input class="form-control" type="text" placeholder="{{placeholder}}" data-ng-model="datum.ESTM_Marks" value="" name="t1_{{datum.amsT_Id}}" ng-blur="valid_marks_S(Y,Y.ismS_Id,datum.ESTM_Marks,datum.amsT_Id,datum)" ng-paste="$event.preventDefault()" ng-disabled="!datum.selected_s" ng-required="datum.selected_s" allow-pattern="{{allowpattern}}" ng-pattern="ngpattern" /><!--ng-pattern="ngpattern" allow-pattern="{{allowpattern}}"--> <!--ng-pattern="/^[0-9]{0,4}\.?[0-9]{1,2}?$/" allow-pattern="[a-zA-Z0-9.]" placeholder="Enter Marks..."--><!--ng-change="valid_max(user.EYCES_MaxMarks,user)" ,ng-change="valid_max_123(user.EYCES_MaxMarks,user)"--><!--data-ng-model="datum.ESTM_Marks[Y.sub_subject.emsS_Id][Y.sub_exam.emsE_Id][datum.amsT_Id]"-->
+                                    <div class="error-messages" ng-if="interacted(myForm['t1_'+datum.amsT_Id])" ng-messages="myForm['t1_'+datum.amsT_Id].$error">
+                                        <div ng-message="pattern">Enter valid Format[For Example 100.00,99.97,......]</div>
+                                        <div ng-message="required" ng-if="eyceS_MarksGradeEntryFlg=='M'">Enter Obtained Marks</div>
+                                        <div ng-message="required" ng-if="eyceS_MarksGradeEntryFlg=='G'">Enter Obtained Grade</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="SaveMarks_S(ASMS_Id,ASMCL_Id,ASMAY_Id,EME_Id,ISMS_Id)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body" ng-show="eyceS_SubSubjectFlg && eyceS_SubExamFlg" style="overflow:scroll;">
+                <!--<div ui-grid="gridOptions" class="grid text-center" id="style-4" style="height: 720px;"></div>-->  <!--ui-grid-pagination-->
+                <div>
+                    <table class="table table-hover table-responsive table-bordered" id="tre">
+                        <thead>
+                            <tr>
+                                <th rowspan="{{row_span}}">
+                                    <label>
+                                        <input type="checkbox" value="" data-ng-model="all_ssse" ng-click="toggleAll_SSSE()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th rowspan="{{row_span}}">
+                                    <a href="" ng-click="order('sno')">SL NO</a>
+                                </th>
+                                <th rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_FirstName')">
+                                        Student Name
+                                    </a>
+                                </th>
+                                <th ng-show="regno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_RegistrationNo')">
+                                        Reg No
+                                    </a>
+                                </th>
+                                <th ng-show="admno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_AdmNo')">
+                                        Admission No
+                                    </a>
+                                </th>
+                                <th ng-show="rollno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amaY_RollNo')">
+                                        Roll No
+                                    </a>
+                                </th>
+
+
+                                <th colspan="{{col_span+1}}" ng-repeat="subjs in subject_details track by $index">
+                                    {{subjs.ismS_SubjectName}}-(M-{{subjs.eyceS_MaxMarks}})-(ME-{{subjs.eyceS_MarksEntryMax}})
+                                </th>
+                            </tr>
+                            <tr ng-if="eyceS_SubSubjectFlg">
+                                <th colspan="{{col_span/subject_subsubjects_details.length}}" ng-repeat="X in subject_subsubjects_details track by $index">
+                                    {{X.emsS_SubSubjectName}}-(M-{{X.eycessS_MaxMarks}})
+                                </th>
+
+
+                            </tr>
+                            <tr ng-if="eyceS_SubExamFlg">
+                                <th ng-repeat="Y in temp_sub_subjs_exams track by $index">
+                                    {{Y.sub_exam.emsE_SubExamName}}-(M-{{Y.sub_exam.eycessE_MaxMarks}})
+                                </th>
+                            </tr>
+
+
+                        </thead>
+                        <tbody>
+                            <!--<tr ng-repeat="datum in filterValue=(temp_student_list_SSSE  | filter : searchValue|orderBy:sortKey:reverse)">-->
+                            <tr ng-repeat="datum in temp_student_list_SSSE | orderBy:sortKey:sortReverse">
+                                <td class="text-center">
+                                    <!--hdTD-->
+                                    <label>
+                                        <input type="checkbox" ng-model="datum.selected_ssse" ng-change="optionToggled_SSSE()"><!--optionToggled(datum,$index) ng-true-value="true" ng-false-value="false"-->
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    {{$index+1}}
+                                </td>
+                                <td class="text-left">{{datum.amsT_FirstName}}</td>
+                                <td ng-show="regno"> {{datum.amsT_RegistrationNo}} </td>
+                                <td ng-show="admno"> {{datum.amsT_AdmNo}} </td>
+                                <td ng-show="rollno"> {{datum.amaY_RollNo}} </td>
+
+
+                                <!--<td ng-repeat="X in newarray1 track by $index">
+                                   {{datum[X.name1]}}
+                                </td>-->
+                                <td class="text-center" ng-repeat="Y in temp_sub_subjs_exams track by $index">
+                                    <input class="form-control" type="text" placeholder="Enter Marks..." data-ng-model="datum.ESTMSS_Marks[Y.sub_subject.emsS_Id][Y.sub_exam.emsE_Id][datum.amsT_Id]" value="" name="t1_{{Y.sub_subject.emsS_Id}}_{{Y.sub_exam.emsE_Id}}_{{datum.amsT_Id}}" ng-blur="valid_marks_SSSE(Y,Y.sub_subject.emsS_Id,Y.sub_exam.emsE_Id,datum.ESTMSS_Marks,datum.amsT_Id,datum)" ng-paste="$event.preventDefault()" ng-disabled="!datum.selected_ssse" ng-required="datum.selected_ssse" allow-pattern="{{allowpattern}}" ng-pattern="ngpattern" />
+                                    <!--ng-pattern="ngpattern" allow-pattern="{{allowpattern}}"--> <!--allow-pattern="[a-zA-Z0-9.]"--><!--ng-pattern="/^[0-9]{0,4}\.?[0-9]{1,2}?$/"--><!--ng-change="valid_max(user.EYCES_MaxMarks,user)" ,ng-change="valid_max_123(user.EYCES_MaxMarks,user)"--><!--data-ng-model="datum.ESTMSS_Marks[Y.sub_subject.emsS_Id][Y.sub_exam.emsE_Id][datum.amsT_Id]"-->
+                                    <div class="error-messages" ng-if="interacted(myForm['t1_'+Y.sub_subject.emsS_Id++'_'+Y.sub_exam.emsE_Id+'_'+datum.amsT_Id])" ng-messages="myForm['t1_'+Y.sub_subject.emsS_Id+'_'+Y.sub_exam.emsE_Id+'_'+datum.amsT_Id].$error">
+                                        <div ng-message="pattern">Enter valid Format[For Example 100.00,99.97,......]</div>
+                                        <div ng-message="required">Enter Obtained Marks</div>
+
+                                    </div>
+
+                                    <!--<input class="form-control" type="number" placeholder="Enter Marks..." ng-pattern="/^[0-9]{0,4}\.?[0-9]{1,2}?$/" allow-pattern="[0-9.]" data-ng-model="datum.ESTMSS_Marks[Y.sub_subject.emsS_Id][Y.sub_exam.emsE_Id][datum.amsT_Id]" value="" name="t1_{{Y.sub_subject.emsS_Id}}_{{Y.sub_exam.emsE_Id}}_{{datum.amsT_Id}}" ng-blur="valid_marks(Y,datum.ESTMSS_Marks,datum)" ng-paste="$event.preventDefault()" ng-required="datum.selected_s" />
+                                    <div class="error-messages" ng-if="interacted(myForm['t1_'+Y.sub_subject.emsS_Id++'_'+Y.sub_exam.emsE_Id+'_'+datum.amsT_Id])" ng-messages="myForm['t1_'+Y.sub_subject.emsS_Id+'_'+Y.sub_exam.emsE_Id+'_'+datum.amsT_Id].$error">
+                                        <div ng-message="pattern">Enter valid Format[For Example 100.00,99.97,......]</div>
+                                        <div ng-message="required">Enter Max Marks</div>
+
+                                    </div>-->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="SaveMarks_SSSE(ASMS_Id,ASMCL_Id,ASMAY_Id,EME_Id,ISMS_Id)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body" ng-show="eyceS_SubSubjectFlg && !eyceS_SubExamFlg" style="overflow:scroll;">
+                <!--<div ui-grid="gridOptions" class="grid text-center" id="style-4" style="height: 720px;"></div>-->  <!--ui-grid-pagination-->
+                <div>
+                    <table class="table table-hover table-responsive table-bordered" id="tre">
+                        <thead>
+                            <tr>
+                                <th rowspan="{{row_span}}">
+                                    <label>
+                                        <input type="checkbox" value="" data-ng-model="all_ss" ng-click="toggleAll_SS()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th rowspan="{{row_span}}">
+                                    <a href="" ng-click="order('sno')">SL NO</a>
+                                </th>
+                                <th rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_FirstName')">
+                                        Student Name
+                                    </a>
+                                </th>
+                                <th ng-show="regno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_RegistrationNo')">
+                                        Reg No
+                                    </a>
+                                </th>
+                                <th ng-show="admno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_AdmNo')">
+                                        Admission No
+                                    </a>
+                                </th>
+                                <th ng-show="rollno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amaY_RollNo')">
+                                        Roll No
+                                    </a>
+                                </th>
+
+                                <th colspan="{{col_span}}" ng-repeat="subjs in subject_details track by $index">
+                                    {{subjs.ismS_SubjectName}}-(M-{{subjs.eyceS_MaxMarks}})-(ME-{{subjs.eyceS_MarksEntryMax}})
+                                </th>
+                            </tr>
+                            <tr ng-if="eyceS_SubSubjectFlg">
+                                <th colspan="{{col_span/subject_subsubjects_details.length}}" ng-repeat="X in subject_subsubjects_details track by $index">
+                                    {{X.emsS_SubSubjectName}}-(M-{{X.eycessS_MaxMarks}})
+                                </th>
+
+
+                            </tr>
+                            <!--<tr ng-if="eyceS_SubExamFlg">
+
+
+                                <th  ng-repeat="Y in temp_sub_subjs_exams track by $index">
+
+                                    {{Y.sub_exam.emsE_SubExamName}}-(M-{{Y.sub_exam.eycessE_MaxMarks}})
+                                </th>
+                            </tr>-->
+
+
+                        </thead>
+                        <tbody>
+                            <!--<tr ng-repeat="datum in filterValue=(temp_student_list_SS | filter : searchValue|orderBy:sortKey:reverse)">-->
+                            <tr ng-repeat="datum in temp_student_list_SS | orderBy:sortKey:sortReverse">
+                                <td class="text-center">
+                                    <!--hdTD-->
+                                    <label>
+                                        <input type="checkbox" ng-model="datum.selected_ss" ng-change="optionToggled_ss()"><!--optionToggled(datum,$index) ng-true-value="true" ng-false-value="false"-->
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    {{$index+1}}
+                                </td>
+                                <td class="text-left">{{datum.amsT_FirstName}}</td>
+                                <td ng-show="regno"> {{datum.amsT_RegistrationNo}} </td>
+                                <td ng-show="admno"> {{datum.amsT_AdmNo}} </td>
+                                <td ng-show="rollno"> {{datum.amaY_RollNo}} </td>
+
+
+                                <!--<td ng-repeat="X in newarray1 track by $index">
+                                   {{datum[X.name1]}}
+                                </td>-->
+                                <!--<td ng-repeat="Y in temp_sub_subjs_exams track by $index">
+                                    <input class="form-control" type="text" placeholder="Enter Marks..."  allow-pattern="[a-zA-Z0-9.]" data-ng-model="datum.ESTMSS_Marks[Y.sub_subject.emsS_Id][Y.sub_exam.emsE_Id][datum.amsT_Id]" value="" name="t1_{{Y.sub_subject.emsS_Id}}_{{Y.sub_exam.emsE_Id}}_{{datum.amsT_Id}}" ng-blur="valid_marks(Y,Y.sub_subject.emsS_Id,Y.sub_exam.emsE_Id,datum.ESTMSS_Marks,datum.amsT_Id,datum)" ng-paste="$event.preventDefault()" ng-disabled="!datum.selected_s" ng-required="datum.selected_s" />
+                                    <div class="error-messages" ng-if="interacted(myForm['t1_'+Y.sub_subject.emsS_Id++'_'+Y.sub_exam.emsE_Id+'_'+datum.amsT_Id])" ng-messages="myForm['t1_'+Y.sub_subject.emsS_Id+'_'+Y.sub_exam.emsE_Id+'_'+datum.amsT_Id].$error">
+                                        <div ng-message="pattern">Enter valid Format[For Example 100.00,99.97,......]</div>
+                                        <div ng-message="required">Enter Max Marks</div>
+
+                                    </div>
+                                </td>-->
+                                <td class="text-center" ng-repeat="X in subject_subsubjects_details track by $index">
+                                    <input class="form-control" type="text" placeholder="Enter Marks..." data-ng-model="datum.ESTMSS_Marks[X.emsS_Id][datum.amsT_Id]" value="" name="t1_{{X.emsS_Id}}_{{datum.amsT_Id}}" ng-blur="valid_marks_SS(X,X.emsS_Id,datum.ESTMSS_Marks,datum.amsT_Id,datum)" ng-paste="$event.preventDefault()" ng-disabled="!datum.selected_ss" ng-required="datum.selected_ss" allow-pattern="{{allowpattern}}" ng-pattern="ngpattern" /><!--ng-pattern="ngpattern" allow-pattern="{{allowpattern}}"--> <!--allow-pattern="[a-zA-Z0-9.]"-->
+                                    <div class="error-messages" ng-if="interacted(myForm['t1_'+X.emsS_Id+'_'+datum.amsT_Id])" ng-messages="myForm['t1_'+X.emsS_Id+'_'+datum.amsT_Id].$error">
+                                        <div ng-message="pattern">Enter valid Format[For Example 100.00,99.97,......]</div>
+                                        <div ng-message="required">Enter Obtained Marks</div>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="SaveMarks_SS(ASMS_Id,ASMCL_Id,ASMAY_Id,EME_Id,ISMS_Id)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body" ng-show="!eyceS_SubSubjectFlg && eyceS_SubExamFlg" style="overflow:scroll;">
+                <!--<div ui-grid="gridOptions" class="grid text-center" id="style-4" style="height: 720px;"></div>-->  <!--ui-grid-pagination-->
+                <div>
+                    <table class="table table-hover table-responsive table-bordered" id="tre">
+                        <thead>
+                            <tr>
+                                <th rowspan="{{row_span}}">
+                                    <label>
+                                        <input type="checkbox" value="" data-ng-model="all_se" ng-click="toggleAll_SE()">
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </th>
+                                <th rowspan="{{row_span}}">
+                                    <a href="" ng-click="order('sno')">SL NO</a>
+                                </th>
+                                <th rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_FirstName')">
+                                        Student Name
+                                    </a>
+                                </th>
+                                <th ng-show="regno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_RegistrationNo')">
+                                        Reg No
+                                    </a>
+                                </th>
+                                <th ng-show="admno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amsT_AdmNo')">
+                                        Admission No
+                                    </a>
+                                </th>
+                                <th ng-show="rollno" rowspan="{{row_span}}">
+                                    <a href="" ng-click="sort('amaY_RollNo')">
+                                        Roll No
+                                    </a>
+                                </th>
+
+
+                                <th colspan="{{col_span}}" ng-repeat="subjs in subject_details track by $index">
+                                    {{subjs.ismS_SubjectName}}-(M-{{subjs.eyceS_MaxMarks}})-(ME-{{subjs.eyceS_MarksEntryMax}})
+                                </th>
+                            </tr>
+                            <tr ng-if="eyceS_SubExamFlg">
+                                <th colspan="{{col_span/subject_subexams_details.length}}" ng-repeat="X in subject_subexams_details track by $index">
+                                    {{X.emsE_SubExamName}}-(M-{{X.eycessE_MaxMarks}})
+                                </th>
+
+
+                            </tr>
+                            <!--<tr ng-if="eyceS_SubExamFlg">
+
+
+                                <th  ng-repeat="Y in temp_sub_subjs_exams track by $index">
+
+                                    {{Y.sub_exam.emsE_SubExamName}}-(M-{{Y.sub_exam.eycessE_MaxMarks}})
+                                </th>
+                            </tr>-->
+
+
+                        </thead>
+                        <tbody>
+                            <!--<tr ng-repeat="datum in filterValue=(temp_student_list_SE | filter : searchValue|orderBy:sortKey:reverse)">-->
+                            <tr ng-repeat="datum in temp_student_list_SE | orderBy:sortKey:sortReverse">
+                                <td class="text-center">
+                                    <!--hdTD-->
+                                    <label>
+                                        <input type="checkbox" ng-model="datum.selected_se" ng-change="optionToggled_SE()"><!--optionToggled(datum,$index) ng-true-value="true" ng-false-value="false"-->
+                                        <span class="lbl padding-8"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    {{$index+1}}
+                                </td>
+                                <td class="text-left">{{datum.amsT_FirstName}}</td>
+                                <td ng-show="regno">{{datum.amsT_RegistrationNo}}</td>
+                                <td ng-show="admno"> {{datum.amsT_AdmNo}} </td>
+                                <td ng-show="rollno"> {{datum.amaY_RollNo}} </td>
+
+
+                                <!--<td ng-repeat="X in newarray1 track by $index">
+                                   {{datum[X.name1]}}
+                                </td>-->
+                                <!--<td ng-repeat="Y in temp_sub_subjs_exams track by $index">
+                                    <input class="form-control" type="text" placeholder="Enter Marks..."  allow-pattern="[a-zA-Z0-9.]" data-ng-model="datum.ESTMSS_Marks[Y.sub_subject.emsS_Id][Y.sub_exam.emsE_Id][datum.amsT_Id]" value="" name="t1_{{Y.sub_subject.emsS_Id}}_{{Y.sub_exam.emsE_Id}}_{{datum.amsT_Id}}" ng-blur="valid_marks(Y,Y.sub_subject.emsS_Id,Y.sub_exam.emsE_Id,datum.ESTMSS_Marks,datum.amsT_Id,datum)" ng-paste="$event.preventDefault()" ng-disabled="!datum.selected_s" ng-required="datum.selected_s" />
+                                    <div class="error-messages" ng-if="interacted(myForm['t1_'+Y.sub_subject.emsS_Id++'_'+Y.sub_exam.emsE_Id+'_'+datum.amsT_Id])" ng-messages="myForm['t1_'+Y.sub_subject.emsS_Id+'_'+Y.sub_exam.emsE_Id+'_'+datum.amsT_Id].$error">
+                                        <div ng-message="pattern">Enter valid Format[For Example 100.00,99.97,......]</div>
+                                        <div ng-message="required">Enter Max Marks</div>
+
+                                    </div>
+                                </td>-->
+                                <td class="text-center" ng-repeat="X in subject_subexams_details track by $index">
+                                    <input class="form-control" type="text" placeholder="Enter Marks..." data-ng-model="datum.ESTMSS_Marks[X.emsE_Id][datum.amsT_Id]" value="" name="t1_{{X.emsE_Id}}_{{datum.amsT_Id}}" ng-blur="valid_marks_SE(X,X.emsE_Id,datum.ESTMSS_Marks,datum.amsT_Id,datum)" ng-paste="$event.preventDefault()" ng-disabled="!datum.selected_se" ng-required="datum.selected_se" allow-pattern="{{allowpattern}}" ng-pattern="ngpattern" /><!--ng-pattern="ngpattern" allow-pattern="{{allowpattern}}"--><!--allow-pattern="[a-zA-Z0-9.]"-->
+                                    <div class="error-messages" ng-if="interacted(myForm['t1_'+X.emsE_Id+'_'+datum.amsT_Id])" ng-messages="myForm['t1_'+X.emsE_Id+'_'+datum.amsT_Id].$error">
+                                        <div ng-message="pattern">Enter valid Format[For Example 100.00,99.97,......]</div>
+                                        <div ng-message="required">Enter Obtained Marks</div>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="button" class="md-raised md-primary" id="save-btn" ng-click="SaveMarks_SE(ASMS_Id,ASMCL_Id,ASMAY_Id,EME_Id,ISMS_Id)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Save
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="clear()">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</section>

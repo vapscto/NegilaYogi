@@ -1,0 +1,347 @@
+﻿
+<section class="content" data-ng-init="loaddata()">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Deputation Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+
+                <div class="row">
+
+                    <div class="col-sm-7 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<span style="color:red;">*</span></label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="seluse" data-ng-model="academicyr" name="acd_year" required>
+                                    <option value="" label="Select Year"> </option>
+                                    <option ng-repeat="option in acayyearbind" value="{{option.asmaY_Id}}" ng-selected="{{option.Selected == true}}">
+                                        {{option.asmaY_Year}}
+                                    </option>
+                                </select>
+                                <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                    <div ng-message="required"> Select the Academic Year</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-7 col-sm-offset-2">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">B/W Dates: <span style="color:Red">*</span></label>
+                            <div class="col-sm-4">
+                                <div class="">
+                                    <md-datepicker id="FromDate" ng-model="fromdate" onkeydown="return false" name="fdate" md-placeholder="From Date"
+                                                   required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                        <div ng-message="required">Select the from date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--md-min-date="minDatef" md-max-date="maxDatef" ng-change='setTodate(fromdate);'-->
+                            <div class="col-sm-5">
+                                <div class="">
+                                    <md-datepicker id="ToDate" name="tdate" ng-model="todate" onkeydown="return false" md-placeholder="To Date"
+                                                   required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                                        <div ng-message="required">Select the To date</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--md-min-date="minDate" md-max-date="maxDate" ng-change='checkErr(fromdate,todate);'-->
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="well text-center">
+                            <label class="radio-inline">
+                                <input type="radio" value="D" ng-model="flag" name="optradio" data-ng-click="onclickloaddata()">
+                                <span class="lbl padding-8">DETAILS</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" value="C" ng-model="flag" name="optradio" data-ng-click="onclickloaddata()">
+                                <span class="lbl padding-8">COUNT</span>
+                            </label>
+
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <md-button type="submit" class="md-raised md-primary" ng-click="ShowReportdata()" id="save-btn">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" ng-click="Clear_Details()" target="_blank" class="md-raised md-warn">
+                        <i class="fa fa-times" aria-hidden="true"></i> Clear
+                    </md-button>
+                    <md-button type="button" ng-show="datapages.length>0" class="md-raised md-primary" id="excel-btn" ng-click="exportToExcel()">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-show="datapages.length>0" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box box-primary" ng-show="report">
+            <div class="box-header with-border">
+                <h3 class="box-title">DEPUTATION COUNT REPORT</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+            <div class="box-body">
+
+                <div class="box-body" id="printSectionId">
+                    <table class="table table-hover table-responsive table-bordered text-center" id="Table">
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    <a>SL.NO.</a>
+                                </th>
+                                <th>
+                                    <a href="" ng-click="sortBy('AMCO_CourseName')">COURSE</a>
+                                </th>
+                                <th><a href="" ng-click="sortBy('AMB_BranchName')">BRANCH </a> </th>
+                                <th>
+                                    <a href="" ng-click="sortBy('AMSE_SEMName')">SEMESTER</a>
+                                </th>
+                                <th><a href="" ng-click="sortBy('ACMS_SectionName')">SECTION </a> </th>
+                                <th><a href="" ng-click="sortBy('count')">TOTAL DEPUTED</a> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in datapages | orderBy:propertyName:reverse |  filter:search">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.AMCO_CourseName}}</td>
+                                <td>{{user.AMB_BranchName}}</td>
+                                <td>{{ user.AMSE_SEMName}}</td>
+                                <td>{{user.ACMS_SectionName}}</td>
+                                <td>{{user.count}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!------------------------PDF AND EXCEL------------------------------->
+            <div id="STDPRNT1" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                </div>
+                <div id="STDEXCEL1">
+                    <center> <h4 class="box-title">DEPUTATION COUNT REPORT</h4></center>
+                    <br />
+                    <table class="table table-hover table-responsive table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SL.NO.
+                                </th>
+                                <th>
+                                    COURSE
+                                </th>
+                                <th>BRANCH  </th>
+                                <th>
+                                    SEMESTER
+                                </th>
+                                <th>SECTION </th>
+                                <th>TOTAL DEPUTED </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in datapages">
+                                <td>{{ $index+1}}</td>
+                                <td>{{ user.AMCO_CourseName}}</td>
+                                <td>{{user.AMB_BranchName}}</td>
+                                <td>{{ user.AMSE_SEMName}}</td>
+                                <td>{{user.ACMS_SectionName}}</td>
+                                <td>{{user.count}}</td>
+                            </tr>
+
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="6">
+                                    <label>
+                                        Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                    </label>
+                                </td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="box box-primary" ng-show="report1">
+            <div class="box-header with-border">
+                <h3 class="box-title">Deputation Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+
+           
+              
+                   
+                    <div class="box-body" id="printSectionId1">
+
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    <b> Total Grid Records :</b>
+                                    <label class="badge">
+                                        {{datapages.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" ng-if="stdsearchValue!=''">
+                                <label class="control-label">
+                                    <b>Total Records Searched : </b>
+                                    <label class="badge">
+                                        {{filterValue1.length}}
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="stdsearchValue" type="text" placeholder="search here...">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-hover table-responsive table-bordered text-center" id="Table1">
+                            <thead>
+                                <tr>
+
+                                    <th>
+                                        <a>SL.NO.</a>
+                                    </th>
+                                    <th>
+                                        <a href="" ng-click="sortBy('TTSDC_Date')">DATE</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('AMCO_CourseName')">COURSE </a> </th>
+                                    <th><a href="" ng-click="sortBy('AMB_BranchName')">BRANCH</a> </th>
+                                    <th><a href="" ng-click="sortBy('AMSE_SEMName')">SEMESTER </a> </th>
+                                    <th><a href="" ng-click="sortBy('ACMS_SectionName')">SECTION</a> </th>
+                                    <th>
+                                        <a href="" ng-click="sortBy('TTMD_DayName')">DAY</a>
+                                    </th>
+                                    <th><a href="" ng-click="sortBy('TTMP_PeriodName')">PERIOD </a> </th>
+                                    <th><a href="" ng-click="sortBy('AbsentStaff')">ABSENT STAFF</a> </th>
+                                    <th><a href="" ng-click="sortBy('DeptStaff')">DEPUTED STAFF</a> </th>
+                                    <th><a href="" ng-click="sortBy('TTSDC_Remarks')">REMARKS</a> </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="user in filterValue1=(datapages | filter : stdsearchValue) | orderBy:propertyName:reverse |itemsPerPage:itemsPerPage" current-page="currentPage">
+                                    <td>{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+                                    <td>{{ user.TTSDC_Date |date:'dd/MM/yyyy'}}</td>
+                                    <td>{{user.AMCO_CourseName}}</td>
+                                    <td>{{user.AMB_BranchName}}</td>
+                                    <td>{{user.AMSE_SEMName}}</td>
+                                    <td>{{user.ACMS_SectionName}}</td>
+                                    <td>{{ user.TTMD_DayName}}</td>
+                                    <td>{{user.TTMP_PeriodName}}</td>
+                                    <td>{{user.AbsentStaff}}</td>
+                                    <td>{{user.DeptStaff}}</td>
+                                    <td>{{user.TTSDC_Remarks}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"> </dir-pagination-controls>
+                    </div>
+
+
+                    <!------------------------PDF AND EXCEL------------------------------->
+                    <div id="STDPRNT" ng-show="tadprint">
+                        <div class="baldwin text-center">
+                            <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                        </div>
+                        <div id="STDEXCEL">
+                            <center> <h4 class="box-title">DEPUTATION REPORT</h4></center>
+                            <br />
+                            <table class="table table-hover table-responsive table-bordered text-center">
+                                <thead>
+                                    <tr>
+
+                                        <th>
+                                            <a>SL.NO.</a>
+                                        </th>
+                                        <th>
+                                            DATE
+                                        </th>
+                                        <th>COURSE  </th>
+                                        <th>BRANCH </th>
+                                        <th>SEMESTER  </th>
+                                        <th>SECTION </th>
+                                        <th> DAY </th>
+                                        <th>PERIOD  </th>
+                                        <th>ABSENT STAFF </th>
+                                        <th>DEPUTED STAFF </th>
+                                        <th>REMARKS </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat=" user in datapages">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{ user.TTSDC_Date |date:'dd/MM/yyyy'}}</td>
+                                        <td>{{user.AMCO_CourseName}}</td>
+                                        <td>{{user.AMB_BranchName}}</td>
+                                        <td>{{user.AMSE_SEMName}}</td>
+                                        <td>{{user.ACMS_SectionName}}</td>
+                                        <td>{{ user.TTMD_DayName}}</td>
+                                        <td>{{user.TTMP_PeriodName}}</td>
+                                        <td style="overflow-wrap:break-word">{{user.AbsentStaff}}</td>
+                                        <td style="overflow-wrap:break-word">{{user.DeptStaff}}</td>
+                                        <td style="overflow-wrap:break-word">{{user.TTSDC_Remarks}}</td>
+                                    </tr>
+
+                                </tbody>
+
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="11" class="text-center">
+                                            <label>
+                                                Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}}  {{coptyright}}
+                                            </label>
+                                        </td>
+                                    </tr>
+
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!------------------------PDF AND EXCEL------------------------------->
+
+
+             
+        </div>
+
+    </form>
+</section>

@@ -1,0 +1,249 @@
+﻿<style>
+    .center {
+        margin: auto;
+        width: 60px;
+        border: 3px solid #73AD21;
+        padding: 10px;
+    }
+
+    #EmpPaySlip .table-bordered > thead > tr > th, #EmpPaySlip .table-bordered > tbody > tr > th, #EmpPaySlip .table-bordered > tfoot > tr > th, #EmpPaySlip .table-bordered > thead > tr > td, #EmpPaySlip .table-bordered > tbody > tr > td, #EmpPaySlip .table-bordered > tfoot > tr > td {
+        border: 1px solid #000;
+        padding: 5px;
+        vertical-align: middle;
+        font-weight: 900;
+        font-size: 18px;
+    }
+
+    .edd {
+        margin-left: 272px;
+        margin-top: 9px;
+    }
+
+    .edd1 {
+        margin-left: 218px;
+    }
+
+    .mul {
+        margin-left: 150px;
+        margin-top: -20px;
+    }
+
+    .multiselect {
+        width: 26.1em;
+        height: 10em;
+        border: solid 1px #5cb7ff;
+        overflow: auto;
+        margin-bottom: 1%;
+        padding: 2%;
+    }
+</style>
+<link href="css/print/EmpSalarySlip/EmpPaySlip.css" rel="stylesheet" />
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="onLoadGetData()" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Student TC Applied Report </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Class:<span style="color:red;">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-control" id="sel11" ng-model="asmcL_Id" name="cls" ng-change="getsection()" required>
+                                <option value="">--Select--</option>
+                                <option ng-repeat="cls in class_s_list" value="{{cls.asmcL_Id}}" ng-selected="{{cls.Selected==true}}"> {{cls.asmcL_ClassName}}</option>
+                            </select>
+
+
+
+
+                            <div class="error-messages" ng-if="interacted(myForm.cls)" ng-messages="myForm.cls.$error">
+                                <div ng-message="required">Select Class</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Section:<span style="color:red;">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-control" id="sel12" ng-model="asmS_Id" name="sec" ng-change="getstudent()" required>
+                                <option value="">--Select--</option>
+                                <option ng-repeat="sec in section_s_list" value="{{sec.asmS_Id}}" ng-selected="{{sec.Selected==true}}"> {{sec.asmC_SectionName}}</option>
+                            </select>
+                            <div class="error-messages" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                <div ng-message="required">Select Section</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Student:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 1px;">*</strong></label>
+                        <div class="multiselect col-sm-8 mul">
+                            <input class="form-control" ng-model="searchchkbx" type="text" placeholder="search here...">
+                            <label>
+                                <input name="stdd" value="usercheck" ng-model="usercheck" type="checkbox" data-ng-click="all_check()">
+                                <span class="lbl padding-8">
+                                    All
+                                </span>
+                            </label>
+                            <label data-ng-model="SPCCMH_Id" ng-repeat="stu in student_s_list |filter:searchchkbx" value="{{stu.amsT_Id}}">
+                                <input name="hous1" value="1" data-ng-model="stu.select" type="checkbox" ng-click="togchkbx();" ng-required="isOptionsRequired()">
+                                <span class="lbl padding-8">
+                                    {{stu.amsT_FirstName}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="error-messages edd" ng-if="interacted(myForm.hous1)" ng-messages="myForm.hous1.$error">
+                            <div ng-message="required" style="color:red">Select Student</div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col-sm-3"></div>
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" aria-disabled="false" ng-click="getreport()">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Report
+                        </md-button>
+                        <md-button type="button" class="md-raised md-warn" ng-click="cancel()">
+                            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+                        </md-button>
+                        <md-button type="button" ng-click="Print()" ng-if="student_tc_list.length > 0" class="md-raised md-primary">
+
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                            print
+                        </md-button>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+        </div>
+
+        <div class="box box-primary" ng-show="pdata">
+            <div class="box-header with-border">
+                <h3 class="box-title"> Student TC Report List</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="overflow:scroll">
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label">
+                            <b> Total Grid Records :</b>
+                            <label class="badge">
+                                {{presentCountgrid}}
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+
+
+                            <th><a href="" ng-click="order('')">SLNO</a></th>
+                            <th><a href="" ng-click="sort('')">Student Name</a></th>
+                            <th><a href="" ng-click="sort('')">Admission no</a></th>
+                            <th><a href="" ng-click="sort('')">Class</a></th>
+                            <th><a href="" ng-click="sort('')">Section</a></th>
+                            <th><a href="" ng-click="sort('')">Apply Date</a></th>
+                            <th><a href="" ng-click="sort('')">Reasion</a></th>
+                            <th><a href="" ng-click="sort('')">Status</a></th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr dir-paginate="user1 in filterValue1 = (student_tc_list | filter : searchValue)  |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                            <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td style="text-align:center">{{user1.AMST_FirstName}}</td>
+                            <td style="text-align:center">{{user1.AMST_AdmNo}}</td>
+
+                            <td style="text-align:center">{{user1.ASMCL_ClassName}}</td>
+                            <td style="text-align:center">{{user1.ASMC_SectionName}}</td>
+                            <td style="text-align:center">{{user1.ASCA_ApplyDate|date:'dd/MM/yyyy'}}</td>
+                            <td style="text-align:center">{{user1.ASCA_Reason}}</td>
+                            <td style="text-align:center">{{user1.ASCA_Status}}</td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"></dir-pagination-controls>
+            </div>
+
+
+            <div id="printSectionId" ng-show="tadprint">
+                <div class="baldwin text-center">
+                    <img src="{{imgname}}" style="height:100px;width:50%" class="img-responsive" alt="baldwin">
+                </div>
+                <center>
+                    <h4>Student Applied TC Report List</h4>
+
+                </center>
+                <br />
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+
+
+                            <th><a href="" ng-click="order('')">SLNO</a></th>
+                            <th><a href="" ng-click="sort('')">Student Name</a></th>
+                            <th><a href="" ng-click="sort('')">Admission no</a></th>
+                            <th><a href="" ng-click="sort('')">Class</a></th>
+                            <th><a href="" ng-click="sort('')">Section</a></th>
+                            <th><a href="" ng-click="sort('')">Apply Date</a></th>
+                            <th><a href="" ng-click="sort('')">Reasion</a></th>
+                            <th><a href="" ng-click="sort('')">Status</a></th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr dir-paginate="user1 in filterValue1 = (student_tc_list | filter : searchValue)  |orderBy:sortKey:sortReverse  |itemsPerPage:itemsPerPage" current-page="currentPage">
+
+                            <td style="text-align:center">{{itemsPerPage *(currentPage-1)+$index+1}}</td>
+
+                            <td style="text-align:center">{{user1.AMST_FirstName}}</td>
+                            <td style="text-align:center">{{user1.AMST_AdmNo}}</td>
+
+                            <td style="text-align:center">{{user1.ASMCL_ClassName}}</td>
+                            <td style="text-align:center">{{user1.ASMC_SectionName}}</td>
+                            <td style="text-align:center">{{user1.ASCA_ApplyDate|date:'dd/MM/yyyy'}}</td>
+                            <td style="text-align:center">{{user1.ASCA_Reason}}</td>
+                            <td style="text-align:center">{{user1.ASCA_Status}}</td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+
+
+
+        </div>
+        
+    </form>
+</section>

@@ -1,0 +1,226 @@
+﻿
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" name="myForm" data-ng-init="loaddata();" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    NoticeBoard Report
+                </h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">From Date: <span style="color:Red">*</span></label>
+                            <div class="col-sm-5">
+                                <div class="">
+                                    <md-datepicker id="FromDate" ng-model="fromdate" onkeydown="return false" name="fdate" md-placeholder="From Date" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.fdate)" ng-messages="myForm.fdate.$error">
+                                        <div ng-message="required">Select from date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">To Date: <span style="color:Red">*</span></label>
+                            <div class="col-sm-5">
+                                <div class="">
+                                    <md-datepicker id="ToDate" name="tdate" ng-model="todate" onkeydown="return false" md-placeholder="To Date"
+                                                   md-min-date="fromdate" required></md-datepicker>
+                                    <div class="error-messages" ng-if="interacted(myForm.tdate)" ng-messages="myForm.tdate.$error">
+                                        <div ng-message="required">Select To date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <label for="sel2" class="control-label col-sm-3">Class Name : </label>
+                            <div class="multiselect col-sm-8">
+                                <input class="form-control" ng-model="searchchkbx1" type="text" placeholder="search here..." />
+                                <label ng-hide="searchchkbx1.length>0">
+                                    <input name="clsoption" value="all" ng-model="all" type="checkbox" ng-click="toggleAll()">
+                                    <span class="lbl padding-8">
+                                        All
+                                    </span>
+                                </label>
+                                <label ng-repeat="cls in classlist | filter:searchchkbx1" value="{{ASMCL_Id}}">
+                                    <input type="checkbox" ng-model="cls.selected" ng-change="optionToggled(cls)" name="sec" /> <!--ng-required="isOptionsRequired()"-->
+                                    <span class="lbl padding-8">{{cls.ASMCL_ClassName}}</span>
+                                </label>
+                            </div>
+                            <div class="error-messages col-sm-offset-4" ng-if="interacted(myForm.sec)" ng-messages="myForm.sec.$error">
+                                <div ng-message="required">Please Select any one Class</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <span>
+                            <md-button type="submit" class="md-raised md-primary" id="save-btn" ng-click="showreport()">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Report
+                            </md-button>
+                        </span>
+                        <md-button type="submit" class="md-raised md-warn" data-ng-click="Clearid();">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Cancel
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-primary" ng-show="classreportlist.length>0 || classreportlist.length!=null">
+            <div class="box-header with-border">
+                <h3 class="box-title">NoticeBoard Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                <div class="">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="control-label">
+                                <b> Total Grid Records :</b>
+                                <label class="badge">
+                                    {{classreportlist.length}}
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+
+                            <th>SL.NO</th>
+                            <th>Title</th>
+                            <th>Class  </th>
+                            <th> File Name </th>
+                            <th>Upload Date</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr dir-paginate="user in filterValue1=(classreportlist  | filter:filterValue) | orderBy:sortKey:reverse |itemsPerPage:itemsPerPage1" current-page="currentPage1" pagination-id="paginate1">
+
+
+                            <td>{{itemsPerPage1 *(currentPage1-1)+$index+1}}</td>
+                            <td style="text-align:left">{{ user.INTB_Title}}</td>
+                            <td style="text-align:center">{{ user.ASMCL_ClassName}}</td>
+                            <td style="text-align:left">{{ user.INTBUPL_FileName}}</td>
+                            <td style="text-align:center">{{ user.INTBUPL_Date |date:'dd-MM-yyyy'}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <dir-pagination-controls max-size="5" pagination-id="paginate1" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                <hr />
+                <div class="">
+                    <div class="text-center">
+                        <md-button type="submit" class="md-raised md-primary" ng-click="exportToExcel('#tableex')" target="_blank">
+                            Export to Excel
+                        </md-button>
+                        <md-button type="submit" class="md-raised md-warn" ng-click="printData();">
+                            Print
+                        </md-button>
+
+
+                    </div>
+                </div>
+            </div>
+            <div id="printSectionId" ng-show=false style="overflow:scroll">
+                <div class="">
+                    <div class="baldwin text-center">
+                        <img src="{{imgname}}" class="img-responsive" alt="baldwin">
+                    </div>
+                </div>
+                <center> <h4><u> NoticeBoard Report </u></h4></center>
+                <table class="table-bordered" id="table">
+                    <thead>
+                        <tr>
+                            <th style="width:8%">SL.NO</th>
+                            <th>Title</th>
+                            <th style="width:10%">Class  </th>
+                            <th> File Name </th>
+                            <th style="width:15%">Upload Date</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in classreportlist | orderBy:sortKey:reverse">
+                            <td style="text-align:center">{{$index+1}}</td>
+                            <td style="text-align:left">{{ user.INTB_Title}}</td>
+                            <td style="text-align:center">{{ user.ASMCL_ClassName}}</td>
+                            <td style="text-align:left">{{ user.INTBUPL_FileName}}</td>
+                            <td style="text-align:center">{{ user.INTBUPL_Date |date:'dd-MM-yyyy'}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="margin-top-10">
+                        <tr>
+                            <td colspan="16" class="col-sm-12 text-center margin-top-2">
+                                <label>
+                                    Date:{{ddate|date:'dd/MM/yyyy'}} UserName: {{usrname}} {{coptyright}}
+                                </label>
+
+                            </td>
+                        </tr>
+
+                    </tfoot>
+                </table>
+            </div>
+
+
+            <div id="tableexcell" ng-show=false class="table-bordered text-center" style="overflow:scroll">
+
+
+                <table class="table table-hover table-responsive table-bordered text-center" id="tableex">
+                    <thead>
+                        <tr style="border:0.5px solid black">
+                            <th>SL.NO</th>
+                            <th>Title</th>
+                            <th>Class  </th>
+                            <th> File Name </th>
+                            <th>Upload Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in classreportlist | orderBy:sortKey:reverse">
+                            <td style="text-align:center">{{$index+1}}</td>
+                            <td style="text-align:left">{{ user.INTB_Title}}</td>
+                            <td style="text-align:center">{{ user.ASMCL_ClassName}}</td>
+                            <td style="text-align:left">{{ user.INTBUPL_FileName}}</td>
+                            <td style="text-align:center">{{ user.INTBUPL_Date |date:'dd-MM-yyyy'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </form>
+</section>

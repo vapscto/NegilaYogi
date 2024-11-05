@@ -1,0 +1,287 @@
+<style>
+    .k-icon, .k-tool-icon {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        width: 0em !important;
+        height: 0em !important;
+        text-align: center;
+        vertical-align: middle;
+        background-image: none;
+        font: 16px/1 WebComponentsIcons;
+        speak: none;
+        font-variant: normal;
+        text-transform: none;
+        text-indent: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: inherit;
+    }
+    .k-filter-row th, .k-grid-header th.k-header {
+        overflow: hidden;
+        border-style: solid;
+        border-width: 0 0 1px 1px;
+        /*padding: 18.5em 12.6em 0.4em 0.6em;*/
+        font-weight: 400;
+        white-space: normal !important;
+        text-overflow: ellipsis;
+        text-align: left;
+    }
+</style>
+
+<section class="content">
+    <form class="form-horizontal ng-pristine ng-valid" role="form" data-ng-init="loaddata()" name="myForm" novalidate>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Income Report</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" ng-click="ShowHideup()"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Academic Year:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="sel1" ng-model="asmaY_Id" name="acd_year" required>
+                                    <option value="">Select</option>
+                                    <option value="0">All</option>
+                                    <option ng-repeat="year in yearlist" value="{{year.asmaY_Id}}"> {{year.asmaY_Year}} </option>
+                                </select>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.acd_year)" ng-messages="myForm.acd_year.$error">
+                                <div ng-message="required" style="margin-left:195px;">Please Select the Academic Year</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">From Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-4 input-group text-right" style="">
+                                <md-datepicker ng-model="FMCB_fromDATE" onkeydown="return false" name="From_Date" id="date1" md-placeholder="Enter  date" ng-change="fromdatechange()" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.From_Date)" ng-messages="myForm.From_Date.$error">
+                                <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                            <label class="control-label col-sm-3">To Date:<strong style="color:red;display:inline; font-weight: bolder; margin-left: 7px;">*</strong></label>
+                            <div class="col-sm-4 input-group text-right" style="">
+                                <md-datepicker ng-model="FMCB_toDATE" onkeydown="return false" name="To_Date" id="date2" md-placeholder="Enter  date" ng-change="todatechange()" required></md-datepicker>
+                            </div>
+                            <div class="error-messages" ng-if="interacted(myForm.To_Date)" ng-messages="myForm.To_Date.$error">
+                                <div ng-message="required" style="margin-left:210px; ">Please Select Date</div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>                
+                <hr />
+                <div class="text-center" ng-show="IsHiddenup">
+                    <md-button type="submit" class="md-raised md-primary" ng-disabled="form.$invalid" id="save-btn" ng-click="ShowReport()">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                        Report
+                    </md-button>
+                    <md-button type="button" class="md-raised md-warn" data-ng-click="Clearid()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                    </md-button>
+                    <md-button type="button" class="md-raised md-primary" ng-click="exportToExcel()" target="_blank">
+                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        Export to Excel
+                    </md-button>
+
+                    <md-button type="button" class="md-raised md-primary" id="print-btn" ng-click="printData();">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        Print
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-body" ng-show="termflg == true">
+
+        </div>
+        <div class="box-body" ng-show="stdtermflg == true">
+
+        </div>
+    </form>
+
+    <div class="box box-primary" ng-show="Grid_view">
+        <div class="box-header with-border">
+            <h3 class="box-title">Income Report</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-placement="bottom" data-toggle="tooltip" title="collapsible"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <!--<div class="box-body" ng-show="std==true">
+            <div id="gridall"></div>
+        </div>-->
+        <div class="box-body">            
+            <div class="col-sm-12 text-center">
+                <div class="row">
+                    <div class="col-sm-1">&nbsp;</div>
+                    <div class="col-sm-2 text-left" style="margin-left: -100px;">
+                        <img ng-src="https://dcampusstrg.blob.core.windows.net/files/17/ISM_Attachments/90fae0a6-421b-40c6-a358-7dbedde5bd71.png" style="width: 100px;" />
+                    </div>
+                    <div class="col-sm-8 text-left" style="padding-left: 200px;">
+                        <p style="font-weight: bold; font-size: 30px;margin-top: 35px !important;">VIDYA VIKASA VIDYA SAMSTHE (R)</p>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="col-sm-1">&nbsp;</div>
+                    <div class="col-sm-10">
+                        <b style="font-size:18px">{{FMCB_fromDATE | date:'dd/MM/yyyy'}} EXPENSE/INCOME REPORT</b>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 px-0">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th colspan="2" class="text-center" style="font-size:20px"><b>Income</b></th>
+                        </tr>
+                        <tr>
+                            <th style="font-size:20px"><b>Sl No</b></th>
+                            <th style="font-size:20px"><b>Description</b></th>
+                            <th style="font-size:20px"><b>Amount</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in incomereport">
+                            <td style="font-size:15px"><b>{{$index+1}}</b></td>
+                            <td style="font-size:15px">{{user.Payment_Mode}}</td>
+                            <td style="font-size:15px"><b>{{user.FYP_Tot_Amount}}</b></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="text-right" style="font-size:20px"><b>Total</b></td>
+                            <td style="font-size:20px"><b>{{income_cnt}}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-6 px-0" style="margin-left: -30px;">
+                <table class="table table-hover table-responsive table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th colspan="2" class="text-center" style="font-size:20px"><b>Expense</b></th>
+                        </tr>
+                        <tr>
+                            <th width="80" style="font-size:20px"><b>Sl No</b></th>
+                            <th style="font-size:20px"><b>Description</b></th>
+                            <th width="160" style="font-size:15px"><b>Amount</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in expensereport">
+                            <td style="font-size:15px"><b>{{$index+1}}</b></td>
+                            <td style="font-size:15px">{{user.Particular}}</td>
+                            <td style="font-size:15px"><b>{{user.PCREQTNDET_Amount}}</b></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="text-right" style="font-size:20px"><b>Total</b></td>
+                            <td style="font-size:20px"><b>{{expense_cnt}}</b></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="text-right" style="font-size:20px"><b>Closing Balance</b></td>
+                            <td style="font-size:20px"><b>{{closeing_bal}}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!--Daily Collection Report Print-->
+            <div id="printdailycollectionreport" style="overflow:scroll" ng-show="tadprint">
+                <div class="col-sm-12 text-center">
+                    <div class="row">
+                        <div class="col-sm-1">&nbsp;</div>
+                        <div class="col-sm-2 text-left" style="margin-left: -100px;">
+                            <img ng-src="https://dcampusstrg.blob.core.windows.net/files/17/ISM_Attachments/90fae0a6-421b-40c6-a358-7dbedde5bd71.png" style="width: 100px;" />
+                        </div>
+                        <div class="col-sm-8 text-left" style="padding-left: 180px;">
+                            <p style="font-weight: bold; font-size: 30px;margin-top: 35px !important;">VIDYA VIKASA VIDYA SAMSTHE (R)</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-1">&nbsp;</div>
+                        <div class="col-sm-10">
+                            <b style="font-size:18px;padding-left: 100px;">{{FMCB_fromDATE | date:'dd/MM/yyyy'}} EXPENSE/INCOME REPORT</b>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="tablecldaily">
+                    <div class="col-sm-6 px-0">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="2" class="text-center" style="font-size:25px"><b>Income</b></th>
+                                </tr>
+                                <tr>
+                                    <th style="font-size:20px"><b>Sl No</b></th>
+                                    <th style="font-size:20px"><b>Description</b></th>
+                                    <th style="font-size:20px"><b>Amount</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in incomereport">
+                                    <td style="font-size:15px"><b>{{$index+1}}</b></td>
+                                    <td style="font-size:15px">{{user.Payment_Mode}}</td>
+                                    <td style="font-size:15px"><b>{{user.FYP_Tot_Amount}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-right" style="font-size:20px"><b>Total</b></td>
+                                    <td style="font-size:20px"><b>{{income_cnt}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-6 px-0" style="margin-left: -30px;">
+                        <table class="table table-hover table-responsive table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="2" class="text-center" style="font-size:25px"><b>Expense</b></th>
+                                </tr>
+                                <tr>
+                                    <th width="80" style="font-size:20px"><b>Sl No</b></th>
+                                    <th style="font-size:20px"><b>Description</b></th>
+                                    <th width="160" style="font-size:20px"><b>Amount</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in expensereport">
+                                    <td style="font-size:15px"><b>{{$index+1}}</b></td>
+                                    <td style="font-size:15px">{{user.Particular}}</td>
+                                    <td style="font-size:15px"><b>{{user.PCREQTNDET_Amount}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-right" style="font-size:20px"><b>Total</b></td>
+                                    <td style="font-size:20px"><b>{{expense_cnt}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-right" style="font-size:20px"><b>Closing Balance</b></td>
+                                    <td style="font-size:20px"><b>{{closeing_bal}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <pagination total-items="totalItems" ng-model="currentPage"
+                        max-size="5" boundary-links="true"
+                        items-per-page="numPerPage" class="pagination-sm">
+            </pagination>
+        </div>
+    </div>
+</section>
+
+
